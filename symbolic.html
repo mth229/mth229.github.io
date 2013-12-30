@@ -579,9 +579,11 @@ function next_nav_tab() {$('.tabbable li').filter('.active').next('li').find('a[
 
 <p>The <code>julia</code> language bills itself as &quot;fresh approach to technical computing.&quot; By saying &quot;fresh&quot; the implication is that there exists many older approaches to technical computing. Indeed there are. For mathematical areas there are three different philosophies for computing: symbolic, numeric, and general purpose. The symbolic approach is the domain of Computer Algebra Systems (CAS), and is exemplified by very comprehensive programs like <code>Mathematica</code>, <code>Maple</code> and the open-source alternative <code>Sage</code>. The numeric approach is the domain of tailored programming languages such as <code>MATLAB</code> and <code>R</code>. A general purpose approach would be to leverage a widely used programming language, such as <code>Python</code> or <code>Haskell</code>, for a specific use. The <code>julia</code> language is an alternative approach to <code>MATLAB</code> or <code>R</code> for numerical computation.</p>
 <p>One strength of <code>julia</code> is how well it plays with others. This is leveraged in the <code>SymPy</code> package for <code>julia</code> to provide a symbolic math interface through a connection to <code>Python</code> and its <code>SymPy</code> package via julia's <code>PyCall</code> package. We see in this project how this additional functionality affords an alternative approach to performing calculus problems.</p>
-<p>The <code>SymPy</code> package for <code>julia</code> is an add on. If not already installed, one can install it through the command</p>
+<p>The <code>SymPy</code> package for <code>julia</code> is an add on, it is loaded into a session with the command</p>
+<pre class="sourceCode julia"><code class="sourceCode julia"><span class="kw">using</span> SymPy</code></pre>
+<p>If the package is not already installed, it can be installed through the command</p>
 <pre class="sourceCode julia" execute="false"><code class="sourceCode julia">Pkg.add(<span class="st">&quot;SymPy&quot;</span>)</code></pre>
-<p>In order for this to work, you should have a working version of <code>Python</code> on you computer and the <code>SymPy</code> package for <code>Python</code> installed for that.</p>
+<p>The package itself requires a version of <code>Python</code> that works with <code>julia</code>'s <code>PyCall</code> package <em>and</em> a version of sympy installed for <code>Python</code>.</p>
 <div class="pagination">
 <ul><li>
 <button class="btn btn-default" onclick="next_nav_tab()">
@@ -617,7 +619,7 @@ f(x)                           <span class="co">## takes a symbolic object and r
  ───
   2 
 ℯ   </code></pre>
-<p>This shows that function object <code>f</code> will map a symbolic object to another symbolic object.</p>
+<p>This shows that the function object <code>f</code> will map a symbolic object to another symbolic object.</p>
 <p>In <code>SymPy</code>, the <code>subs</code> function allows you to evaluate a symbolic expression for a given value. For example,</p>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">subs(f(x), x, <span class="fl">1</span>)        <span class="co">## set x equal to 1</span></code></pre>
 <pre class="output"><code> -1/2
@@ -664,7 +666,7 @@ sin (x) + cos (x)</code></pre>
 x  + 6⋅x  + 11⋅x + 6</code></pre>
 <h3 id="solving-equations">Solving equations</h3>
 <p>We can now see how to use symbolic expressions. First we discuss solving for when an expression is 0.</p>
-<p>For polynomials, the <code>real_roots</code> function will find the real roots, returning them as <code>julia</code> numbers:</p>
+<p>For polynomials, the <code>real_roots</code> function will find the real roots, returning them as symbolic answers:</p>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">real_roots(x^<span class="fl">2</span> + x - <span class="fl">1</span>) </code></pre>
 <pre class="output"><code>2-element Array{Sym,1}:
          ___
@@ -675,11 +677,12 @@ x  + 6⋅x  + 11⋅x + 6</code></pre>
   ╲╱ 5    1
 - ───── - ─
     2     2</code></pre>
-<p>If the formatting is hard to read, there is a way to get a simplified printout:</p>
+<p>If the formatting is hard to read (or there is an error), there is a way to get a simplified printout:</p>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">real_roots(x^<span class="fl">2</span> + x - <span class="fl">1</span>) |&gt; jprint <span class="co"># simplified output</span></code></pre>
 <pre class="output"><code>2-element Array{ASCIIString,1}:
  &quot;-1/2 + sqrt(5)/2&quot;
  &quot;-sqrt(5)/2 - 1/2&quot;</code></pre>
+<p>(It may be necessary to upgrade <code>SymPy</code> to have the printing of arrays work properly.)</p>
 <p>More generally, the <code>solve</code> command can be used to solve equations -- and not just polynomial equations -- symbolically. The same problem above becomes:</p>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">solve(x^<span class="fl">2</span> + x -<span class="fl">1</span>, x)</code></pre>
 <pre class="output"><code>2-element Array{Sym,1}:
@@ -920,56 +923,1737 @@ Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
 <div  class="tab-pane" id="_graphing_expressions_">
 
 <h2 id="graphing-expressions">Graphing expressions</h2>
-<p>Plotting symbolic expressions can be done directly without bringing them back into <code>julia</code>. For example, here we plot the function <span class="math">\(f(x) = \sin(x^4) - \cos(x^4)\)</span> over <span class="math">\([0,1]\)</span>:</p>
-<pre class="sourceCode julia" results="block"><code class="sourceCode julia">f(x) = sin(x^<span class="fl">4</span>) - cos(x^<span class="fl">4</span>)
-plot(f(x), <span class="fl">0</span>, <span class="fl">1</span>)</code></pre>
-<figure>
-  <object alt="Figure 1" data="judo_figure_1.svg" type="image/svg+xml">
-  </object>
-  <figcaption>
-    
-  </figcaption>
-</figure>
+<p>Plotting a symbolic expression is done by coercing the expression into a function. One way to do this, is this idiom:</p>
+<pre class="sourceCode julia" results="block"><code class="sourceCode julia">ex = x^<span class="fl">2</span> - <span class="fl">2</span>x + <span class="fl">4</span>
+f(u) = float(subs(ex, x, u))
+plot(f, -<span class="fl">1</span>, <span class="fl">3</span>)</code></pre>
+<div id="gadflyplot-HzBNzV1oILuynN8F7E3B"></div>
+<script>
+function draw_with_data(data, parent_id) {
+  var g = d3.select(parent_id)
+            .append("svg")
+              .attr("width", "120mm")
+              .attr("height", "80mm")
+              .attr("viewBox", "0 0 120 80")
+              .attr("stroke-width", "0.5")
+              .attr("style", "stroke:black;fill:black");
+  g.append("defs");
+  var ctx = {
+      "scale": 1.0,
+      "tx": 0.0,
+      "ty": 0.0
+  };
+(function (g) {
+  g.attr("class", "plotroot xscalable yscalable");
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#4C404B")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.18px")
+     .attr("class", "guide ylabels");
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 15.41)
+         .attr("y", 87.19)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("1");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 15.41)
+         .attr("y", 73.76)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("2");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 15.41)
+       .attr("y", 33.47)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("5");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 15.41)
+         .attr("y", -33.68)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("10");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 15.41)
+         .attr("y", 127.48)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("-2");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 15.41)
+       .attr("y", 60.33)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("3");
+})
+;
+    g.append("svg:text")
+       .attr("x", 15.41)
+       .attr("y", 6.61)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("7");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 15.41)
+         .attr("y", -47.11)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("11");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 15.41)
+       .attr("y", 46.9)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("4");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 15.41)
+         .attr("y", -6.82)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("8");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 15.41)
+       .attr("y", 20.04)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("6");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 15.41)
+         .attr("y", 100.62)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("0");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 15.41)
+         .attr("y", -20.25)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("9");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 15.41)
+         .attr("y", -60.54)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("12");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 15.41)
+         .attr("y", 114.05)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("-1");
+})
+;
+    }(g.append("g")));
+  }(g.append("g")));
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#362A35")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.88px");
+    g.append("svg:text")
+       .attr("x", 7.94)
+       .attr("y", 33.47)
+       .attr("text-anchor", "middle")
+       .style("dominant-baseline", "central")
+       .attr("transform", "rotate(-90, 7.94, 33.47)")
+    .call(function(text) {
+  text.text("f(x)");
+})
+;
+  }(g.append("g")));
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#4C404B")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.18px")
+     .attr("class", "guide xlabels");
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -73.8)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-5");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 65.71)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("1");
+})
+;
+    g.append("svg:text")
+       .attr("x", 88.96)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("2");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 158.71)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -50.55)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-4");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -4.05)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-2");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 112.21)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("3");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 205.22)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("7");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -97.06)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-6");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -27.3)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-3");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 135.46)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("4");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 228.47)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("8");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 181.97)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("6");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 42.45)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("0");
+})
+;
+    g.append("svg:text")
+       .attr("x", 19.2)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("-1");
+})
+;
+  }(g.append("g")));
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#362A35")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.88px");
+    g.append("svg:text")
+       .attr("x", 65.71)
+       .attr("y", 73)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("x");
+})
+;
+  }(g.append("g")));
+  (function (g) {
+    g.on("mouseover", guide_background_mouseover("#C6C6C9"))
+     .on("mouseout", guide_background_mouseout("#F0F0F3"))
+     .call(zoom_behavior(ctx))
+;
+    (function (g) {
+      d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath0")
+    .append("svg:path")
+      .attr("d", " M16.41,5 L 115 5 115 61.94 16.41 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath0)");
+      (function (g) {
+        g.attr("class", "guide background")
+         .attr("stroke", "#F1F1F5")
+         .attr("fill", "#FAFAFA");
+        g.append("svg:path")
+           .attr("d", "M16.41,5 L 115 5 115 61.94 16.41 61.94 z");
+      }(g.append("g")));
+      (function (g) {
+        g.attr("stroke", "#F0F0F3")
+         .attr("stroke-width", 0.2)
+         .attr("class", "guide ygridlines xfixed");
+        g.append("svg:path")
+           .attr("d", "M16.41,73.76 L 115 73.76");
+        g.append("svg:path")
+           .attr("d", "M16.41,-33.68 L 115 -33.68");
+        g.append("svg:path")
+           .attr("d", "M16.41,60.33 L 115 60.33");
+        g.append("svg:path")
+           .attr("d", "M16.41,-47.11 L 115 -47.11");
+        g.append("svg:path")
+           .attr("d", "M16.41,-6.82 L 115 -6.82");
+        g.append("svg:path")
+           .attr("d", "M16.41,100.62 L 115 100.62");
+        g.append("svg:path")
+           .attr("d", "M16.41,-60.54 L 115 -60.54");
+        g.append("svg:path")
+           .attr("d", "M16.41,114.05 L 115 114.05");
+        g.append("svg:path")
+           .attr("d", "M16.41,-20.25 L 115 -20.25");
+        g.append("svg:path")
+           .attr("d", "M16.41,20.04 L 115 20.04");
+        g.append("svg:path")
+           .attr("d", "M16.41,46.9 L 115 46.9");
+        g.append("svg:path")
+           .attr("d", "M16.41,6.61 L 115 6.61");
+        g.append("svg:path")
+           .attr("d", "M16.41,127.48 L 115 127.48");
+        g.append("svg:path")
+           .attr("d", "M16.41,33.47 L 115 33.47");
+        g.append("svg:path")
+           .attr("d", "M16.41,87.19 L 115 87.19");
+      }(g.append("g")));
+      (function (g) {
+        g.attr("stroke", "#F0F0F3")
+         .attr("stroke-width", 0.2)
+         .attr("class", "guide xgridlines yfixed");
+        g.append("svg:path")
+           .attr("d", "M65.71,5 L 65.71 61.94");
+        g.append("svg:path")
+           .attr("d", "M158.71,5 L 158.71 61.94");
+        g.append("svg:path")
+           .attr("d", "M-4.05,5 L -4.05 61.94");
+        g.append("svg:path")
+           .attr("d", "M205.22,5 L 205.22 61.94");
+        g.append("svg:path")
+           .attr("d", "M-27.3,5 L -27.3 61.94");
+        g.append("svg:path")
+           .attr("d", "M228.47,5 L 228.47 61.94");
+        g.append("svg:path")
+           .attr("d", "M42.45,5 L 42.45 61.94");
+        g.append("svg:path")
+           .attr("d", "M19.2,5 L 19.2 61.94");
+        g.append("svg:path")
+           .attr("d", "M181.97,5 L 181.97 61.94");
+        g.append("svg:path")
+           .attr("d", "M135.46,5 L 135.46 61.94");
+        g.append("svg:path")
+           .attr("d", "M-97.06,5 L -97.06 61.94");
+        g.append("svg:path")
+           .attr("d", "M112.21,5 L 112.21 61.94");
+        g.append("svg:path")
+           .attr("d", "M-50.55,5 L -50.55 61.94");
+        g.append("svg:path")
+           .attr("d", "M88.96,5 L 88.96 61.94");
+        g.append("svg:path")
+           .attr("d", "M-73.8,5 L -73.8 61.94");
+      }(g.append("g")));
+    }(g.append("g")));
+    (function (g) {
+      d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath1")
+    .append("svg:path")
+      .attr("d", " M16.41,5 L 115 5 115 61.94 16.41 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath1)");
+      (function (g) {
+        g.attr("class", "plotpanel");
+        (function (g) {
+          g.attr("stroke", "#00BFFF")
+           .attr("class", "geometry")
+           .attr("fill", "none")
+           .attr("stroke-width", 0.3);
+          g.append("svg:path")
+             .attr("d", "M19.2,6.61 L 19.57 7.47 19.95 8.32 20.32 9.16 20.69 9.99 21.06 10.82 21.43 11.65 21.81 12.46 22.18 13.27 22.55 14.07 22.92 14.86 23.29 15.65 23.67 16.43 24.04 17.2 24.41 17.97 24.78 18.73 25.16 19.48 25.53 20.23 25.9 20.97 26.27 21.7 26.64 22.43 27.02 23.15 27.39 23.86 27.76 24.56 28.13 25.26 28.5 25.95 28.88 26.64 29.25 27.31 29.62 27.98 29.99 28.65 30.36 29.3 30.74 29.95 31.11 30.6 31.48 31.23 31.85 31.86 32.22 32.48 32.6 33.1 32.97 33.71 33.34 34.31 33.71 34.9 34.08 35.49 34.46 36.07 34.83 36.65 35.2 37.21 35.57 37.78 35.94 38.33 36.32 38.88 36.69 39.42 37.06 39.95 37.43 40.47 37.8 40.99 38.18 41.51 38.55 42.01 38.92 42.51 39.29 43 39.66 43.49 40.04 43.96 40.41 44.43 40.78 44.9 41.15 45.36 41.52 45.81 41.9 46.25 42.27 46.69 42.64 47.12 43.01 47.54 43.38 47.96 43.76 48.36 44.13 48.77 44.5 49.16 44.87 49.55 45.24 49.93 45.62 50.31 45.99 50.68 46.36 51.04 46.73 51.39 47.1 51.74 47.48 52.08 47.85 52.41 48.22 52.74 48.59 53.06 48.96 53.37 49.34 53.68 49.71 53.98 50.08 54.27 50.45 54.55 50.83 54.83 51.2 55.1 51.57 55.37 51.94 55.63 52.31 55.88 52.69 56.12 53.06 56.36 53.43 56.59 53.8 56.81 54.17 57.03 54.55 57.24 54.92 57.44 55.29 57.64 55.66 57.83 56.03 58.01 56.41 58.18 56.78 58.35 57.15 58.51 57.52 58.67 57.89 58.82 58.27 58.96 58.64 59.09 59.01 59.22 59.38 59.34 59.75 59.45 60.13 59.56 60.5 59.66 60.87 59.75 61.24 59.84 61.61 59.92 61.99 59.99 62.36 60.05 62.73 60.11 63.1 60.16 63.47 60.21 63.85 60.25 64.22 60.28 64.59 60.3 64.96 60.32 65.33 60.33 65.71 60.33 66.08 60.33 66.45 60.32 66.82 60.3 67.19 60.28 67.57 60.25 67.94 60.21 68.31 60.16 68.68 60.11 69.05 60.05 69.43 59.99 69.8 59.92 70.17 59.84 70.54 59.75 70.91 59.66 71.29 59.56 71.66 59.45 72.03 59.34 72.4 59.22 72.77 59.09 73.15 58.96 73.52 58.82 73.89 58.67 74.26 58.51 74.63 58.35 75.01 58.18 75.38 58.01 75.75 57.83 76.12 57.64 76.5 57.44 76.87 57.24 77.24 57.03 77.61 56.81 77.98 56.59 78.36 56.36 78.73 56.12 79.1 55.88 79.47 55.63 79.84 55.37 80.22 55.1 80.59 54.83 80.96 54.55 81.33 54.27 81.7 53.98 82.08 53.68 82.45 53.37 82.82 53.06 83.19 52.74 83.56 52.41 83.94 52.08 84.31 51.74 84.68 51.39 85.05 51.04 85.42 50.68 85.8 50.31 86.17 49.93 86.54 49.55 86.91 49.16 87.28 48.77 87.66 48.36 88.03 47.96 88.4 47.54 88.77 47.12 89.14 46.69 89.52 46.25 89.89 45.81 90.26 45.36 90.63 44.9 91 44.43 91.38 43.96 91.75 43.49 92.12 43 92.49 42.51 92.86 42.01 93.24 41.51 93.61 40.99 93.98 40.47 94.35 39.95 94.72 39.42 95.1 38.88 95.47 38.33 95.84 37.78 96.21 37.21 96.58 36.65 96.96 36.07 97.33 35.49 97.7 34.9 98.07 34.31 98.44 33.71 98.82 33.1 99.19 32.48 99.56 31.86 99.93 31.23 100.3 30.6 100.68 29.95 101.05 29.3 101.42 28.65 101.79 27.98 102.17 27.31 102.54 26.64 102.91 25.95 103.28 25.26 103.65 24.56 104.03 23.86 104.4 23.15 104.77 22.43 105.14 21.7 105.51 20.97 105.89 20.23 106.26 19.48 106.63 18.73 107 17.97 107.37 17.2 107.75 16.43 108.12 15.65 108.49 14.86 108.86 14.07 109.23 13.27 109.61 12.46 109.98 11.65 110.35 10.82 110.72 9.99 111.09 9.16 111.47 8.32 111.84 7.47 112.21 6.61");
+        }(g.append("g")));
+      }(g.append("g")));
+    }(g.append("g")));
+    (function (g) {
+      d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath2")
+    .append("svg:path")
+      .attr("d", " M16.41,5 L 115 5 115 61.94 16.41 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath2)");
+      (function (g) {
+        g.attr("stroke", "none")
+         .attr("class", "guide zoomslider")
+         .attr("opacity", 0.00);
+        (function (g) {
+          g.attr("stroke", "#6A6A6A")
+           .attr("stroke-opacity", 0.00)
+           .attr("stroke-width", 0.3)
+           .attr("fill", "#EAEAEA")
+           .on("click", zoomin_behavior(ctx))
+.on("dblclick", function() { d3.event.stopPropagation(); })
+.on("mouseover", zoomslider_button_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_button_mouseover("#6a6a6a"))
+;
+          g.append("svg:path")
+             .attr("d", "M108,8 L 112 8 112 12 108 12 z");
+          (function (g) {
+            g.attr("fill", "#6A6A6A")
+             .attr("class", "button_logo");
+            g.append("svg:path")
+               .attr("d", "M108.8,9.6 L 109.6 9.6 109.6 8.8 110.4 8.8 110.4 9.6 111.2 9.6 111.2 10.4 110.4 10.4 110.4 11.2 109.6 11.2 109.6 10.4 108.8 10.4 z");
+          }(g.append("g")));
+        }(g.append("g")));
+        (function (g) {
+          g.attr("fill", "#EAEAEA")
+           .on("click", zoomslider_track_behavior(ctx, 82, 99));
+          g.append("svg:path")
+             .attr("d", "M88.5,8 L 107.5 8 107.5 12 88.5 12 z");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("fill", "#6A6A6A")
+           .attr("class", "zoomslider_thumb")
+           .call(zoomslider_behavior(ctx, 82, 99))
+.on("mouseover", zoomslider_thumb_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_thumb_mouseover("#6a6a6a"))
+;
+          g.append("svg:path")
+             .attr("d", "M97,8 L 99 8 99 12 97 12 z");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("stroke", "#6A6A6A")
+           .attr("stroke-opacity", 0.00)
+           .attr("stroke-width", 0.3)
+           .attr("fill", "#EAEAEA")
+           .on("click", zoomout_behavior(ctx))
+.on("dblclick", function() { d3.event.stopPropagation(); })
+.on("mouseover", zoomslider_button_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_button_mouseover("#6a6a6a"))
+;
+          g.append("svg:path")
+             .attr("d", "M84,8 L 88 8 88 12 84 12 z");
+          (function (g) {
+            g.attr("fill", "#6A6A6A")
+             .attr("class", "button_logo");
+            g.append("svg:path")
+               .attr("d", "M84.8,9.6 L 87.2 9.6 87.2 10.4 84.8 10.4 z");
+          }(g.append("g")));
+        }(g.append("g")));
+      }(g.append("g")));
+    }(g.append("g")));
+  }(g.append("g")));
+}(g.append("g")));
+    d3.select(parent_id)
+      .selectAll("path")
+      .each(function() {
+          var sw = parseFloat(window.getComputedStyle(this).getPropertyValue("stroke-width"));
+          d3.select(this)
+            .attr("vector-effect", "non-scaling-stroke")
+            .style("stroke-width", sw + "mm");
+      });
+}
 
-<p>This is very similar to how we can plot a function object, <code>f</code>, using <code>plot</code>, but note that <code>f(x)</code> is a symbolic expression, not a function object:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">(typeof(f(x)), typeof(f))
-<span class="co">## (Sym,Function)</span></code></pre>
-<p>Graphing more than one function at a time is possible. We just specify an array of symbolic expressions. For example, to graph a function and its tangent line at a point we can do this.</p>
+var data = [
+];
+
+var draw = function(parent_id) {
+    draw_with_data(data, parent_id);
+};
+
+draw("#gadflyplot-HzBNzV1oILuynN8F7E3B");
+</script>
+
+
+<p>This can be formalized by creating a function to convert an expression into a function. Such a formula is present in <code>SymPy</code>. Here we simplify the act by assuming our expression only involves a symbolic value of <code>x</code>:</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">asf(ex::Sym) = u -&gt; float(subs(ex, x, u))</code></pre>
+<p>Here we show how to plot the function <span class="math">\(f(x) = \sin(x^4) - \cos(x^4)\)</span> over <span class="math">\([0,1]\)</span>:</p>
+<pre class="sourceCode julia" results="block"><code class="sourceCode julia">f(x) = sin(x^<span class="fl">4</span>) - cos(x^<span class="fl">4</span>)
+plot(asf(f(x)), <span class="fl">0</span>, <span class="fl">1</span>)</code></pre>
+<div id="gadflyplot-U5s7J840SzEU7CCmKXvE"></div>
+<script>
+function draw_with_data(data, parent_id) {
+  var g = d3.select(parent_id)
+            .append("svg")
+              .attr("width", "120mm")
+              .attr("height", "80mm")
+              .attr("viewBox", "0 0 120 80")
+              .attr("stroke-width", "0.5")
+              .attr("style", "stroke:black;fill:black");
+  g.append("defs");
+  var ctx = {
+      "scale": 1.0,
+      "tx": 0.0,
+      "ty": 0.0
+  };
+(function (g) {
+  g.attr("class", "plotroot xscalable yscalable");
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#4C404B")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.18px")
+     .attr("class", "guide ylabels");
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", -65.02)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("2.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", 78.24)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("-1.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", 114.05)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("-2.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", -11.3)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("1.0");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", -47.11)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("2.0");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", -29.2)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("1.5");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 17.35)
+       .attr("y", 6.61)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("0.5");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", 96.15)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("-2.0");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 17.35)
+       .attr("y", 42.43)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("-0.5");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", 131.96)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("-3.0");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 17.35)
+       .attr("y", 24.52)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("0.0");
+})
+;
+    g.append("svg:text")
+       .attr("x", 17.35)
+       .attr("y", 60.33)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("-1.0");
+})
+;
+  }(g.append("g")));
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#362A35")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.88px");
+    g.append("svg:text")
+       .attr("x", 7.94)
+       .attr("y", 33.47)
+       .attr("text-anchor", "middle")
+       .style("dominant-baseline", "central")
+       .attr("transform", "rotate(-90, 7.94, 33.47)")
+    .call(function(text) {
+  text.text("f(x)");
+})
+;
+  }(g.append("g")));
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#4C404B")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.18px")
+     .attr("class", "guide xlabels");
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 249.03)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("2.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -24.5)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-0.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 203.44)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("2.0");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 157.85)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("1.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -115.68)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-1.5");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 66.68)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("0.5");
+})
+;
+    g.append("svg:text")
+       .attr("x", 112.26)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("1.0");
+})
+;
+    g.append("svg:text")
+       .attr("x", 21.09)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("0.0");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -70.09)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-1.0");
+})
+;
+    }(g.append("g")));
+  }(g.append("g")));
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#362A35")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.88px");
+    g.append("svg:text")
+       .attr("x", 66.68)
+       .attr("y", 73)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("x");
+})
+;
+  }(g.append("g")));
+  (function (g) {
+    g.on("mouseover", guide_background_mouseover("#C6C6C9"))
+     .on("mouseout", guide_background_mouseout("#F0F0F3"))
+     .call(zoom_behavior(ctx))
+;
+    (function (g) {
+      d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath0")
+    .append("svg:path")
+      .attr("d", " M18.35,5 L 115 5 115 61.94 18.35 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath0)");
+      (function (g) {
+        g.attr("class", "guide background")
+         .attr("stroke", "#F1F1F5")
+         .attr("fill", "#FAFAFA");
+        g.append("svg:path")
+           .attr("d", "M18.35,5 L 115 5 115 61.94 18.35 61.94 z");
+      }(g.append("g")));
+      (function (g) {
+        g.attr("stroke", "#F0F0F3")
+         .attr("stroke-width", 0.2)
+         .attr("class", "guide ygridlines xfixed");
+        g.append("svg:path")
+           .attr("d", "M18.35,78.24 L 115 78.24");
+        g.append("svg:path")
+           .attr("d", "M18.35,-11.3 L 115 -11.3");
+        g.append("svg:path")
+           .attr("d", "M18.35,-29.2 L 115 -29.2");
+        g.append("svg:path")
+           .attr("d", "M18.35,96.15 L 115 96.15");
+        g.append("svg:path")
+           .attr("d", "M18.35,131.96 L 115 131.96");
+        g.append("svg:path")
+           .attr("d", "M18.35,60.33 L 115 60.33");
+        g.append("svg:path")
+           .attr("d", "M18.35,24.52 L 115 24.52");
+        g.append("svg:path")
+           .attr("d", "M18.35,42.43 L 115 42.43");
+        g.append("svg:path")
+           .attr("d", "M18.35,6.61 L 115 6.61");
+        g.append("svg:path")
+           .attr("d", "M18.35,-47.11 L 115 -47.11");
+        g.append("svg:path")
+           .attr("d", "M18.35,114.05 L 115 114.05");
+        g.append("svg:path")
+           .attr("d", "M18.35,-65.02 L 115 -65.02");
+      }(g.append("g")));
+      (function (g) {
+        g.attr("stroke", "#F0F0F3")
+         .attr("stroke-width", 0.2)
+         .attr("class", "guide xgridlines yfixed");
+        g.append("svg:path")
+           .attr("d", "M-24.5,5 L -24.5 61.94");
+        g.append("svg:path")
+           .attr("d", "M157.85,5 L 157.85 61.94");
+        g.append("svg:path")
+           .attr("d", "M66.68,5 L 66.68 61.94");
+        g.append("svg:path")
+           .attr("d", "M21.09,5 L 21.09 61.94");
+        g.append("svg:path")
+           .attr("d", "M-70.09,5 L -70.09 61.94");
+        g.append("svg:path")
+           .attr("d", "M112.26,5 L 112.26 61.94");
+        g.append("svg:path")
+           .attr("d", "M-115.68,5 L -115.68 61.94");
+        g.append("svg:path")
+           .attr("d", "M203.44,5 L 203.44 61.94");
+        g.append("svg:path")
+           .attr("d", "M249.03,5 L 249.03 61.94");
+      }(g.append("g")));
+    }(g.append("g")));
+    (function (g) {
+      d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath1")
+    .append("svg:path")
+      .attr("d", " M18.35,5 L 115 5 115 61.94 18.35 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath1)");
+      (function (g) {
+        g.attr("class", "plotpanel");
+        (function (g) {
+          g.attr("stroke", "#00BFFF")
+           .attr("class", "geometry")
+           .attr("fill", "none")
+           .attr("stroke-width", 0.3);
+          g.append("svg:path")
+             .attr("d", "M21.09,60.33 L 21.45 60.33 21.82 60.33 22.18 60.33 22.55 60.33 22.91 60.33 23.28 60.33 23.64 60.33 24.01 60.33 24.37 60.33 24.73 60.33 25.1 60.33 25.46 60.33 25.83 60.33 26.19 60.33 26.56 60.33 26.92 60.33 27.29 60.33 27.65 60.33 28.02 60.33 28.38 60.33 28.75 60.33 29.11 60.33 29.48 60.33 29.84 60.33 30.21 60.33 30.57 60.33 30.93 60.33 31.3 60.33 31.66 60.33 32.03 60.33 32.39 60.32 32.76 60.32 33.12 60.32 33.49 60.32 33.85 60.32 34.22 60.32 34.58 60.32 34.95 60.31 35.31 60.31 35.68 60.31 36.04 60.31 36.41 60.3 36.77 60.3 37.13 60.3 37.5 60.3 37.86 60.29 38.23 60.29 38.59 60.28 38.96 60.28 39.32 60.28 39.69 60.27 40.05 60.27 40.42 60.26 40.78 60.25 41.15 60.25 41.51 60.24 41.88 60.24 42.24 60.23 42.61 60.22 42.97 60.21 43.33 60.21 43.7 60.2 44.06 60.19 44.43 60.18 44.79 60.17 45.16 60.16 45.52 60.15 45.89 60.14 46.25 60.12 46.62 60.11 46.98 60.1 47.35 60.09 47.71 60.07 48.08 60.06 48.44 60.04 48.81 60.03 49.17 60.01 49.53 59.99 49.9 59.97 50.26 59.96 50.63 59.94 50.99 59.92 51.36 59.9 51.72 59.87 52.09 59.85 52.45 59.83 52.82 59.8 53.18 59.78 53.55 59.75 53.91 59.73 54.28 59.7 54.64 59.67 55.01 59.64 55.37 59.61 55.73 59.58 56.1 59.55 56.46 59.51 56.83 59.48 57.19 59.44 57.56 59.4 57.92 59.37 58.29 59.33 58.65 59.29 59.02 59.24 59.38 59.2 59.75 59.16 60.11 59.11 60.48 59.06 60.84 59.02 61.21 58.97 61.57 58.91 61.93 58.86 62.3 58.81 62.66 58.75 63.03 58.69 63.39 58.63 63.76 58.57 64.12 58.51 64.49 58.45 64.85 58.38 65.22 58.31 65.58 58.25 65.95 58.17 66.31 58.1 66.68 58.03 67.04 57.95 67.41 57.87 67.77 57.79 68.13 57.71 68.5 57.62 68.86 57.53 69.23 57.44 69.59 57.35 69.96 57.26 70.32 57.16 70.69 57.06 71.05 56.96 71.42 56.86 71.78 56.75 72.15 56.64 72.51 56.53 72.88 56.42 73.24 56.3 73.61 56.18 73.97 56.06 74.33 55.93 74.7 55.81 75.06 55.68 75.43 55.54 75.79 55.4 76.16 55.26 76.52 55.12 76.89 54.97 77.25 54.82 77.62 54.67 77.98 54.51 78.35 54.35 78.71 54.19 79.08 54.02 79.44 53.85 79.81 53.67 80.17 53.5 80.53 53.31 80.9 53.13 81.26 52.94 81.63 52.74 81.99 52.54 82.36 52.34 82.72 52.13 83.09 51.92 83.45 51.7 83.82 51.48 84.18 51.25 84.55 51.02 84.91 50.79 85.28 50.55 85.64 50.3 86.01 50.05 86.37 49.8 86.74 49.54 87.1 49.27 87.46 49 87.83 48.73 88.19 48.44 88.56 48.16 88.92 47.86 89.29 47.56 89.65 47.26 90.02 46.95 90.38 46.63 90.75 46.31 91.11 45.98 91.48 45.64 91.84 45.3 92.21 44.95 92.57 44.6 92.94 44.23 93.3 43.87 93.66 43.49 94.03 43.11 94.39 42.72 94.76 42.32 95.12 41.92 95.49 41.51 95.85 41.09 96.22 40.66 96.58 40.23 96.95 39.79 97.31 39.34 97.68 38.88 98.04 38.42 98.41 37.94 98.77 37.46 99.14 36.98 99.5 36.48 99.86 35.97 100.23 35.46 100.59 34.94 100.96 34.41 101.32 33.87 101.69 33.32 102.05 32.77 102.42 32.2 102.78 31.63 103.15 31.05 103.51 30.46 103.88 29.86 104.24 29.25 104.61 28.64 104.97 28.01 105.34 27.38 105.7 26.73 106.06 26.08 106.43 25.42 106.79 24.75 107.16 24.08 107.52 23.39 107.89 22.7 108.25 21.99 108.62 21.28 108.98 20.56 109.35 19.83 109.71 19.1 110.08 18.35 110.44 17.6 110.81 16.84 111.17 16.08 111.54 15.3 111.9 14.52 112.26 13.73");
+        }(g.append("g")));
+      }(g.append("g")));
+    }(g.append("g")));
+    (function (g) {
+      d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath2")
+    .append("svg:path")
+      .attr("d", " M18.35,5 L 115 5 115 61.94 18.35 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath2)");
+      (function (g) {
+        g.attr("stroke", "none")
+         .attr("class", "guide zoomslider")
+         .attr("opacity", 0.00);
+        (function (g) {
+          g.attr("stroke", "#6A6A6A")
+           .attr("stroke-opacity", 0.00)
+           .attr("stroke-width", 0.3)
+           .attr("fill", "#EAEAEA")
+           .on("click", zoomin_behavior(ctx))
+.on("dblclick", function() { d3.event.stopPropagation(); })
+.on("mouseover", zoomslider_button_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_button_mouseover("#6a6a6a"))
+;
+          g.append("svg:path")
+             .attr("d", "M108,8 L 112 8 112 12 108 12 z");
+          (function (g) {
+            g.attr("fill", "#6A6A6A")
+             .attr("class", "button_logo");
+            g.append("svg:path")
+               .attr("d", "M108.8,9.6 L 109.6 9.6 109.6 8.8 110.4 8.8 110.4 9.6 111.2 9.6 111.2 10.4 110.4 10.4 110.4 11.2 109.6 11.2 109.6 10.4 108.8 10.4 z");
+          }(g.append("g")));
+        }(g.append("g")));
+        (function (g) {
+          g.attr("fill", "#EAEAEA")
+           .on("click", zoomslider_track_behavior(ctx, 82, 99));
+          g.append("svg:path")
+             .attr("d", "M88.5,8 L 107.5 8 107.5 12 88.5 12 z");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("fill", "#6A6A6A")
+           .attr("class", "zoomslider_thumb")
+           .call(zoomslider_behavior(ctx, 82, 99))
+.on("mouseover", zoomslider_thumb_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_thumb_mouseover("#6a6a6a"))
+;
+          g.append("svg:path")
+             .attr("d", "M97,8 L 99 8 99 12 97 12 z");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("stroke", "#6A6A6A")
+           .attr("stroke-opacity", 0.00)
+           .attr("stroke-width", 0.3)
+           .attr("fill", "#EAEAEA")
+           .on("click", zoomout_behavior(ctx))
+.on("dblclick", function() { d3.event.stopPropagation(); })
+.on("mouseover", zoomslider_button_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_button_mouseover("#6a6a6a"))
+;
+          g.append("svg:path")
+             .attr("d", "M84,8 L 88 8 88 12 84 12 z");
+          (function (g) {
+            g.attr("fill", "#6A6A6A")
+             .attr("class", "button_logo");
+            g.append("svg:path")
+               .attr("d", "M84.8,9.6 L 87.2 9.6 87.2 10.4 84.8 10.4 z");
+          }(g.append("g")));
+        }(g.append("g")));
+      }(g.append("g")));
+    }(g.append("g")));
+  }(g.append("g")));
+}(g.append("g")));
+    d3.select(parent_id)
+      .selectAll("path")
+      .each(function() {
+          var sw = parseFloat(window.getComputedStyle(this).getPropertyValue("stroke-width"));
+          d3.select(this)
+            .attr("vector-effect", "non-scaling-stroke")
+            .style("stroke-width", sw + "mm");
+      });
+}
+
+var data = [
+];
+
+var draw = function(parent_id) {
+    draw_with_data(data, parent_id);
+};
+
+draw("#gadflyplot-U5s7J840SzEU7CCmKXvE");
+</script>
+
+
+<p>Graphing more than one function at a time is, of course, possible. For example, to graph a function and its tangent line at a point we can do this.</p>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">f(x) = sqrt(x);
 fp = diff(f(x));        <span class="co"># diff finds derivative, fp an expression (not function)</span>
 c = <span class="fl">2</span>;
 m = subs(fp, x, c);     <span class="co"># at c=2</span>
-plot([f(x), f(c) + m*(x-c)], <span class="fl">1</span>, <span class="fl">3</span>)</code></pre>
-<figure>
-  <object alt="Figure 2" data="judo_figure_2.svg" type="image/svg+xml">
-  </object>
-  <figcaption>
-    
-  </figcaption>
-</figure>
+fs = [f(x), f(c) + m * (x - c)]
+fs = map(asf, fs)
+plot(fs, <span class="fl">1</span>, <span class="fl">3</span>)</code></pre>
+<div id="gadflyplot-N7qUBg15jNmEoFEYhIzj"></div>
+<script>
+function draw_with_data(data, parent_id) {
+  var g = d3.select(parent_id)
+            .append("svg")
+              .attr("width", "120mm")
+              .attr("height", "80mm")
+              .attr("viewBox", "0 0 120 80")
+              .attr("stroke-width", "0.5")
+              .attr("style", "stroke:black;fill:black");
+  g.append("defs");
+  var ctx = {
+      "scale": 1.0,
+      "tx": 0.0,
+      "ty": 0.0
+  };
+(function (g) {
+  g.attr("class", "plotroot xscalable yscalable");
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#4C404B")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.18px")
+     .attr("class", "guide ylabels");
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.29)
+         .attr("y", -47.11)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("2.6");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 16.29)
+       .attr("y", 20.04)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("1.6");
+})
+;
+    g.append("svg:text")
+       .attr("x", 16.29)
+       .attr("y", 60.33)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("1.0");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.29)
+         .attr("y", 100.62)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("0.4");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.29)
+         .attr("y", -6.82)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("2.0");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.29)
+         .attr("y", 73.76)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("0.8");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.29)
+         .attr("y", -60.54)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("2.8");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.29)
+         .attr("y", 114.05)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("0.2");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.29)
+         .attr("y", -33.68)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("2.4");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.29)
+         .attr("y", -20.25)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("2.2");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 16.29)
+       .attr("y", 33.47)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("1.4");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.29)
+         .attr("y", 87.19)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("0.6");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 16.29)
+       .attr("y", 6.61)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("1.8");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.29)
+         .attr("y", 127.48)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("0.0");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 16.29)
+       .attr("y", 46.9)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("1.2");
+})
+;
+  }(g.append("g")));
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#362A35")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.88px");
+    g.append("svg:text")
+       .attr("x", 7.94)
+       .attr("y", 33.47)
+       .attr("text-anchor", "middle")
+       .style("dominant-baseline", "central")
+       .attr("transform", "rotate(-90, 7.94, 33.47)")
+    .call(function(text) {
+  text.text("f(x)");
+})
+;
+  }(g.append("g")));
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#4C404B")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.18px")
+     .attr("class", "guide xlabels");
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 164.36)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("4.5");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 81.74)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("2.5");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -83.5)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-1.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 123.05)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("3.5");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 19.77)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("1.0");
+})
+;
+    g.append("svg:text")
+       .attr("x", 61.08)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("2.0");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 185.01)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("5.0");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 40.43)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("1.5");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -0.88)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("0.5");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 102.39)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("3.0");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -42.19)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-0.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 143.7)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("4.0");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -21.54)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("0.0");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 205.66)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("5.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -62.85)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-1.0");
+})
+;
+    }(g.append("g")));
+  }(g.append("g")));
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#362A35")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.88px");
+    g.append("svg:text")
+       .attr("x", 61.08)
+       .attr("y", 73)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("x");
+})
+;
+  }(g.append("g")));
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.88px")
+     .attr("fill", "#362A35");
+    g.append("svg:text")
+       .attr("x", 111.94)
+       .attr("y", 30.64)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("f");
+})
+;
+  }(g.append("g")));
+  (function (g) {
+    g.attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.18px");
+    (function (g) {
+      g.attr("class", "guide color_f1")
+       .on("click", guide_toggle_color("color_f1"));
+      (function (g) {
+        g.attr("fill", "#00BFFF")
+         .attr("stroke", "#0096DD")
+         .attr("stroke-width", 0.3);
+        g.append("svg:path")
+           .attr("d", "M106.87,32.64 L 111.65 32.64 111.65 37.41 106.87 37.41 z");
+      }(g.append("g")));
+      (function (g) {
+        g.attr("stroke", "none")
+         .attr("fill", "#4C404B");
+        g.append("svg:text")
+           .attr("x", 112.65)
+           .attr("y", 35.02)
+           .style("dominant-baseline", "central")
+        .call(function(text) {
+  text.append("tspan").text("f")
+      .append("tspan")
+        .attr("dy", "1ex")
+      .call(function(text) {
+        text.text("1");
+      })
+.append("tspan").attr("font-style", "normal")      ;
+})
+;
+      }(g.append("g")));
+    }(g.append("g")));
+    (function (g) {
+      g.attr("class", "guide color_f2")
+       .on("click", guide_toggle_color("color_f2"));
+      (function (g) {
+        g.attr("fill", "#D4CA3A")
+         .attr("stroke", "#A8A200")
+         .attr("stroke-width", 0.3);
+        g.append("svg:path")
+           .attr("d", "M106.87,38.41 L 111.65 38.41 111.65 43.19 106.87 43.19 z");
+      }(g.append("g")));
+      (function (g) {
+        g.attr("stroke", "none")
+         .attr("fill", "#4C404B");
+        g.append("svg:text")
+           .attr("x", 112.65)
+           .attr("y", 40.8)
+           .style("dominant-baseline", "central")
+        .call(function(text) {
+  text.append("tspan").text("f")
+      .append("tspan")
+        .attr("dy", "1ex")
+      .call(function(text) {
+        text.text("2");
+      })
+.append("tspan").attr("font-style", "normal")      ;
+})
+;
+      }(g.append("g")));
+    }(g.append("g")));
+  }(g.append("g")));
+  (function (g) {
+    g.on("mouseover", guide_background_mouseover("#C6C6C9"))
+     .on("mouseout", guide_background_mouseout("#F0F0F3"))
+     .call(zoom_behavior(ctx))
+;
+    (function (g) {
+      d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath0")
+    .append("svg:path")
+      .attr("d", " M17.29,5 L 104.87 5 104.87 61.94 17.29 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath0)");
+      (function (g) {
+        g.attr("class", "guide background")
+         .attr("stroke", "#F1F1F5")
+         .attr("fill", "#FAFAFA");
+        g.append("svg:path")
+           .attr("d", "M17.29,5 L 104.87 5 104.87 61.94 17.29 61.94 z");
+      }(g.append("g")));
+      (function (g) {
+        g.attr("stroke", "#F0F0F3")
+         .attr("stroke-width", 0.2)
+         .attr("class", "guide ygridlines xfixed");
+        g.append("svg:path")
+           .attr("d", "M17.29,20.04 L 104.87 20.04");
+        g.append("svg:path")
+           .attr("d", "M17.29,100.62 L 104.87 100.62");
+        g.append("svg:path")
+           .attr("d", "M17.29,73.76 L 104.87 73.76");
+        g.append("svg:path")
+           .attr("d", "M17.29,114.05 L 104.87 114.05");
+        g.append("svg:path")
+           .attr("d", "M17.29,-20.25 L 104.87 -20.25");
+        g.append("svg:path")
+           .attr("d", "M17.29,87.19 L 104.87 87.19");
+        g.append("svg:path")
+           .attr("d", "M17.29,127.48 L 104.87 127.48");
+        g.append("svg:path")
+           .attr("d", "M17.29,46.9 L 104.87 46.9");
+        g.append("svg:path")
+           .attr("d", "M17.29,6.61 L 104.87 6.61");
+        g.append("svg:path")
+           .attr("d", "M17.29,33.47 L 104.87 33.47");
+        g.append("svg:path")
+           .attr("d", "M17.29,-33.68 L 104.87 -33.68");
+        g.append("svg:path")
+           .attr("d", "M17.29,-60.54 L 104.87 -60.54");
+        g.append("svg:path")
+           .attr("d", "M17.29,-6.82 L 104.87 -6.82");
+        g.append("svg:path")
+           .attr("d", "M17.29,60.33 L 104.87 60.33");
+        g.append("svg:path")
+           .attr("d", "M17.29,-47.11 L 104.87 -47.11");
+      }(g.append("g")));
+      (function (g) {
+        g.attr("stroke", "#F0F0F3")
+         .attr("stroke-width", 0.2)
+         .attr("class", "guide xgridlines yfixed");
+        g.append("svg:path")
+           .attr("d", "M81.74,5 L 81.74 61.94");
+        g.append("svg:path")
+           .attr("d", "M123.05,5 L 123.05 61.94");
+        g.append("svg:path")
+           .attr("d", "M61.08,5 L 61.08 61.94");
+        g.append("svg:path")
+           .attr("d", "M40.43,5 L 40.43 61.94");
+        g.append("svg:path")
+           .attr("d", "M102.39,5 L 102.39 61.94");
+        g.append("svg:path")
+           .attr("d", "M143.7,5 L 143.7 61.94");
+        g.append("svg:path")
+           .attr("d", "M205.66,5 L 205.66 61.94");
+        g.append("svg:path")
+           .attr("d", "M-62.85,5 L -62.85 61.94");
+        g.append("svg:path")
+           .attr("d", "M-21.54,5 L -21.54 61.94");
+        g.append("svg:path")
+           .attr("d", "M-42.19,5 L -42.19 61.94");
+        g.append("svg:path")
+           .attr("d", "M-0.88,5 L -0.88 61.94");
+        g.append("svg:path")
+           .attr("d", "M185.01,5 L 185.01 61.94");
+        g.append("svg:path")
+           .attr("d", "M19.77,5 L 19.77 61.94");
+        g.append("svg:path")
+           .attr("d", "M-83.5,5 L -83.5 61.94");
+        g.append("svg:path")
+           .attr("d", "M164.36,5 L 164.36 61.94");
+      }(g.append("g")));
+    }(g.append("g")));
+    (function (g) {
+      d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath1")
+    .append("svg:path")
+      .attr("d", " M17.29,5 L 104.87 5 104.87 61.94 17.29 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath1)");
+      (function (g) {
+        g.attr("class", "plotpanel");
+        (function (g) {
+          g.attr("fill", "none")
+           .attr("stroke-width", 0.3);
+          (function (g) {
+            g.attr("stroke", "#00BFFF")
+             .attr("class", "geometry color_f1");
+            g.append("svg:path")
+               .attr("d", "M19.77,60.33 L 20.1 60.06 20.43 59.8 20.76 59.53 21.1 59.27 21.43 59 21.76 58.74 22.09 58.48 22.42 58.22 22.75 57.96 23.08 57.7 23.41 57.44 23.74 57.18 24.07 56.93 24.4 56.67 24.73 56.42 25.06 56.16 25.39 55.91 25.72 55.66 26.05 55.41 26.38 55.16 26.71 54.91 27.04 54.66 27.37 54.42 27.7 54.17 28.04 53.92 28.37 53.68 28.7 53.43 29.03 53.19 29.36 52.95 29.69 52.71 30.02 52.47 30.35 52.23 30.68 51.99 31.01 51.75 31.34 51.51 31.67 51.27 32 51.04 32.33 50.8 32.66 50.57 32.99 50.33 33.32 50.1 33.65 49.87 33.98 49.63 34.31 49.4 34.64 49.17 34.98 48.94 35.31 48.71 35.64 48.48 35.97 48.26 36.3 48.03 36.63 47.8 36.96 47.58 37.29 47.35 37.62 47.13 37.95 46.9 38.28 46.68 38.61 46.46 38.94 46.23 39.27 46.01 39.6 45.79 39.93 45.57 40.26 45.35 40.59 45.13 40.92 44.91 41.25 44.69 41.58 44.48 41.92 44.26 42.25 44.04 42.58 43.83 42.91 43.61 43.24 43.4 43.57 43.18 43.9 42.97 44.23 42.76 44.56 42.54 44.89 42.33 45.22 42.12 45.55 41.91 45.88 41.7 46.21 41.49 46.54 41.28 46.87 41.07 47.2 40.86 47.53 40.65 47.86 40.45 48.19 40.24 48.52 40.03 48.86 39.83 49.19 39.62 49.52 39.42 49.85 39.21 50.18 39.01 50.51 38.8 50.84 38.6 51.17 38.4 51.5 38.2 51.83 37.99 52.16 37.79 52.49 37.59 52.82 37.39 53.15 37.19 53.48 36.99 53.81 36.79 54.14 36.59 54.47 36.4 54.8 36.2 55.13 36 55.46 35.8 55.79 35.61 56.13 35.41 56.46 35.22 56.79 35.02 57.12 34.82 57.45 34.63 57.78 34.44 58.11 34.24 58.44 34.05 58.77 33.86 59.1 33.66 59.43 33.47 59.76 33.28 60.09 33.09 60.42 32.9 60.75 32.71 61.08 32.52 61.41 32.33 61.74 32.14 62.07 31.95 62.4 31.76 62.73 31.57 63.07 31.38 63.4 31.2 63.73 31.01 64.06 30.82 64.39 30.64 64.72 30.45 65.05 30.27 65.38 30.08 65.71 29.89 66.04 29.71 66.37 29.53 66.7 29.34 67.03 29.16 67.36 28.98 67.69 28.79 68.02 28.61 68.35 28.43 68.68 28.25 69.01 28.06 69.34 27.88 69.67 27.7 70.01 27.52 70.34 27.34 70.67 27.16 71 26.98 71.33 26.8 71.66 26.62 71.99 26.44 72.32 26.27 72.65 26.09 72.98 25.91 73.31 25.73 73.64 25.56 73.97 25.38 74.3 25.2 74.63 25.03 74.96 24.85 75.29 24.67 75.62 24.5 75.95 24.32 76.28 24.15 76.61 23.98 76.95 23.8 77.28 23.63 77.61 23.45 77.94 23.28 78.27 23.11 78.6 22.93 78.93 22.76 79.26 22.59 79.59 22.42 79.92 22.25 80.25 22.08 80.58 21.9 80.91 21.73 81.24 21.56 81.57 21.39 81.9 21.22 82.23 21.05 82.56 20.88 82.89 20.72 83.22 20.55 83.55 20.38 83.89 20.21 84.22 20.04 84.55 19.87 84.88 19.71 85.21 19.54 85.54 19.37 85.87 19.21 86.2 19.04 86.53 18.87 86.86 18.71 87.19 18.54 87.52 18.38 87.85 18.21 88.18 18.05 88.51 17.88 88.84 17.72 89.17 17.55 89.5 17.39 89.83 17.22 90.16 17.06 90.49 16.9 90.83 16.74 91.16 16.57 91.49 16.41 91.82 16.25 92.15 16.09 92.48 15.92 92.81 15.76 93.14 15.6 93.47 15.44 93.8 15.28 94.13 15.12 94.46 14.96 94.79 14.8 95.12 14.64 95.45 14.48 95.78 14.32 96.11 14.16 96.44 14 96.77 13.84 97.1 13.68 97.43 13.52 97.77 13.37 98.1 13.21 98.43 13.05 98.76 12.89 99.09 12.74 99.42 12.58 99.75 12.42 100.08 12.27 100.41 12.11 100.74 11.95 101.07 11.8 101.4 11.64 101.73 11.49 102.06 11.33 102.39 11.17");
+          }(g.append("g")));
+          (function (g) {
+            g.attr("stroke", "#D4CA3A")
+             .attr("class", "geometry color_f2");
+            g.append("svg:path")
+               .attr("d", "M19.77,56.26 L 20.1 56.07 20.43 55.88 20.76 55.69 21.1 55.5 21.43 55.31 21.76 55.12 22.09 54.93 22.42 54.74 22.75 54.55 23.08 54.36 23.41 54.17 23.74 53.98 24.07 53.79 24.4 53.6 24.73 53.41 25.06 53.22 25.39 53.03 25.72 52.84 26.05 52.65 26.38 52.46 26.71 52.27 27.04 52.08 27.37 51.89 27.7 51.7 28.04 51.51 28.37 51.32 28.7 51.13 29.03 50.94 29.36 50.75 29.69 50.56 30.02 50.37 30.35 50.18 30.68 49.99 31.01 49.8 31.34 49.61 31.67 49.42 32 49.23 32.33 49.04 32.66 48.85 32.99 48.66 33.32 48.47 33.65 48.28 33.98 48.09 34.31 47.9 34.64 47.71 34.98 47.52 35.31 47.33 35.64 47.14 35.97 46.95 36.3 46.76 36.63 46.57 36.96 46.38 37.29 46.19 37.62 46 37.95 45.81 38.28 45.62 38.61 45.43 38.94 45.24 39.27 45.05 39.6 44.86 39.93 44.67 40.26 44.48 40.59 44.29 40.92 44.1 41.25 43.91 41.58 43.72 41.92 43.53 42.25 43.34 42.58 43.15 42.91 42.96 43.24 42.77 43.57 42.58 43.9 42.39 44.23 42.2 44.56 42.01 44.89 41.82 45.22 41.63 45.55 41.44 45.88 41.25 46.21 41.06 46.54 40.87 46.87 40.68 47.2 40.49 47.53 40.31 47.86 40.12 48.19 39.93 48.52 39.74 48.86 39.55 49.19 39.36 49.52 39.17 49.85 38.98 50.18 38.79 50.51 38.6 50.84 38.41 51.17 38.22 51.5 38.03 51.83 37.84 52.16 37.65 52.49 37.46 52.82 37.27 53.15 37.08 53.48 36.89 53.81 36.7 54.14 36.51 54.47 36.32 54.8 36.13 55.13 35.94 55.46 35.75 55.79 35.56 56.13 35.37 56.46 35.18 56.79 34.99 57.12 34.8 57.45 34.61 57.78 34.42 58.11 34.23 58.44 34.04 58.77 33.85 59.1 33.66 59.43 33.47 59.76 33.28 60.09 33.09 60.42 32.9 60.75 32.71 61.08 32.52 61.41 32.33 61.74 32.14 62.07 31.95 62.4 31.76 62.73 31.57 63.07 31.38 63.4 31.19 63.73 31 64.06 30.81 64.39 30.62 64.72 30.43 65.05 30.24 65.38 30.05 65.71 29.86 66.04 29.67 66.37 29.48 66.7 29.29 67.03 29.1 67.36 28.91 67.69 28.72 68.02 28.53 68.35 28.34 68.68 28.15 69.01 27.96 69.34 27.77 69.67 27.58 70.01 27.39 70.34 27.2 70.67 27.01 71 26.82 71.33 26.63 71.66 26.44 71.99 26.25 72.32 26.06 72.65 25.87 72.98 25.68 73.31 25.49 73.64 25.3 73.97 25.11 74.3 24.92 74.63 24.73 74.96 24.54 75.29 24.35 75.62 24.16 75.95 23.97 76.28 23.78 76.61 23.59 76.95 23.4 77.28 23.21 77.61 23.02 77.94 22.83 78.27 22.64 78.6 22.45 78.93 22.26 79.26 22.07 79.59 21.88 79.92 21.69 80.25 21.5 80.58 21.31 80.91 21.12 81.24 20.93 81.57 20.74 81.9 20.55 82.23 20.36 82.56 20.17 82.89 19.98 83.22 19.79 83.55 19.6 83.89 19.41 84.22 19.22 84.55 19.03 84.88 18.84 85.21 18.65 85.54 18.46 85.87 18.27 86.2 18.08 86.53 17.89 86.86 17.7 87.19 17.51 87.52 17.32 87.85 17.13 88.18 16.94 88.51 16.75 88.84 16.56 89.17 16.37 89.5 16.18 89.83 15.99 90.16 15.8 90.49 15.61 90.83 15.42 91.16 15.23 91.49 15.04 91.82 14.85 92.15 14.66 92.48 14.47 92.81 14.28 93.14 14.09 93.47 13.9 93.8 13.71 94.13 13.52 94.46 13.33 94.79 13.14 95.12 12.95 95.45 12.76 95.78 12.57 96.11 12.38 96.44 12.19 96.77 12 97.1 11.82 97.43 11.63 97.77 11.44 98.1 11.25 98.43 11.06 98.76 10.87 99.09 10.68 99.42 10.49 99.75 10.3 100.08 10.11 100.41 9.92 100.74 9.73 101.07 9.54 101.4 9.35 101.73 9.16 102.06 8.97 102.39 8.78");
+          }(g.append("g")));
+        }(g.append("g")));
+      }(g.append("g")));
+    }(g.append("g")));
+    (function (g) {
+      d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath2")
+    .append("svg:path")
+      .attr("d", " M17.29,5 L 104.87 5 104.87 61.94 17.29 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath2)");
+      (function (g) {
+        g.attr("stroke", "none")
+         .attr("class", "guide zoomslider")
+         .attr("opacity", 0.00);
+        (function (g) {
+          g.attr("stroke", "#6A6A6A")
+           .attr("stroke-opacity", 0.00)
+           .attr("stroke-width", 0.3)
+           .attr("fill", "#EAEAEA")
+           .on("click", zoomin_behavior(ctx))
+.on("dblclick", function() { d3.event.stopPropagation(); })
+.on("mouseover", zoomslider_button_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_button_mouseover("#6a6a6a"))
+;
+          g.append("svg:path")
+             .attr("d", "M97.87,8 L 101.87 8 101.87 12 97.87 12 z");
+          (function (g) {
+            g.attr("fill", "#6A6A6A")
+             .attr("class", "button_logo");
+            g.append("svg:path")
+               .attr("d", "M98.67,9.6 L 99.47 9.6 99.47 8.8 100.27 8.8 100.27 9.6 101.07 9.6 101.07 10.4 100.27 10.4 100.27 11.2 99.47 11.2 99.47 10.4 98.67 10.4 z");
+          }(g.append("g")));
+        }(g.append("g")));
+        (function (g) {
+          g.attr("fill", "#EAEAEA")
+           .on("click", zoomslider_track_behavior(ctx, 71.87, 88.87));
+          g.append("svg:path")
+             .attr("d", "M78.37,8 L 97.37 8 97.37 12 78.37 12 z");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("fill", "#6A6A6A")
+           .attr("class", "zoomslider_thumb")
+           .call(zoomslider_behavior(ctx, 71.87, 88.87))
+.on("mouseover", zoomslider_thumb_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_thumb_mouseover("#6a6a6a"))
+;
+          g.append("svg:path")
+             .attr("d", "M86.87,8 L 88.87 8 88.87 12 86.87 12 z");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("stroke", "#6A6A6A")
+           .attr("stroke-opacity", 0.00)
+           .attr("stroke-width", 0.3)
+           .attr("fill", "#EAEAEA")
+           .on("click", zoomout_behavior(ctx))
+.on("dblclick", function() { d3.event.stopPropagation(); })
+.on("mouseover", zoomslider_button_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_button_mouseover("#6a6a6a"))
+;
+          g.append("svg:path")
+             .attr("d", "M73.87,8 L 77.87 8 77.87 12 73.87 12 z");
+          (function (g) {
+            g.attr("fill", "#6A6A6A")
+             .attr("class", "button_logo");
+            g.append("svg:path")
+               .attr("d", "M74.67,9.6 L 77.07 9.6 77.07 10.4 74.67 10.4 z");
+          }(g.append("g")));
+        }(g.append("g")));
+      }(g.append("g")));
+    }(g.append("g")));
+  }(g.append("g")));
+}(g.append("g")));
+    d3.select(parent_id)
+      .selectAll("path")
+      .each(function() {
+          var sw = parseFloat(window.getComputedStyle(this).getPropertyValue("stroke-width"));
+          d3.select(this)
+            .attr("vector-effect", "non-scaling-stroke")
+            .style("stroke-width", sw + "mm");
+      });
+}
+
+var data = [
+];
+
+var draw = function(parent_id) {
+    draw_with_data(data, parent_id);
+};
+
+draw("#gadflyplot-N7qUBg15jNmEoFEYhIzj");
+</script>
+
 
 <h3 id="practice-1">Practice</h3>
 <h4 id="question-5">Question</h4>
 <p>Plot the expression <code>x^4 - 3x^3 + 3x^2 - 3x +2</code> over <span class="math">\([-1, 3]\)</span>. How many real roots are there?</p>
 
-<form name='WeaveQuestion' data-id='HzBNzV1oIL' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='dzXYwvAa5a' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="HzBNzV1oIL" type="number">
+<input id="dzXYwvAa5a" type="number">
 
 
-<div id='HzBNzV1oIL_message'></div>
+<div id='dzXYwvAa5a_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#HzBNzV1oIL').on('change', function() {
+$('#dzXYwvAa5a').on('change', function() {
   correct = Math.abs(this.value - 2) <= 1.4901161193847656e-8;
 
   if(correct) {
-     $('#HzBNzV1oIL_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#dzXYwvAa5a_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#HzBNzV1oIL_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#dzXYwvAa5a_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1029,24 +2713,24 @@ limit( (f(g(x+h)) - f(g(x)))/h, h, <span class="fl">0</span>) |&gt; replace(x, <
 \lim_{x \rightarrow 4} \frac{(3 - \sqrt(x + 5))}{(x-4)}
 \]</span></p>
 
-<form name='WeaveQuestion' data-id='uynN8F7E3B' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='TPCBOuau07' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="uynN8F7E3B" type="number">
+<input id="TPCBOuau07" type="number">
 
 
-<div id='uynN8F7E3B_message'></div>
+<div id='TPCBOuau07_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#uynN8F7E3B').on('change', function() {
+$('#TPCBOuau07').on('change', function() {
   correct = Math.abs(this.value - -0.16666666666666666) <= 1.4901161193847656e-8;
 
   if(correct) {
-     $('#uynN8F7E3B_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#TPCBOuau07_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#uynN8F7E3B_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#TPCBOuau07_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1055,27 +2739,27 @@ $('#uynN8F7E3B').on('change', function() {
 <h4 id="question-7">Question</h4>
 <p>Compute</p>
 <p><span class="math">\[
-lim_{x \rightarrow 1} \frac{x^{1/4} - 1}{x^{1/3} - 1}.
+\lim_{x \rightarrow 1} \frac{x^{1/4} - 1}{x^{1/3} - 1}.
 \]</span></p>
 
-<form name='WeaveQuestion' data-id='U5s7J840Sz' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='k2jcpl3g9p' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="U5s7J840Sz" type="number">
+<input id="k2jcpl3g9p" type="number">
 
 
-<div id='U5s7J840Sz_message'></div>
+<div id='k2jcpl3g9p_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#U5s7J840Sz').on('change', function() {
+$('#k2jcpl3g9p').on('change', function() {
   correct = Math.abs(this.value - 0.7500000000000002) <= 1.4901161193847656e-8;
 
   if(correct) {
-     $('#U5s7J840Sz_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#k2jcpl3g9p_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#U5s7J840Sz_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#k2jcpl3g9p_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1091,40 +2775,40 @@ f(x) = sin(x);</code></pre>
 \]</span></p>
 <p>Based on your answer, what do you think the above expression finds for any <code>f</code>?</p>
 
-<form name='WeaveQuestion' data-id='EU7CCmKXvE' data-controltype='radio'>
+<form name='WeaveQuestion' data-id='8UYWBKgLLc' data-controltype='radio'>
 <div class='control-group '>
 <div class='controls'>
 
 
 <label class='radio'>
-  <input type='radio' name='radio_EU7CCmKXvE' value='1'>
+  <input type='radio' name='radio_8UYWBKgLLc' value='1'>
   <p><code>f'(x)</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_EU7CCmKXvE' value='2'>
+  <input type='radio' name='radio_8UYWBKgLLc' value='2'>
   <p><code>f''(x)</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_EU7CCmKXvE' value='3'>
+  <input type='radio' name='radio_8UYWBKgLLc' value='3'>
   <p><code>f'''(x)</code></p>
 </label>
 
 
 
-<div id='EU7CCmKXvE_message'></div>
+<div id='8UYWBKgLLc_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('input:radio[name="radio_EU7CCmKXvE"]').on('change', function() {
+$('input:radio[name="radio_8UYWBKgLLc"]').on('change', function() {
   correct = this.value == 2;
 
   if(correct) {
-     $('#EU7CCmKXvE_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#8UYWBKgLLc_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#EU7CCmKXvE_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#8UYWBKgLLc_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1137,45 +2821,45 @@ $('input:radio[name="radio_EU7CCmKXvE"]').on('change', function() {
 \]</span></p>
 <p>What is the answer?</p>
 
-<form name='WeaveQuestion' data-id='N7qUBg15jN' data-controltype='radio'>
+<form name='WeaveQuestion' data-id='Ut4VNBhBWz' data-controltype='radio'>
 <div class='control-group '>
 <div class='controls'>
 
 
 <label class='radio'>
-  <input type='radio' name='radio_N7qUBg15jN' value='1'>
+  <input type='radio' name='radio_Ut4VNBhBWz' value='1'>
   <p>1</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_N7qUBg15jN' value='2'>
+  <input type='radio' name='radio_Ut4VNBhBWz' value='2'>
   <p>a</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_N7qUBg15jN' value='3'>
+  <input type='radio' name='radio_Ut4VNBhBWz' value='3'>
   <p>a^2</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_N7qUBg15jN' value='4'>
+  <input type='radio' name='radio_Ut4VNBhBWz' value='4'>
   <p>No limit exists</p>
 </label>
 
 
 
-<div id='N7qUBg15jN_message'></div>
+<div id='Ut4VNBhBWz_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('input:radio[name="radio_N7qUBg15jN"]').on('change', function() {
+$('input:radio[name="radio_Ut4VNBhBWz"]').on('change', function() {
   correct = this.value == 3;
 
   if(correct) {
-     $('#N7qUBg15jN_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#Ut4VNBhBWz_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#N7qUBg15jN_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#Ut4VNBhBWz_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1183,62 +2867,62 @@ $('input:radio[name="radio_N7qUBg15jN"]').on('change', function() {
 
 <h4 id="question-10">Question</h4>
 <p>Let</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">f(x) = <span class="fl">1</span>/(x^(log(log(log(<span class="fl">1</span>/x)))-<span class="fl">1</span>))</code></pre>
+<pre class="sourceCode julia"><code class="sourceCode julia">f(x) = <span class="fl">1</span>/(x^(log(log(log(log((<span class="fl">1</span>/x)))))-<span class="fl">1</span>))</code></pre>
 <p>We can investigate the limit <span class="math">\(\lim_{x \rightarrow 0} f(x)\)</span> numerically:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">xs = (<span class="fl">0.1</span>).^(<span class="fl">2</span>:<span class="fl">10</span>);
-fxs = [f(x) <span class="kw">for</span> x <span class="kw">in</span> xs];
+fxs = map(f, xs);
 [xs fxs]
-<span class="co">## 9x2 Array{Any,2}:</span>
-<span class="co">##  0.01      0.0702822</span>
-<span class="co">##  0.001     0.0947694</span>
-<span class="co">##  0.0001    0.155102 </span>
-<span class="co">##  1.0e-5    0.293154 </span>
-<span class="co">##  1.0e-6    0.619862 </span>
-<span class="co">##  1.0e-7    1.43553  </span>
-<span class="co">##  1.0e-8    3.58731  </span>
-<span class="co">##  1.0e-9    9.56746  </span>
-<span class="co">##  1.0e-10  27.0054   </span></code></pre>
-<p>Rather than do that, use <code>limit</code> to compute the limit. The answer is:</p>
+<span class="co">## 9x2 Array{Float64,2}:</span>
+<span class="co">##  0.01     0.000191087</span>
+<span class="co">##  0.001    5.60275e-5 </span>
+<span class="co">##  0.0001   1.24647e-5 </span>
+<span class="co">##  1.0e-5   2.73214e-6 </span>
+<span class="co">##  1.0e-6   6.14632e-7 </span>
+<span class="co">##  1.0e-7   1.42981e-7 </span>
+<span class="co">##  1.0e-8   3.43858e-8 </span>
+<span class="co">##  1.0e-9   8.52992e-9 </span>
+<span class="co">##  1.0e-10  2.17687e-9 </span></code></pre>
+<p>It looks like the limit is <span class="math">\(0\)</span>. What does <code>limit</code> compute for the <em>real</em> answer?</p>
 
-<form name='WeaveQuestion' data-id='mEoFEYhIzj' data-controltype='radio'>
+<form name='WeaveQuestion' data-id='PTeglQvXfx' data-controltype='radio'>
 <div class='control-group '>
 <div class='controls'>
 
 
 <label class='radio'>
-  <input type='radio' name='radio_mEoFEYhIzj' value='1'>
+  <input type='radio' name='radio_PTeglQvXfx' value='1'>
   <p><code>0</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_mEoFEYhIzj' value='2'>
+  <input type='radio' name='radio_PTeglQvXfx' value='2'>
   <p><code>1</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_mEoFEYhIzj' value='3'>
+  <input type='radio' name='radio_PTeglQvXfx' value='3'>
   <p><code>e = 2.7182818284590455</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_mEoFEYhIzj' value='4'>
+  <input type='radio' name='radio_PTeglQvXfx' value='4'>
   <p><code>Inf</code></p>
 </label>
 
 
 
-<div id='mEoFEYhIzj_message'></div>
+<div id='PTeglQvXfx_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('input:radio[name="radio_mEoFEYhIzj"]').on('change', function() {
+$('input:radio[name="radio_PTeglQvXfx"]').on('change', function() {
   correct = this.value == 4;
 
   if(correct) {
-     $('#mEoFEYhIzj_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#PTeglQvXfx_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#mEoFEYhIzj_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#PTeglQvXfx_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1250,24 +2934,24 @@ $('input:radio[name="radio_mEoFEYhIzj"]').on('change', function() {
 <pre class="sourceCode julia"><code class="sourceCode julia">f(x) = log(log(x*exp(x*exp(x)) + <span class="fl">1</span>)) - exp(exp(log(log(x)) + <span class="fl">1</span>/x))</code></pre>
 <p>This function has a limit at <span class="math">\(\infty\)</span>. It can't be found numerically though (well, not easily). You can verify this by trying to evaluate the function at <span class="math">\(10\)</span>, let alone for really large values. However, it can be computed symbolically. What is the answer?</p>
 
-<form name='WeaveQuestion' data-id='dzXYwvAa5a' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='szKbYR6JVO' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="dzXYwvAa5a" type="number">
+<input id="szKbYR6JVO" type="number">
 
 
-<div id='dzXYwvAa5a_message'></div>
+<div id='szKbYR6JVO_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#dzXYwvAa5a').on('change', function() {
+$('#szKbYR6JVO').on('change', function() {
   correct = Math.abs(this.value - 0) <= 1.0e-8;
 
   if(correct) {
-     $('#dzXYwvAa5a_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#szKbYR6JVO_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#dzXYwvAa5a_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#szKbYR6JVO_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1290,34 +2974,1259 @@ Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
 <p>We just saw we can take derivatives with a limit, though just as with pen and paper, it is better to use the rules of derivatives. These rules are implemented by the <code>diff</code> operator, which takes a symbolic expression, a variable to differentiate in (the default is <code>x</code>) and an optional integer for the number of derivatives and returns a symbolic derivative.</p>
 <p>For example</p>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">f(x) = exp(exp(x))
-diff(f(x))             <span class="co">## not f, but the symbolic expression f(x)</span>
-diff(f(x), x)                  <span class="co">## optional x is necessary if other symbols involved</span>
-diff(f(x), x, <span class="fl">2</span>)               <span class="co">## Finds f&#39;&#39;(x), not f&#39;(2).</span></code></pre>
+diff(f(x))             <span class="co">## not f, but the symbolic expression f(x)</span></code></pre>
+<pre class="output"><code>    ⎛ x⎞
+ x  ⎝ℯ ⎠
+ℯ ⋅ℯ    </code></pre>
+<pre class="sourceCode julia" results="block"><code class="sourceCode julia">diff(f(x), x)                  <span class="co">## optional x is necessary if other symbols involved</span></code></pre>
+<pre class="output"><code>    ⎛ x⎞
+ x  ⎝ℯ ⎠
+ℯ ⋅ℯ    </code></pre>
+<pre class="sourceCode julia" results="block"><code class="sourceCode julia">diff(f(x), x, <span class="fl">2</span>)               <span class="co">## Finds f&#39;&#39;(x), not f&#39;(2).</span></code></pre>
 <pre class="output"><code>      ⎛ x⎞       ⎛ x⎞
  2⋅x  ⎝ℯ ⎠    x  ⎝ℯ ⎠
 ℯ   ⋅ℯ     + ℯ ⋅ℯ    </code></pre>
 <p>Here we find and plot the derivative of <span class="math">\(x^x\)</span> avoiding the asymptote at <span class="math">\(x=0\)</span>.</p>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">f(x) = x^x
-plot([ f(x), diff(f(x)) ], <span class="fl">1</span>/<span class="fl">10</span>, <span class="fl">2</span>)</code></pre>
-<figure>
-  <object alt="Figure 3" data="judo_figure_3.svg" type="image/svg+xml">
-  </object>
-  <figcaption>
-    
-  </figcaption>
-</figure>
+plot(asf(diff(f(x))), <span class="fl">1</span>/<span class="fl">10</span>, <span class="fl">2</span>)</code></pre>
+<div id="gadflyplot-py7Q7NZS5fkwio8ANzUt"></div>
+<script>
+function draw_with_data(data, parent_id) {
+  var g = d3.select(parent_id)
+            .append("svg")
+              .attr("width", "120mm")
+              .attr("height", "80mm")
+              .attr("viewBox", "0 0 120 80")
+              .attr("stroke-width", "0.5")
+              .attr("style", "stroke:black;fill:black");
+  g.append("defs");
+  var ctx = {
+      "scale": 1.0,
+      "tx": 0.0,
+      "ty": 0.0
+  };
+(function (g) {
+  g.attr("class", "plotroot xscalable yscalable");
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#4C404B")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.18px")
+     .attr("class", "guide ylabels");
+    g.append("svg:text")
+       .attr("x", 16.47)
+       .attr("y", 38.84)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("2");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.47)
+         .attr("y", 71.08)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("-4");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.47)
+         .attr("y", -47.11)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("18");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.47)
+         .attr("y", -4.13)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("10");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 16.47)
+       .attr("y", 60.33)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("-2");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.47)
+         .attr("y", 81.82)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("-6");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.47)
+         .attr("y", 103.31)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("-10");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.47)
+         .attr("y", -25.62)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("14");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 16.47)
+       .attr("y", 28.1)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("4");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.47)
+         .attr("y", -57.85)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("20");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 16.47)
+       .attr("y", 6.61)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("8");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.47)
+         .attr("y", 124.8)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("-14");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 16.47)
+       .attr("y", 17.36)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("6");
+})
+;
+    g.append("svg:text")
+       .attr("x", 16.47)
+       .attr("y", 49.59)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("0");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.47)
+         .attr("y", 92.57)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("-8");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.47)
+         .attr("y", -14.88)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("12");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.47)
+         .attr("y", 114.05)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("-12");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 16.47)
+         .attr("y", -36.37)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("16");
+})
+;
+    }(g.append("g")));
+  }(g.append("g")));
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#362A35")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.88px");
+    g.append("svg:text")
+       .attr("x", 7.94)
+       .attr("y", 33.47)
+       .attr("text-anchor", "middle")
+       .style("dominant-baseline", "central")
+       .attr("transform", "rotate(-90, 7.94, 33.47)")
+    .call(function(text) {
+  text.text("f(x)");
+})
+;
+  }(g.append("g")));
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#4C404B")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.18px")
+     .attr("class", "guide xlabels");
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 227.25)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("4.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 135.24)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("2.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -48.78)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-1.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -94.78)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-2.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 181.25)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("3.5");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 66.23)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("1.0");
+})
+;
+    g.append("svg:text")
+       .attr("x", 112.24)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("2.0");
+})
+;
+    g.append("svg:text")
+       .attr("x", 89.24)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("1.5");
+})
+;
+    g.append("svg:text")
+       .attr("x", 43.23)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("0.5");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -71.78)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-2.0");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 158.24)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("3.0");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -2.77)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-0.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 204.25)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("4.0");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 20.23)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("0.0");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -25.77)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-1.0");
+})
+;
+    }(g.append("g")));
+  }(g.append("g")));
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#362A35")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.88px");
+    g.append("svg:text")
+       .attr("x", 66.23)
+       .attr("y", 73)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("x");
+})
+;
+  }(g.append("g")));
+  (function (g) {
+    g.on("mouseover", guide_background_mouseover("#C6C6C9"))
+     .on("mouseout", guide_background_mouseout("#F0F0F3"))
+     .call(zoom_behavior(ctx))
+;
+    (function (g) {
+      d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath0")
+    .append("svg:path")
+      .attr("d", " M17.47,5 L 115 5 115 61.94 17.47 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath0)");
+      (function (g) {
+        g.attr("class", "guide background")
+         .attr("stroke", "#F1F1F5")
+         .attr("fill", "#FAFAFA");
+        g.append("svg:path")
+           .attr("d", "M17.47,5 L 115 5 115 61.94 17.47 61.94 z");
+      }(g.append("g")));
+      (function (g) {
+        g.attr("stroke", "#F0F0F3")
+         .attr("stroke-width", 0.2)
+         .attr("class", "guide ygridlines xfixed");
+        g.append("svg:path")
+           .attr("d", "M17.47,71.08 L 115 71.08");
+        g.append("svg:path")
+           .attr("d", "M17.47,-4.13 L 115 -4.13");
+        g.append("svg:path")
+           .attr("d", "M17.47,81.82 L 115 81.82");
+        g.append("svg:path")
+           .attr("d", "M17.47,-25.62 L 115 -25.62");
+        g.append("svg:path")
+           .attr("d", "M17.47,-57.85 L 115 -57.85");
+        g.append("svg:path")
+           .attr("d", "M17.47,124.8 L 115 124.8");
+        g.append("svg:path")
+           .attr("d", "M17.47,49.59 L 115 49.59");
+        g.append("svg:path")
+           .attr("d", "M17.47,-14.88 L 115 -14.88");
+        g.append("svg:path")
+           .attr("d", "M17.47,-36.37 L 115 -36.37");
+        g.append("svg:path")
+           .attr("d", "M17.47,114.05 L 115 114.05");
+        g.append("svg:path")
+           .attr("d", "M17.47,92.57 L 115 92.57");
+        g.append("svg:path")
+           .attr("d", "M17.47,17.36 L 115 17.36");
+        g.append("svg:path")
+           .attr("d", "M17.47,6.61 L 115 6.61");
+        g.append("svg:path")
+           .attr("d", "M17.47,28.1 L 115 28.1");
+        g.append("svg:path")
+           .attr("d", "M17.47,103.31 L 115 103.31");
+        g.append("svg:path")
+           .attr("d", "M17.47,60.33 L 115 60.33");
+        g.append("svg:path")
+           .attr("d", "M17.47,-47.11 L 115 -47.11");
+        g.append("svg:path")
+           .attr("d", "M17.47,38.84 L 115 38.84");
+      }(g.append("g")));
+      (function (g) {
+        g.attr("stroke", "#F0F0F3")
+         .attr("stroke-width", 0.2)
+         .attr("class", "guide xgridlines yfixed");
+        g.append("svg:path")
+           .attr("d", "M135.24,5 L 135.24 61.94");
+        g.append("svg:path")
+           .attr("d", "M-94.78,5 L -94.78 61.94");
+        g.append("svg:path")
+           .attr("d", "M66.23,5 L 66.23 61.94");
+        g.append("svg:path")
+           .attr("d", "M89.24,5 L 89.24 61.94");
+        g.append("svg:path")
+           .attr("d", "M-71.78,5 L -71.78 61.94");
+        g.append("svg:path")
+           .attr("d", "M-2.77,5 L -2.77 61.94");
+        g.append("svg:path")
+           .attr("d", "M20.23,5 L 20.23 61.94");
+        g.append("svg:path")
+           .attr("d", "M-25.77,5 L -25.77 61.94");
+        g.append("svg:path")
+           .attr("d", "M204.25,5 L 204.25 61.94");
+        g.append("svg:path")
+           .attr("d", "M158.24,5 L 158.24 61.94");
+        g.append("svg:path")
+           .attr("d", "M43.23,5 L 43.23 61.94");
+        g.append("svg:path")
+           .attr("d", "M112.24,5 L 112.24 61.94");
+        g.append("svg:path")
+           .attr("d", "M181.25,5 L 181.25 61.94");
+        g.append("svg:path")
+           .attr("d", "M-48.78,5 L -48.78 61.94");
+        g.append("svg:path")
+           .attr("d", "M227.25,5 L 227.25 61.94");
+      }(g.append("g")));
+    }(g.append("g")));
+    (function (g) {
+      d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath1")
+    .append("svg:path")
+      .attr("d", " M17.47,5 L 115 5 115 61.94 17.47 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath1)");
+      (function (g) {
+        g.attr("class", "plotpanel");
+        (function (g) {
+          g.attr("stroke", "#00BFFF")
+           .attr("class", "geometry")
+           .attr("fill", "none")
+           .attr("stroke-width", 0.3);
+          g.append("svg:path")
+             .attr("d", "M24.83,55.15 L 25.18 54.78 25.53 54.45 25.88 54.14 26.23 53.86 26.58 53.6 26.93 53.35 27.28 53.12 27.63 52.9 27.98 52.7 28.33 52.51 28.68 52.32 29.03 52.15 29.38 51.99 29.73 51.83 30.08 51.68 30.42 51.54 30.77 51.4 31.12 51.27 31.47 51.15 31.82 51.02 32.17 50.91 32.52 50.8 32.87 50.69 33.22 50.58 33.57 50.48 33.92 50.38 34.27 50.29 34.62 50.19 34.97 50.1 35.32 50.02 35.67 49.93 36.02 49.85 36.37 49.77 36.72 49.69 37.07 49.61 37.42 49.53 37.77 49.46 38.12 49.38 38.47 49.31 38.82 49.24 39.17 49.17 39.52 49.1 39.86 49.03 40.21 48.97 40.56 48.9 40.91 48.84 41.26 48.77 41.61 48.71 41.96 48.65 42.31 48.58 42.66 48.52 43.01 48.46 43.36 48.4 43.71 48.34 44.06 48.28 44.41 48.22 44.76 48.16 45.11 48.1 45.46 48.05 45.81 47.99 46.16 47.93 46.51 47.87 46.86 47.81 47.21 47.76 47.56 47.7 47.91 47.64 48.26 47.59 48.61 47.53 48.96 47.47 49.31 47.41 49.65 47.36 50 47.3 50.35 47.24 50.7 47.18 51.05 47.13 51.4 47.07 51.75 47.01 52.1 46.95 52.45 46.89 52.8 46.83 53.15 46.78 53.5 46.72 53.85 46.66 54.2 46.6 54.55 46.54 54.9 46.48 55.25 46.41 55.6 46.35 55.95 46.29 56.3 46.23 56.65 46.17 57 46.1 57.35 46.04 57.7 45.98 58.05 45.91 58.4 45.85 58.75 45.78 59.09 45.72 59.44 45.65 59.79 45.58 60.14 45.51 60.49 45.45 60.84 45.38 61.19 45.31 61.54 45.24 61.89 45.16 62.24 45.09 62.59 45.02 62.94 44.95 63.29 44.87 63.64 44.8 63.99 44.72 64.34 44.65 64.69 44.57 65.04 44.49 65.39 44.41 65.74 44.33 66.09 44.25 66.44 44.17 66.79 44.09 67.14 44 67.49 43.92 67.84 43.83 68.19 43.75 68.54 43.66 68.88 43.57 69.23 43.48 69.58 43.39 69.93 43.3 70.28 43.2 70.63 43.11 70.98 43.01 71.33 42.92 71.68 42.82 72.03 42.72 72.38 42.62 72.73 42.52 73.08 42.41 73.43 42.31 73.78 42.2 74.13 42.1 74.48 41.99 74.83 41.88 75.18 41.77 75.53 41.65 75.88 41.54 76.23 41.42 76.58 41.31 76.93 41.19 77.28 41.07 77.63 40.94 77.98 40.82 78.32 40.69 78.67 40.56 79.02 40.44 79.37 40.3 79.72 40.17 80.07 40.04 80.42 39.9 80.77 39.76 81.12 39.62 81.47 39.48 81.82 39.33 82.17 39.19 82.52 39.04 82.87 38.89 83.22 38.73 83.57 38.58 83.92 38.42 84.27 38.26 84.62 38.1 84.97 37.93 85.32 37.77 85.67 37.6 86.02 37.42 86.37 37.25 86.72 37.07 87.07 36.89 87.42 36.71 87.77 36.53 88.11 36.34 88.46 36.15 88.81 35.96 89.16 35.76 89.51 35.56 89.86 35.36 90.21 35.15 90.56 34.95 90.91 34.73 91.26 34.52 91.61 34.3 91.96 34.08 92.31 33.86 92.66 33.63 93.01 33.4 93.36 33.16 93.71 32.93 94.06 32.68 94.41 32.44 94.76 32.19 95.11 31.94 95.46 31.68 95.81 31.42 96.16 31.15 96.51 30.88 96.86 30.61 97.21 30.33 97.55 30.05 97.9 29.77 98.25 29.48 98.6 29.18 98.95 28.88 99.3 28.58 99.65 28.27 100 27.96 100.35 27.64 100.7 27.31 101.05 26.99 101.4 26.65 101.75 26.31 102.1 25.97 102.45 25.62 102.8 25.26 103.15 24.9 103.5 24.54 103.85 24.16 104.2 23.79 104.55 23.4 104.9 23.01 105.25 22.61 105.6 22.21 105.95 21.8 106.3 21.39 106.65 20.96 107 20.54 107.34 20.1 107.69 19.66 108.04 19.21 108.39 18.75 108.74 18.28 109.09 17.81 109.44 17.33 109.79 16.85 110.14 16.35 110.49 15.85 110.84 15.34 111.19 14.82 111.54 14.29 111.89 13.75 112.24 13.21");
+        }(g.append("g")));
+      }(g.append("g")));
+    }(g.append("g")));
+    (function (g) {
+      d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath2")
+    .append("svg:path")
+      .attr("d", " M17.47,5 L 115 5 115 61.94 17.47 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath2)");
+      (function (g) {
+        g.attr("stroke", "none")
+         .attr("class", "guide zoomslider")
+         .attr("opacity", 0.00);
+        (function (g) {
+          g.attr("stroke", "#6A6A6A")
+           .attr("stroke-opacity", 0.00)
+           .attr("stroke-width", 0.3)
+           .attr("fill", "#EAEAEA")
+           .on("click", zoomin_behavior(ctx))
+.on("dblclick", function() { d3.event.stopPropagation(); })
+.on("mouseover", zoomslider_button_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_button_mouseover("#6a6a6a"))
+;
+          g.append("svg:path")
+             .attr("d", "M108,8 L 112 8 112 12 108 12 z");
+          (function (g) {
+            g.attr("fill", "#6A6A6A")
+             .attr("class", "button_logo");
+            g.append("svg:path")
+               .attr("d", "M108.8,9.6 L 109.6 9.6 109.6 8.8 110.4 8.8 110.4 9.6 111.2 9.6 111.2 10.4 110.4 10.4 110.4 11.2 109.6 11.2 109.6 10.4 108.8 10.4 z");
+          }(g.append("g")));
+        }(g.append("g")));
+        (function (g) {
+          g.attr("fill", "#EAEAEA")
+           .on("click", zoomslider_track_behavior(ctx, 82, 99));
+          g.append("svg:path")
+             .attr("d", "M88.5,8 L 107.5 8 107.5 12 88.5 12 z");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("fill", "#6A6A6A")
+           .attr("class", "zoomslider_thumb")
+           .call(zoomslider_behavior(ctx, 82, 99))
+.on("mouseover", zoomslider_thumb_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_thumb_mouseover("#6a6a6a"))
+;
+          g.append("svg:path")
+             .attr("d", "M97,8 L 99 8 99 12 97 12 z");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("stroke", "#6A6A6A")
+           .attr("stroke-opacity", 0.00)
+           .attr("stroke-width", 0.3)
+           .attr("fill", "#EAEAEA")
+           .on("click", zoomout_behavior(ctx))
+.on("dblclick", function() { d3.event.stopPropagation(); })
+.on("mouseover", zoomslider_button_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_button_mouseover("#6a6a6a"))
+;
+          g.append("svg:path")
+             .attr("d", "M84,8 L 88 8 88 12 84 12 z");
+          (function (g) {
+            g.attr("fill", "#6A6A6A")
+             .attr("class", "button_logo");
+            g.append("svg:path")
+               .attr("d", "M84.8,9.6 L 87.2 9.6 87.2 10.4 84.8 10.4 z");
+          }(g.append("g")));
+        }(g.append("g")));
+      }(g.append("g")));
+    }(g.append("g")));
+  }(g.append("g")));
+}(g.append("g")));
+    d3.select(parent_id)
+      .selectAll("path")
+      .each(function() {
+          var sw = parseFloat(window.getComputedStyle(this).getPropertyValue("stroke-width"));
+          d3.select(this)
+            .attr("vector-effect", "non-scaling-stroke")
+            .style("stroke-width", sw + "mm");
+      });
+}
+
+var data = [
+];
+
+var draw = function(parent_id) {
+    draw_with_data(data, parent_id);
+};
+
+draw("#gadflyplot-py7Q7NZS5fkwio8ANzUt");
+</script>
+
 
 <p>Here we plot <span class="math">\(f(x)\)</span> and it's tangent line at <span class="math">\(c=1\)</span>:</p>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">f(x) = x^x; c = <span class="fl">1</span>
 m = diff(f(x)) |&gt; replace(x, c);
-plot([ f(x), f(c) + m * (x - c)], <span class="fl">.5</span>, <span class="fl">1.5</span>)</code></pre>
-<figure>
-  <object alt="Figure 4" data="judo_figure_4.svg" type="image/svg+xml">
-  </object>
-  <figcaption>
-    
-  </figcaption>
-</figure>
+fs = [f(x), f(c) + m*(x-c)]
+fs = map(asf, fs)
+plot(fs, <span class="fl">.5</span>, <span class="fl">1.5</span>)</code></pre>
+<div id="gadflyplot-uQy4T2mwoqAA9mDVpYMj"></div>
+<script>
+function draw_with_data(data, parent_id) {
+  var g = d3.select(parent_id)
+            .append("svg")
+              .attr("width", "120mm")
+              .attr("height", "80mm")
+              .attr("viewBox", "0 0 120 80")
+              .attr("stroke-width", "0.5")
+              .attr("style", "stroke:black;fill:black");
+  g.append("defs");
+  var ctx = {
+      "scale": 1.0,
+      "tx": 0.0,
+      "ty": 0.0
+  };
+(function (g) {
+  g.attr("class", "plotroot xscalable yscalable");
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#4C404B")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.18px")
+     .attr("class", "guide ylabels");
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", -60.54)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("4.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", -6.82)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("2.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", 100.62)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("-1.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", 127.48)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("-2.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", -33.68)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("3.5");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 17.35)
+       .attr("y", 33.47)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("1.0");
+})
+;
+    g.append("svg:text")
+       .attr("x", 17.35)
+       .attr("y", 6.61)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("2.0");
+})
+;
+    g.append("svg:text")
+       .attr("x", 17.35)
+       .attr("y", 20.04)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("1.5");
+})
+;
+    g.append("svg:text")
+       .attr("x", 17.35)
+       .attr("y", 46.9)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("0.5");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", 114.05)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("-2.0");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", -20.25)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("3.0");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", 73.76)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("-0.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", -47.11)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("4.0");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 17.35)
+       .attr("y", 60.33)
+       .attr("text-anchor", "end")
+       .style("dominant-baseline", "central")
+    .call(function(text) {
+  text.text("0.0");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 17.35)
+         .attr("y", 87.19)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+      .call(function(text) {
+  text.text("-1.0");
+})
+;
+    }(g.append("g")));
+  }(g.append("g")));
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#362A35")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.88px");
+    g.append("svg:text")
+       .attr("x", 7.94)
+       .attr("y", 33.47)
+       .attr("text-anchor", "middle")
+       .style("dominant-baseline", "central")
+       .attr("transform", "rotate(-90, 7.94, 33.47)")
+    .call(function(text) {
+  text.text("f(x)");
+})
+;
+  }(g.append("g")));
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#4C404B")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.18px")
+     .attr("class", "guide xlabels");
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 156.84)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("2.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -60.82)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-1.5");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 211.25)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("3.5");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 75.21)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("1.0");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 129.63)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("2.0");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 102.42)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("1.5");
+})
+;
+    g.append("svg:text")
+       .attr("x", 48.01)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("0.5");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -88.03)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-2.0");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", 184.04)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("3.0");
+})
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -6.41)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-0.5");
+})
+;
+    }(g.append("g")));
+    g.append("svg:text")
+       .attr("x", 20.8)
+       .attr("y", 66.12)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("0.0");
+})
+;
+    (function (g) {
+      g.attr("visibility", "hidden");
+      g.append("svg:text")
+         .attr("x", -33.61)
+         .attr("y", 66.12)
+         .attr("text-anchor", "middle")
+      .call(function(text) {
+  text.text("-1.0");
+})
+;
+    }(g.append("g")));
+  }(g.append("g")));
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("fill", "#362A35")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.88px");
+    g.append("svg:text")
+       .attr("x", 61.61)
+       .attr("y", 73)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("x");
+})
+;
+  }(g.append("g")));
+  (function (g) {
+    g.attr("stroke", "none")
+     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.88px")
+     .attr("fill", "#362A35");
+    g.append("svg:text")
+       .attr("x", 111.94)
+       .attr("y", 30.64)
+       .attr("text-anchor", "middle")
+    .call(function(text) {
+  text.text("f");
+})
+;
+  }(g.append("g")));
+  (function (g) {
+    g.attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+     .style("font-size", "3.18px");
+    (function (g) {
+      g.attr("class", "guide color_f1")
+       .on("click", guide_toggle_color("color_f1"));
+      (function (g) {
+        g.attr("fill", "#00BFFF")
+         .attr("stroke", "#0096DD")
+         .attr("stroke-width", 0.3);
+        g.append("svg:path")
+           .attr("d", "M106.87,32.64 L 111.65 32.64 111.65 37.41 106.87 37.41 z");
+      }(g.append("g")));
+      (function (g) {
+        g.attr("stroke", "none")
+         .attr("fill", "#4C404B");
+        g.append("svg:text")
+           .attr("x", 112.65)
+           .attr("y", 35.02)
+           .style("dominant-baseline", "central")
+        .call(function(text) {
+  text.append("tspan").text("f")
+      .append("tspan")
+        .attr("dy", "1ex")
+      .call(function(text) {
+        text.text("1");
+      })
+.append("tspan").attr("font-style", "normal")      ;
+})
+;
+      }(g.append("g")));
+    }(g.append("g")));
+    (function (g) {
+      g.attr("class", "guide color_f2")
+       .on("click", guide_toggle_color("color_f2"));
+      (function (g) {
+        g.attr("fill", "#D4CA3A")
+         .attr("stroke", "#A8A200")
+         .attr("stroke-width", 0.3);
+        g.append("svg:path")
+           .attr("d", "M106.87,38.41 L 111.65 38.41 111.65 43.19 106.87 43.19 z");
+      }(g.append("g")));
+      (function (g) {
+        g.attr("stroke", "none")
+         .attr("fill", "#4C404B");
+        g.append("svg:text")
+           .attr("x", 112.65)
+           .attr("y", 40.8)
+           .style("dominant-baseline", "central")
+        .call(function(text) {
+  text.append("tspan").text("f")
+      .append("tspan")
+        .attr("dy", "1ex")
+      .call(function(text) {
+        text.text("2");
+      })
+.append("tspan").attr("font-style", "normal")      ;
+})
+;
+      }(g.append("g")));
+    }(g.append("g")));
+  }(g.append("g")));
+  (function (g) {
+    g.on("mouseover", guide_background_mouseover("#C6C6C9"))
+     .on("mouseout", guide_background_mouseout("#F0F0F3"))
+     .call(zoom_behavior(ctx))
+;
+    (function (g) {
+      d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath0")
+    .append("svg:path")
+      .attr("d", " M18.35,5 L 104.87 5 104.87 61.94 18.35 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath0)");
+      (function (g) {
+        g.attr("class", "guide background")
+         .attr("stroke", "#F1F1F5")
+         .attr("fill", "#FAFAFA");
+        g.append("svg:path")
+           .attr("d", "M18.35,5 L 104.87 5 104.87 61.94 18.35 61.94 z");
+      }(g.append("g")));
+      (function (g) {
+        g.attr("stroke", "#F0F0F3")
+         .attr("stroke-width", 0.2)
+         .attr("class", "guide ygridlines xfixed");
+        g.append("svg:path")
+           .attr("d", "M18.35,-6.82 L 104.87 -6.82");
+        g.append("svg:path")
+           .attr("d", "M18.35,127.48 L 104.87 127.48");
+        g.append("svg:path")
+           .attr("d", "M18.35,33.47 L 104.87 33.47");
+        g.append("svg:path")
+           .attr("d", "M18.35,20.04 L 104.87 20.04");
+        g.append("svg:path")
+           .attr("d", "M18.35,114.05 L 104.87 114.05");
+        g.append("svg:path")
+           .attr("d", "M18.35,73.76 L 104.87 73.76");
+        g.append("svg:path")
+           .attr("d", "M18.35,60.33 L 104.87 60.33");
+        g.append("svg:path")
+           .attr("d", "M18.35,87.19 L 104.87 87.19");
+        g.append("svg:path")
+           .attr("d", "M18.35,-47.11 L 104.87 -47.11");
+        g.append("svg:path")
+           .attr("d", "M18.35,-20.25 L 104.87 -20.25");
+        g.append("svg:path")
+           .attr("d", "M18.35,46.9 L 104.87 46.9");
+        g.append("svg:path")
+           .attr("d", "M18.35,6.61 L 104.87 6.61");
+        g.append("svg:path")
+           .attr("d", "M18.35,-33.68 L 104.87 -33.68");
+        g.append("svg:path")
+           .attr("d", "M18.35,100.62 L 104.87 100.62");
+        g.append("svg:path")
+           .attr("d", "M18.35,-60.54 L 104.87 -60.54");
+      }(g.append("g")));
+      (function (g) {
+        g.attr("stroke", "#F0F0F3")
+         .attr("stroke-width", 0.2)
+         .attr("class", "guide xgridlines yfixed");
+        g.append("svg:path")
+           .attr("d", "M-60.82,5 L -60.82 61.94");
+        g.append("svg:path")
+           .attr("d", "M75.21,5 L 75.21 61.94");
+        g.append("svg:path")
+           .attr("d", "M102.42,5 L 102.42 61.94");
+        g.append("svg:path")
+           .attr("d", "M-88.03,5 L -88.03 61.94");
+        g.append("svg:path")
+           .attr("d", "M-6.41,5 L -6.41 61.94");
+        g.append("svg:path")
+           .attr("d", "M-33.61,5 L -33.61 61.94");
+        g.append("svg:path")
+           .attr("d", "M20.8,5 L 20.8 61.94");
+        g.append("svg:path")
+           .attr("d", "M184.04,5 L 184.04 61.94");
+        g.append("svg:path")
+           .attr("d", "M48.01,5 L 48.01 61.94");
+        g.append("svg:path")
+           .attr("d", "M129.63,5 L 129.63 61.94");
+        g.append("svg:path")
+           .attr("d", "M211.25,5 L 211.25 61.94");
+        g.append("svg:path")
+           .attr("d", "M156.84,5 L 156.84 61.94");
+      }(g.append("g")));
+    }(g.append("g")));
+    (function (g) {
+      d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath1")
+    .append("svg:path")
+      .attr("d", " M18.35,5 L 104.87 5 104.87 61.94 18.35 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath1)");
+      (function (g) {
+        g.attr("class", "plotpanel");
+        (function (g) {
+          g.attr("fill", "none")
+           .attr("stroke-width", 0.3);
+          (function (g) {
+            g.attr("stroke", "#00BFFF")
+             .attr("class", "geometry color_f1");
+            g.append("svg:path")
+               .attr("d", "M48.01,41.34 L 48.23 41.32 48.44 41.29 48.66 41.27 48.88 41.24 49.1 41.22 49.31 41.19 49.53 41.16 49.75 41.13 49.97 41.1 50.18 41.07 50.4 41.05 50.62 41.01 50.84 40.98 51.05 40.95 51.27 40.92 51.49 40.89 51.71 40.85 51.93 40.82 52.14 40.78 52.36 40.75 52.58 40.71 52.8 40.68 53.01 40.64 53.23 40.6 53.45 40.56 53.67 40.52 53.88 40.48 54.1 40.44 54.32 40.4 54.54 40.36 54.76 40.32 54.97 40.28 55.19 40.23 55.41 40.19 55.63 40.15 55.84 40.1 56.06 40.06 56.28 40.01 56.5 39.96 56.71 39.91 56.93 39.87 57.15 39.82 57.37 39.77 57.58 39.72 57.8 39.67 58.02 39.62 58.24 39.57 58.46 39.51 58.67 39.46 58.89 39.41 59.11 39.35 59.33 39.3 59.54 39.24 59.76 39.19 59.98 39.13 60.2 39.07 60.41 39.01 60.63 38.96 60.85 38.9 61.07 38.84 61.28 38.78 61.5 38.72 61.72 38.65 61.94 38.59 62.16 38.53 62.37 38.47 62.59 38.4 62.81 38.34 63.03 38.27 63.24 38.2 63.46 38.14 63.68 38.07 63.9 38 64.11 37.93 64.33 37.86 64.55 37.79 64.77 37.72 64.98 37.65 65.2 37.58 65.42 37.51 65.64 37.43 65.86 37.36 66.07 37.28 66.29 37.21 66.51 37.13 66.73 37.05 66.94 36.98 67.16 36.9 67.38 36.82 67.6 36.74 67.81 36.66 68.03 36.58 68.25 36.5 68.47 36.41 68.69 36.33 68.9 36.25 69.12 36.16 69.34 36.08 69.56 35.99 69.77 35.9 69.99 35.81 70.21 35.73 70.43 35.64 70.64 35.55 70.86 35.46 71.08 35.36 71.3 35.27 71.51 35.18 71.73 35.08 71.95 34.99 72.17 34.89 72.39 34.8 72.6 34.7 72.82 34.6 73.04 34.5 73.26 34.41 73.47 34.3 73.69 34.2 73.91 34.1 74.13 34 74.34 33.9 74.56 33.79 74.78 33.69 75 33.58 75.21 33.47 75.43 33.36 75.65 33.26 75.87 33.15 76.09 33.04 76.3 32.92 76.52 32.81 76.74 32.7 76.96 32.58 77.17 32.47 77.39 32.35 77.61 32.24 77.83 32.12 78.04 32 78.26 31.88 78.48 31.76 78.7 31.64 78.91 31.52 79.13 31.39 79.35 31.27 79.57 31.14 79.79 31.02 80 30.89 80.22 30.76 80.44 30.63 80.66 30.5 80.87 30.37 81.09 30.24 81.31 30.11 81.53 29.97 81.74 29.84 81.96 29.7 82.18 29.56 82.4 29.42 82.62 29.29 82.83 29.14 83.05 29 83.27 28.86 83.49 28.72 83.7 28.57 83.92 28.43 84.14 28.28 84.36 28.13 84.57 27.98 84.79 27.83 85.01 27.68 85.23 27.53 85.44 27.37 85.66 27.22 85.88 27.06 86.1 26.9 86.32 26.74 86.53 26.58 86.75 26.42 86.97 26.26 87.19 26.1 87.4 25.93 87.62 25.77 87.84 25.6 88.06 25.43 88.27 25.26 88.49 25.09 88.71 24.92 88.93 24.74 89.14 24.57 89.36 24.39 89.58 24.21 89.8 24.04 90.02 23.86 90.23 23.67 90.45 23.49 90.67 23.31 90.89 23.12 91.1 22.93 91.32 22.74 91.54 22.55 91.76 22.36 91.97 22.17 92.19 21.98 92.41 21.78 92.63 21.58 92.84 21.38 93.06 21.18 93.28 20.98 93.5 20.78 93.72 20.57 93.93 20.37 94.15 20.16 94.37 19.95 94.59 19.74 94.8 19.53 95.02 19.31 95.24 19.1 95.46 18.88 95.67 18.66 95.89 18.44 96.11 18.22 96.33 17.99 96.55 17.77 96.76 17.54 96.98 17.31 97.2 17.08 97.42 16.85 97.63 16.61 97.85 16.38 98.07 16.14 98.29 15.9 98.5 15.66 98.72 15.41 98.94 15.17 99.16 14.92 99.37 14.67 99.59 14.42 99.81 14.17 100.03 13.92 100.25 13.66 100.46 13.4 100.68 13.14 100.9 12.88 101.12 12.61 101.33 12.35 101.55 12.08 101.77 11.81 101.99 11.54 102.2 11.26 102.42 10.99");
+          }(g.append("g")));
+          (function (g) {
+            g.attr("stroke", "#D4CA3A")
+             .attr("class", "geometry color_f2");
+            g.append("svg:path")
+               .attr("d", "M48.01,46.9 L 48.23 46.8 48.44 46.69 48.66 46.58 48.88 46.47 49.1 46.37 49.31 46.26 49.53 46.15 49.75 46.04 49.97 45.94 50.18 45.83 50.4 45.72 50.62 45.61 50.84 45.51 51.05 45.4 51.27 45.29 51.49 45.18 51.71 45.08 51.93 44.97 52.14 44.86 52.36 44.75 52.58 44.65 52.8 44.54 53.01 44.43 53.23 44.32 53.45 44.22 53.67 44.11 53.88 44 54.1 43.89 54.32 43.79 54.54 43.68 54.76 43.57 54.97 43.46 55.19 43.36 55.41 43.25 55.63 43.14 55.84 43.03 56.06 42.93 56.28 42.82 56.5 42.71 56.71 42.6 56.93 42.5 57.15 42.39 57.37 42.28 57.58 42.18 57.8 42.07 58.02 41.96 58.24 41.85 58.46 41.75 58.67 41.64 58.89 41.53 59.11 41.42 59.33 41.32 59.54 41.21 59.76 41.1 59.98 40.99 60.2 40.89 60.41 40.78 60.63 40.67 60.85 40.56 61.07 40.46 61.28 40.35 61.5 40.24 61.72 40.13 61.94 40.03 62.16 39.92 62.37 39.81 62.59 39.7 62.81 39.6 63.03 39.49 63.24 39.38 63.46 39.27 63.68 39.17 63.9 39.06 64.11 38.95 64.33 38.84 64.55 38.74 64.77 38.63 64.98 38.52 65.2 38.41 65.42 38.31 65.64 38.2 65.86 38.09 66.07 37.98 66.29 37.88 66.51 37.77 66.73 37.66 66.94 37.56 67.16 37.45 67.38 37.34 67.6 37.23 67.81 37.13 68.03 37.02 68.25 36.91 68.47 36.8 68.69 36.7 68.9 36.59 69.12 36.48 69.34 36.37 69.56 36.27 69.77 36.16 69.99 36.05 70.21 35.94 70.43 35.84 70.64 35.73 70.86 35.62 71.08 35.51 71.3 35.41 71.51 35.3 71.73 35.19 71.95 35.08 72.17 34.98 72.39 34.87 72.6 34.76 72.82 34.65 73.04 34.55 73.26 34.44 73.47 34.33 73.69 34.22 73.91 34.12 74.13 34.01 74.34 33.9 74.56 33.79 74.78 33.69 75 33.58 75.21 33.47 75.43 33.36 75.65 33.26 75.87 33.15 76.09 33.04 76.3 32.94 76.52 32.83 76.74 32.72 76.96 32.61 77.17 32.51 77.39 32.4 77.61 32.29 77.83 32.18 78.04 32.08 78.26 31.97 78.48 31.86 78.7 31.75 78.91 31.65 79.13 31.54 79.35 31.43 79.57 31.32 79.79 31.22 80 31.11 80.22 31 80.44 30.89 80.66 30.79 80.87 30.68 81.09 30.57 81.31 30.46 81.53 30.36 81.74 30.25 81.96 30.14 82.18 30.03 82.4 29.93 82.62 29.82 82.83 29.71 83.05 29.6 83.27 29.5 83.49 29.39 83.7 29.28 83.92 29.17 84.14 29.07 84.36 28.96 84.57 28.85 84.79 28.74 85.01 28.64 85.23 28.53 85.44 28.42 85.66 28.31 85.88 28.21 86.1 28.1 86.32 27.99 86.53 27.89 86.75 27.78 86.97 27.67 87.19 27.56 87.4 27.46 87.62 27.35 87.84 27.24 88.06 27.13 88.27 27.03 88.49 26.92 88.71 26.81 88.93 26.7 89.14 26.6 89.36 26.49 89.58 26.38 89.8 26.27 90.02 26.17 90.23 26.06 90.45 25.95 90.67 25.84 90.89 25.74 91.1 25.63 91.32 25.52 91.54 25.41 91.76 25.31 91.97 25.2 92.19 25.09 92.41 24.98 92.63 24.88 92.84 24.77 93.06 24.66 93.28 24.55 93.5 24.45 93.72 24.34 93.93 24.23 94.15 24.12 94.37 24.02 94.59 23.91 94.8 23.8 95.02 23.69 95.24 23.59 95.46 23.48 95.67 23.37 95.89 23.27 96.11 23.16 96.33 23.05 96.55 22.94 96.76 22.84 96.98 22.73 97.2 22.62 97.42 22.51 97.63 22.41 97.85 22.3 98.07 22.19 98.29 22.08 98.5 21.98 98.72 21.87 98.94 21.76 99.16 21.65 99.37 21.55 99.59 21.44 99.81 21.33 100.03 21.22 100.25 21.12 100.46 21.01 100.68 20.9 100.9 20.79 101.12 20.69 101.33 20.58 101.55 20.47 101.77 20.36 101.99 20.26 102.2 20.15 102.42 20.04");
+          }(g.append("g")));
+        }(g.append("g")));
+      }(g.append("g")));
+    }(g.append("g")));
+    (function (g) {
+      d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath2")
+    .append("svg:path")
+      .attr("d", " M18.35,5 L 104.87 5 104.87 61.94 18.35 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath2)");
+      (function (g) {
+        g.attr("stroke", "none")
+         .attr("class", "guide zoomslider")
+         .attr("opacity", 0.00);
+        (function (g) {
+          g.attr("stroke", "#6A6A6A")
+           .attr("stroke-opacity", 0.00)
+           .attr("stroke-width", 0.3)
+           .attr("fill", "#EAEAEA")
+           .on("click", zoomin_behavior(ctx))
+.on("dblclick", function() { d3.event.stopPropagation(); })
+.on("mouseover", zoomslider_button_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_button_mouseover("#6a6a6a"))
+;
+          g.append("svg:path")
+             .attr("d", "M97.87,8 L 101.87 8 101.87 12 97.87 12 z");
+          (function (g) {
+            g.attr("fill", "#6A6A6A")
+             .attr("class", "button_logo");
+            g.append("svg:path")
+               .attr("d", "M98.67,9.6 L 99.47 9.6 99.47 8.8 100.27 8.8 100.27 9.6 101.07 9.6 101.07 10.4 100.27 10.4 100.27 11.2 99.47 11.2 99.47 10.4 98.67 10.4 z");
+          }(g.append("g")));
+        }(g.append("g")));
+        (function (g) {
+          g.attr("fill", "#EAEAEA")
+           .on("click", zoomslider_track_behavior(ctx, 71.87, 88.87));
+          g.append("svg:path")
+             .attr("d", "M78.37,8 L 97.37 8 97.37 12 78.37 12 z");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("fill", "#6A6A6A")
+           .attr("class", "zoomslider_thumb")
+           .call(zoomslider_behavior(ctx, 71.87, 88.87))
+.on("mouseover", zoomslider_thumb_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_thumb_mouseover("#6a6a6a"))
+;
+          g.append("svg:path")
+             .attr("d", "M86.87,8 L 88.87 8 88.87 12 86.87 12 z");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("stroke", "#6A6A6A")
+           .attr("stroke-opacity", 0.00)
+           .attr("stroke-width", 0.3)
+           .attr("fill", "#EAEAEA")
+           .on("click", zoomout_behavior(ctx))
+.on("dblclick", function() { d3.event.stopPropagation(); })
+.on("mouseover", zoomslider_button_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_button_mouseover("#6a6a6a"))
+;
+          g.append("svg:path")
+             .attr("d", "M73.87,8 L 77.87 8 77.87 12 73.87 12 z");
+          (function (g) {
+            g.attr("fill", "#6A6A6A")
+             .attr("class", "button_logo");
+            g.append("svg:path")
+               .attr("d", "M74.67,9.6 L 77.07 9.6 77.07 10.4 74.67 10.4 z");
+          }(g.append("g")));
+        }(g.append("g")));
+      }(g.append("g")));
+    }(g.append("g")));
+  }(g.append("g")));
+}(g.append("g")));
+    d3.select(parent_id)
+      .selectAll("path")
+      .each(function() {
+          var sw = parseFloat(window.getComputedStyle(this).getPropertyValue("stroke-width"));
+          d3.select(this)
+            .attr("vector-effect", "non-scaling-stroke")
+            .style("stroke-width", sw + "mm");
+      });
+}
+
+var data = [
+];
+
+var draw = function(parent_id) {
+    draw_with_data(data, parent_id);
+};
+
+draw("#gadflyplot-uQy4T2mwoqAA9mDVpYMj");
+</script>
+
 
 <h3 id="extrema">Extrema</h3>
 <p>We can combine <code>solve</code> with <code>diff</code> to find extrema of a differentiable function over a closed interval, by locating the critical points where <span class="math">\(f&#39;(x) = 0\)</span>.</p>
@@ -1339,40 +4248,40 @@ subs(L - <span class="fl">2</span>x, x, out)        </code></pre>
 <h3 id="practice-3">Practice</h3>
 <p>Find the derivative of <span class="math">\(\tan^{-1}(x)\)</span>. What do you get?</p>
 
-<form name='WeaveQuestion' data-id='TPCBOuau07' data-controltype='radio'>
+<form name='WeaveQuestion' data-id='MwDmqHnSRk' data-controltype='radio'>
 <div class='control-group '>
 <div class='controls'>
 
 
 <label class='radio'>
-  <input type='radio' name='radio_TPCBOuau07' value='1'>
+  <input type='radio' name='radio_MwDmqHnSRk' value='1'>
   <p>1/sqrt(-x^2 + 1)</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_TPCBOuau07' value='2'>
+  <input type='radio' name='radio_MwDmqHnSRk' value='2'>
   <p>1/(x^2 + 1)</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_TPCBOuau07' value='3'>
+  <input type='radio' name='radio_MwDmqHnSRk' value='3'>
   <p>1/x</p>
 </label>
 
 
 
-<div id='TPCBOuau07_message'></div>
+<div id='MwDmqHnSRk_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('input:radio[name="radio_TPCBOuau07"]').on('change', function() {
+$('input:radio[name="radio_MwDmqHnSRk"]').on('change', function() {
   correct = this.value == 2;
 
   if(correct) {
-     $('#TPCBOuau07_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#MwDmqHnSRk_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#TPCBOuau07_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#MwDmqHnSRk_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1381,24 +4290,24 @@ $('input:radio[name="radio_TPCBOuau07"]').on('change', function() {
 <h4 id="questions">Questions</h4>
 <p>Let <span class="math">\(f(x) = \exp(-\cos(x))\)</span>. Evaluate <span class="math">\(f&#39;(3)\)</span>. (You'll need to <code>subs</code>titute 3 for <code>x</code> and convert to floating point.)</p>
 
-<form name='WeaveQuestion' data-id='k2jcpl3g9p' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='2RmH6Lv76U' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="k2jcpl3g9p" type="number">
+<input id="2RmH6Lv76U" type="number">
 
 
-<div id='k2jcpl3g9p_message'></div>
+<div id='2RmH6Lv76U_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#k2jcpl3g9p').on('change', function() {
+$('#2RmH6Lv76U').on('change', function() {
   correct = Math.abs(this.value - 0.37978418074577663) <= 1.4901161193847656e-8;
 
   if(correct) {
-     $('#k2jcpl3g9p_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#2RmH6Lv76U_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#k2jcpl3g9p_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#2RmH6Lv76U_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1407,24 +4316,24 @@ $('#k2jcpl3g9p').on('change', function() {
 <h4 id="questions-1">Questions</h4>
 <p>Find the single critical point of <span class="math">\(f(x) = 1/x^2 + x^3\)</span>. (Solve, will return many answers but only one real one. You can also try <code>nsolve(diff(f(x)), 1)</code>.)</p>
 
-<form name='WeaveQuestion' data-id='8UYWBKgLLc' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='mdjcSGiNMt' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="8UYWBKgLLc" type="number">
+<input id="mdjcSGiNMt" type="number">
 
 
-<div id='8UYWBKgLLc_message'></div>
+<div id='mdjcSGiNMt_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#8UYWBKgLLc').on('change', function() {
+$('#mdjcSGiNMt').on('change', function() {
   correct = Math.abs(this.value - 0.9221079114817278) <= 0.01;
 
   if(correct) {
-     $('#8UYWBKgLLc_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#mdjcSGiNMt_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#8UYWBKgLLc_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#mdjcSGiNMt_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1432,33 +4341,64 @@ $('#8UYWBKgLLc').on('change', function() {
 
 <h4 id="question-12">Question</h4>
 <p>Let <span class="math">\(f(x) = \tan(x)\)</span>. Newton's method finds the zero of the tangent line <span class="math">\(f(c) + f&#39;(c)(x-c)\)</span>. You can do this with <code>julia</code> via:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">f(x) = tan(x)
+<pre class="sourceCode julia" results="block"><code class="sourceCode julia">f(x) = tan(x)
 c = Sym(<span class="st">&quot;c&quot;</span>);
-solve(f(c) + diff(f(c)) * (x - c), x)
-<span class="co">## 1-element Array{Sym,1}</span>
-<span class="co">## ⎡    sin(2⋅c)⎤</span>
-<span class="co">## ⎢c - ────────⎥</span>
-<span class="co">## ⎣       2    ⎦</span></code></pre>
+solve(f(c) + diff(f(c)) * (x - c), x)</code></pre>
+<pre class="output"><code>1-element Array{Sym,1}:
+     sin(2⋅c)
+c - ────────
+       2    </code></pre>
 <p>What do you get when <span class="math">\(c = \pi/4\)</span>?</p>
 
-<form name='WeaveQuestion' data-id='Ut4VNBhBWz' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='9FoW6fLhnY' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="Ut4VNBhBWz" type="number">
+<input id="9FoW6fLhnY" type="number">
 
 
-<div id='Ut4VNBhBWz_message'></div>
+<div id='9FoW6fLhnY_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#Ut4VNBhBWz').on('change', function() {
+$('#9FoW6fLhnY').on('change', function() {
   correct = Math.abs(this.value - 0.2853981633974483) <= 0.001;
 
   if(correct) {
-     $('#Ut4VNBhBWz_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#9FoW6fLhnY_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#Ut4VNBhBWz_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#9FoW6fLhnY_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+  }
+});
+
+</script>
+
+<h4 id="question-13">Question</h4>
+<p>You have a 12-inch wide rectangular piece of metal that you will fold into three 4 inch strips in a symmetric manner. Let <span class="math">\(\theta\)</span> be the amount each wing is folded up (<span class="math">\(\theta \in [0, 90^\circ]\)</span>). What value of <span class="math">\(\theta\)</span> will produce the larges cross sectional area?</p>
+<p>The area as a function of <span class="math">\(\theta\)</span> is that of two right triangles with hypotenuse <span class="math">\(4\)</span> and height given by <span class="math">\(h/4 = \sin(\theta)\)</span> and base given by <span class="math">\(b/4 = \cos(\theta)\)</span>. The total area then is:</p>
+<p><span class="math">\[
+A(\theta) = 2 \cdot (1/2) \cdot 4\sin(\theta) \cdot 4 \cos(\theta) + 4 \cdot 4\sin(\theta)
+\]</span></p>
+<p>In degrees, what angle maximizes the area?</p>
+
+<form name='WeaveQuestion' data-id='vvk5g3nRF6' data-controltype='numeric'>
+<div class='control-group '>
+<div class='controls'>
+<input id="vvk5g3nRF6" type="number">
+
+
+<div id='vvk5g3nRF6_message'></div>
+</div>
+</div>
+</form>
+<script text='text/javascript'>
+$('#vvk5g3nRF6').on('change', function() {
+  correct = Math.abs(this.value - 49.6569) <= 0.01;
+
+  if(correct) {
+     $('#vvk5g3nRF6_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+  } else {
+     $('#vvk5g3nRF6_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1499,7 +4439,7 @@ x    4⋅x     6   4⋅x    x
 log⎝x  + 1⎠
 ───────────
      2     </code></pre>
-<h4 id="definite-integrals">Definite integrals</h4>
+<h3 id="definite-integrals">Definite integrals</h3>
 <p>By specifying a range to integrate over, the definite integral <span class="math">\(\int_a^b f(x) dx\)</span> can be found.</p>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">integrate(x^<span class="fl">2</span>, (x, <span class="fl">0</span>, <span class="fl">1</span>))                                </code></pre>
 <pre class="output"><code>1/3</code></pre>
@@ -1515,74 +4455,74 @@ solve(eq, b)</code></pre>
  0.840896415253715⋅ⅈ </code></pre>
 <p>We can see that the answer is <span class="math">\(0.840896415253715\)</span>, though the mathematical expression has 3 other possibilities for solution.</p>
 <h3 id="practice-4">Practice</h3>
-<h4 id="question-13">Question</h4>
+<h4 id="question-14">Question</h4>
 <p>Integrate <span class="math">\(f(x) = 2/(x \cdot \log(x))\)</span>. What do you get:</p>
 
-<form name='WeaveQuestion' data-id='PTeglQvXfx' data-controltype='radio'>
+<form name='WeaveQuestion' data-id='tcDr5Wmr67' data-controltype='radio'>
 <div class='control-group '>
 <div class='controls'>
 
 
 <label class='radio'>
-  <input type='radio' name='radio_PTeglQvXfx' value='1'>
+  <input type='radio' name='radio_tcDr5Wmr67' value='1'>
   <p>3*log(x)</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_PTeglQvXfx' value='2'>
+  <input type='radio' name='radio_tcDr5Wmr67' value='2'>
   <p>3*log(x)^2/2</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_PTeglQvXfx' value='3'>
+  <input type='radio' name='radio_tcDr5Wmr67' value='3'>
   <p>-log(x) + log(x*log(x))</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_PTeglQvXfx' value='4'>
+  <input type='radio' name='radio_tcDr5Wmr67' value='4'>
   <p>-3<em>log(x) + 3</em>log(x*log(x))</p>
 </label>
 
 
 
-<div id='PTeglQvXfx_message'></div>
+<div id='tcDr5Wmr67_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('input:radio[name="radio_PTeglQvXfx"]').on('change', function() {
+$('input:radio[name="radio_tcDr5Wmr67"]').on('change', function() {
   correct = this.value == 3;
 
   if(correct) {
-     $('#PTeglQvXfx_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#tcDr5Wmr67_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#PTeglQvXfx_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#tcDr5Wmr67_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
 </script>
 
-<h4 id="question-14">Question</h4>
+<h4 id="question-15">Question</h4>
 <p>Integrate <span class="math">\(f(x) = (2x+5)(x^2 + 5x)^7\)</span> from <span class="math">\(0\)</span> to <span class="math">\(1\)</span>.</p>
 
-<form name='WeaveQuestion' data-id='szKbYR6JVO' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='poYVDFwFmE' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="szKbYR6JVO" type="number">
+<input id="poYVDFwFmE" type="number">
 
 
-<div id='szKbYR6JVO_message'></div>
+<div id='poYVDFwFmE_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#szKbYR6JVO').on('change', function() {
+$('#poYVDFwFmE').on('change', function() {
   correct = Math.abs(this.value - 0.2853981633974483) <= 0.001;
 
   if(correct) {
-     $('#szKbYR6JVO_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#poYVDFwFmE_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#szKbYR6JVO_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#poYVDFwFmE_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1591,40 +4531,40 @@ $('#szKbYR6JVO').on('change', function() {
 <h4 id="questions-2">Questions</h4>
 <p>Integrate <code>f(x) = sqrt(4 - sqrt(x))</code> over <span class="math">\([0,9]\)</span>. What value do you get? Does it make any sense?</p>
 
-<form name='WeaveQuestion' data-id='py7Q7NZS5f' data-controltype='radio'>
+<form name='WeaveQuestion' data-id='5n9ddVXKe8' data-controltype='radio'>
 <div class='control-group '>
 <div class='controls'>
 
 
 <label class='radio'>
-  <input type='radio' name='radio_py7Q7NZS5f' value='1'>
+  <input type='radio' name='radio_5n9ddVXKe8' value='1'>
   <p>12.5333, and yes it makes sense.</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_py7Q7NZS5f' value='2'>
+  <input type='radio' name='radio_5n9ddVXKe8' value='2'>
   <p>-8.884, and no it makes no sense as f(x) &gt; 0, but the integral is negative</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_py7Q7NZS5f' value='3'>
+  <input type='radio' name='radio_5n9ddVXKe8' value='3'>
   <p>Inf, and yes it makes sense as the vertical asymptote at 0 makes this a problem integral.</p>
 </label>
 
 
 
-<div id='py7Q7NZS5f_message'></div>
+<div id='5n9ddVXKe8_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('input:radio[name="radio_py7Q7NZS5f"]').on('change', function() {
+$('input:radio[name="radio_5n9ddVXKe8"]').on('change', function() {
   correct = this.value == 2;
 
   if(correct) {
-     $('#py7Q7NZS5f_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#5n9ddVXKe8_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#py7Q7NZS5f_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#5n9ddVXKe8_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
