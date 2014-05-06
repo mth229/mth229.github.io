@@ -645,7 +645,7 @@ P = 20 = 2b + 2h, \quad A = bh.
 <p>This is exactly the form needed to apply our theorem about the existence of extrema (a continuous function on a closed interval). Rather than solve analytically by taking a derivative, we simply graph to find the value:</p>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">A(b) = b * (<span class="fl">10</span> - b)
 plot(A, <span class="fl">0</span>, <span class="fl">10</span>)</code></pre>
-<div id="gadflyplot-ITZOSKgkO1abenRbTPKy"></div>
+<div id="gadflyplot-Cm7LTmGXmvw6wwKr8Z9T"></div>
 <script>
 (function (module) {
 function draw_with_data(data, parent_id) {
@@ -1199,14 +1199,21 @@ if ('undefined' !== typeof module) {
 }
 
 return module;
-})({}).exports("#gadflyplot-ITZOSKgkO1abenRbTPKy");
-//@ sourceURL=gadflyplot-ITZOSKgkO1abenRbTPKy.js
+})({}).exports("#gadflyplot-Cm7LTmGXmvw6wwKr8Z9T");
+//@ sourceURL=gadflyplot-Cm7LTmGXmvw6wwKr8Z9T.js
 </script>
 
 
 <p>You should see the maximum occurs at <span class="math">\(b=5\)</span> by symmetry, so <span class="math">\(h=5\)</span> as well, and the maximum area is then <span class="math">\(25\)</span>. This gives the satisfying answer that among all rectangles of fixed perimeter, that with the largest area is a square.</p>
+<p>Before moving on, let's see a slightly different way to do this problem, where we trade off some algebra for a bit of abstraction. Let's first write area as a function of both base and height:</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">A(b, h) = b*h</code></pre>
+<p>Then from the constraint given by the perimeter be a fixed value we can solve for <code>h</code> in terms of <code>b</code>:</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">h(b) = (<span class="fl">20</span> - <span class="fl">2</span>b) / <span class="fl">2</span></code></pre>
+<p>Then to get <code>A(b)</code> we simply need to substitute <code>h</code> into <code>A</code>, though instead of doing the substitution our selves we let <code>julia</code> do it:</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">A(b) = A(b, h(b))</code></pre>
+<p>From this we can solve as before. This approach makes the algebra a bit more manageable.</p>
 <h3 id="norman-windows">Norman Windows</h3>
-<p>Here is a similar, though more complicated, example where the analytic approach can be a bit more tedious, but the graphical one mostly satisfying, though we do use Newton's method to find the final answer.</p>
+<p>Here is a similar, though more complicated, example where the analytic approach can be a bit more tedious, but the graphical one mostly satisfying, though we do use something like Newton's method to find the final answer.</p>
 <p>Let a &quot;Norman&quot; window consist of a rectangular window of top length <span class="math">\(x\)</span> and side length <span class="math">\(y\)</span> and a half circle on top. The goal is to maximize the area for a fixed value of the perimeter. Let this be 20 units.</p>
 <script>
 \\ ```{r echo=FALSE}
@@ -1236,12 +1243,15 @@ P = 2y + x + \pi(x/2) = 20
 <p><span class="math">\[
 A = xy + \pi(x/2)^2/2
 \]</span></p>
-<p>We solve for <span class="math">\(y\)</span> in the first with <span class="math">\(y = (20 - x - \pi(x/2))/2\)</span> and substitute into <span class="math">\(A\)</span> without taking time to simplify, as your high school teacher isn't here anymore.</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">A(x) = x * (<span class="fl">20</span> - x - pi*(x/<span class="fl">2</span>))/<span class="fl">2</span> + pi*(x/<span class="fl">2</span>)^<span class="fl">2</span>/<span class="fl">2</span></code></pre>
+<p>We solve for <span class="math">\(y\)</span> in the first with <span class="math">\(y = (20 - x - \pi(x/2))/2\)</span> so that in <code>julia</code> we have:</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">y(x) = (<span class="fl">20</span> - x - pi * x/ <span class="fl">2</span>) / <span class="fl">2</span></code></pre>
+<p>And then we have</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">A(x,y) = x*y + pi * (x/<span class="fl">2</span>)^<span class="fl">2</span> / <span class="fl">2</span>
+A(x) = A(x, y(x))</code></pre>
 <p>The limits are found from the perimeter equation when either <span class="math">\(x=0\)</span> or when <span class="math">\(y=0\)</span> (which is at <span class="math">\(x=20/(1+\pi/2)\)</span>). This leaves us to find an absolute maximum of a continuous function over the closed interval <span class="math">\([0, 20/(1+\pi/2)]\)</span>. Again, our theorem tells us this maximum must occur.</p>
 <p>We begin by simply graphing and estimating the values of the maximum and where it occurs.</p>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">plot(A, <span class="fl">0</span>, <span class="fl">20</span>/(<span class="fl">1</span>+pi/<span class="fl">2</span>))</code></pre>
-<div id="gadflyplot-HPwiIJpd5hRZdC7HHEdw"></div>
+<div id="gadflyplot-mxhEmy9APlX1P17KC22z"></div>
 <script>
 (function (module) {
 function draw_with_data(data, parent_id) {
@@ -1789,8 +1799,8 @@ if ('undefined' !== typeof module) {
 }
 
 return module;
-})({}).exports("#gadflyplot-HPwiIJpd5hRZdC7HHEdw");
-//@ sourceURL=gadflyplot-HPwiIJpd5hRZdC7HHEdw.js
+})({}).exports("#gadflyplot-mxhEmy9APlX1P17KC22z");
+//@ sourceURL=gadflyplot-mxhEmy9APlX1P17KC22z.js
 </script>
 
 
@@ -1798,7 +1808,7 @@ return module;
 <p>As reading the maximum from the graph is more difficult than reading a <span class="math">\(0\)</span> of a function, we plot the derivative using our approximate derivative.</p>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia"><span class="kw">using</span> Roots         <span class="co">## provides D</span>
 plot(D(A), <span class="fl">5.5</span>, <span class="fl">5.7</span>) </code></pre>
-<div id="gadflyplot-sG8TMrkkugqbpTU81S8S"></div>
+<div id="gadflyplot-NjTzg4mUefrcfI9sBjd1"></div>
 <script>
 (function (module) {
 function draw_with_data(data, parent_id) {
@@ -2421,8 +2431,8 @@ if ('undefined' !== typeof module) {
 }
 
 return module;
-})({}).exports("#gadflyplot-sG8TMrkkugqbpTU81S8S");
-//@ sourceURL=gadflyplot-sG8TMrkkugqbpTU81S8S.js
+})({}).exports("#gadflyplot-NjTzg4mUefrcfI9sBjd1");
+//@ sourceURL=gadflyplot-NjTzg4mUefrcfI9sBjd1.js
 </script>
 
 
@@ -2440,24 +2450,24 @@ return module;
 <h4 id="question">Question</h4>
 <p>A rancher with 20 meters of fence, wishes to make a pen adjacent to an existing fence. The pen will be a rectangle with one edge using the existing fence. Say that has length <span class="math">\(x\)</span>, then <span class="math">\(20 = 2y + x\)</span>, with <span class="math">\(y\)</span> the other dimension of the pen. What is the maximum area that can be made?</p>
 
-<form name='WeaveQuestion' data-id='HzBNzV1oIL' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='9KV1jjSRDE' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="HzBNzV1oIL" type="number">
+<input id="9KV1jjSRDE" type="number">
 
 
-<div id='HzBNzV1oIL_message'></div>
+<div id='9KV1jjSRDE_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#HzBNzV1oIL').on('change', function() {
+$('#9KV1jjSRDE').on('change', function() {
   correct = Math.abs(this.value - 50.0) <= 0.001;
 
   if(correct) {
-     $('#HzBNzV1oIL_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#9KV1jjSRDE_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#HzBNzV1oIL_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#9KV1jjSRDE_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -2507,15 +2517,16 @@ Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
 <p>Now, to find the length <span class="math">\(l = l_1 + l_2\)</span> as a function of <span class="math">\(\theta\)</span>.</p>
 <p>We need to brush off our trigonometry, in particular right triangle trigonometry. We see from the figure that <span class="math">\(l_1\)</span> is the hypotenuse of a right triangle with opposite side <span class="math">\(8\)</span> and <span class="math">\(l_2\)</span> is the hypotenuse of a right triangle with adjacent side <span class="math">\(5\)</span>. So, <span class="math">\(8/l_1 = \sin\theta\)</span> and <span class="math">\(5/l_2 = \cos\theta\)</span>.</p>
 <p>That is, we have</p>
-<p><span class="math">\[
-l(\theta) = \frac{8}{\sin\theta} + \frac{5}{\cos\theta}.
-\]</span></p>
-<p>Our goal is to minimize this function for all angles between <span class="math">\(0\)</span> and <span class="math">\(\pi/2\)</span>.</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">l(l1, l2) = l1 + l2
+l1(t) = <span class="fl">8</span>/sin(t)    
+l2(t) = <span class="fl">5</span>/cos(t)
+<span class="co">##</span>
+l(t) = l(l1(t), l2(t))</code></pre>
+<p>Our goal is to minimize this function for all angles between <span class="math">\(0\)</span> and <span class="math">\(90\)</span> degrees, or <span class="math">\(0\)</span> and <span class="math">\(\pi/2\)</span> radians.</p>
 <p>This is not a continuous function on a closed interval -- it is undefined at the endpoints. That being said, a quick plot will convince us that the minimum occurs at a critical point and there is only one critical point in <span class="math">\((0, \pi/2)\)</span>.</p>
-<pre class="sourceCode julia" results="block"><code class="sourceCode julia">l(t) = <span class="fl">8</span>/sin(t) + <span class="fl">5</span>/cos(t)
-delta = <span class="fl">0.1</span>;
-plot(l, <span class="fl">0</span> + delta, pi/<span class="fl">2</span> - delta)</code></pre>
-<div id="gadflyplot-uynN8F7E3BU5s7J840Sz"></div>
+<pre class="sourceCode julia" results="block"><code class="sourceCode julia">delta = <span class="fl">0.2</span>
+plot(l, delta, pi/<span class="fl">2</span> - delta)</code></pre>
+<div id="gadflyplot-BHJk0J7d2j8wo76lNmsN"></div>
 <script>
 (function (module) {
 function draw_with_data(data, parent_id) {
@@ -2546,9 +2557,156 @@ function draw_with_data(data, parent_id) {
        .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
        .style("font-size", "3.18px")
        .attr("class", "guide ylabels");
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 20.24)
+           .attr("y", -34.66)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("90");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 20.24)
+           .attr("y", 119.85)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-60");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 20.24)
+           .attr("y", -24.36)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("80");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 20.24)
+           .attr("y", 88.95)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-30");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 20.24)
+           .attr("y", -3.76)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("60");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 20.24)
+           .attr("y", -55.26)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("110");
+    })
+;
+      }(g.append("g")));
       g.append("svg:text")
-         .attr("x", 21.65)
-         .attr("y", 32.3)
+         .attr("x", 20.24)
+         .attr("y", 47.75)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("10");
+   })
+;
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 20.24)
+           .attr("y", 78.65)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-20");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 20.24)
+           .attr("y", 68.35)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-10");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 20.24)
+           .attr("y", 109.55)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-50");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 20.24)
+           .attr("y", -14.06)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("70");
+    })
+;
+      }(g.append("g")));
+      g.append("svg:text")
+         .attr("x", 20.24)
+         .attr("y", 37.45)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("20");
+   })
+;
+      g.append("svg:text")
+         .attr("x", 20.24)
+         .attr("y", 58.05)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("0");
+   })
+;
+      g.append("svg:text")
+         .attr("x", 20.24)
+         .attr("y", 6.55)
          .attr("text-anchor", "end")
          .style("dominant-baseline", "central")
          .call(function(text) {
@@ -2558,93 +2716,45 @@ function draw_with_data(data, parent_id) {
       (function (g) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
-           .attr("x", 21.65)
-           .attr("y", 109.55)
+           .attr("x", 20.24)
+           .attr("y", 99.25)
            .attr("text-anchor", "end")
            .style("dominant-baseline", "central")
             .call(function(text) {
-      text.text("-100");
-    })
-;
-      }(g.append("g")));
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 21.65)
-           .attr("y", 135.3)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("-150");
-    })
-;
-      }(g.append("g")));
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 21.65)
-           .attr("y", 83.8)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("-50");
+      text.text("-40");
     })
 ;
       }(g.append("g")));
       g.append("svg:text")
-         .attr("x", 21.65)
-         .attr("y", 6.55)
+         .attr("x", 20.24)
+         .attr("y", 16.85)
          .attr("text-anchor", "end")
          .style("dominant-baseline", "central")
          .call(function(text) {
-     text.text("100");
+     text.text("40");
+   })
+;
+      g.append("svg:text")
+         .attr("x", 20.24)
+         .attr("y", 27.15)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("30");
    })
 ;
       (function (g) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
-           .attr("x", 21.65)
+           .attr("x", 20.24)
            .attr("y", -44.96)
            .attr("text-anchor", "end")
            .style("dominant-baseline", "central")
             .call(function(text) {
-      text.text("200");
+      text.text("100");
     })
 ;
       }(g.append("g")));
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 21.65)
-           .attr("y", -19.21)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("150");
-    })
-;
-      }(g.append("g")));
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 21.65)
-           .attr("y", -70.71)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("250");
-    })
-;
-      }(g.append("g")));
-      g.append("svg:text")
-         .attr("x", 21.65)
-         .attr("y", 58.05)
-         .attr("text-anchor", "end")
-         .style("dominant-baseline", "central")
-         .call(function(text) {
-     text.text("0");
-   })
-;
     }(g.append("g")));
     (function (g) {
       g.attr("stroke", "none")
@@ -2671,7 +2781,7 @@ function draw_with_data(data, parent_id) {
       (function (g) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
-           .attr("x", 170.47)
+           .attr("x", 171.32)
            .attr("y", 64.83)
            .attr("text-anchor", "middle")
             .call(function(text) {
@@ -2682,7 +2792,7 @@ function draw_with_data(data, parent_id) {
       (function (g) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
-           .attr("x", -61.86)
+           .attr("x", -64.56)
            .attr("y", 64.83)
            .attr("text-anchor", "middle")
             .call(function(text) {
@@ -2693,7 +2803,7 @@ function draw_with_data(data, parent_id) {
       (function (g) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
-           .attr("x", 228.55)
+           .attr("x", 230.29)
            .attr("y", 64.83)
            .attr("text-anchor", "middle")
             .call(function(text) {
@@ -2702,7 +2812,7 @@ function draw_with_data(data, parent_id) {
 ;
       }(g.append("g")));
       g.append("svg:text")
-         .attr("x", 83.34)
+         .attr("x", 82.86)
          .attr("y", 64.83)
          .attr("text-anchor", "middle")
          .call(function(text) {
@@ -2712,7 +2822,7 @@ function draw_with_data(data, parent_id) {
       (function (g) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
-           .attr("x", 141.43)
+           .attr("x", 141.83)
            .attr("y", 64.83)
            .attr("text-anchor", "middle")
             .call(function(text) {
@@ -2721,7 +2831,7 @@ function draw_with_data(data, parent_id) {
 ;
       }(g.append("g")));
       g.append("svg:text")
-         .attr("x", 112.39)
+         .attr("x", 112.35)
          .attr("y", 64.83)
          .attr("text-anchor", "middle")
          .call(function(text) {
@@ -2729,7 +2839,7 @@ function draw_with_data(data, parent_id) {
    })
 ;
       g.append("svg:text")
-         .attr("x", 54.3)
+         .attr("x", 53.38)
          .attr("y", 64.83)
          .attr("text-anchor", "middle")
          .call(function(text) {
@@ -2739,7 +2849,7 @@ function draw_with_data(data, parent_id) {
       (function (g) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
-           .attr("x", -90.91)
+           .attr("x", -94.05)
            .attr("y", 64.83)
            .attr("text-anchor", "middle")
             .call(function(text) {
@@ -2750,7 +2860,7 @@ function draw_with_data(data, parent_id) {
       (function (g) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
-           .attr("x", 199.51)
+           .attr("x", 200.8)
            .attr("y", 64.83)
            .attr("text-anchor", "middle")
             .call(function(text) {
@@ -2761,7 +2871,7 @@ function draw_with_data(data, parent_id) {
       (function (g) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
-           .attr("x", -3.78)
+           .attr("x", -5.59)
            .attr("y", 64.83)
            .attr("text-anchor", "middle")
             .call(function(text) {
@@ -2770,7 +2880,7 @@ function draw_with_data(data, parent_id) {
 ;
       }(g.append("g")));
       g.append("svg:text")
-         .attr("x", 25.26)
+         .attr("x", 23.89)
          .attr("y", 64.83)
          .attr("text-anchor", "middle")
          .call(function(text) {
@@ -2780,7 +2890,7 @@ function draw_with_data(data, parent_id) {
       (function (g) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
-           .attr("x", -32.82)
+           .attr("x", -35.08)
            .attr("y", 64.83)
            .attr("text-anchor", "middle")
             .call(function(text) {
@@ -2795,7 +2905,7 @@ function draw_with_data(data, parent_id) {
        .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
        .style("font-size", "3.88px");
       g.append("svg:text")
-         .attr("x", 68.82)
+         .attr("x", 68.12)
          .attr("y", 73)
          .attr("text-anchor", "middle")
          .call(function(text) {
@@ -2813,66 +2923,84 @@ function draw_with_data(data, parent_id) {
   .append("svg:clipPath")
     .attr("id", parent_id + "_clippath0")
     .append("svg:path")
-      .attr("d", " M22.65,5 L 115 5 115 59.59 22.65 59.59 z");g.attr("clip-path", "url(#" + parent_id + "_clippath0)");
+      .attr("d", " M21.24,5 L 115 5 115 59.59 21.24 59.59 z");g.attr("clip-path", "url(#" + parent_id + "_clippath0)");
         (function (g) {
           g.attr("class", "guide background")
            .attr("stroke", "#F1F1F5")
            .attr("fill", "#FAFAFA")
            .attr("opacity", 1.00);
           g.append("svg:path")
-             .attr("d", "M22.65,5 L 115 5 115 59.59 22.65 59.59 z");
+             .attr("d", "M21.24,5 L 115 5 115 59.59 21.24 59.59 z");
         }(g.append("g")));
         (function (g) {
           g.attr("stroke", "#F0F0F3")
            .attr("stroke-width", 0.2)
            .attr("class", "guide ygridlines xfixed");
           g.append("svg:path")
-             .attr("d", "M22.65,109.55 L 115 109.55");
+             .attr("d", "M21.24,119.85 L 115 119.85");
           g.append("svg:path")
-             .attr("d", "M22.65,83.8 L 115 83.8");
+             .attr("d", "M21.24,88.95 L 115 88.95");
           g.append("svg:path")
-             .attr("d", "M22.65,-44.96 L 115 -44.96");
+             .attr("d", "M21.24,-55.26 L 115 -55.26");
           g.append("svg:path")
-             .attr("d", "M22.65,-70.71 L 115 -70.71");
+             .attr("d", "M21.24,78.65 L 115 78.65");
           g.append("svg:path")
-             .attr("d", "M22.65,58.05 L 115 58.05");
+             .attr("d", "M21.24,109.55 L 115 109.55");
           g.append("svg:path")
-             .attr("d", "M22.65,-19.21 L 115 -19.21");
+             .attr("d", "M21.24,37.45 L 115 37.45");
           g.append("svg:path")
-             .attr("d", "M22.65,6.55 L 115 6.55");
+             .attr("d", "M21.24,6.55 L 115 6.55");
           g.append("svg:path")
-             .attr("d", "M22.65,135.3 L 115 135.3");
+             .attr("d", "M21.24,16.85 L 115 16.85");
           g.append("svg:path")
-             .attr("d", "M22.65,32.3 L 115 32.3");
+             .attr("d", "M21.24,-44.96 L 115 -44.96");
+          g.append("svg:path")
+             .attr("d", "M21.24,27.15 L 115 27.15");
+          g.append("svg:path")
+             .attr("d", "M21.24,99.25 L 115 99.25");
+          g.append("svg:path")
+             .attr("d", "M21.24,58.05 L 115 58.05");
+          g.append("svg:path")
+             .attr("d", "M21.24,-14.06 L 115 -14.06");
+          g.append("svg:path")
+             .attr("d", "M21.24,68.35 L 115 68.35");
+          g.append("svg:path")
+             .attr("d", "M21.24,47.75 L 115 47.75");
+          g.append("svg:path")
+             .attr("d", "M21.24,-3.76 L 115 -3.76");
+          g.append("svg:path")
+             .attr("d", "M21.24,-24.36 L 115 -24.36");
+          g.append("svg:path")
+             .attr("d", "M21.24,-34.66 L 115 -34.66");
         }(g.append("g")));
         (function (g) {
           g.attr("stroke", "#F0F0F3")
            .attr("stroke-width", 0.2)
            .attr("class", "guide xgridlines yfixed");
           g.append("svg:path")
-             .attr("d", "M-61.86,5 L -61.86 59.59");
+             .attr("d", "M-64.56,5 L -64.56 59.59");
           g.append("svg:path")
-             .attr("d", "M83.34,5 L 83.34 59.59");
+             .attr("d", "M82.86,5 L 82.86 59.59");
           g.append("svg:path")
-             .attr("d", "M112.39,5 L 112.39 59.59");
+             .attr("d", "M112.35,5 L 112.35 59.59");
           g.append("svg:path")
-             .attr("d", "M-90.91,5 L -90.91 59.59");
+             .attr("d", "M-94.05,5 L -94.05 59.59");
           g.append("svg:path")
-             .attr("d", "M-3.78,5 L -3.78 59.59");
+             .attr("d", "M-5.59,5 L -5.59 59.59");
           g.append("svg:path")
-             .attr("d", "M-32.82,5 L -32.82 59.59");
+             .attr("d", "M-35.08,5 L -35.08 59.59");
           g.append("svg:path")
-             .attr("d", "M25.26,5 L 25.26 59.59");
+             .attr("d", "M23.89,5 L 23.89 59.59");
           g.append("svg:path")
-             .attr("d", "M199.51,5 L 199.51 59.59");
+             .attr("d", "M200.8,5 L 200.8 59.59");
           g.append("svg:path")
-             .attr("d", "M54.3,5 L 54.3 59.59");
+             .attr("d", "M53.38,5 L 53.38 59.59");
           g.append("svg:path")
-             .attr("d", "M141.43,5 L 141.43 59.59");
+             .attr("d", "M141.83,5 L 141.83 59.59");
           g.append("svg:path")
-             .attr("d", "M228.55,5 L 228.55 59.59");
+             .attr("d", "M230.29,5 L 230.29 59.59");
           g.append("svg:path")
-             .attr("d", "M170.47,5 L 170.47 59.59");
+             .attr("d", "M171.32,5 L 171.32 59.59");
         }(g.append("g")));
       }(g.append("g")));
       (function (g) {
@@ -2880,7 +3008,7 @@ function draw_with_data(data, parent_id) {
   .append("svg:clipPath")
     .attr("id", parent_id + "_clippath1")
     .append("svg:path")
-      .attr("d", " M22.65,5 L 115 5 115 59.59 22.65 59.59 z");g.attr("clip-path", "url(#" + parent_id + "_clippath1)");
+      .attr("d", " M21.24,5 L 115 5 115 59.59 21.24 59.59 z");g.attr("clip-path", "url(#" + parent_id + "_clippath1)");
         (function (g) {
           g.attr("class", "plotpanel");
           (function (g) {
@@ -2890,7 +3018,7 @@ function draw_with_data(data, parent_id) {
               g.attr("stroke", "#00BFFF")
                .attr("class", "geometry");
               g.append("svg:path")
-                 .attr("d", "M31.07,14.19 L 31.39 16.33 31.71 18.26 32.03 20.01 32.35 21.6 32.67 23.05 32.99 24.39 33.31 25.61 33.63 26.74 33.95 27.79 34.27 28.76 34.59 29.67 34.91 30.51 35.23 31.3 35.55 32.04 35.87 32.74 36.19 33.39 36.51 34.01 36.82 34.59 37.14 35.14 37.46 35.66 37.78 36.15 38.1 36.62 38.42 37.07 38.74 37.49 39.06 37.89 39.38 38.28 39.7 38.65 40.02 39 40.34 39.34 40.66 39.66 40.98 39.96 41.3 40.26 41.62 40.54 41.94 40.82 42.26 41.08 42.58 41.33 42.9 41.57 43.22 41.8 43.54 42.03 43.86 42.24 44.18 42.45 44.5 42.65 44.82 42.85 45.14 43.04 45.46 43.22 45.78 43.39 46.1 43.56 46.42 43.73 46.74 43.88 47.06 44.04 47.38 44.19 47.7 44.33 48.02 44.47 48.34 44.61 48.66 44.74 48.98 44.86 49.3 44.99 49.62 45.11 49.94 45.22 50.25 45.34 50.57 45.45 50.89 45.55 51.21 45.66 51.53 45.76 51.85 45.86 52.17 45.95 52.49 46.04 52.81 46.13 53.13 46.22 53.45 46.3 53.77 46.39 54.09 46.47 54.41 46.55 54.73 46.62 55.05 46.7 55.37 46.77 55.69 46.84 56.01 46.91 56.33 46.97 56.65 47.04 56.97 47.1 57.29 47.16 57.61 47.22 57.93 47.28 58.25 47.33 58.57 47.39 58.89 47.44 59.21 47.49 59.53 47.54 59.85 47.59 60.17 47.64 60.49 47.68 60.81 47.73 61.13 47.77 61.45 47.82 61.77 47.86 62.09 47.9 62.41 47.93 62.73 47.97 63.05 48.01 63.37 48.04 63.68 48.08 64 48.11 64.32 48.14 64.64 48.17 64.96 48.2 65.28 48.23 65.6 48.26 65.92 48.29 66.24 48.31 66.56 48.34 66.88 48.36 67.2 48.38 67.52 48.4 67.84 48.42 68.16 48.44 68.48 48.46 68.8 48.48 69.12 48.5 69.44 48.52 69.76 48.53 70.08 48.55 70.4 48.56 70.72 48.57 71.04 48.58 71.36 48.6 71.68 48.61 72 48.62 72.32 48.62 72.64 48.63 72.96 48.64 73.28 48.65 73.6 48.65 73.92 48.65 74.24 48.66 74.56 48.66 74.88 48.66 75.2 48.66 75.52 48.66 75.84 48.66 76.16 48.66 76.48 48.66 76.8 48.66 77.11 48.65 77.43 48.65 77.75 48.64 78.07 48.63 78.39 48.63 78.71 48.62 79.03 48.61 79.35 48.6 79.67 48.59 79.99 48.57 80.31 48.56 80.63 48.55 80.95 48.53 81.27 48.52 81.59 48.5 81.91 48.48 82.23 48.46 82.55 48.44 82.87 48.42 83.19 48.4 83.51 48.37 83.83 48.35 84.15 48.32 84.47 48.29 84.79 48.27 85.11 48.24 85.43 48.21 85.75 48.17 86.07 48.14 86.39 48.11 86.71 48.07 87.03 48.03 87.35 47.99 87.67 47.95 87.99 47.91 88.31 47.87 88.63 47.82 88.95 47.78 89.27 47.73 89.59 47.68 89.91 47.63 90.23 47.57 90.54 47.52 90.86 47.46 91.18 47.4 91.5 47.34 91.82 47.28 92.14 47.21 92.46 47.14 92.78 47.07 93.1 47 93.42 46.92 93.74 46.85 94.06 46.76 94.38 46.68 94.7 46.59 95.02 46.5 95.34 46.41 95.66 46.31 95.98 46.21 96.3 46.11 96.62 46 96.94 45.89 97.26 45.77 97.58 45.65 97.9 45.53 98.22 45.4 98.54 45.26 98.86 45.12 99.18 44.97 99.5 44.82 99.82 44.66 100.14 44.49 100.46 44.32 100.78 44.14 101.1 43.95 101.42 43.75 101.74 43.55 102.06 43.33 102.38 43.11 102.7 42.87 103.02 42.62 103.34 42.36 103.66 42.08 103.97 41.79 104.29 41.49 104.61 41.17 104.93 40.82 105.25 40.46 105.57 40.08 105.89 39.67 106.21 39.24 106.53 38.78 106.85 38.29 107.17 37.77 107.49 37.2 107.81 36.6 108.13 35.94 108.45 35.24 108.77 34.48 109.09 33.65 109.41 32.74 109.73 31.75 110.05 30.66 110.37 29.45 110.69 28.11");
+                 .attr("d", "M35.69,11.31 L 35.96 12.25 36.24 13.14 36.52 13.99 36.79 14.81 37.07 15.59 37.35 16.34 37.63 17.05 37.9 17.74 38.18 18.4 38.46 19.04 38.74 19.65 39.01 20.23 39.29 20.8 39.57 21.34 39.84 21.87 40.12 22.37 40.4 22.86 40.68 23.34 40.95 23.79 41.23 24.23 41.51 24.66 41.79 25.07 42.06 25.47 42.34 25.86 42.62 26.23 42.89 26.6 43.17 26.95 43.45 27.29 43.73 27.62 44 27.95 44.28 28.26 44.56 28.56 44.84 28.86 45.11 29.14 45.39 29.42 45.67 29.69 45.94 29.96 46.22 30.21 46.5 30.46 46.78 30.71 47.05 30.94 47.33 31.17 47.61 31.4 47.89 31.62 48.16 31.83 48.44 32.04 48.72 32.24 48.99 32.44 49.27 32.63 49.55 32.82 49.83 33 50.1 33.18 50.38 33.35 50.66 33.52 50.94 33.69 51.21 33.85 51.49 34.01 51.77 34.16 52.04 34.31 52.32 34.46 52.6 34.61 52.88 34.75 53.15 34.88 53.43 35.02 53.71 35.15 53.99 35.28 54.26 35.4 54.54 35.52 54.82 35.64 55.09 35.76 55.37 35.87 55.65 35.98 55.93 36.09 56.2 36.2 56.48 36.3 56.76 36.4 57.04 36.5 57.31 36.59 57.59 36.69 57.87 36.78 58.14 36.87 58.42 36.96 58.7 37.04 58.98 37.13 59.25 37.21 59.53 37.29 59.81 37.36 60.09 37.44 60.36 37.51 60.64 37.59 60.92 37.66 61.19 37.72 61.47 37.79 61.75 37.86 62.03 37.92 62.3 37.98 62.58 38.04 62.86 38.1 63.14 38.15 63.41 38.21 63.69 38.26 63.97 38.31 64.24 38.36 64.52 38.41 64.8 38.46 65.08 38.51 65.35 38.55 65.63 38.59 65.91 38.64 66.19 38.68 66.46 38.72 66.74 38.75 67.02 38.79 67.29 38.82 67.57 38.86 67.85 38.89 68.13 38.92 68.4 38.95 68.68 38.98 68.96 39 69.24 39.03 69.51 39.05 69.79 39.08 70.07 39.1 70.34 39.12 70.62 39.14 70.9 39.16 71.18 39.17 71.45 39.19 71.73 39.2 72.01 39.22 72.29 39.23 72.56 39.24 72.84 39.25 73.12 39.26 73.39 39.26 73.67 39.27 73.95 39.27 74.23 39.28 74.5 39.28 74.78 39.28 75.06 39.28 75.34 39.28 75.61 39.28 75.89 39.27 76.17 39.27 76.44 39.26 76.72 39.25 77 39.24 77.28 39.23 77.55 39.22 77.83 39.21 78.11 39.19 78.39 39.17 78.66 39.16 78.94 39.14 79.22 39.12 79.49 39.1 79.77 39.07 80.05 39.05 80.33 39.03 80.6 39 80.88 38.97 81.16 38.94 81.44 38.91 81.71 38.88 81.99 38.84 82.27 38.8 82.54 38.77 82.82 38.73 83.1 38.69 83.38 38.64 83.65 38.6 83.93 38.55 84.21 38.51 84.49 38.46 84.76 38.41 85.04 38.35 85.32 38.3 85.6 38.24 85.87 38.18 86.15 38.12 86.43 38.06 86.7 38 86.98 37.93 87.26 37.86 87.54 37.79 87.81 37.71 88.09 37.64 88.37 37.56 88.65 37.48 88.92 37.4 89.2 37.31 89.48 37.22 89.75 37.13 90.03 37.04 90.31 36.94 90.59 36.84 90.86 36.74 91.14 36.64 91.42 36.53 91.7 36.42 91.97 36.3 92.25 36.18 92.53 36.06 92.8 35.94 93.08 35.81 93.36 35.67 93.64 35.53 93.91 35.39 94.19 35.25 94.47 35.1 94.75 34.94 95.02 34.78 95.3 34.62 95.58 34.45 95.85 34.27 96.13 34.09 96.41 33.91 96.69 33.71 96.96 33.51 97.24 33.31 97.52 33.1 97.8 32.88 98.07 32.65 98.35 32.42 98.63 32.18 98.9 31.93 99.18 31.67 99.46 31.4 99.74 31.12 100.01 30.83 100.29 30.53 100.57 30.22 100.85 29.9 101.12 29.57 101.4 29.22 101.68 28.86 101.95 28.49 102.23 28.1 102.51 27.69 102.79 27.26 103.06 26.82 103.34 26.36 103.62 25.88 103.9 25.38 104.17 24.85 104.45 24.3 104.73 23.72");
             }(g.append("g")));
           }(g.append("g")));
         }(g.append("g")));
@@ -2900,7 +3028,7 @@ function draw_with_data(data, parent_id) {
   .append("svg:clipPath")
     .attr("id", parent_id + "_clippath2")
     .append("svg:path")
-      .attr("d", " M22.65,5 L 115 5 115 59.59 22.65 59.59 z");g.attr("clip-path", "url(#" + parent_id + "_clippath2)");
+      .attr("d", " M21.24,5 L 115 5 115 59.59 21.24 59.59 z");g.attr("clip-path", "url(#" + parent_id + "_clippath2)");
         (function (g) {
           g.attr("stroke", "none")
            .attr("class", "guide zoomslider")
@@ -2988,13 +3116,13 @@ if ('undefined' !== typeof module) {
 }
 
 return module;
-})({}).exports("#gadflyplot-uynN8F7E3BU5s7J840Sz");
-//@ sourceURL=gadflyplot-uynN8F7E3BU5s7J840Sz.js
+})({}).exports("#gadflyplot-BHJk0J7d2j8wo76lNmsN");
+//@ sourceURL=gadflyplot-BHJk0J7d2j8wo76lNmsN.js
 </script>
 
 
-<p>The minimum occurs between <span class="math">\(0.5\)</span> and <span class="math">\(1.25\)</span>, we will use a bracketing method:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">x = fzero(D(l), [<span class="fl">0.5</span>, <span class="fl">1.25</span>])
+<p>The minimum occurs between 0.5 and 1.0 radins, we will use a bracketing method:</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">x = fzero(D(l), [<span class="fl">0.5</span>, <span class="fl">1.0</span>])
 <span class="co">## 0.8634136052517809</span></code></pre>
 <p>So the minimum of the function <span class="math">\(l\)</span> is</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">l(x)
@@ -3004,40 +3132,40 @@ return module;
 <h4 id="question-1">Question</h4>
 <p>Rather than use a bracketing method to solve for the root of <span class="math">\(l&#39;(t)=0\)</span>, we might have tried using <code>fzero(D(l), 0.8)</code>. Do so. What do you find?</p>
 
-<form name='WeaveQuestion' data-id='EU7CCmKXvE' data-controltype='radio'>
+<form name='WeaveQuestion' data-id='T6yCui2yGr' data-controltype='radio'>
 <div class='control-group '>
 <div class='controls'>
 
 
 <label class='radio'>
-  <input type='radio' name='radio_EU7CCmKXvE' value='1'>
+  <input type='radio' name='radio_T6yCui2yGr' value='1'>
   <p>You get the same answer, 0.8634...</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_EU7CCmKXvE' value='2'>
+  <input type='radio' name='radio_T6yCui2yGr' value='2'>
   <p>You get a different answer, 0.9834...</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_EU7CCmKXvE' value='3'>
+  <input type='radio' name='radio_T6yCui2yGr' value='3'>
   <p>The method does not converge</p>
 </label>
 
 
 
-<div id='EU7CCmKXvE_message'></div>
+<div id='T6yCui2yGr_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('input:radio[name="radio_EU7CCmKXvE"]').on('change', function() {
+$('input:radio[name="radio_T6yCui2yGr"]').on('change', function() {
   correct = this.value == 3;
 
   if(correct) {
-     $('#EU7CCmKXvE_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#T6yCui2yGr_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#EU7CCmKXvE_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#T6yCui2yGr_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -3048,26 +3176,26 @@ $('input:radio[name="radio_EU7CCmKXvE"]').on('change', function() {
 <p>A rain gutter is constructed from a 30&quot; wide sheet of tin by bending it into thirds. If the sides are bent 90 degrees, then the cross-sectional area would be <span class="math">\(100 = 10^2\)</span>. This is not the largest possible amount. For example, if the sides are bent by 45 degrees, the cross sectional area is:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia"><span class="fl">2</span> * (<span class="fl">1</span>/<span class="fl">2</span> * <span class="fl">10</span>*cos(pi/<span class="fl">4</span>) * <span class="fl">10</span> * sin(pi/<span class="fl">4</span>)) + <span class="fl">10</span>*sin(pi/<span class="fl">4</span>) * <span class="fl">10</span>
 <span class="co">## 120.71067811865474</span></code></pre>
-<p>Find a value in degrees that gives the maximum. (The first task is to write the area in terms of <span class="math">\(theta\)</span>.</p>
+<p>Find a value in degrees that gives the maximum. (The first task is to write the area in terms of <span class="math">\(\theta\)</span>.</p>
 
-<form name='WeaveQuestion' data-id='N7qUBg15jN' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='kHJKvjlBCp' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="N7qUBg15jN" type="number">
+<input id="kHJKvjlBCp" type="number">
 
 
-<div id='N7qUBg15jN_message'></div>
+<div id='kHJKvjlBCp_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#N7qUBg15jN').on('change', function() {
+$('#kHJKvjlBCp').on('change', function() {
   correct = Math.abs(this.value - 60.00000000000001) <= 0.001;
 
   if(correct) {
-     $('#N7qUBg15jN_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#kHJKvjlBCp_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#N7qUBg15jN_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#kHJKvjlBCp_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -3079,24 +3207,24 @@ $('#N7qUBg15jN').on('change', function() {
 " />
 <p>What is the value of theta in degrees?</p>
 
-<form name='WeaveQuestion' data-id='mEoFEYhIzj' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='kbJBCZ2mSV' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="mEoFEYhIzj" type="number">
+<input id="kbJBCZ2mSV" type="number">
 
 
-<div id='mEoFEYhIzj_message'></div>
+<div id='kbJBCZ2mSV_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#mEoFEYhIzj').on('change', function() {
-  correct = Math.abs(this.value - 30.00000000000001) <= 0.1;
+$('#kbJBCZ2mSV').on('change', function() {
+  correct = Math.abs(this.value - 30.000000000000004) <= 0.1;
 
   if(correct) {
-     $('#mEoFEYhIzj_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#kbJBCZ2mSV_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#mEoFEYhIzj_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#kbJBCZ2mSV_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -3139,7 +3267,7 @@ T(x) = x/30 + \sqrt{5^2 + (10-x)^2}/10, \quad 0 &lt; x &lt; 10
 <p>Let's plot <span class="math">\(T(x)\)</span> over the interval <span class="math">\((0,10)\)</span> and look:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">T(x) = x/<span class="fl">30</span> + sqrt(<span class="fl">5</span>^<span class="fl">2</span> + (<span class="fl">10</span>-x)^<span class="fl">2</span>)/<span class="fl">10</span></code></pre>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">plot(T, <span class="fl">0</span>, <span class="fl">10</span>) </code></pre>
-<div id="gadflyplot-dzXYwvAa5aTPCBOuau07"></div>
+<div id="gadflyplot-xaZMFzJWlo377jE9eAl9"></div>
 <script>
 (function (module) {
 function draw_with_data(data, parent_id) {
@@ -3654,14 +3782,14 @@ if ('undefined' !== typeof module) {
 }
 
 return module;
-})({}).exports("#gadflyplot-dzXYwvAa5aTPCBOuau07");
-//@ sourceURL=gadflyplot-dzXYwvAa5aTPCBOuau07.js
+})({}).exports("#gadflyplot-xaZMFzJWlo377jE9eAl9");
+//@ sourceURL=gadflyplot-xaZMFzJWlo377jE9eAl9.js
 </script>
 
 
 <p>The minimum happens way out near 8. We zoom in a bit:</p>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">plot(T, <span class="fl">7</span>, <span class="fl">9</span>) </code></pre>
-<div id="gadflyplot-k2jcpl3g9p8UYWBKgLLc"></div>
+<div id="gadflyplot-K90k1hn9SvB1dsUR30xJ"></div>
 <script>
 (function (module) {
 function draw_with_data(data, parent_id) {
@@ -4248,8 +4376,8 @@ if ('undefined' !== typeof module) {
 }
 
 return module;
-})({}).exports("#gadflyplot-k2jcpl3g9p8UYWBKgLLc");
-//@ sourceURL=gadflyplot-k2jcpl3g9p8UYWBKgLLc.js
+})({}).exports("#gadflyplot-K90k1hn9SvB1dsUR30xJ");
+//@ sourceURL=gadflyplot-K90k1hn9SvB1dsUR30xJ.js
 </script>
 
 
@@ -4269,40 +4397,40 @@ return module;
 <span class="co">## 0.3333333333333333</span></code></pre>
 <p>Now if <span class="math">\(L(t) = \exp(-3t) \cdot \exp(-2t) \cdot \exp(-4t), \quad 0 \leq t \leq 10\)</span>, explain why the same approach won't work:</p>
 
-<form name='WeaveQuestion' data-id='Ut4VNBhBWz' data-controltype='radio'>
+<form name='WeaveQuestion' data-id='kRRAUbb834' data-controltype='radio'>
 <div class='control-group '>
 <div class='controls'>
 
 
 <label class='radio'>
-  <input type='radio' name='radio_Ut4VNBhBWz' value='1'>
+  <input type='radio' name='radio_kRRAUbb834' value='1'>
   <p>It does work and the answer is x = 2.27...</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_Ut4VNBhBWz' value='2'>
+  <input type='radio' name='radio_kRRAUbb834' value='2'>
   <p>L(t) is not continuous on 0 to 10</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_Ut4VNBhBWz' value='3'>
+  <input type='radio' name='radio_kRRAUbb834' value='3'>
   <p>L(t) takes its maximum at a boundary point -- not a critical point</p>
 </label>
 
 
 
-<div id='Ut4VNBhBWz_message'></div>
+<div id='kRRAUbb834_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('input:radio[name="radio_Ut4VNBhBWz"]').on('change', function() {
+$('input:radio[name="radio_kRRAUbb834"]').on('change', function() {
   correct = this.value == 3;
 
   if(correct) {
-     $('#Ut4VNBhBWz_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#kRRAUbb834_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#Ut4VNBhBWz_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#kRRAUbb834_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -4326,7 +4454,7 @@ Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
 <p>So to approach this problem we first graph it over a wide interval.</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">f(x) = x * exp(-x^<span class="fl">2</span>)</code></pre>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">plot(f, <span class="fl">0</span>, <span class="fl">100</span>) </code></pre>
-<div id="gadflyplot-PTeglQvXfxszKbYR6JVO"></div>
+<div id="gadflyplot-UfaNQeUFHgaAQWb80YWQ"></div>
 <script>
 (function (module) {
 function draw_with_data(data, parent_id) {
@@ -4880,14 +5008,14 @@ if ('undefined' !== typeof module) {
 }
 
 return module;
-})({}).exports("#gadflyplot-PTeglQvXfxszKbYR6JVO");
-//@ sourceURL=gadflyplot-PTeglQvXfxszKbYR6JVO.js
+})({}).exports("#gadflyplot-UfaNQeUFHgaAQWb80YWQ");
+//@ sourceURL=gadflyplot-UfaNQeUFHgaAQWb80YWQ.js
 </script>
 
 
 <p>Clearly the action is nearer to 1 than 100. We try graphing the derivative near that area:</p>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">plot(D(f), <span class="fl">0</span>, <span class="fl">5</span>) </code></pre>
-<div id="gadflyplot-py7Q7NZS5fkwio8ANzUt"></div>
+<div id="gadflyplot-6Qcg5czUoMB3r4m1qA3X"></div>
 <script>
 (function (module) {
 function draw_with_data(data, parent_id) {
@@ -5471,8 +5599,8 @@ if ('undefined' !== typeof module) {
 }
 
 return module;
-})({}).exports("#gadflyplot-py7Q7NZS5fkwio8ANzUt");
-//@ sourceURL=gadflyplot-py7Q7NZS5fkwio8ANzUt.js
+})({}).exports("#gadflyplot-6Qcg5czUoMB3r4m1qA3X");
+//@ sourceURL=gadflyplot-6Qcg5czUoMB3r4m1qA3X.js
 </script>
 
 
@@ -5492,15 +5620,16 @@ SA = h \cdot 2\pi r + 2 \cdot \pi r^2
 V = 355 = h \cdot \pi r^2
 \]</span></p>
 <p>Find the values of <span class="math">\(r\)</span> and <span class="math">\(h\)</span> which minimize the surface area.</p>
-<p>Okay, we start (like most all of these problems) by expressing the function to minimize in terms of one variable. In this case, we easily solve for <span class="math">\(h\)</span> from the equation for the volume to get:</p>
-<p><span class="math">\[
-SA = \frac{355}{\pi r^2} \cdot 2\pi r + 2 \cdot \pi r^2
-\]</span></p>
-<p>Which we minimize subject to the constraint that <span class="math">\(r \geq 0\)</span>. A quick glance shows that as <span class="math">\(r\)</span> gets close to <span class="math">\(0\)</span>, the can must get infinitely tall to contain that fixed volume, and would have infinite surface area as the <span class="math">\(1/r^2\)</span> in the first term implies. On the other hand, as <span class="math">\(r\)</span> goes to infinity, the height must go to 0 to make a really flat can. Again, we would have infinite surface area, as the <span class="math">\(r^2\)</span> term at the end indicates. With this observation, we can rule out the endpoints as possible minima, so any minima must occur at a critical point.</p>
+<p>First the surface area in both variables is given by</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">SA(h, r) = h * <span class="fl">2</span>pi * r + <span class="fl">2</span>pi * r^<span class="fl">2</span></code></pre>
+<p>And solving from the constraint on the volume for <code>h</code> in terms of <code>r</code> we have</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">h(r) = <span class="fl">355</span> / (pi * r^<span class="fl">2</span>)</code></pre>
+<p>And composing gives us a function of <code>r</code> alone:</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">SA(r) = SA(h(r), r)</code></pre>
+<p>This we minimize subject to the constraint that <span class="math">\(r \geq 0\)</span>. A quick glance shows that as <span class="math">\(r\)</span> gets close to <span class="math">\(0\)</span>, the can must get infinitely tall to contain that fixed volume, and would have infinite surface area as the <span class="math">\(1/r^2\)</span> in the first term implies. On the other hand, as <span class="math">\(r\)</span> goes to infinity, the height must go to 0 to make a really flat can. Again, we would have infinite surface area, as the <span class="math">\(r^2\)</span> term at the end indicates. With this observation, we can rule out the endpoints as possible minima, so any minima must occur at a critical point.</p>
 <p>We start by making a graph, making an educated guess that the answer is somewhere near a real life answer, or around 3-5 cms in radius:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">SA(r) = <span class="fl">355</span>/(pi*r^<span class="fl">2</span>)*<span class="fl">2</span>*pi*r + <span class="fl">2</span> * pi * r^<span class="fl">2</span></code></pre>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">plot(SA, <span class="fl">2</span>, <span class="fl">10</span>)</code></pre>
-<div id="gadflyplot-uQy4T2mwoqAA9mDVpYMj"></div>
+<div id="gadflyplot-YXZ7FiJrzb8A62CubAWB"></div>
 <script>
 (function (module) {
 function draw_with_data(data, parent_id) {
@@ -6162,8 +6291,8 @@ if ('undefined' !== typeof module) {
 }
 
 return module;
-})({}).exports("#gadflyplot-uQy4T2mwoqAA9mDVpYMj");
-//@ sourceURL=gadflyplot-uQy4T2mwoqAA9mDVpYMj.js
+})({}).exports("#gadflyplot-YXZ7FiJrzb8A62CubAWB");
+//@ sourceURL=gadflyplot-YXZ7FiJrzb8A62CubAWB.js
 </script>
 
 
@@ -6171,31 +6300,31 @@ return module;
 <pre class="sourceCode julia"><code class="sourceCode julia">r0 = fzero(D(SA), <span class="fl">4</span>)
 <span class="co">## 3.8372152480156734</span></code></pre>
 <p>Okay, <span class="math">\(3.837...\)</span> is our computation for <span class="math">\(r\)</span>. To get <span class="math">\(h\)</span>, we use:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia"><span class="fl">355</span>/(pi*r0^<span class="fl">2</span>) <span class="co">## h</span>
+<pre class="sourceCode julia"><code class="sourceCode julia">h(r0)
 <span class="co">## 7.674430496031345</span></code></pre>
 <p>This produces a can which is about square in profile. This is not how most cans look though. Perhaps our model is too simple, or the cans are optimized for some other purpose than minimizing materials.</p>
 <h3 id="practice-3">Practice</h3>
 <h4 id="questions-1">Questions</h4>
 <p>Minimize the function <span class="math">\(f(x) = 2x + 3/x\)</span> over <span class="math">\((0, \infty)\)</span>.</p>
 
-<form name='WeaveQuestion' data-id='MwDmqHnSRk' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='OnRZm89iry' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="MwDmqHnSRk" type="number">
+<input id="OnRZm89iry" type="number">
 
 
-<div id='MwDmqHnSRk_message'></div>
+<div id='OnRZm89iry_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#MwDmqHnSRk').on('change', function() {
-  correct = Math.abs(this.value - NaN) <= 0.001;
+$('#OnRZm89iry').on('change', function() {
+  correct = Math.abs(this.value - 1.2247448713915892) <= 0.001;
 
   if(correct) {
-     $('#MwDmqHnSRk_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#OnRZm89iry_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#MwDmqHnSRk_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#OnRZm89iry_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -6204,24 +6333,24 @@ $('#MwDmqHnSRk').on('change', function() {
 <h4 id="question-3">Question</h4>
 <p>Of all rectangles of area 4, find the one with largest perimeter. What is the perimeter?</p>
 
-<form name='WeaveQuestion' data-id='2RmH6Lv76U' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='V2LfJJaFM9' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="2RmH6Lv76U" type="number">
+<input id="V2LfJJaFM9" type="number">
 
 
-<div id='2RmH6Lv76U_message'></div>
+<div id='V2LfJJaFM9_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#2RmH6Lv76U').on('change', function() {
-  correct = Math.abs(this.value - -8.0) <= 0.001;
+$('#V2LfJJaFM9').on('change', function() {
+  correct = Math.abs(this.value - 8.0) <= 0.001;
 
   if(correct) {
-     $('#2RmH6Lv76U_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#V2LfJJaFM9_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#2RmH6Lv76U_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#V2LfJJaFM9_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -6314,7 +6443,7 @@ h(y) = f(x, y) - L = 0
 <p>This is essentially <code>L=</code> <code class="sourceCode julia"><span class="fl">10</span></code> which should be the case for any choice of <span class="math">\(x\)</span> when we have convergence for <span class="math">\(g\)</span>. Try it yourself with a different value in <span class="math">\([0,1]\)</span>.</p>
 <p>Now, through this inversion trick, we have a function <span class="math">\(y=g(x)\)</span>. We graph to see that indeed this function will have a minimum value:</p>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">plot(g, <span class="fl">0.2</span>, <span class="fl">0.8</span>)</code></pre>
-<div id="gadflyplot-mdjcSGiNMt9FoW6fLhnY"></div>
+<div id="gadflyplot-dKwo4dNBiT17JHQh5mEn"></div>
 <script>
 (function (module) {
 function draw_with_data(data, parent_id) {
@@ -6862,26 +6991,24 @@ if ('undefined' !== typeof module) {
 }
 
 return module;
-})({}).exports("#gadflyplot-mdjcSGiNMt9FoW6fLhnY");
-//@ sourceURL=gadflyplot-mdjcSGiNMt9FoW6fLhnY.js
+})({}).exports("#gadflyplot-dKwo4dNBiT17JHQh5mEn");
+//@ sourceURL=gadflyplot-dKwo4dNBiT17JHQh5mEn.js
 </script>
 
 
 <p>(The implicit function theorem will tell us that locally for any <span class="math">\(x\)</span> we can find a function to return <span class="math">\(y\)</span> provided a certain derivative is not <span class="math">\(0\)</span> and the equation is reasonably behaved.)</p>
 <p>Okay, now to find the lowest point. This is what we minimize to find the resting position of the ring. Again, we turn to <code>fzero</code>, but for minimization we use the first derivative, as we are finding critical points. Here, <code>D</code> from the roots package doesn't work without some adjustments, so we use a numeric derivative:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">h = <span class="fl">1e-6</span>
-<span class="co">## 1.0e-6</span>
-gprime(x) =  (g(x+h) - g(x-h))/(<span class="fl">2</span>h)
-x = fzero(gprime, [<span class="fl">0.3</span>, <span class="fl">0.6</span>])
-<span class="co">## 0.44974810928106307</span></code></pre>
+<pre class="sourceCode julia"><code class="sourceCode julia">deriv(g; h=<span class="fl">1e-6</span>) =  x -&gt; (g(x+h) - g(x-h))/(<span class="fl">2</span>h)
+x = fzero(deriv(g), [<span class="fl">0.3</span>, <span class="fl">0.6</span>])
+<span class="co">## 0.44974811021238564</span></code></pre>
 <p>The point where the ring rests is:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">x, g(x)
-<span class="co">## (0.44974810928106307,-4.4749371855331)</span></code></pre>
+<span class="co">## (0.44974811021238564,-4.4749371855331)</span></code></pre>
 <p>If you watch the video linked to above, you will see that the surprising fact here is the resting point is such that the angles formed by the rope are the same. Basically this makes the tension in both parts of the rope equal, so there is a static position (if not static, the ring would move and not end in the final position). We can verify this fact numerically by showing the arctangents of the two triangles are the same:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">y = g(x)
+<pre class="sourceCode julia"><code class="sourceCode julia">t = g(x)
 <span class="co">## -4.4749371855331</span>
-atan(abs(y)/x) - atan((b-y)/(a-x))
-<span class="co">## -1.7700063636993946e-11</span></code></pre>
+atan(abs(t)/x) - atan((b-t)/(a-x))
+<span class="co">## -3.921440949739008e-10</span></code></pre>
 <p>Now, were we lucky and just happened to take <span class="math">\(b = 1\)</span> in such a way to make this work? Well, no. But convince yourself by doing the above for different values of <span class="math">\(b\)</span>.</p>
 </div>
 </div>
