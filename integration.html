@@ -169,20 +169,42 @@ var guide_background_mouseout = function(color) {
 // Construct a call back used for mouseover effects in the point geometry.
 //
 // Args:
-//   lw: Stroke width to transition to.
+//   scale: Scale for expanded width
+//   ratio: radius / line-width. This is necessary to maintain relative width
+//          at arbitraty levels of zoom
 //
 // Returns:
 //  Callback function.
 //
-var geom_point_mouseover = function(lw) {
+var geom_point_mouseover = function(scale, ratio) {
     return (function() {
+        var lw = this.getAttribute('r') * ratio * scale
         d3.select(this)
           .transition()
           .duration(100)
-          .attr("stroke-width", lw);
+          .style("stroke-width", lw + 'px', 'important');
     });
 };
 
+// Construct a call back used for mouseout effects in the point geometry.
+//
+// Args:
+//   scale: Scale for expanded width
+//   ratio: radius / line-width. This is necessary to maintain relative width
+//          at arbitraty levels of zoom
+//
+// Returns:
+//  Callback function.
+//
+var geom_point_mouseout = function(scale, ratio) {
+    return (function() {
+        var lw = this.getAttribute('r') * ratio
+        d3.select(this)
+          .transition()
+          .duration(100)
+          .style("stroke-width", lw + 'px', 'important');
+    });
+};
 
 // Translate and scale geometry while trying to maintain scale invariance for
 // certain ellements.
@@ -219,7 +241,7 @@ var set_geometry_transform = function(root, ctx, old_scale) {
 
     // unscale geometry widths, radiuses, etc.
     var size_attribs = ["r"];
-    var size_styles = ["font-size"];
+    var size_styles = ["font-size", "stroke-width"];
     root.select(".plotpanel")
         .selectAll("g, .geometry")
         .each(function() {
@@ -362,8 +384,9 @@ var zoom_behavior = function(ctx) {
         zm(g);
         default_handler = g.on("wheel.zoom");
         function wheelhandler() {
-            if (d3.event.shiftKey) {
+        if (d3.event.shiftKey) {
                 default_handler.call(this);
+                d3.event.stopPropagation();
             }
         }
         g.on("wheel.zoom", wheelhandler)
@@ -546,7 +569,7 @@ var zoomslider_thumb_mouseover = function(destcolor) {
     });
 };
 
-
+//@ sourceURL=gadfly.js
 </script>
 <script type="text/javascript">
 function next_nav_tab() {$('.tabbable li').filter('.active').next('li').find('a[data-toggle="tab"]').tab('show');window.scrollTo(0,0);}
@@ -598,7 +621,7 @@ x = a + (<span class="fl">0</span>:n) * delta           <span class="co"># alter
 <p>To apply a function to a range of values, we may use a map, a comprehension, a <code>for</code> loop or the &quot;dot&quot; notation. We will use <code>map</code> here. Recall, the syntax:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">f(x) = x^<span class="fl">2</span>
 fx = map(f, x)
-<span class="co">## [1.0,1.9599999999999997,3.24,4.840000000000001,6.760000000000001,9.0]</span></code></pre>
+<span class="co">## [1.0,1.96,3.24,4.84,6.76,9.0]</span></code></pre>
 <p>Now to add the numbers up. For this task, the <code>sum</code> function is available</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">sum(fx)
 <span class="co">## 26.8</span></code></pre>
@@ -608,7 +631,7 @@ fx = map(f, x)
 <span class="co">##  1.0  1.4  1.8  2.2  2.6</span></code></pre>
 <p>for the left Riemann sum and the points</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">[ a + (<span class="fl">1</span>:n) * delta ]
-<span class="co">## [1.4,1.7999999999999998,2.2,2.6,3.0]</span></code></pre>
+<span class="co">## [1.4,1.8,2.2,2.6,3.0]</span></code></pre>
 <p>for the right.</p>
 <p>Putting this together, here are commands to approximate the area under the curve <span class="math">\(f(x)=x^2\)</span> using 10 left Riemann sums:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">f(x) = x^<span class="fl">2</span>
@@ -628,24 +651,24 @@ F(b) - F(a)
 <p>Repeat with n=100</p>
 <p>For the same problem, let <span class="math">\(n=100\)</span>. What do you get?</p>
 
-<form name='WeaveQuestion' data-id='ITZOSKgkO1' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='Cm7LTmGXmv' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="ITZOSKgkO1" type="number">
+<input id="Cm7LTmGXmv" type="number">
 
 
-<div id='ITZOSKgkO1_message'></div>
+<div id='Cm7LTmGXmv_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#ITZOSKgkO1').on('change', function() {
+$('#Cm7LTmGXmv').on('change', function() {
   correct = Math.abs(this.value - 8.5868) <= 0.0001;
 
   if(correct) {
-     $('#ITZOSKgkO1_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#Cm7LTmGXmv_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#ITZOSKgkO1_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#Cm7LTmGXmv_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -655,24 +678,24 @@ $('#ITZOSKgkO1').on('change', function() {
 <p>Repeat with n=1,000</p>
 <p>For the same problem, let <span class="math">\(n=1000\)</span>. What do you get?</p>
 
-<form name='WeaveQuestion' data-id='abenRbTPKy' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='w6wwKr8Z9T' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="abenRbTPKy" type="number">
+<input id="w6wwKr8Z9T" type="number">
 
 
-<div id='abenRbTPKy_message'></div>
+<div id='w6wwKr8Z9T_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#abenRbTPKy').on('change', function() {
+$('#w6wwKr8Z9T').on('change', function() {
   correct = Math.abs(this.value - 8.658668000000002) <= 0.0001;
 
   if(correct) {
-     $('#abenRbTPKy_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#w6wwKr8Z9T_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#abenRbTPKy_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#w6wwKr8Z9T_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -682,35 +705,35 @@ $('#abenRbTPKy').on('change', function() {
 <p>Repeat with n=10,000</p>
 <p>For the same problem, let <span class="math">\(n=10,000\)</span>. is the difference between the answer and the actual answer within <span class="math">\(0.001\)</span>?</p>
 
-<form name='WeaveQuestion' data-id='HPwiIJpd5h' data-controltype='radio'>
+<form name='WeaveQuestion' data-id='mxhEmy9APl' data-controltype='radio'>
 <div class='control-group '>
 <div class='controls'>
 
 
 <label class='radio inline'>
-  <input type='radio' name='radio_HPwiIJpd5h' value='1'>
+  <input type='radio' name='radio_mxhEmy9APl' value='1'>
   <p>true</p>
 </label>
 
 <label class='radio inline'>
-  <input type='radio' name='radio_HPwiIJpd5h' value='2'>
+  <input type='radio' name='radio_mxhEmy9APl' value='2'>
   <p>false</p>
 </label>
 
 
 
-<div id='HPwiIJpd5h_message'></div>
+<div id='mxhEmy9APl_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('input:radio[name="radio_HPwiIJpd5h"]').on('change', function() {
+$('input:radio[name="radio_mxhEmy9APl"]').on('change', function() {
   correct = this.value == 1;
 
   if(correct) {
-     $('#HPwiIJpd5h_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#mxhEmy9APl_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#HPwiIJpd5h_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#mxhEmy9APl_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -720,50 +743,50 @@ $('input:radio[name="radio_HPwiIJpd5h"]').on('change', function() {
 <p>How big should n be? (Strang)</p>
 <p>Let <span class="math">\(f(x) = (10 + \cos(2\pi x))^{-1}\)</span>. For the integral over <span class="math">\([0,1]\)</span>, the known answer is <span class="math">\(1/\sqrt{99}\)</span>. How big must <span class="math">\(n\)</span> be so that the error in the Riemann sum is less than <span class="math">\(10^{-8}\)</span>?</p>
 
-<form name='WeaveQuestion' data-id='RZdC7HHEdw' data-controltype='radio'>
+<form name='WeaveQuestion' data-id='X1P17KC22z' data-controltype='radio'>
 <div class='control-group '>
 <div class='controls'>
 
 
 <label class='radio'>
-  <input type='radio' name='radio_RZdC7HHEdw' value='1'>
+  <input type='radio' name='radio_X1P17KC22z' value='1'>
   <p>5</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_RZdC7HHEdw' value='2'>
+  <input type='radio' name='radio_X1P17KC22z' value='2'>
   <p>10</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_RZdC7HHEdw' value='3'>
+  <input type='radio' name='radio_X1P17KC22z' value='3'>
   <p>100</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_RZdC7HHEdw' value='4'>
+  <input type='radio' name='radio_X1P17KC22z' value='4'>
   <p>1000</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_RZdC7HHEdw' value='5'>
+  <input type='radio' name='radio_X1P17KC22z' value='5'>
   <p>10000</p>
 </label>
 
 
 
-<div id='RZdC7HHEdw_message'></div>
+<div id='X1P17KC22z_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('input:radio[name="radio_RZdC7HHEdw"]').on('change', function() {
+$('input:radio[name="radio_X1P17KC22z"]').on('change', function() {
   correct = this.value == 2;
 
   if(correct) {
-     $('#RZdC7HHEdw_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#X1P17KC22z_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#RZdC7HHEdw_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#X1P17KC22z_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -804,10 +827,10 @@ Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
 <p>The basic usage of the <code>integrate</code> function is straightforward. Here we approximate the integral of <span class="math">\(e^{-x^2}\)</span> from <span class="math">\(0\)</span> to <span class="math">\(3\)</span> using <span class="math">\(10,000\)</span> subintervals:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">f(x) =  exp(-x^<span class="fl">2</span>)       
 integrate(f, <span class="fl">0</span>, <span class="fl">3</span>, <span class="fl">10</span>_<span class="fl">000</span>)
-<span class="co">## 0.8863573297424971</span></code></pre>
+<span class="co">## 0.8863573297424974</span></code></pre>
 <p>How big should the number of intervals be? More intervals will give better answers, but unlike Newton's method we have no stopping criteria. For this problem, we look at various values based on <code>n</code>:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">[integrate(f, <span class="fl">0</span>, <span class="fl">3</span>, n) <span class="kw">for</span> n <span class="kw">in</span> [<span class="fl">100</span>, <span class="fl">1000</span>, <span class="fl">10000</span>, <span class="fl">100000</span>]]   <span class="co">## or use 10.^(2:5)</span>
-<span class="co">## {0.9012054416030275,0.8877071625894734,0.8863573297424971,0.8862223464083187}</span></code></pre>
+<span class="co">## {0.9012054416030272,0.8877071625894736,0.8863573297424974,0.8862223464083187}</span></code></pre>
 <p>We see a value around <span class="math">\(0.886\)</span> as the answer.</p>
 <h3 id="continuity">Continuity</h3>
 <p>For some integrals, you may need to make a minor adjustment for lack of continuity. The function <span class="math">\(f(x) = \sin(x)/x\)</span> over the interval <span class="math">\([0, \pi]\)</span> has to be defined to be <span class="math">\(1\)</span> at <span class="math">\(0\)</span> to be continuous. We do so here:</p>
@@ -839,24 +862,24 @@ ys = [integrate(f, <span class="fl">0</span>, <span class="fl">2</span>, n, righ
 <pre class="sourceCode julia"><code class="sourceCode julia">midpoint(f, a, b) = f((a+b)/<span class="fl">2</span>) * (b-a)</code></pre>
 <p>With <span class="math">\(n=10,000\)</span> what does <code>integrate</code> return when <span class="math">\(f(x) = \sin^2(x)\)</span> between <span class="math">\(0\)</span> and <span class="math">\(\pi\)</span>?</p>
 
-<form name='WeaveQuestion' data-id='sG8TMrkkug' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='NjTzg4mUef' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="sG8TMrkkug" type="number">
+<input id="NjTzg4mUef" type="number">
 
 
-<div id='sG8TMrkkug_message'></div>
+<div id='NjTzg4mUef_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#sG8TMrkkug').on('change', function() {
+$('#NjTzg4mUef').on('change', function() {
   correct = Math.abs(this.value - 1.5707963267948966) <= 0.0001;
 
   if(correct) {
-     $('#sG8TMrkkug_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#NjTzg4mUef_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#sG8TMrkkug_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#NjTzg4mUef_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -866,43 +889,43 @@ $('#sG8TMrkkug').on('change', function() {
 <p>Repeat the above analysis comparing the right and left Riemann sums, but this time multiply by <span class="math">\(n\)</span>, as follows:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">f(x) = exp(x)
 [n * (integrate(f, <span class="fl">0</span>, <span class="fl">2</span>, n, right_riemann) - integrate(f, <span class="fl">0</span>, <span class="fl">2</span>, n)) <span class="kw">for</span> n <span class="kw">in</span> <span class="fl">10</span>.^(<span class="fl">2</span>:<span class="fl">5</span>)]
-<span class="co">## {12.778112197861269,12.778112197860736,12.77811219787317,12.778112197864289}</span></code></pre>
+<span class="co">## {12.778112197861358,12.778112197860736,12.778112197864289,12.778112197864289}</span></code></pre>
 <p>This shows what?</p>
 
-<form name='WeaveQuestion' data-id='qbpTU81S8S' data-controltype='radio'>
+<form name='WeaveQuestion' data-id='rcfI9sBjd1' data-controltype='radio'>
 <div class='control-group '>
 <div class='controls'>
 
 
 <label class='radio'>
-  <input type='radio' name='radio_qbpTU81S8S' value='1'>
+  <input type='radio' name='radio_rcfI9sBjd1' value='1'>
   <p>That it is constant says the difference between right and left Riemann sums never goes to 0</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_qbpTU81S8S' value='2'>
+  <input type='radio' name='radio_rcfI9sBjd1' value='2'>
   <p>That it is constant says the difference between right and left Riemann sums goes to 0 like 1/n</p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_qbpTU81S8S' value='3'>
+  <input type='radio' name='radio_rcfI9sBjd1' value='3'>
   <p>That it is constant says the difference between right and left Riemann sums is constant.</p>
 </label>
 
 
 
-<div id='qbpTU81S8S_message'></div>
+<div id='rcfI9sBjd1_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('input:radio[name="radio_qbpTU81S8S"]').on('change', function() {
+$('input:radio[name="radio_rcfI9sBjd1"]').on('change', function() {
   correct = this.value == 2;
 
   if(correct) {
-     $('#qbpTU81S8S_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#rcfI9sBjd1_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#qbpTU81S8S_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#rcfI9sBjd1_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -981,7 +1004,7 @@ Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
 <p>We can use this as follows. Let's approximate the area under <span class="math">\(5x^4\)</span> curve between <span class="math">\(0\)</span> and <span class="math">\(1\)</span> (with known answer <span class="math">\(1\)</span>):</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">f(x) = <span class="fl">5</span>x^<span class="fl">4</span>
 integrate(f, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">1000</span>, trapezoid)
-<span class="co">## 1.0000016666665</span></code></pre>
+<span class="co">## 1.0000016666665004</span></code></pre>
 <p>Pretty close to 1 with just 1,000 subintervals.</p>
 <p>We now compare the error with the left Riemann sum for the same size <span class="math">\(n\)</span>:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">ns = <span class="fl">10</span> .^ (<span class="fl">2</span>:<span class="fl">5</span>);           
@@ -1019,55 +1042,55 @@ trapezoid_r = [integrate(f, <span class="fl">0</span>, <span class="fl">1</span>
 integrate(f, <span class="fl">0</span>, <span class="fl">10</span>, <span class="fl">100</span>, simpsons) - (F(<span class="fl">10</span>) - F(<span class="fl">0</span>));</code></pre>
 <p>How accurate is the approximation? Around</p>
 
-<form name='WeaveQuestion' data-id='HzBNzV1oIL' data-controltype='radio'>
+<form name='WeaveQuestion' data-id='9KV1jjSRDE' data-controltype='radio'>
 <div class='control-group '>
 <div class='controls'>
 
 
 <label class='radio'>
-  <input type='radio' name='radio_HzBNzV1oIL' value='1'>
+  <input type='radio' name='radio_9KV1jjSRDE' value='1'>
   <p><code>1e-8</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_HzBNzV1oIL' value='2'>
+  <input type='radio' name='radio_9KV1jjSRDE' value='2'>
   <p><code>1e-10</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_HzBNzV1oIL' value='3'>
+  <input type='radio' name='radio_9KV1jjSRDE' value='3'>
   <p><code>1e-12</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_HzBNzV1oIL' value='4'>
+  <input type='radio' name='radio_9KV1jjSRDE' value='4'>
   <p><code>1e-14</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_HzBNzV1oIL' value='5'>
+  <input type='radio' name='radio_9KV1jjSRDE' value='5'>
   <p><code>1e-16</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_HzBNzV1oIL' value='6'>
+  <input type='radio' name='radio_9KV1jjSRDE' value='6'>
   <p><code>0</code></p>
 </label>
 
 
 
-<div id='HzBNzV1oIL_message'></div>
+<div id='9KV1jjSRDE_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('input:radio[name="radio_HzBNzV1oIL"]').on('change', function() {
+$('input:radio[name="radio_9KV1jjSRDE"]').on('change', function() {
   correct = this.value == 4;
 
   if(correct) {
-     $('#HzBNzV1oIL_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#9KV1jjSRDE_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#HzBNzV1oIL_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#9KV1jjSRDE_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1078,81 +1101,81 @@ $('input:radio[name="radio_HzBNzV1oIL"]').on('change', function() {
 <pre class="sourceCode julia"><code class="sourceCode julia">integrate(cos, <span class="fl">0</span>, pi/<span class="fl">6</span>, <span class="fl">1000</span>, trapezoid) - integrate(cos, <span class="fl">0</span>, pi/<span class="fl">6</span>, <span class="fl">1000</span>, simpsons);</code></pre>
 <p>How big is the difference?</p>
 
-<form name='WeaveQuestion' data-id='uynN8F7E3B' data-controltype='radio'>
+<form name='WeaveQuestion' data-id='BHJk0J7d2j' data-controltype='radio'>
 <div class='control-group '>
 <div class='controls'>
 
 
 <label class='radio'>
-  <input type='radio' name='radio_uynN8F7E3B' value='1'>
+  <input type='radio' name='radio_BHJk0J7d2j' value='1'>
   <p><code>1e-8</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_uynN8F7E3B' value='2'>
+  <input type='radio' name='radio_BHJk0J7d2j' value='2'>
   <p><code>1e-10</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_uynN8F7E3B' value='3'>
+  <input type='radio' name='radio_BHJk0J7d2j' value='3'>
   <p><code>1e-12</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_uynN8F7E3B' value='4'>
+  <input type='radio' name='radio_BHJk0J7d2j' value='4'>
   <p><code>1e-14</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_uynN8F7E3B' value='5'>
+  <input type='radio' name='radio_BHJk0J7d2j' value='5'>
   <p><code>1e-16</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_uynN8F7E3B' value='6'>
+  <input type='radio' name='radio_BHJk0J7d2j' value='6'>
   <p><code>0</code></p>
 </label>
 
 
 
-<div id='uynN8F7E3B_message'></div>
+<div id='BHJk0J7d2j_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('input:radio[name="radio_uynN8F7E3B"]').on('change', function() {
+$('input:radio[name="radio_BHJk0J7d2j"]').on('change', function() {
   correct = this.value == 1;
 
   if(correct) {
-     $('#uynN8F7E3B_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#BHJk0J7d2j_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#uynN8F7E3B_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#BHJk0J7d2j_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
 </script>
 
 <h4 id="question-....">Question ....</h4>
-<p>Using Simpson's rule and <code>n=</code> <code class="sourceCode julia"><span class="fl">3800</span></code> compute the integral of <span class="math">\(f(x) = 1/(1+x^2)\)</span> between <span class="math">\(0\)</span> and <span class="math">\(1\)</span>.</p>
+<p>Using Simpson's rule and <code>n=</code> <code class="sourceCode julia"><span class="fl">6100</span></code> compute the integral of <span class="math">\(f(x) = 1/(1+x^2)\)</span> between <span class="math">\(0\)</span> and <span class="math">\(1\)</span>.</p>
 
-<form name='WeaveQuestion' data-id='a0adVqiA7f' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='Z5puJ4gN0A' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="a0adVqiA7f" type="number">
+<input id="Z5puJ4gN0A" type="number">
 
 
-<div id='a0adVqiA7f_message'></div>
+<div id='Z5puJ4gN0A_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#a0adVqiA7f').on('change', function() {
+$('#Z5puJ4gN0A').on('change', function() {
   correct = Math.abs(this.value - 0.7853981633974483) <= 1.0e-5;
 
   if(correct) {
-     $('#a0adVqiA7f_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#Z5puJ4gN0A_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#a0adVqiA7f_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#Z5puJ4gN0A_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1183,24 +1206,24 @@ Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
 <h4 id="question-use-quadgk">Question Use quadgk</h4>
 <p>Let <span class="math">\(f(x) = \exp(-4 \cdot  |x-1/2|)\)</span>. Find the integral over <span class="math">\([0,1]\)</span> using <code>quadgk</code>:</p>
 
-<form name='WeaveQuestion' data-id='EnuLv8Rgbl' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='8W5Q1shzqT' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="EnuLv8Rgbl" type="number">
+<input id="8W5Q1shzqT" type="number">
 
 
-<div id='EnuLv8Rgbl_message'></div>
+<div id='8W5Q1shzqT_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#EnuLv8Rgbl').on('change', function() {
+$('#8W5Q1shzqT').on('change', function() {
   correct = Math.abs(this.value - 0.43233235838169365) <= 1.0e-5;
 
   if(correct) {
-     $('#EnuLv8Rgbl_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#8W5Q1shzqT_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#EnuLv8Rgbl_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#8W5Q1shzqT_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1209,24 +1232,24 @@ $('#EnuLv8Rgbl').on('change', function() {
 <h4 id="question-use-quadgk-1">Question Use quadgk</h4>
 <p>Let <span class="math">\(f(x) = \sin(100\pi x)/(\pi x)\)</span>. Find the integral over <span class="math">\([0,1]\)</span> using <code>quadgk</code>:</p>
 
-<form name='WeaveQuestion' data-id='ltX2GL6WQU' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='rRawRUpXZ3' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="ltX2GL6WQU" type="number">
+<input id="rRawRUpXZ3" type="number">
 
 
-<div id='ltX2GL6WQU_message'></div>
+<div id='rRawRUpXZ3_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#ltX2GL6WQU').on('change', function() {
+$('#rRawRUpXZ3').on('change', function() {
   correct = Math.abs(this.value - 0.4989868086930457) <= 0.0001;
 
   if(correct) {
-     $('#ltX2GL6WQU_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#rRawRUpXZ3_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#ltX2GL6WQU_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#rRawRUpXZ3_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1239,27 +1262,27 @@ $('#ltX2GL6WQU').on('change', function() {
   right_riemann(f::<span class="dt">Function</span>, a, b) = f(b) * (b-a)
   val = integrate(f, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">1000</span>, right_riemann);
 <span class="kw">end</span>
-<span class="co">## 0.0044899515576561425</span></code></pre>
+<span class="co">## 0.004489951557656147</span></code></pre>
 <p>What is it?</p>
 
-<form name='WeaveQuestion' data-id='PrjeHbSt2O' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='D7v1Ef6x8G' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="PrjeHbSt2O" type="number">
+<input id="D7v1Ef6x8G" type="number">
 
 
-<div id='PrjeHbSt2O_message'></div>
+<div id='D7v1Ef6x8G_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#PrjeHbSt2O').on('change', function() {
-  correct = Math.abs(this.value - 0.0044899515576561425) <= 1.0e-5;
+$('#D7v1Ef6x8G').on('change', function() {
+  correct = Math.abs(this.value - 0.004489951557656147) <= 1.0e-5;
 
   if(correct) {
-     $('#PrjeHbSt2O_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#D7v1Ef6x8G_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#PrjeHbSt2O_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#D7v1Ef6x8G_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1272,42 +1295,42 @@ $('#PrjeHbSt2O').on('change', function() {
   f(x) = <span class="fl">1</span>/(<span class="fl">1</span> + x^<span class="fl">4</span>)
   quadgk(f, <span class="fl">0</span>, <span class="fl">1</span>)[<span class="fl">1</span>] - integrate(f, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">100000</span>);
 <span class="kw">end</span>
-<span class="co">## -2.499991666571333e-6</span></code></pre>
+<span class="co">## -2.499991666682355e-6</span></code></pre>
 
-<form name='WeaveQuestion' data-id='k7njktROgl' data-controltype='radio'>
+<form name='WeaveQuestion' data-id='eMtaYWxtVi' data-controltype='radio'>
 <div class='control-group '>
 <div class='controls'>
 
 
 <label class='radio'>
-  <input type='radio' name='radio_k7njktROgl' value='1'>
+  <input type='radio' name='radio_eMtaYWxtVi' value='1'>
   <p>Roughly <code>1e-4</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_k7njktROgl' value='2'>
+  <input type='radio' name='radio_eMtaYWxtVi' value='2'>
   <p>Roughly <code>1e-6</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_k7njktROgl' value='3'>
+  <input type='radio' name='radio_eMtaYWxtVi' value='3'>
   <p>Roughly <code>1e-12</code></p>
 </label>
 
 
 
-<div id='k7njktROgl_message'></div>
+<div id='eMtaYWxtVi_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('input:radio[name="radio_k7njktROgl"]').on('change', function() {
+$('input:radio[name="radio_eMtaYWxtVi"]').on('change', function() {
   correct = this.value == 2;
 
   if(correct) {
-     $('#k7njktROgl_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#eMtaYWxtVi_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#k7njktROgl_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#eMtaYWxtVi_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1316,24 +1339,24 @@ $('input:radio[name="radio_k7njktROgl"]').on('change', function() {
 <h4 id="question-9">Question</h4>
 <p>The <code>quadgk</code> function allows you to specify issues where there are troubles. For example, we know that <span class="math">\(f(x) = \sin(x)/x\)</span> has an issue at 0. Directly trying this integral <code>quadgk(x-&gt;sin(x)/x, -pi, pi)</code> will fail, but you can specify the issue at <span class="math">\(0\)</span> as follows <code>quadgk(x -&gt; sin(x)/x, -pi, 0, pi)</code>. Do so. What is the value of the result:</p>
 
-<form name='WeaveQuestion' data-id='rL5ocxvUnb' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='lmjTYlf9db' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="rL5ocxvUnb" type="number">
+<input id="lmjTYlf9db" type="number">
 
 
-<div id='rL5ocxvUnb_message'></div>
+<div id='lmjTYlf9db_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#rL5ocxvUnb').on('change', function() {
-  correct = Math.abs(this.value - 3.7038741039649326) <= 0.0001;
+$('#lmjTYlf9db').on('change', function() {
+  correct = Math.abs(this.value - 3.703874103964932) <= 0.0001;
 
   if(correct) {
-     $('#rL5ocxvUnb_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#lmjTYlf9db_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#rL5ocxvUnb_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#lmjTYlf9db_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1345,24 +1368,24 @@ $('#rL5ocxvUnb').on('change', function() {
 val = quadgk(f, <span class="fl">0</span>, <span class="fl">0.3</span>, <span class="fl">1</span>);</code></pre>
 <p>Following the above, what answer do you get?</p>
 
-<form name='WeaveQuestion' data-id='eBJ7yC4Uja' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='kuSXlHzFv4' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="eBJ7yC4Uja" type="number">
+<input id="kuSXlHzFv4" type="number">
 
 
-<div id='eBJ7yC4Uja_message'></div>
+<div id='kuSXlHzFv4_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#eBJ7yC4Uja').on('change', function() {
+$('#kuSXlHzFv4').on('change', function() {
   correct = Math.abs(this.value - 1.5608608290003947) <= 0.0001;
 
   if(correct) {
-     $('#eBJ7yC4Uja_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#kuSXlHzFv4_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#eBJ7yC4Uja_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#kuSXlHzFv4_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1410,40 +1433,40 @@ s(h) = 3 + \log(1 + h), \quad 0 \leq h \leq b
 <h4 id="question-11">Question</h4>
 <p>Which of these functions might describe a fluted glass where the radius changes faster as the height gets bigger, that is the radius is a <em>concave up</em> function?</p>
 
-<form name='WeaveQuestion' data-id='C1BWsmj5dr' data-controltype='radio'>
+<form name='WeaveQuestion' data-id='S2P6oU0fg2' data-controltype='radio'>
 <div class='control-group '>
 <div class='controls'>
 
 
 <label class='radio'>
-  <input type='radio' name='radio_C1BWsmj5dr' value='1'>
+  <input type='radio' name='radio_S2P6oU0fg2' value='1'>
   <p><code>r(h) = 2 + (x/10)^2, 0 &lt;= x &lt;= 10</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_C1BWsmj5dr' value='2'>
+  <input type='radio' name='radio_S2P6oU0fg2' value='2'>
   <p><code>r(h) = 2 + sqrt(x/10), 0 &lt;= x &lt;= 10</code></p>
 </label>
 
 <label class='radio'>
-  <input type='radio' name='radio_C1BWsmj5dr' value='3'>
+  <input type='radio' name='radio_S2P6oU0fg2' value='3'>
   <p><code>r(h) = 2 + x/10, 0 &lt;= x &lt;= 10</code></p>
 </label>
 
 
 
-<div id='C1BWsmj5dr_message'></div>
+<div id='S2P6oU0fg2_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('input:radio[name="radio_C1BWsmj5dr"]').on('change', function() {
+$('input:radio[name="radio_S2P6oU0fg2"]').on('change', function() {
   correct = this.value == 1;
 
   if(correct) {
-     $('#C1BWsmj5dr_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#S2P6oU0fg2_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#C1BWsmj5dr_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#S2P6oU0fg2_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1465,10 +1488,10 @@ V(b) = \int_0^b \pi r(h)^2 dh = 450.
 <p>Not to worry, we can use <code>fzero</code> from the <code>Roots</code> package for that. To solve for when <code>V(b) = r_vol(b) - 450 = 0</code> we have</p>
 <pre class="sourceCode julia"><code class="sourceCode julia"><span class="kw">using</span> Roots
 r_b = fzero(x -&gt; r_vol(x) - <span class="fl">450</span>,  <span class="fl">10</span>)
-<span class="co">## 9.168923214523723</span></code></pre>
+<span class="co">## 9.168923214523724</span></code></pre>
 <p>So <span class="math">\(b\)</span> is basically <span class="math">\(9.17\)</span>. Given this, how much volume is left at <code>b/2</code>?</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">r_vol(r_b/<span class="fl">2</span>)
-<span class="co">## 173.27527610482952</span></code></pre>
+<span class="co">## 173.27527610482954</span></code></pre>
 <p>That is about <code>j r_vol(r_b/2) / r_vol(r_b) *100</code> percent (<span class="math">\(\approx 173.28/450 \cdot 100\)</span>). As this height is often mistaken for the half-way by volume mark, people tend to drink these pints faster than they think.</p>
 <p>Now compare to the height to get half the volume (225 ml):</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">fzero(x -&gt; r_vol(x) - <span class="fl">225</span>,  <span class="fl">5</span>)
@@ -1479,24 +1502,24 @@ r_b = fzero(x -&gt; r_vol(x) - <span class="fl">450</span>,  <span class="fl">10
 <p>Compare the above for the curved glass, where <span class="math">\(s(h) = 3 + \log(1 + h)\)</span>.</p>
 <p>What is the height of the glass, <code>b</code>, needed to make the volume 450?</p>
 
-<form name='WeaveQuestion' data-id='ya89FZ7EPP' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='Qn6jAM5tLI' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="ya89FZ7EPP" type="number">
+<input id="Qn6jAM5tLI" type="number">
 
 
-<div id='ya89FZ7EPP_message'></div>
+<div id='Qn6jAM5tLI_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#ya89FZ7EPP').on('change', function() {
+$('#Qn6jAM5tLI').on('change', function() {
   correct = Math.abs(this.value - 7.273543523711022) <= 0.001;
 
   if(correct) {
-     $('#ya89FZ7EPP_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#Qn6jAM5tLI_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#ya89FZ7EPP_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#Qn6jAM5tLI_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1505,24 +1528,24 @@ $('#ya89FZ7EPP').on('change', function() {
 <h4 id="question-13">Question</h4>
 <p>Find the volume of the glass represented by <span class="math">\(s(h) = 3 + \log(1 + h), 0 \leq h \leq b\)</span> when the glass is filled to half its height. Report the value as a percentage of the total volume.</p>
 
-<form name='WeaveQuestion' data-id='Ah52XpcbV2' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='mWqyUQBzHb' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="Ah52XpcbV2" type="number">
+<input id="mWqyUQBzHb" type="number">
 
 
-<div id='Ah52XpcbV2_message'></div>
+<div id='mWqyUQBzHb_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#Ah52XpcbV2').on('change', function() {
+$('#mWqyUQBzHb').on('change', function() {
   correct = Math.abs(this.value - 40.17520354006268) <= 1;
 
   if(correct) {
-     $('#Ah52XpcbV2_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#mWqyUQBzHb_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#Ah52XpcbV2_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#mWqyUQBzHb_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1531,24 +1554,24 @@ $('#Ah52XpcbV2').on('change', function() {
 <h4 id="question-14">Question</h4>
 <p>Now, what height of filling will produce half the volume when? Report your answer in terms of a percentage of <span class="math">\(b\)</span>, height of the glass.</p>
 
-<form name='WeaveQuestion' data-id='c6NAVqqgdG' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='q6X4W6pd9h' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="c6NAVqqgdG" type="number">
+<input id="q6X4W6pd9h" type="number">
 
 
-<div id='c6NAVqqgdG_message'></div>
+<div id='q6X4W6pd9h_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#c6NAVqqgdG').on('change', function() {
+$('#q6X4W6pd9h').on('change', function() {
   correct = Math.abs(this.value - 40.17520354006268) <= 0.1;
 
   if(correct) {
-     $('#c6NAVqqgdG_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#q6X4W6pd9h_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#c6NAVqqgdG_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#q6X4W6pd9h_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -1569,8 +1592,9 @@ Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
 <h2 id="example-arc-length">Example, arc length</h2>
 <p>The basic indefinite integral for a positive function answers the amount of area under the curve over a given interval. However, the integral can be interpreted in many different ways. For example, one can use an integral to answer how long a curve is. Of course one can estimate this answer. For example, consider this curve:</p>
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">plot(x -&gt; x^<span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">1</span>)</code></pre>
-<div id="gadflyplot-CyxZe82piDT89qSmHENf"></div>
+<div id="gadflyplot-41J2KLrwDtlV7CP2gqKU"></div>
 <script>
+(function (module) {
 function draw_with_data(data, parent_id) {
   var g = d3.select(parent_id)
             .append("svg")
@@ -1586,385 +1610,395 @@ function draw_with_data(data, parent_id) {
       "ty": 0.0
   };
 (function (g) {
-  g.attr("class", "plotroot xscalable yscalable");
+  g.attr("stroke", "none")
+   .attr("fill", "#000000")
+   .attr("stroke-width", 0.3)
+   .attr("font-family", "Helvetic,Arial,sans")
+   .style("font-size", "3.88px");
   (function (g) {
-    g.attr("stroke", "none")
-     .attr("fill", "#4C404B")
-     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
-     .style("font-size", "3.18px")
-     .attr("class", "guide ylabels");
+    g.attr("class", "plotroot xscalable yscalable");
     (function (g) {
-      g.attr("visibility", "hidden");
+      g.attr("stroke", "none")
+       .attr("fill", "#4C404B")
+       .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+       .style("font-size", "3.18px")
+       .attr("class", "guide ylabels");
       g.append("svg:text")
-         .attr("x", 17.35)
-         .attr("y", -73.97)
+         .attr("x", 20.47)
+         .attr("y", 6.55)
          .attr("text-anchor", "end")
          .style("dominant-baseline", "central")
-      .call(function(text) {
-  text.text("2.5");
-})
+         .call(function(text) {
+     text.text("1.0");
+   })
 ;
-    }(g.append("g")));
-    (function (g) {
-      g.attr("visibility", "hidden");
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 20.47)
+           .attr("y", 83.8)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-0.5");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 20.47)
+           .attr("y", 135.3)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-1.5");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 20.47)
+           .attr("y", -19.21)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("1.5");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 20.47)
+           .attr("y", -70.71)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("2.5");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 20.47)
+           .attr("y", -44.96)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("2.0");
+    })
+;
+      }(g.append("g")));
       g.append("svg:text")
-         .attr("x", 17.35)
-         .attr("y", 87.19)
+         .attr("x", 20.47)
+         .attr("y", 32.3)
          .attr("text-anchor", "end")
          .style("dominant-baseline", "central")
-      .call(function(text) {
-  text.text("-0.5");
-})
+         .call(function(text) {
+     text.text("0.5");
+   })
 ;
-    }(g.append("g")));
-    (function (g) {
-      g.attr("visibility", "hidden");
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 20.47)
+           .attr("y", 109.55)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-1.0");
+    })
+;
+      }(g.append("g")));
       g.append("svg:text")
-         .attr("x", 17.35)
-         .attr("y", -47.11)
+         .attr("x", 20.47)
+         .attr("y", 58.05)
          .attr("text-anchor", "end")
          .style("dominant-baseline", "central")
-      .call(function(text) {
-  text.text("2.0");
-})
+         .call(function(text) {
+     text.text("0.0");
+   })
 ;
     }(g.append("g")));
     (function (g) {
-      g.attr("visibility", "hidden");
+      g.attr("stroke", "none")
+       .attr("fill", "#362A35")
+       .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+       .style("font-size", "3.88px");
       g.append("svg:text")
-         .attr("x", 17.35)
-         .attr("y", -20.25)
-         .attr("text-anchor", "end")
+         .attr("x", 8.59)
+         .attr("y", 32.3)
+         .attr("text-anchor", "middle")
          .style("dominant-baseline", "central")
-      .call(function(text) {
-  text.text("1.5");
-})
+         .attr("transform", "rotate(-90, 8.59, 32.3)")
+         .call(function(text) {
+     text.text("f(x)");
+   })
 ;
     }(g.append("g")));
     (function (g) {
-      g.attr("visibility", "hidden");
+      g.attr("stroke", "none")
+       .attr("fill", "#4C404B")
+       .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+       .style("font-size", "3.18px")
+       .attr("class", "guide xlabels");
       g.append("svg:text")
-         .attr("x", 17.35)
-         .attr("y", 140.91)
-         .attr("text-anchor", "end")
-         .style("dominant-baseline", "central")
-      .call(function(text) {
-  text.text("-1.5");
-})
-;
-    }(g.append("g")));
-    g.append("svg:text")
-       .attr("x", 17.35)
-       .attr("y", 33.47)
-       .attr("text-anchor", "end")
-       .style("dominant-baseline", "central")
-    .call(function(text) {
-  text.text("0.5");
-})
-;
-    g.append("svg:text")
-       .attr("x", 17.35)
-       .attr("y", 6.61)
-       .attr("text-anchor", "end")
-       .style("dominant-baseline", "central")
-    .call(function(text) {
-  text.text("1.0");
-})
-;
-    g.append("svg:text")
-       .attr("x", 17.35)
-       .attr("y", 60.33)
-       .attr("text-anchor", "end")
-       .style("dominant-baseline", "central")
-    .call(function(text) {
-  text.text("0.0");
-})
-;
-    (function (g) {
-      g.attr("visibility", "hidden");
-      g.append("svg:text")
-         .attr("x", 17.35)
-         .attr("y", 114.05)
-         .attr("text-anchor", "end")
-         .style("dominant-baseline", "central")
-      .call(function(text) {
-  text.text("-1.0");
-})
-;
-    }(g.append("g")));
-  }(g.append("g")));
-  (function (g) {
-    g.attr("stroke", "none")
-     .attr("fill", "#362A35")
-     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
-     .style("font-size", "3.88px");
-    g.append("svg:text")
-       .attr("x", 7.94)
-       .attr("y", 33.47)
-       .attr("text-anchor", "middle")
-       .style("dominant-baseline", "central")
-       .attr("transform", "rotate(-90, 7.94, 33.47)")
-    .call(function(text) {
-  text.text("f(x)");
-})
-;
-  }(g.append("g")));
-  (function (g) {
-    g.attr("stroke", "none")
-     .attr("fill", "#4C404B")
-     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
-     .style("font-size", "3.18px")
-     .attr("class", "guide xlabels");
-    (function (g) {
-      g.attr("visibility", "hidden");
-      g.append("svg:text")
-         .attr("x", 249.03)
-         .attr("y", 66.12)
+         .attr("x", 112.35)
+         .attr("y", 64.83)
          .attr("text-anchor", "middle")
-      .call(function(text) {
-  text.text("2.5");
-})
+         .call(function(text) {
+     text.text("1.0");
+   })
 ;
-    }(g.append("g")));
-    (function (g) {
-      g.attr("visibility", "hidden");
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", -20)
+           .attr("y", 64.83)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("-0.5");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", -108.24)
+           .attr("y", 64.83)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("-1.5");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 156.47)
+           .attr("y", 64.83)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("1.5");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 244.71)
+           .attr("y", 64.83)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("2.5");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 200.59)
+           .attr("y", 64.83)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("2.0");
+    })
+;
+      }(g.append("g")));
       g.append("svg:text")
-         .attr("x", -24.5)
-         .attr("y", 66.12)
+         .attr("x", 68.23)
+         .attr("y", 64.83)
          .attr("text-anchor", "middle")
-      .call(function(text) {
-  text.text("-0.5");
-})
+         .call(function(text) {
+     text.text("0.5");
+   })
 ;
-    }(g.append("g")));
-    (function (g) {
-      g.attr("visibility", "hidden");
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", -64.12)
+           .attr("y", 64.83)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("-1.0");
+    })
+;
+      }(g.append("g")));
       g.append("svg:text")
-         .attr("x", 203.44)
-         .attr("y", 66.12)
+         .attr("x", 24.12)
+         .attr("y", 64.83)
          .attr("text-anchor", "middle")
-      .call(function(text) {
-  text.text("2.0");
-})
+         .call(function(text) {
+     text.text("0.0");
+   })
 ;
     }(g.append("g")));
     (function (g) {
-      g.attr("visibility", "hidden");
+      g.attr("stroke", "none")
+       .attr("fill", "#362A35")
+       .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+       .style("font-size", "3.88px");
       g.append("svg:text")
-         .attr("x", 157.85)
-         .attr("y", 66.12)
+         .attr("x", 68.23)
+         .attr("y", 73)
          .attr("text-anchor", "middle")
-      .call(function(text) {
-  text.text("1.5");
-})
+         .call(function(text) {
+     text.text("x");
+   })
 ;
     }(g.append("g")));
     (function (g) {
-      g.attr("visibility", "hidden");
-      g.append("svg:text")
-         .attr("x", -115.68)
-         .attr("y", 66.12)
-         .attr("text-anchor", "middle")
-      .call(function(text) {
-  text.text("-1.5");
-})
+      g.on("mouseover", guide_background_mouseover("#C6C6C9"))
+       .on("mouseout", guide_background_mouseout("#F0F0F3"))
+       .call(zoom_behavior(ctx))
 ;
-    }(g.append("g")));
-    g.append("svg:text")
-       .attr("x", 66.68)
-       .attr("y", 66.12)
-       .attr("text-anchor", "middle")
-    .call(function(text) {
-  text.text("0.5");
-})
-;
-    g.append("svg:text")
-       .attr("x", 112.26)
-       .attr("y", 66.12)
-       .attr("text-anchor", "middle")
-    .call(function(text) {
-  text.text("1.0");
-})
-;
-    g.append("svg:text")
-       .attr("x", 21.09)
-       .attr("y", 66.12)
-       .attr("text-anchor", "middle")
-    .call(function(text) {
-  text.text("0.0");
-})
-;
-    (function (g) {
-      g.attr("visibility", "hidden");
-      g.append("svg:text")
-         .attr("x", -70.09)
-         .attr("y", 66.12)
-         .attr("text-anchor", "middle")
-      .call(function(text) {
-  text.text("-1.0");
-})
-;
-    }(g.append("g")));
-  }(g.append("g")));
-  (function (g) {
-    g.attr("stroke", "none")
-     .attr("fill", "#362A35")
-     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
-     .style("font-size", "3.88px");
-    g.append("svg:text")
-       .attr("x", 66.68)
-       .attr("y", 73)
-       .attr("text-anchor", "middle")
-    .call(function(text) {
-  text.text("x");
-})
-;
-  }(g.append("g")));
-  (function (g) {
-    g.on("mouseover", guide_background_mouseover("#C6C6C9"))
-     .on("mouseout", guide_background_mouseout("#F0F0F3"))
-     .call(zoom_behavior(ctx))
-;
-    (function (g) {
-      d3.select("defs")
+      (function (g) {
+        d3.select("defs")
   .append("svg:clipPath")
     .attr("id", parent_id + "_clippath0")
     .append("svg:path")
-      .attr("d", " M18.35,5 L 115 5 115 61.94 18.35 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath0)");
-      (function (g) {
-        g.attr("class", "guide background")
-         .attr("stroke", "#F1F1F5")
-         .attr("fill", "#FAFAFA");
-        g.append("svg:path")
-           .attr("d", "M18.35,5 L 115 5 115 61.94 18.35 61.94 z");
+      .attr("d", " M21.47,5 L 115 5 115 59.59 21.47 59.59 z");g.attr("clip-path", "url(#" + parent_id + "_clippath0)");
+        (function (g) {
+          g.attr("class", "guide background")
+           .attr("stroke", "#F1F1F5")
+           .attr("fill", "#FAFAFA")
+           .attr("opacity", 1.00);
+          g.append("svg:path")
+             .attr("d", "M21.47,5 L 115 5 115 59.59 21.47 59.59 z");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("stroke", "#F0F0F3")
+           .attr("stroke-width", 0.2)
+           .attr("class", "guide ygridlines xfixed");
+          g.append("svg:path")
+             .attr("d", "M21.47,83.8 L 115 83.8");
+          g.append("svg:path")
+             .attr("d", "M21.47,-19.21 L 115 -19.21");
+          g.append("svg:path")
+             .attr("d", "M21.47,-44.96 L 115 -44.96");
+          g.append("svg:path")
+             .attr("d", "M21.47,109.55 L 115 109.55");
+          g.append("svg:path")
+             .attr("d", "M21.47,58.05 L 115 58.05");
+          g.append("svg:path")
+             .attr("d", "M21.47,32.3 L 115 32.3");
+          g.append("svg:path")
+             .attr("d", "M21.47,-70.71 L 115 -70.71");
+          g.append("svg:path")
+             .attr("d", "M21.47,135.3 L 115 135.3");
+          g.append("svg:path")
+             .attr("d", "M21.47,6.55 L 115 6.55");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("stroke", "#F0F0F3")
+           .attr("stroke-width", 0.2)
+           .attr("class", "guide xgridlines yfixed");
+          g.append("svg:path")
+             .attr("d", "M-20,5 L -20 59.59");
+          g.append("svg:path")
+             .attr("d", "M156.47,5 L 156.47 59.59");
+          g.append("svg:path")
+             .attr("d", "M200.59,5 L 200.59 59.59");
+          g.append("svg:path")
+             .attr("d", "M-64.12,5 L -64.12 59.59");
+          g.append("svg:path")
+             .attr("d", "M24.12,5 L 24.12 59.59");
+          g.append("svg:path")
+             .attr("d", "M68.23,5 L 68.23 59.59");
+          g.append("svg:path")
+             .attr("d", "M244.71,5 L 244.71 59.59");
+          g.append("svg:path")
+             .attr("d", "M-108.24,5 L -108.24 59.59");
+          g.append("svg:path")
+             .attr("d", "M112.35,5 L 112.35 59.59");
+        }(g.append("g")));
       }(g.append("g")));
       (function (g) {
-        g.attr("stroke", "#F0F0F3")
-         .attr("stroke-width", 0.2)
-         .attr("class", "guide ygridlines xfixed");
-        g.append("svg:path")
-           .attr("d", "M18.35,87.19 L 115 87.19");
-        g.append("svg:path")
-           .attr("d", "M18.35,-20.25 L 115 -20.25");
-        g.append("svg:path")
-           .attr("d", "M18.35,33.47 L 115 33.47");
-        g.append("svg:path")
-           .attr("d", "M18.35,60.33 L 115 60.33");
-        g.append("svg:path")
-           .attr("d", "M18.35,114.05 L 115 114.05");
-        g.append("svg:path")
-           .attr("d", "M18.35,6.61 L 115 6.61");
-        g.append("svg:path")
-           .attr("d", "M18.35,140.91 L 115 140.91");
-        g.append("svg:path")
-           .attr("d", "M18.35,-47.11 L 115 -47.11");
-        g.append("svg:path")
-           .attr("d", "M18.35,-73.97 L 115 -73.97");
-      }(g.append("g")));
-      (function (g) {
-        g.attr("stroke", "#F0F0F3")
-         .attr("stroke-width", 0.2)
-         .attr("class", "guide xgridlines yfixed");
-        g.append("svg:path")
-           .attr("d", "M-24.5,5 L -24.5 61.94");
-        g.append("svg:path")
-           .attr("d", "M157.85,5 L 157.85 61.94");
-        g.append("svg:path")
-           .attr("d", "M66.68,5 L 66.68 61.94");
-        g.append("svg:path")
-           .attr("d", "M21.09,5 L 21.09 61.94");
-        g.append("svg:path")
-           .attr("d", "M-70.09,5 L -70.09 61.94");
-        g.append("svg:path")
-           .attr("d", "M112.26,5 L 112.26 61.94");
-        g.append("svg:path")
-           .attr("d", "M-115.68,5 L -115.68 61.94");
-        g.append("svg:path")
-           .attr("d", "M203.44,5 L 203.44 61.94");
-        g.append("svg:path")
-           .attr("d", "M249.03,5 L 249.03 61.94");
-      }(g.append("g")));
-    }(g.append("g")));
-    (function (g) {
-      d3.select("defs")
+        d3.select("defs")
   .append("svg:clipPath")
     .attr("id", parent_id + "_clippath1")
     .append("svg:path")
-      .attr("d", " M18.35,5 L 115 5 115 61.94 18.35 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath1)");
-      (function (g) {
-        g.attr("class", "plotpanel");
+      .attr("d", " M21.47,5 L 115 5 115 59.59 21.47 59.59 z");g.attr("clip-path", "url(#" + parent_id + "_clippath1)");
         (function (g) {
-          g.attr("stroke", "#00BFFF")
-           .attr("class", "geometry")
-           .attr("fill", "none")
-           .attr("stroke-width", 0.3);
-          g.append("svg:path")
-             .attr("d", "M21.09,60.33 L 21.45 60.33 21.82 60.33 22.18 60.33 22.55 60.32 22.91 60.31 23.28 60.3 23.64 60.29 24.01 60.28 24.37 60.26 24.73 60.25 25.1 60.23 25.46 60.21 25.83 60.19 26.19 60.16 26.56 60.14 26.92 60.11 27.29 60.08 27.65 60.05 28.02 60.02 28.38 59.99 28.75 59.95 29.11 59.92 29.48 59.88 29.84 59.84 30.21 59.8 30.57 59.75 30.93 59.71 31.3 59.66 31.66 59.61 32.03 59.56 32.39 59.51 32.76 59.45 33.12 59.4 33.49 59.34 33.85 59.28 34.22 59.22 34.58 59.16 34.95 59.09 35.31 59.03 35.68 58.96 36.04 58.89 36.41 58.82 36.77 58.74 37.13 58.67 37.5 58.59 37.86 58.51 38.23 58.43 38.59 58.35 38.96 58.27 39.32 58.18 39.69 58.1 40.05 58.01 40.42 57.92 40.78 57.83 41.15 57.73 41.51 57.64 41.88 57.54 42.24 57.44 42.61 57.34 42.97 57.24 43.33 57.13 43.7 57.03 44.06 56.92 44.43 56.81 44.79 56.7 45.16 56.59 45.52 56.47 45.89 56.36 46.25 56.24 46.62 56.12 46.98 56 47.35 55.88 47.71 55.75 48.08 55.63 48.44 55.5 48.81 55.37 49.17 55.24 49.53 55.1 49.9 54.97 50.26 54.83 50.63 54.69 50.99 54.55 51.36 54.41 51.72 54.27 52.09 54.12 52.45 53.98 52.82 53.83 53.18 53.68 53.55 53.52 53.91 53.37 54.28 53.21 54.64 53.06 55.01 52.9 55.37 52.74 55.73 52.58 56.1 52.41 56.46 52.25 56.83 52.08 57.19 51.91 57.56 51.74 57.92 51.56 58.29 51.39 58.65 51.21 59.02 51.04 59.38 50.86 59.75 50.68 60.11 50.49 60.48 50.31 60.84 50.12 61.21 49.93 61.57 49.74 61.93 49.55 62.3 49.36 62.66 49.16 63.03 48.97 63.39 48.77 63.76 48.57 64.12 48.36 64.49 48.16 64.85 47.96 65.22 47.75 65.58 47.54 65.95 47.33 66.31 47.12 66.68 46.9 67.04 46.69 67.41 46.47 67.77 46.25 68.13 46.03 68.5 45.81 68.86 45.58 69.23 45.36 69.59 45.13 69.96 44.9 70.32 44.67 70.69 44.43 71.05 44.2 71.42 43.96 71.78 43.73 72.15 43.49 72.51 43.24 72.88 43 73.24 42.76 73.61 42.51 73.97 42.26 74.33 42.01 74.7 41.76 75.06 41.51 75.43 41.25 75.79 40.99 76.16 40.73 76.52 40.47 76.89 40.21 77.25 39.95 77.62 39.68 77.98 39.42 78.35 39.15 78.71 38.88 79.08 38.6 79.44 38.33 79.81 38.05 80.17 37.78 80.53 37.5 80.9 37.21 81.26 36.93 81.63 36.65 81.99 36.36 82.36 36.07 82.72 35.78 83.09 35.49 83.45 35.2 83.82 34.9 84.18 34.61 84.55 34.31 84.91 34.01 85.28 33.71 85.64 33.4 86.01 33.1 86.37 32.79 86.74 32.48 87.1 32.17 87.46 31.86 87.83 31.55 88.19 31.23 88.56 30.92 88.92 30.6 89.29 30.28 89.65 29.95 90.02 29.63 90.38 29.3 90.75 28.98 91.11 28.65 91.48 28.32 91.84 27.98 92.21 27.65 92.57 27.31 92.94 26.97 93.3 26.64 93.66 26.29 94.03 25.95 94.39 25.61 94.76 25.26 95.12 24.91 95.49 24.56 95.85 24.21 96.22 23.86 96.58 23.5 96.95 23.15 97.31 22.79 97.68 22.43 98.04 22.07 98.41 21.7 98.77 21.34 99.14 20.97 99.5 20.6 99.86 20.23 100.23 19.86 100.59 19.48 100.96 19.11 101.32 18.73 101.69 18.35 102.05 17.97 102.42 17.59 102.78 17.2 103.15 16.82 103.51 16.43 103.88 16.04 104.24 15.65 104.61 15.26 104.97 14.86 105.34 14.47 105.7 14.07 106.06 13.67 106.43 13.27 106.79 12.86 107.16 12.46 107.52 12.05 107.89 11.65 108.25 11.24 108.62 10.82 108.98 10.41 109.35 9.99 109.71 9.58 110.08 9.16 110.44 8.74 110.81 8.32 111.17 7.89 111.54 7.47 111.9 7.04 112.26 6.61");
+          g.attr("class", "plotpanel");
+          (function (g) {
+            g.attr("fill", "none")
+             .attr("stroke-width", 0.3);
+            (function (g) {
+              g.attr("stroke", "#00BFFF")
+               .attr("class", "geometry");
+              g.append("svg:path")
+                 .attr("d", "M24.12,58.05 L 24.47 58.05 24.82 58.04 25.18 58.04 25.53 58.03 25.89 58.03 26.24 58.02 26.6 58.01 26.95 57.99 27.31 57.98 27.66 57.96 28.01 57.95 28.37 57.93 28.72 57.91 29.08 57.88 29.43 57.86 29.79 57.83 30.14 57.81 30.49 57.78 30.85 57.75 31.2 57.72 31.56 57.68 31.91 57.65 32.27 57.61 32.62 57.57 32.98 57.53 33.33 57.49 33.68 57.44 34.04 57.4 34.39 57.35 34.75 57.3 35.1 57.25 35.46 57.2 35.81 57.14 36.16 57.09 36.52 57.03 36.87 56.97 37.23 56.91 37.58 56.85 37.94 56.78 38.29 56.72 38.64 56.65 39 56.58 39.35 56.51 39.71 56.44 40.06 56.37 40.42 56.29 40.77 56.21 41.13 56.13 41.48 56.05 41.83 55.97 42.19 55.89 42.54 55.8 42.9 55.71 43.25 55.63 43.61 55.53 43.96 55.44 44.31 55.35 44.67 55.25 45.02 55.16 45.38 55.06 45.73 54.96 46.09 54.85 46.44 54.75 46.8 54.64 47.15 54.54 47.5 54.43 47.86 54.32 48.21 54.21 48.57 54.09 48.92 53.98 49.28 53.86 49.63 53.74 49.98 53.62 50.34 53.5 50.69 53.37 51.05 53.25 51.4 53.12 51.76 52.99 52.11 52.86 52.47 52.73 52.82 52.6 53.17 52.46 53.53 52.32 53.88 52.19 54.24 52.05 54.59 51.9 54.95 51.76 55.3 51.61 55.65 51.47 56.01 51.32 56.36 51.17 56.72 51.02 57.07 50.86 57.43 50.71 57.78 50.55 58.14 50.39 58.49 50.23 58.84 50.07 59.2 49.91 59.55 49.74 59.91 49.57 60.26 49.41 60.62 49.23 60.97 49.06 61.32 48.89 61.68 48.71 62.03 48.54 62.39 48.36 62.74 48.18 63.1 48 63.45 47.81 63.8 47.63 64.16 47.44 64.51 47.25 64.87 47.06 65.22 46.87 65.58 46.68 65.93 46.48 66.29 46.28 66.64 46.09 66.99 45.89 67.35 45.68 67.7 45.48 68.06 45.28 68.41 45.07 68.77 44.86 69.12 44.65 69.47 44.44 69.83 44.22 70.18 44.01 70.54 43.79 70.89 43.57 71.25 43.35 71.6 43.13 71.96 42.91 72.31 42.68 72.66 42.46 73.02 42.23 73.37 42 73.73 41.77 74.08 41.53 74.44 41.3 74.79 41.06 75.14 40.82 75.5 40.58 75.85 40.34 76.21 40.1 76.56 39.85 76.92 39.61 77.27 39.36 77.63 39.11 77.98 38.86 78.33 38.6 78.69 38.35 79.04 38.09 79.4 37.83 79.75 37.57 80.11 37.31 80.46 37.05 80.81 36.78 81.17 36.52 81.52 36.25 81.88 35.98 82.23 35.71 82.59 35.43 82.94 35.16 83.29 34.88 83.65 34.6 84 34.32 84.36 34.04 84.71 33.76 85.07 33.47 85.42 33.19 85.78 32.9 86.13 32.61 86.48 32.32 86.84 32.02 87.19 31.73 87.55 31.43 87.9 31.13 88.26 30.83 88.61 30.53 88.96 30.23 89.32 29.92 89.67 29.62 90.03 29.31 90.38 29 90.74 28.69 91.09 28.38 91.45 28.06 91.8 27.74 92.15 27.43 92.51 27.11 92.86 26.78 93.22 26.46 93.57 26.14 93.93 25.81 94.28 25.48 94.63 25.15 94.99 24.82 95.34 24.49 95.7 24.15 96.05 23.82 96.41 23.48 96.76 23.14 97.12 22.8 97.47 22.45 97.82 22.11 98.18 21.76 98.53 21.41 98.89 21.07 99.24 20.71 99.6 20.36 99.95 20.01 100.3 19.65 100.66 19.29 101.01 18.93 101.37 18.57 101.72 18.21 102.08 17.84 102.43 17.48 102.79 17.11 103.14 16.74 103.49 16.37 103.85 15.99 104.2 15.62 104.56 15.24 104.91 14.87 105.27 14.49 105.62 14.1 105.97 13.72 106.33 13.34 106.68 12.95 107.04 12.56 107.39 12.17 107.75 11.78 108.1 11.39 108.45 10.99 108.81 10.6 109.16 10.2 109.52 9.8 109.87 9.4 110.23 9 110.58 8.59 110.94 8.19 111.29 7.78 111.64 7.37 112 6.96 112.35 6.55");
+            }(g.append("g")));
+          }(g.append("g")));
         }(g.append("g")));
       }(g.append("g")));
-    }(g.append("g")));
-    (function (g) {
-      d3.select("defs")
+      (function (g) {
+        d3.select("defs")
   .append("svg:clipPath")
     .attr("id", parent_id + "_clippath2")
     .append("svg:path")
-      .attr("d", " M18.35,5 L 115 5 115 61.94 18.35 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath2)");
-      (function (g) {
-        g.attr("stroke", "none")
-         .attr("class", "guide zoomslider")
-         .attr("opacity", 0.00);
+      .attr("d", " M21.47,5 L 115 5 115 59.59 21.47 59.59 z");g.attr("clip-path", "url(#" + parent_id + "_clippath2)");
         (function (g) {
-          g.attr("stroke", "#6A6A6A")
-           .attr("stroke-opacity", 0.00)
-           .attr("stroke-width", 0.3)
-           .attr("fill", "#EAEAEA")
-           .on("click", zoomin_behavior(ctx))
+          g.attr("stroke", "none")
+           .attr("class", "guide zoomslider")
+           .attr("opacity", 0.00);
+          (function (g) {
+            g.attr("stroke", "#6A6A6A")
+             .attr("stroke-opacity", 0.00)
+             .attr("stroke-width", 0.3)
+             .attr("fill", "#EAEAEA")
+             .on("click", zoomin_behavior(ctx))
 .on("dblclick", function() { d3.event.stopPropagation(); })
 .on("mouseover", zoomslider_button_mouseover("#cd5c5c"))
 .on("mouseout", zoomslider_button_mouseover("#6a6a6a"))
 ;
-          g.append("svg:path")
-             .attr("d", "M108,8 L 112 8 112 12 108 12 z");
+            g.append("svg:path")
+               .attr("d", "M108,8 L 112 8 112 12 108 12 z");
+            (function (g) {
+              g.attr("fill", "#6A6A6A")
+               .attr("class", "button_logo");
+              g.append("svg:path")
+                 .attr("d", "M108.8,9.6 L 109.6 9.6 109.6 8.8 110.4 8.8 110.4 9.6 111.2 9.6 111.2 10.4 110.4 10.4 110.4 11.2 109.6 11.2 109.6 10.4 108.8 10.4 z");
+            }(g.append("g")));
+          }(g.append("g")));
+          (function (g) {
+            g.attr("fill", "#EAEAEA")
+             .on("click", zoomslider_track_behavior(ctx, 82, 99));
+            g.append("svg:path")
+               .attr("d", "M88.5,8 L 107.5 8 107.5 12 88.5 12 z");
+          }(g.append("g")));
           (function (g) {
             g.attr("fill", "#6A6A6A")
-             .attr("class", "button_logo");
-            g.append("svg:path")
-               .attr("d", "M108.8,9.6 L 109.6 9.6 109.6 8.8 110.4 8.8 110.4 9.6 111.2 9.6 111.2 10.4 110.4 10.4 110.4 11.2 109.6 11.2 109.6 10.4 108.8 10.4 z");
-          }(g.append("g")));
-        }(g.append("g")));
-        (function (g) {
-          g.attr("fill", "#EAEAEA")
-           .on("click", zoomslider_track_behavior(ctx, 82, 99));
-          g.append("svg:path")
-             .attr("d", "M88.5,8 L 107.5 8 107.5 12 88.5 12 z");
-        }(g.append("g")));
-        (function (g) {
-          g.attr("fill", "#6A6A6A")
-           .attr("class", "zoomslider_thumb")
-           .call(zoomslider_behavior(ctx, 82, 99))
+             .attr("class", "zoomslider_thumb")
+             .call(zoomslider_behavior(ctx, 82, 99))
 .on("mouseover", zoomslider_thumb_mouseover("#cd5c5c"))
 .on("mouseout", zoomslider_thumb_mouseover("#6a6a6a"))
 ;
-          g.append("svg:path")
-             .attr("d", "M97,8 L 99 8 99 12 97 12 z");
-        }(g.append("g")));
-        (function (g) {
-          g.attr("stroke", "#6A6A6A")
-           .attr("stroke-opacity", 0.00)
-           .attr("stroke-width", 0.3)
-           .attr("fill", "#EAEAEA")
-           .on("click", zoomout_behavior(ctx))
+            g.append("svg:path")
+               .attr("d", "M97,8 L 99 8 99 12 97 12 z");
+          }(g.append("g")));
+          (function (g) {
+            g.attr("stroke", "#6A6A6A")
+             .attr("stroke-opacity", 0.00)
+             .attr("stroke-width", 0.3)
+             .attr("fill", "#EAEAEA")
+             .on("click", zoomout_behavior(ctx))
 .on("dblclick", function() { d3.event.stopPropagation(); })
 .on("mouseover", zoomslider_button_mouseover("#cd5c5c"))
 .on("mouseout", zoomslider_button_mouseover("#6a6a6a"))
 ;
-          g.append("svg:path")
-             .attr("d", "M84,8 L 88 8 88 12 84 12 z");
-          (function (g) {
-            g.attr("fill", "#6A6A6A")
-             .attr("class", "button_logo");
             g.append("svg:path")
-               .attr("d", "M84.8,9.6 L 87.2 9.6 87.2 10.4 84.8 10.4 z");
+               .attr("d", "M84,8 L 88 8 88 12 84 12 z");
+            (function (g) {
+              g.attr("fill", "#6A6A6A")
+               .attr("class", "button_logo");
+              g.append("svg:path")
+                 .attr("d", "M84.8,9.6 L 87.2 9.6 87.2 10.4 84.8 10.4 z");
+            }(g.append("g")));
           }(g.append("g")));
         }(g.append("g")));
       }(g.append("g")));
@@ -1988,7 +2022,15 @@ var draw = function(parent_id) {
     draw_with_data(data, parent_id);
 };
 
-draw("#gadflyplot-CyxZe82piDT89qSmHENf");
+if ('undefined' !== typeof module) {
+    module.exports = draw;
+} else if ('undefined' !== typeof window) {
+    window.draw = draw
+}
+
+return module;
+})({}).exports("#gadflyplot-41J2KLrwDtlV7CP2gqKU");
+//@ sourceURL=gadflyplot-41J2KLrwDtlV7CP2gqKU.js
 </script>
 
 
@@ -2016,8 +2058,9 @@ y = a \cosh(x/a) = a \cdot \frac{e^{x/a} + e^{-x/a}}{2}.
 <pre class="sourceCode julia" results="block"><code class="sourceCode julia">a = <span class="fl">2</span>;
 f(x) = a * cosh(x/a)
 plot(f, -<span class="fl">1</span>, <span class="fl">1</span>)</code></pre>
-<div id="gadflyplot-su7zWBJh01HHYW4auUE4"></div>
+<div id="gadflyplot-RjEyG4kQQWP09gf1YHRi"></div>
 <script>
+(function (module) {
 function draw_with_data(data, parent_id) {
   var g = d3.select(parent_id)
             .append("svg")
@@ -2033,496 +2076,506 @@ function draw_with_data(data, parent_id) {
       "ty": 0.0
   };
 (function (g) {
-  g.attr("class", "plotroot xscalable yscalable");
+  g.attr("stroke", "none")
+   .attr("fill", "#000000")
+   .attr("stroke-width", 0.3)
+   .attr("font-family", "Helvetic,Arial,sans")
+   .style("font-size", "3.88px");
   (function (g) {
-    g.attr("stroke", "none")
-     .attr("fill", "#4C404B")
-     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
-     .style("font-size", "3.18px")
-     .attr("class", "guide ylabels");
+    g.attr("class", "plotroot xscalable yscalable");
     (function (g) {
-      g.attr("visibility", "hidden");
+      g.attr("stroke", "none")
+       .attr("fill", "#4C404B")
+       .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+       .style("font-size", "3.18px")
+       .attr("class", "guide ylabels");
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 19.06)
+           .attr("y", 92.38)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("1.8");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 19.06)
+           .attr("y", -27.79)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("2.5");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 19.06)
+           .attr("y", -62.12)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("2.7");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 19.06)
+           .attr("y", 126.72)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("1.6");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 19.06)
+           .attr("y", -10.62)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("2.4");
+    })
+;
+      }(g.append("g")));
       g.append("svg:text")
-         .attr("x", 16.29)
-         .attr("y", -29.2)
+         .attr("x", 19.06)
+         .attr("y", 6.55)
          .attr("text-anchor", "end")
          .style("dominant-baseline", "central")
-      .call(function(text) {
-  text.text("2.5");
-})
+         .call(function(text) {
+     text.text("2.3");
+   })
 ;
-    }(g.append("g")));
-    (function (g) {
-      g.attr("visibility", "hidden");
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 19.06)
+           .attr("y", -44.96)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("2.6");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 19.06)
+           .attr("y", 109.55)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("1.7");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 19.06)
+           .attr("y", 75.21)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("1.9");
+    })
+;
+      }(g.append("g")));
       g.append("svg:text")
-         .attr("x", 16.29)
-         .attr("y", 78.24)
+         .attr("x", 19.06)
+         .attr("y", 40.88)
          .attr("text-anchor", "end")
          .style("dominant-baseline", "central")
-      .call(function(text) {
-  text.text("1.9");
-})
+         .call(function(text) {
+     text.text("2.1");
+   })
 ;
-    }(g.append("g")));
-    (function (g) {
-      g.attr("visibility", "hidden");
       g.append("svg:text")
-         .attr("x", 16.29)
-         .attr("y", -47.11)
+         .attr("x", 19.06)
+         .attr("y", 23.71)
          .attr("text-anchor", "end")
          .style("dominant-baseline", "central")
-      .call(function(text) {
-  text.text("2.6");
-})
+         .call(function(text) {
+     text.text("2.2");
+   })
 ;
-    }(g.append("g")));
-    (function (g) {
-      g.attr("visibility", "hidden");
       g.append("svg:text")
-         .attr("x", 16.29)
-         .attr("y", 131.96)
+         .attr("x", 19.06)
+         .attr("y", 58.05)
          .attr("text-anchor", "end")
          .style("dominant-baseline", "central")
-      .call(function(text) {
-  text.text("1.6");
-})
+         .call(function(text) {
+     text.text("2.0");
+   })
 ;
     }(g.append("g")));
-    g.append("svg:text")
-       .attr("x", 16.29)
-       .attr("y", 60.33)
-       .attr("text-anchor", "end")
-       .style("dominant-baseline", "central")
-    .call(function(text) {
-  text.text("2.0");
-})
-;
-    g.append("svg:text")
-       .attr("x", 16.29)
-       .attr("y", 42.43)
-       .attr("text-anchor", "end")
-       .style("dominant-baseline", "central")
-    .call(function(text) {
-  text.text("2.1");
-})
-;
     (function (g) {
-      g.attr("visibility", "hidden");
+      g.attr("stroke", "none")
+       .attr("fill", "#362A35")
+       .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+       .style("font-size", "3.88px");
       g.append("svg:text")
-         .attr("x", 16.29)
-         .attr("y", 114.05)
-         .attr("text-anchor", "end")
+         .attr("x", 8.59)
+         .attr("y", 32.3)
+         .attr("text-anchor", "middle")
          .style("dominant-baseline", "central")
-      .call(function(text) {
-  text.text("1.7");
-})
-;
-    }(g.append("g")));
-    g.append("svg:text")
-       .attr("x", 16.29)
-       .attr("y", 6.61)
-       .attr("text-anchor", "end")
-       .style("dominant-baseline", "central")
-    .call(function(text) {
-  text.text("2.3");
-})
-;
-    (function (g) {
-      g.attr("visibility", "hidden");
-      g.append("svg:text")
-         .attr("x", 16.29)
-         .attr("y", -11.3)
-         .attr("text-anchor", "end")
-         .style("dominant-baseline", "central")
-      .call(function(text) {
-  text.text("2.4");
-})
+         .attr("transform", "rotate(-90, 8.59, 32.3)")
+         .call(function(text) {
+     text.text("f(x)");
+   })
 ;
     }(g.append("g")));
     (function (g) {
-      g.attr("visibility", "hidden");
+      g.attr("stroke", "none")
+       .attr("fill", "#4C404B")
+       .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+       .style("font-size", "3.18px")
+       .attr("class", "guide xlabels");
       g.append("svg:text")
-         .attr("x", 16.29)
-         .attr("y", 96.15)
-         .attr("text-anchor", "end")
-         .style("dominant-baseline", "central")
-      .call(function(text) {
-  text.text("1.8");
-})
-;
-    }(g.append("g")));
-    g.append("svg:text")
-       .attr("x", 16.29)
-       .attr("y", 24.52)
-       .attr("text-anchor", "end")
-       .style("dominant-baseline", "central")
-    .call(function(text) {
-  text.text("2.2");
-})
-;
-    (function (g) {
-      g.attr("visibility", "hidden");
-      g.append("svg:text")
-         .attr("x", 16.29)
-         .attr("y", -65.02)
-         .attr("text-anchor", "end")
-         .style("dominant-baseline", "central")
-      .call(function(text) {
-  text.text("2.7");
-})
-;
-    }(g.append("g")));
-  }(g.append("g")));
-  (function (g) {
-    g.attr("stroke", "none")
-     .attr("fill", "#362A35")
-     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
-     .style("font-size", "3.88px");
-    g.append("svg:text")
-       .attr("x", 7.94)
-       .attr("y", 33.47)
-       .attr("text-anchor", "middle")
-       .style("dominant-baseline", "central")
-       .attr("transform", "rotate(-90, 7.94, 33.47)")
-    .call(function(text) {
-  text.text("f(x)");
-})
-;
-  }(g.append("g")));
-  (function (g) {
-    g.attr("stroke", "none")
-     .attr("fill", "#4C404B")
-     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
-     .style("font-size", "3.18px")
-     .attr("class", "guide xlabels");
-    (function (g) {
-      g.attr("visibility", "hidden");
-      g.append("svg:text")
-         .attr("x", 181.37)
-         .attr("y", 66.12)
+         .attr("x", 112.31)
+         .attr("y", 64.83)
          .attr("text-anchor", "middle")
-      .call(function(text) {
-  text.text("2.5");
-})
+         .call(function(text) {
+     text.text("1.0");
+   })
 ;
-    }(g.append("g")));
-    (function (g) {
-      g.attr("visibility", "hidden");
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 0.35)
+           .attr("y", 64.83)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("-1.5");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", -22.04)
+           .attr("y", 64.83)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("-2.0");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 179.49)
+           .attr("y", 64.83)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("2.5");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 201.88)
+           .attr("y", 64.83)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("3.0");
+    })
+;
+      }(g.append("g")));
       g.append("svg:text")
-         .attr("x", -2.98)
-         .attr("y", 66.12)
+         .attr("x", 89.92)
+         .attr("y", 64.83)
          .attr("text-anchor", "middle")
-      .call(function(text) {
-  text.text("-1.5");
-})
+         .call(function(text) {
+     text.text("0.5");
+   })
 ;
-    }(g.append("g")));
-    (function (g) {
-      g.attr("visibility", "hidden");
       g.append("svg:text")
-         .attr("x", -49.07)
-         .attr("y", 66.12)
+         .attr("x", 22.75)
+         .attr("y", 64.83)
          .attr("text-anchor", "middle")
-      .call(function(text) {
-  text.text("-2.5");
-})
+         .call(function(text) {
+     text.text("-1.0");
+   })
 ;
-    }(g.append("g")));
-    (function (g) {
-      g.attr("visibility", "hidden");
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", -89.21)
+           .attr("y", 64.83)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("-3.5");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", -44.43)
+           .attr("y", 64.83)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("-2.5");
+    })
+;
+      }(g.append("g")));
       g.append("svg:text")
-         .attr("x", 227.45)
-         .attr("y", 66.12)
+         .attr("x", 45.14)
+         .attr("y", 64.83)
          .attr("text-anchor", "middle")
-      .call(function(text) {
-  text.text("3.5");
-})
+         .call(function(text) {
+     text.text("-0.5");
+   })
 ;
-    }(g.append("g")));
-    g.append("svg:text")
-       .attr("x", 112.23)
-       .attr("y", 66.12)
-       .attr("text-anchor", "middle")
-    .call(function(text) {
-  text.text("1.0");
-})
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 224.27)
+           .attr("y", 64.83)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("3.5");
+    })
 ;
-    (function (g) {
-      g.attr("visibility", "hidden");
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", -66.82)
+           .attr("y", 64.83)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("-3.0");
+    })
+;
+      }(g.append("g")));
       g.append("svg:text")
-         .attr("x", 158.32)
-         .attr("y", 66.12)
+         .attr("x", 67.53)
+         .attr("y", 64.83)
          .attr("text-anchor", "middle")
-      .call(function(text) {
-  text.text("2.0");
-})
+         .call(function(text) {
+     text.text("0.0");
+   })
 ;
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 134.7)
+           .attr("y", 64.83)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("1.5");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 157.1)
+           .attr("y", 64.83)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("2.0");
+    })
+;
+      }(g.append("g")));
     }(g.append("g")));
     (function (g) {
-      g.attr("visibility", "hidden");
+      g.attr("stroke", "none")
+       .attr("fill", "#362A35")
+       .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+       .style("font-size", "3.88px");
       g.append("svg:text")
-         .attr("x", -95.16)
-         .attr("y", 66.12)
+         .attr("x", 67.53)
+         .attr("y", 73)
          .attr("text-anchor", "middle")
-      .call(function(text) {
-  text.text("-3.5");
-})
+         .call(function(text) {
+     text.text("x");
+   })
 ;
     }(g.append("g")));
     (function (g) {
-      g.attr("visibility", "hidden");
-      g.append("svg:text")
-         .attr("x", 135.28)
-         .attr("y", 66.12)
-         .attr("text-anchor", "middle")
-      .call(function(text) {
-  text.text("1.5");
-})
+      g.on("mouseover", guide_background_mouseover("#C6C6C9"))
+       .on("mouseout", guide_background_mouseout("#F0F0F3"))
+       .call(zoom_behavior(ctx))
 ;
-    }(g.append("g")));
-    g.append("svg:text")
-       .attr("x", 89.19)
-       .attr("y", 66.12)
-       .attr("text-anchor", "middle")
-    .call(function(text) {
-  text.text("0.5");
-})
-;
-    (function (g) {
-      g.attr("visibility", "hidden");
-      g.append("svg:text")
-         .attr("x", -26.03)
-         .attr("y", 66.12)
-         .attr("text-anchor", "middle")
-      .call(function(text) {
-  text.text("-2.0");
-})
-;
-    }(g.append("g")));
-    (function (g) {
-      g.attr("visibility", "hidden");
-      g.append("svg:text")
-         .attr("x", 204.41)
-         .attr("y", 66.12)
-         .attr("text-anchor", "middle")
-      .call(function(text) {
-  text.text("3.0");
-})
-;
-    }(g.append("g")));
-    g.append("svg:text")
-       .attr("x", 43.1)
-       .attr("y", 66.12)
-       .attr("text-anchor", "middle")
-    .call(function(text) {
-  text.text("-0.5");
-})
-;
-    (function (g) {
-      g.attr("visibility", "hidden");
-      g.append("svg:text")
-         .attr("x", -72.11)
-         .attr("y", 66.12)
-         .attr("text-anchor", "middle")
-      .call(function(text) {
-  text.text("-3.0");
-})
-;
-    }(g.append("g")));
-    g.append("svg:text")
-       .attr("x", 66.15)
-       .attr("y", 66.12)
-       .attr("text-anchor", "middle")
-    .call(function(text) {
-  text.text("0.0");
-})
-;
-    g.append("svg:text")
-       .attr("x", 20.06)
-       .attr("y", 66.12)
-       .attr("text-anchor", "middle")
-    .call(function(text) {
-  text.text("-1.0");
-})
-;
-  }(g.append("g")));
-  (function (g) {
-    g.attr("stroke", "none")
-     .attr("fill", "#362A35")
-     .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
-     .style("font-size", "3.88px");
-    g.append("svg:text")
-       .attr("x", 66.15)
-       .attr("y", 73)
-       .attr("text-anchor", "middle")
-    .call(function(text) {
-  text.text("x");
-})
-;
-  }(g.append("g")));
-  (function (g) {
-    g.on("mouseover", guide_background_mouseover("#C6C6C9"))
-     .on("mouseout", guide_background_mouseout("#F0F0F3"))
-     .call(zoom_behavior(ctx))
-;
-    (function (g) {
-      d3.select("defs")
+      (function (g) {
+        d3.select("defs")
   .append("svg:clipPath")
     .attr("id", parent_id + "_clippath0")
     .append("svg:path")
-      .attr("d", " M17.29,5 L 115 5 115 61.94 17.29 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath0)");
-      (function (g) {
-        g.attr("class", "guide background")
-         .attr("stroke", "#F1F1F5")
-         .attr("fill", "#FAFAFA");
-        g.append("svg:path")
-           .attr("d", "M17.29,5 L 115 5 115 61.94 17.29 61.94 z");
+      .attr("d", " M20.06,5 L 115 5 115 59.59 20.06 59.59 z");g.attr("clip-path", "url(#" + parent_id + "_clippath0)");
+        (function (g) {
+          g.attr("class", "guide background")
+           .attr("stroke", "#F1F1F5")
+           .attr("fill", "#FAFAFA")
+           .attr("opacity", 1.00);
+          g.append("svg:path")
+             .attr("d", "M20.06,5 L 115 5 115 59.59 20.06 59.59 z");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("stroke", "#F0F0F3")
+           .attr("stroke-width", 0.2)
+           .attr("class", "guide ygridlines xfixed");
+          g.append("svg:path")
+             .attr("d", "M20.06,-27.79 L 115 -27.79");
+          g.append("svg:path")
+             .attr("d", "M20.06,126.72 L 115 126.72");
+          g.append("svg:path")
+             .attr("d", "M20.06,6.55 L 115 6.55");
+          g.append("svg:path")
+             .attr("d", "M20.06,109.55 L 115 109.55");
+          g.append("svg:path")
+             .attr("d", "M20.06,40.88 L 115 40.88");
+          g.append("svg:path")
+             .attr("d", "M20.06,58.05 L 115 58.05");
+          g.append("svg:path")
+             .attr("d", "M20.06,23.71 L 115 23.71");
+          g.append("svg:path")
+             .attr("d", "M20.06,75.21 L 115 75.21");
+          g.append("svg:path")
+             .attr("d", "M20.06,-44.96 L 115 -44.96");
+          g.append("svg:path")
+             .attr("d", "M20.06,-10.62 L 115 -10.62");
+          g.append("svg:path")
+             .attr("d", "M20.06,-62.12 L 115 -62.12");
+          g.append("svg:path")
+             .attr("d", "M20.06,92.38 L 115 92.38");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("stroke", "#F0F0F3")
+           .attr("stroke-width", 0.2)
+           .attr("class", "guide xgridlines yfixed");
+          g.append("svg:path")
+             .attr("d", "M0.35,5 L 0.35 59.59");
+          g.append("svg:path")
+             .attr("d", "M179.49,5 L 179.49 59.59");
+          g.append("svg:path")
+             .attr("d", "M89.92,5 L 89.92 59.59");
+          g.append("svg:path")
+             .attr("d", "M-89.21,5 L -89.21 59.59");
+          g.append("svg:path")
+             .attr("d", "M45.14,5 L 45.14 59.59");
+          g.append("svg:path")
+             .attr("d", "M-66.82,5 L -66.82 59.59");
+          g.append("svg:path")
+             .attr("d", "M134.7,5 L 134.7 59.59");
+          g.append("svg:path")
+             .attr("d", "M157.1,5 L 157.1 59.59");
+          g.append("svg:path")
+             .attr("d", "M67.53,5 L 67.53 59.59");
+          g.append("svg:path")
+             .attr("d", "M224.27,5 L 224.27 59.59");
+          g.append("svg:path")
+             .attr("d", "M-44.43,5 L -44.43 59.59");
+          g.append("svg:path")
+             .attr("d", "M22.75,5 L 22.75 59.59");
+          g.append("svg:path")
+             .attr("d", "M201.88,5 L 201.88 59.59");
+          g.append("svg:path")
+             .attr("d", "M-22.04,5 L -22.04 59.59");
+          g.append("svg:path")
+             .attr("d", "M112.31,5 L 112.31 59.59");
+        }(g.append("g")));
       }(g.append("g")));
       (function (g) {
-        g.attr("stroke", "#F0F0F3")
-         .attr("stroke-width", 0.2)
-         .attr("class", "guide ygridlines xfixed");
-        g.append("svg:path")
-           .attr("d", "M17.29,78.24 L 115 78.24");
-        g.append("svg:path")
-           .attr("d", "M17.29,131.96 L 115 131.96");
-        g.append("svg:path")
-           .attr("d", "M17.29,42.43 L 115 42.43");
-        g.append("svg:path")
-           .attr("d", "M17.29,6.61 L 115 6.61");
-        g.append("svg:path")
-           .attr("d", "M17.29,96.15 L 115 96.15");
-        g.append("svg:path")
-           .attr("d", "M17.29,-65.02 L 115 -65.02");
-        g.append("svg:path")
-           .attr("d", "M17.29,24.52 L 115 24.52");
-        g.append("svg:path")
-           .attr("d", "M17.29,-11.3 L 115 -11.3");
-        g.append("svg:path")
-           .attr("d", "M17.29,114.05 L 115 114.05");
-        g.append("svg:path")
-           .attr("d", "M17.29,60.33 L 115 60.33");
-        g.append("svg:path")
-           .attr("d", "M17.29,-47.11 L 115 -47.11");
-        g.append("svg:path")
-           .attr("d", "M17.29,-29.2 L 115 -29.2");
-      }(g.append("g")));
-      (function (g) {
-        g.attr("stroke", "#F0F0F3")
-         .attr("stroke-width", 0.2)
-         .attr("class", "guide xgridlines yfixed");
-        g.append("svg:path")
-           .attr("d", "M-2.98,5 L -2.98 61.94");
-        g.append("svg:path")
-           .attr("d", "M227.45,5 L 227.45 61.94");
-        g.append("svg:path")
-           .attr("d", "M158.32,5 L 158.32 61.94");
-        g.append("svg:path")
-           .attr("d", "M135.28,5 L 135.28 61.94");
-        g.append("svg:path")
-           .attr("d", "M-26.03,5 L -26.03 61.94");
-        g.append("svg:path")
-           .attr("d", "M43.1,5 L 43.1 61.94");
-        g.append("svg:path")
-           .attr("d", "M66.15,5 L 66.15 61.94");
-        g.append("svg:path")
-           .attr("d", "M20.06,5 L 20.06 61.94");
-        g.append("svg:path")
-           .attr("d", "M-72.11,5 L -72.11 61.94");
-        g.append("svg:path")
-           .attr("d", "M204.41,5 L 204.41 61.94");
-        g.append("svg:path")
-           .attr("d", "M89.19,5 L 89.19 61.94");
-        g.append("svg:path")
-           .attr("d", "M-95.16,5 L -95.16 61.94");
-        g.append("svg:path")
-           .attr("d", "M112.23,5 L 112.23 61.94");
-        g.append("svg:path")
-           .attr("d", "M-49.07,5 L -49.07 61.94");
-        g.append("svg:path")
-           .attr("d", "M181.37,5 L 181.37 61.94");
-      }(g.append("g")));
-    }(g.append("g")));
-    (function (g) {
-      d3.select("defs")
+        d3.select("defs")
   .append("svg:clipPath")
     .attr("id", parent_id + "_clippath1")
     .append("svg:path")
-      .attr("d", " M17.29,5 L 115 5 115 61.94 17.29 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath1)");
-      (function (g) {
-        g.attr("class", "plotpanel");
+      .attr("d", " M20.06,5 L 115 5 115 59.59 20.06 59.59 z");g.attr("clip-path", "url(#" + parent_id + "_clippath1)");
         (function (g) {
-          g.attr("stroke", "#00BFFF")
-           .attr("class", "geometry")
-           .attr("fill", "none")
-           .attr("stroke-width", 0.3);
-          g.append("svg:path")
-             .attr("d", "M20.06,14.62 L 20.43 15.37 20.8 16.1 21.17 16.84 21.53 17.56 21.9 18.28 22.27 18.99 22.64 19.69 23.01 20.39 23.38 21.08 23.75 21.77 24.12 22.45 24.48 23.12 24.85 23.79 25.22 24.45 25.59 25.1 25.96 25.75 26.33 26.39 26.7 27.03 27.07 27.66 27.43 28.28 27.8 28.89 28.17 29.5 28.54 30.11 28.91 30.71 29.28 31.3 29.65 31.88 30.01 32.46 30.38 33.03 30.75 33.6 31.12 34.16 31.49 34.72 31.86 35.27 32.23 35.81 32.6 36.34 32.96 36.87 33.33 37.4 33.7 37.92 34.07 38.43 34.44 38.93 34.81 39.43 35.18 39.93 35.55 40.41 35.91 40.89 36.28 41.37 36.65 41.84 37.02 42.3 37.39 42.76 37.76 43.21 38.13 43.66 38.49 44.1 38.86 44.53 39.23 44.96 39.6 45.38 39.97 45.79 40.34 46.2 40.71 46.61 41.08 47 41.44 47.39 41.81 47.78 42.18 48.16 42.55 48.53 42.92 48.9 43.29 49.26 43.66 49.62 44.03 49.97 44.39 50.31 44.76 50.65 45.13 50.98 45.5 51.31 45.87 51.63 46.24 51.95 46.61 52.25 46.98 52.56 47.34 52.85 47.71 53.15 48.08 53.43 48.45 53.71 48.82 53.99 49.19 54.25 49.56 54.52 49.92 54.77 50.29 55.02 50.66 55.27 51.03 55.51 51.4 55.74 51.77 55.97 52.14 56.19 52.51 56.4 52.87 56.61 53.24 56.82 53.61 57.02 53.98 57.21 54.35 57.39 54.72 57.58 55.09 57.75 55.46 57.92 55.82 58.08 56.19 58.24 56.56 58.39 56.93 58.54 57.3 58.68 57.67 58.82 58.04 58.95 58.4 59.07 58.77 59.19 59.14 59.3 59.51 59.4 59.88 59.5 60.25 59.6 60.62 59.69 60.99 59.77 61.35 59.85 61.72 59.92 62.09 59.99 62.46 60.05 62.83 60.1 63.2 60.15 63.57 60.19 63.94 60.23 64.3 60.26 64.67 60.29 65.04 60.31 65.41 60.32 65.78 60.33 66.15 60.33 66.52 60.33 66.88 60.32 67.25 60.31 67.62 60.29 67.99 60.26 68.36 60.23 68.73 60.19 69.1 60.15 69.47 60.1 69.83 60.05 70.2 59.99 70.57 59.92 70.94 59.85 71.31 59.77 71.68 59.69 72.05 59.6 72.42 59.5 72.78 59.4 73.15 59.3 73.52 59.19 73.89 59.07 74.26 58.95 74.63 58.82 75 58.68 75.36 58.54 75.73 58.39 76.1 58.24 76.47 58.08 76.84 57.92 77.21 57.75 77.58 57.58 77.95 57.39 78.31 57.21 78.68 57.02 79.05 56.82 79.42 56.61 79.79 56.4 80.16 56.19 80.53 55.97 80.9 55.74 81.26 55.51 81.63 55.27 82 55.02 82.37 54.77 82.74 54.52 83.11 54.25 83.48 53.99 83.84 53.71 84.21 53.43 84.58 53.15 84.95 52.85 85.32 52.56 85.69 52.25 86.06 51.95 86.43 51.63 86.79 51.31 87.16 50.98 87.53 50.65 87.9 50.31 88.27 49.97 88.64 49.62 89.01 49.26 89.38 48.9 89.74 48.53 90.11 48.16 90.48 47.78 90.85 47.39 91.22 47 91.59 46.61 91.96 46.2 92.33 45.79 92.69 45.38 93.06 44.96 93.43 44.53 93.8 44.1 94.17 43.66 94.54 43.21 94.91 42.76 95.27 42.3 95.64 41.84 96.01 41.37 96.38 40.89 96.75 40.41 97.12 39.93 97.49 39.43 97.86 38.93 98.22 38.43 98.59 37.92 98.96 37.4 99.33 36.87 99.7 36.34 100.07 35.81 100.44 35.27 100.81 34.72 101.17 34.16 101.54 33.6 101.91 33.03 102.28 32.46 102.65 31.88 103.02 31.3 103.39 30.71 103.75 30.11 104.12 29.5 104.49 28.89 104.86 28.28 105.23 27.66 105.6 27.03 105.97 26.39 106.34 25.75 106.7 25.1 107.07 24.45 107.44 23.79 107.81 23.12 108.18 22.45 108.55 21.77 108.92 21.08 109.29 20.39 109.65 19.69 110.02 18.99 110.39 18.28 110.76 17.56 111.13 16.84 111.5 16.1 111.87 15.37 112.23 14.62");
+          g.attr("class", "plotpanel");
+          (function (g) {
+            g.attr("fill", "none")
+             .attr("stroke-width", 0.3);
+            (function (g) {
+              g.attr("stroke", "#00BFFF")
+               .attr("class", "geometry");
+              g.append("svg:path")
+                 .attr("d", "M22.75,14.23 L 23.11 14.94 23.47 15.65 23.83 16.35 24.18 17.05 24.54 17.74 24.9 18.43 25.26 19.1 25.62 19.78 25.98 20.44 26.34 21.1 26.7 21.76 27.06 22.4 27.42 23.04 27.78 23.68 28.14 24.31 28.5 24.93 28.86 25.55 29.22 26.16 29.58 26.77 29.94 27.36 30.3 27.96 30.66 28.54 31.02 29.12 31.38 29.7 31.74 30.27 32.1 30.83 32.46 31.39 32.82 31.94 33.18 32.48 33.54 33.02 33.9 33.56 34.26 34.08 34.62 34.6 34.98 35.12 35.34 35.63 35.7 36.13 36.06 36.63 36.41 37.12 36.77 37.61 37.13 38.09 37.49 38.56 37.85 39.03 38.21 39.49 38.57 39.95 38.93 40.4 39.29 40.84 39.65 41.28 40.01 41.72 40.37 42.14 40.73 42.56 41.09 42.98 41.45 43.39 41.81 43.79 42.17 44.19 42.53 44.59 42.89 44.97 43.25 45.35 43.61 45.73 43.97 46.1 44.33 46.46 44.69 46.82 45.05 47.17 45.41 47.52 45.77 47.86 46.13 48.2 46.49 48.53 46.85 48.85 47.21 49.17 47.57 49.48 47.93 49.79 48.29 50.09 48.64 50.39 49 50.68 49.36 50.96 49.72 51.24 50.08 51.51 50.44 51.78 50.8 52.04 51.16 52.3 51.52 52.55 51.88 52.79 52.24 53.03 52.6 53.27 52.96 53.5 53.32 53.72 53.68 53.94 54.04 54.15 54.4 54.35 54.76 54.55 55.12 54.75 55.48 54.94 55.84 55.12 56.2 55.3 56.56 55.47 56.92 55.63 57.28 55.8 57.64 55.95 58 56.1 58.36 56.25 58.72 56.38 59.08 56.52 59.44 56.64 59.8 56.77 60.16 56.88 60.52 56.99 60.87 57.1 61.23 57.2 61.59 57.29 61.95 57.38 62.31 57.47 62.67 57.54 63.03 57.61 63.39 57.68 63.75 57.74 64.11 57.8 64.47 57.85 64.83 57.89 65.19 57.93 65.55 57.96 65.91 57.99 66.27 58.01 66.63 58.03 66.99 58.04 67.35 58.05 67.71 58.05 68.07 58.04 68.43 58.03 68.79 58.01 69.15 57.99 69.51 57.96 69.87 57.93 70.23 57.89 70.59 57.85 70.95 57.8 71.31 57.74 71.67 57.68 72.03 57.61 72.39 57.54 72.75 57.47 73.1 57.38 73.46 57.29 73.82 57.2 74.18 57.1 74.54 56.99 74.9 56.88 75.26 56.77 75.62 56.64 75.98 56.52 76.34 56.38 76.7 56.25 77.06 56.1 77.42 55.95 77.78 55.8 78.14 55.63 78.5 55.47 78.86 55.3 79.22 55.12 79.58 54.94 79.94 54.75 80.3 54.55 80.66 54.35 81.02 54.15 81.38 53.94 81.74 53.72 82.1 53.5 82.46 53.27 82.82 53.03 83.18 52.79 83.54 52.55 83.9 52.3 84.26 52.04 84.62 51.78 84.98 51.51 85.34 51.24 85.69 50.96 86.05 50.68 86.41 50.39 86.77 50.09 87.13 49.79 87.49 49.48 87.85 49.17 88.21 48.85 88.57 48.53 88.93 48.2 89.29 47.86 89.65 47.52 90.01 47.17 90.37 46.82 90.73 46.46 91.09 46.1 91.45 45.73 91.81 45.35 92.17 44.97 92.53 44.59 92.89 44.19 93.25 43.79 93.61 43.39 93.97 42.98 94.33 42.56 94.69 42.14 95.05 41.72 95.41 41.28 95.77 40.84 96.13 40.4 96.49 39.95 96.85 39.49 97.21 39.03 97.57 38.56 97.92 38.09 98.28 37.61 98.64 37.12 99 36.63 99.36 36.13 99.72 35.63 100.08 35.12 100.44 34.6 100.8 34.08 101.16 33.56 101.52 33.02 101.88 32.48 102.24 31.94 102.6 31.39 102.96 30.83 103.32 30.27 103.68 29.7 104.04 29.12 104.4 28.54 104.76 27.96 105.12 27.36 105.48 26.77 105.84 26.16 106.2 25.55 106.56 24.93 106.92 24.31 107.28 23.68 107.64 23.04 108 22.4 108.36 21.76 108.72 21.1 109.08 20.44 109.44 19.78 109.8 19.1 110.15 18.43 110.51 17.74 110.87 17.05 111.23 16.35 111.59 15.65 111.95 14.94 112.31 14.23");
+            }(g.append("g")));
+          }(g.append("g")));
         }(g.append("g")));
       }(g.append("g")));
-    }(g.append("g")));
-    (function (g) {
-      d3.select("defs")
+      (function (g) {
+        d3.select("defs")
   .append("svg:clipPath")
     .attr("id", parent_id + "_clippath2")
     .append("svg:path")
-      .attr("d", " M17.29,5 L 115 5 115 61.94 17.29 61.94 z");g.attr("clip-path", "url(#" + parent_id + "_clippath2)");
-      (function (g) {
-        g.attr("stroke", "none")
-         .attr("class", "guide zoomslider")
-         .attr("opacity", 0.00);
+      .attr("d", " M20.06,5 L 115 5 115 59.59 20.06 59.59 z");g.attr("clip-path", "url(#" + parent_id + "_clippath2)");
         (function (g) {
-          g.attr("stroke", "#6A6A6A")
-           .attr("stroke-opacity", 0.00)
-           .attr("stroke-width", 0.3)
-           .attr("fill", "#EAEAEA")
-           .on("click", zoomin_behavior(ctx))
+          g.attr("stroke", "none")
+           .attr("class", "guide zoomslider")
+           .attr("opacity", 0.00);
+          (function (g) {
+            g.attr("stroke", "#6A6A6A")
+             .attr("stroke-opacity", 0.00)
+             .attr("stroke-width", 0.3)
+             .attr("fill", "#EAEAEA")
+             .on("click", zoomin_behavior(ctx))
 .on("dblclick", function() { d3.event.stopPropagation(); })
 .on("mouseover", zoomslider_button_mouseover("#cd5c5c"))
 .on("mouseout", zoomslider_button_mouseover("#6a6a6a"))
 ;
-          g.append("svg:path")
-             .attr("d", "M108,8 L 112 8 112 12 108 12 z");
+            g.append("svg:path")
+               .attr("d", "M108,8 L 112 8 112 12 108 12 z");
+            (function (g) {
+              g.attr("fill", "#6A6A6A")
+               .attr("class", "button_logo");
+              g.append("svg:path")
+                 .attr("d", "M108.8,9.6 L 109.6 9.6 109.6 8.8 110.4 8.8 110.4 9.6 111.2 9.6 111.2 10.4 110.4 10.4 110.4 11.2 109.6 11.2 109.6 10.4 108.8 10.4 z");
+            }(g.append("g")));
+          }(g.append("g")));
+          (function (g) {
+            g.attr("fill", "#EAEAEA")
+             .on("click", zoomslider_track_behavior(ctx, 82, 99));
+            g.append("svg:path")
+               .attr("d", "M88.5,8 L 107.5 8 107.5 12 88.5 12 z");
+          }(g.append("g")));
           (function (g) {
             g.attr("fill", "#6A6A6A")
-             .attr("class", "button_logo");
-            g.append("svg:path")
-               .attr("d", "M108.8,9.6 L 109.6 9.6 109.6 8.8 110.4 8.8 110.4 9.6 111.2 9.6 111.2 10.4 110.4 10.4 110.4 11.2 109.6 11.2 109.6 10.4 108.8 10.4 z");
-          }(g.append("g")));
-        }(g.append("g")));
-        (function (g) {
-          g.attr("fill", "#EAEAEA")
-           .on("click", zoomslider_track_behavior(ctx, 82, 99));
-          g.append("svg:path")
-             .attr("d", "M88.5,8 L 107.5 8 107.5 12 88.5 12 z");
-        }(g.append("g")));
-        (function (g) {
-          g.attr("fill", "#6A6A6A")
-           .attr("class", "zoomslider_thumb")
-           .call(zoomslider_behavior(ctx, 82, 99))
+             .attr("class", "zoomslider_thumb")
+             .call(zoomslider_behavior(ctx, 82, 99))
 .on("mouseover", zoomslider_thumb_mouseover("#cd5c5c"))
 .on("mouseout", zoomslider_thumb_mouseover("#6a6a6a"))
 ;
-          g.append("svg:path")
-             .attr("d", "M97,8 L 99 8 99 12 97 12 z");
-        }(g.append("g")));
-        (function (g) {
-          g.attr("stroke", "#6A6A6A")
-           .attr("stroke-opacity", 0.00)
-           .attr("stroke-width", 0.3)
-           .attr("fill", "#EAEAEA")
-           .on("click", zoomout_behavior(ctx))
+            g.append("svg:path")
+               .attr("d", "M97,8 L 99 8 99 12 97 12 z");
+          }(g.append("g")));
+          (function (g) {
+            g.attr("stroke", "#6A6A6A")
+             .attr("stroke-opacity", 0.00)
+             .attr("stroke-width", 0.3)
+             .attr("fill", "#EAEAEA")
+             .on("click", zoomout_behavior(ctx))
 .on("dblclick", function() { d3.event.stopPropagation(); })
 .on("mouseover", zoomslider_button_mouseover("#cd5c5c"))
 .on("mouseout", zoomslider_button_mouseover("#6a6a6a"))
 ;
-          g.append("svg:path")
-             .attr("d", "M84,8 L 88 8 88 12 84 12 z");
-          (function (g) {
-            g.attr("fill", "#6A6A6A")
-             .attr("class", "button_logo");
             g.append("svg:path")
-               .attr("d", "M84.8,9.6 L 87.2 9.6 87.2 10.4 84.8 10.4 z");
+               .attr("d", "M84,8 L 88 8 88 12 84 12 z");
+            (function (g) {
+              g.attr("fill", "#6A6A6A")
+               .attr("class", "button_logo");
+              g.append("svg:path")
+                 .attr("d", "M84.8,9.6 L 87.2 9.6 87.2 10.4 84.8 10.4 z");
+            }(g.append("g")));
           }(g.append("g")));
         }(g.append("g")));
       }(g.append("g")));
@@ -2546,36 +2599,44 @@ var draw = function(parent_id) {
     draw_with_data(data, parent_id);
 };
 
-draw("#gadflyplot-su7zWBJh01HHYW4auUE4");
+if ('undefined' !== typeof module) {
+    module.exports = draw;
+} else if ('undefined' !== typeof window) {
+    window.draw = draw
+}
+
+return module;
+})({}).exports("#gadflyplot-RjEyG4kQQWP09gf1YHRi");
+//@ sourceURL=gadflyplot-RjEyG4kQQWP09gf1YHRi.js
 </script>
 
 
 <p>How long is the chain? Looking at the graph we can guess an answer is between <span class="math">\(2\)</span> and <span class="math">\(2.5\)</span>, say, but it isn't much work to get much closer to the answer:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">quadgk(x -&gt; sqrt(<span class="fl">1</span> + f&#39;(x)^<span class="fl">2</span>), -<span class="fl">1</span>, <span class="fl">1</span>)
-<span class="co">## &quot;MethodError(ctranspose,(f,))&quot;</span></code></pre>
+<pre class="sourceCode julia"><code class="sourceCode julia">quadgk(x -&gt; sqrt(<span class="fl">1</span> + D(f)(x)^<span class="fl">2</span>), -<span class="fl">1</span>, <span class="fl">1</span>)
+<span class="co">## (2.0843812219749895,4.440892098500626e-16)</span></code></pre>
 <h3 id="practice-5">Practice</h3>
 <h4 id="question-15">Question</h4>
 <p>The sag in the chain is adjusted through the parameter <span class="math">\(a\)</span> -- chains with larger <span class="math">\(a\)</span> have less sag.</p>
-<p>Suppose your chain has parameter <code>a=</code> <code class="sourceCode julia"><span class="fl">2.58</span></code> what is the length? (Use <code>quadgk</code>)</p>
+<p>Suppose your chain has parameter <code>a=</code> <code class="sourceCode julia">[<span class="fl">5.09</span>]</code> what is the length? (Use <code>quadgk</code>)</p>
 
-<form name='WeaveQuestion' data-id='YNGGjQet9Q' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='66qbKe6ewk' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="YNGGjQet9Q" type="number">
+<input id="66qbKe6ewk" type="number">
 
 
-<div id='YNGGjQet9Q_message'></div>
+<div id='66qbKe6ewk_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#YNGGjQet9Q').on('change', function() {
+$('#66qbKe6ewk').on('change', function() {
   correct = Math.abs(this.value - 40.17520354006268) <= 0.001;
 
   if(correct) {
-     $('#YNGGjQet9Q_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#66qbKe6ewk_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#YNGGjQet9Q_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#66qbKe6ewk_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -2594,24 +2655,24 @@ y = \frac{-b}{a^2}(x^2 - a^2)
 \]</span></p>
 <p>Find the arc length of the cable in meters.</p>
 
-<form name='WeaveQuestion' data-id='XcmrVpNQvC' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='VtJRL5AemZ' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="XcmrVpNQvC" type="number">
+<input id="VtJRL5AemZ" type="number">
 
 
-<div id='XcmrVpNQvC_message'></div>
+<div id='VtJRL5AemZ_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#XcmrVpNQvC').on('change', function() {
+$('#VtJRL5AemZ').on('change', function() {
   correct = Math.abs(this.value - 40.17520354006268) <= 0.001;
 
   if(correct) {
-     $('#XcmrVpNQvC_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#VtJRL5AemZ_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#XcmrVpNQvC_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#VtJRL5AemZ_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -2624,26 +2685,26 @@ y = a \ln\frac{a + \sqrt{a^2 - x^2}}{x} - \sqrt{a^2 - x^2}
 \]</span></p>
 <p>This can be entered into <code>julia</code> as:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">g(x, a) = a * log((a + sqrt(a^<span class="fl">2</span> - x^<span class="fl">2</span>))/x) - sqrt(a^<span class="fl">2</span> - x^<span class="fl">2</span>)</code></pre>
-<p>Let <span class="math">\(a=\)</span><code class="sourceCode julia"><span class="fl">16</span></code>, <span class="math">\(f(x) = g(x, a)\)</span>. Compute the length the bow of the boat has traveled between <span class="math">\(x=1\)</span> and <span class="math">\(x=a\)</span> using <code>quadgk</code>.</p>
+<p>Let <span class="math">\(a=\)</span><code class="sourceCode julia">[<span class="fl">19</span>]</code>, <span class="math">\(f(x) = g(x, a)\)</span>. Compute the length the bow of the boat has traveled between <span class="math">\(x=1\)</span> and <span class="math">\(x=a\)</span> using <code>quadgk</code>.</p>
 
-<form name='WeaveQuestion' data-id='8ow3etAHzK' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='puYiAdbnnW' data-controltype='numeric'>
 <div class='control-group '>
 <div class='controls'>
-<input id="8ow3etAHzK" type="number">
+<input id="puYiAdbnnW" type="number">
 
 
-<div id='8ow3etAHzK_message'></div>
+<div id='puYiAdbnnW_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#8ow3etAHzK').on('change', function() {
+$('#puYiAdbnnW').on('change', function() {
   correct = Math.abs(this.value - 40.17520354006268) <= 0.001;
 
   if(correct) {
-     $('#8ow3etAHzK_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#puYiAdbnnW_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
   } else {
-     $('#8ow3etAHzK_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#puYiAdbnnW_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
   }
 });
 
@@ -2708,11 +2769,11 @@ P_0(x) = 1; P_1(x) = x; \quad  n P_{n}(x)  = (2(n-1)+1) x P_{n-1}(x) -(n-1) P_{n
 <span class="kw">end</span></code></pre>
 <p>This is used as,</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">p4 = lgp(<span class="fl">4</span>)
-<span class="co">## Poly(4.375x^4 + -3.75x^2 + 0.375)</span></code></pre>
+<span class="co">## Poly(4.375x^4 - 3.75x^2 + 0.375)</span></code></pre>
 <p>The term <em>recursion</em> is applied to a function when it makes a reference to itself during a computation. With this function, don't try it with values much bigger than <span class="math">\(20\)</span>, as the recursion can take a long time.</p>
 <p>The nodes are the roots of the right polynomial. Here we have the values for <code>p4</code></p>
 <pre class="sourceCode julia"><code class="sourceCode julia">xk = roots(p4)
-<span class="co">## [-0.3399810435848559,0.3399810435848554,-0.8611363115940524,0.8611363115940529]</span></code></pre>
+<span class="co">## [-0.339981,0.339981,-0.861136,0.861136]</span></code></pre>
 <p>(The Konrod part of <code>quadgk</code> changes the nodes so they can be reused during the refinement.)</p>
 <p>Finally, the weights involve the derivative of <span class="math">\(P_n\)</span> through:</p>
 <p><span class="math">\[
@@ -2720,7 +2781,7 @@ w_i = \frac{2}{(1 - x_i^2) \cdot(P^{&#39;}_n(x_i)/P_n(1))^2}
 \]</span></p>
 <p>These can be done simply with:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">P =  p4 /polyval(p4, <span class="fl">1</span>) <span class="co">## normalize p4 so it is 1 at 1.</span>
-<span class="co">## Poly(4.375x^4 + -3.75x^2 + 0.375)</span>
+<span class="co">## Poly(4.375x^4 - 3.75x^2 + 0.375)</span>
 weights(x) = <span class="fl">2</span> / (<span class="fl">1</span> - x^<span class="fl">2</span>) / (polyval(polydir(P), x))^<span class="fl">2</span>
 wk = [weights(xi) <span class="kw">for</span> xi <span class="kw">in</span> xk]
 <span class="co">## {0.6521451548625462,0.6521451548625466,0.34785484513745457,0.34785484513745296}</span></code></pre>
