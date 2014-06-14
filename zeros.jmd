@@ -775,6 +775,70 @@ val = fzero(airy, [-5, -4]);
 numericq(val, 1e-8)
 ```
 
+#### Question <small>What goes up must come down...</small>
+
+<img src="http://ej.iop.org/images/0143-0807/33/1/149/Full/ejp405251f1_online.jpg" height="200" width="300" />
+
+In 1638, according to [Amir
+D. Aczel](http://books.google.com/books?id=kvGt2OlUnQ4C&pg=PA28&lpg=PA28&dq=mersenne+cannon+ball+tests&source=bl&ots=wEUd7e0jFk&sig=LpFuPoUvODzJdaoug4CJsIGZZHw&hl=en&sa=X&ei=KUGcU6OAKJCfyASnioCoBA&ved=0CCEQ6AEwAA#v=onepage&q=mersenne%20cannon%20ball%20tests&f=false),
+an experiment was performed in the French Countryside. A monk, Marin
+Mersenne, launched a cannonball straight up into the air in an attempt
+to help Descartes prove facts about the rotation of the earth. Though
+the experiment was not successful, Mersenne later observed that the
+time for the cannonball to go up was greater than the time to come
+down.
+
+This isn't the case for simple ballistic motion where the time to go
+up is equal. We can "prove" this numerically. For simple ballistic
+motion, $f(t) = -(1/2)\cdot 32 t^2 + v_0t$. The time to go up and down are found by
+the two zeros of this function. The peak time is related to a zero of
+a function given by `D(f)`, which for now we'll take as a mystery
+function, but later will be known as the derivative.
+
+Let $v_0= 390$. The three times in question can be found from the zeros of `f` and `D(f)`. What are they?
+
+```{results="js"}
+choices = ["(0.0, 12.1875, 24.375)",
+	"(-4.9731, 0.0, 4.9731)",
+	"(0.0, 625.0, 1250.0)"]
+ans = 1
+radioq(choices, ans)
+```
+
+#### Question <small>What goes up must come down... (again)</small>
+
+For simple ballistic motion you find that the time to go up is the
+time to come down. For motion within a resistant medium, such as air,
+this isn't the case. Suppose a model for the height is given by
+
+$$
+f(t) = (\frac{g}{\gamma^2} + \frac{v_0}{\gamma})(1 - e^{-\gamma t}) - \frac{gt}{\gamma}
+$$
+
+([From "On the trajectories of projectiles depicted in early ballistic Woodcuts"](http://www.researchgate.net/publication/230963032_On_the_trajectories_of_projectiles_depicted_in_early_ballistic_woodcuts))
+
+Here $g=32$, again we take $v_0=390$, and $\gamma$ is a drag coefficient that we will take to be $1$. Then 
+
+```
+f(t; g=32, v0=390, gamma=1) = (g/gamma^2 + v0/gamma)*(1 - exp(-gamma*t)) - g*t
+```
+
+Now find the three times: $t_0$, the starting time; $t_a$, the time at
+the apex of the flight; and $t_f$, the time the object returns to the
+ground.
+
+```{results="js"}
+t0 = 0.0
+tf = fzero(f, 10, 20)
+ta = fzero(D(f), t0, tf)
+choices = ["(0, 13.187, 30.0)",
+	"(0, 32.0, 390.0)",
+	"(0, 2.569, 13.187)"]
+ans = 3
+radioq(choices, ans)
+```
+
+
 
 
 
