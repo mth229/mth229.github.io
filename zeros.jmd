@@ -304,6 +304,8 @@ bisection algorithm for root finding.
 
 
 
+
+
 ```{results="js"}
 example("Finding a zero")
 ```
@@ -316,17 +318,34 @@ without wind resistance for the height of the arrow at a distance $x$
 units away may be:
 
 $$
-j(x) = \tan(\theta) x- 16(\frac{x}{200 \cos\theta})^2.
+j(x) = \tan(\theta) x - (1/2) \cdot g(\frac{x}{v_0 \cos\theta})^2.
 $$
 
-With a wind resistance given by $k$, again with some units, a similar
+In `julia` we have, taking $v_0=200$:
+
+```
+j(x; theta=pi/4, g=32, v0=200) = tan(theta)*x - (1/2)*g*(x/(v0*cos(theta)))^2
+```
+
+
+With a velocity-dependent wind resistance given by $\gamma$, again with some units, a similar
 equation can be constructed. It takes a different form:
 
 $$
-g(x) = \tan(\theta) x +
-     \frac{32/k}{200 \cos\theta} x -
-    \frac{32}{k} \log\left(\frac{200 \cos\theta}{200\cos\theta - x}\right).
+y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
+      \frac{g}{\gamma^2}\log(\frac{v_0\cos(\theta) - \gamma x}{v_0\cos(\theta)})
 $$
+
+Again, $v_0$ is the initial velocity and is taken to be $200$
+and $\gamma$ a resistance, which we take to be $1$. With this, we have
+the following `julia` definition (with a slight reworking of $\gamma$):
+
+```
+function y(x; theta=pi/4, g=32, v0=200, gamma=1) 
+	 a = gamma * v0 * cos(theta)
+	 (g/a + tan(theta)) * x + g/gamma^2 * log((a-gamma^2 * x)/a)
+end
+```
 
 For each model, we wish to find the value of $x$ after launching where
 the height is modeled to be 0. That is how far will the arrow travel
@@ -337,8 +356,6 @@ For the model without wind resistance, we can graph the function
 easily enough. Let's guess the distance is no more than 500 feet:
 
 ```
-theta = pi/4
-j(x) = tan(theta) * x - 16(x/(200cos(theta)))^2
 plot(j, 0, 500)
 ```
 
@@ -356,68 +373,99 @@ We see that $1250$ is the largest root. So we plot over this domain to visualize
 plot(j, 0, 1250)
 ```
 
-As for the model with `g`, we first define the function. This same
-function appeared in a previous example illustrating the use of the
-`function` keyword for defining multi-expression functions. We copy
-that work here:
+
+
+As for the model with wind resistance,  a quick plot over the same interval, $[0, 1250]$ yields:
 
 ```
-function g(x; theta = pi/4, k = 1/2)
-	 a = 200*cos(theta)
-	 b = 32/k
-	 tan(theta)*x + (b/a)*x - b*log(a/(a-x))
-end
+plot(y, 0, 1250)
 ```
 
-A quick plot over the same interval, $[0, 1250]$ yields:
+Oh, "Domain Error." Of course, when the argument to the logarithm is negative we will have issues.
+We don't have the simplicity of using `roots` to find out the answer, so we solve for when $a-\gamma^2 x$ is $0$:
 
 ```
-plot(g, 0, 1250)
+gamma = 1
+a = 200 * cos(pi/4)
+b = a/gamma^2
 ```
-
-Oh, "Domain Error." Of course, when $x \geq a$, the evaluation of
-$\log(a/(a-x))$ will fail.  We try on the reduced interval avoiding
-the obvious _asymptote_ at `a` by subtracting $1$:
+We try on the reduced interval avoiding
+the obvious _asymptote_ at `b`  by subtracting $1$:
 
 ```
-a = 200*cos(theta)
-plot(g, 0, a - 1) 
+plot(y, 0, b - 1) 
 ```
 
 
-Now we can see the zero is around 130 to 140. We re-plot:
+Now we can see the zero is around 140. We re-plot:
 
 ```
-plot(g, 130, 140)
+plot(y, 135, 141)
 ```
 
-Finally, we plot between 134 and 135 and draw the line for $y=0$ to
-see the zero clearly:
 
 ```
-plot([g, x -> 0], 134, 135)
+plot([y, x -> 0], 140, 141)
 ```
 
-The answer is approximately $134.8$
+The answer is approximately $140.7$
 
 
 Finally, we plot both graphs at once to see that it was a very windy
 day indeed.
 
 ```
-a = 134.8
-plot([j, u -> u < a ? g(u) : NaN] , 0, 1250)
+b = 140.7
+plot([j, u -> u < b ? y(u) : NaN] , 0, 1250)
 ```
 
 ```{results="html"}
 alert("""
 
-The last two plots used *anonymous* functions to plot. Though a bit confusing to read, such
-functions can be very useful for one-off uses.
+The last two plots used *anonymous* functions to plot. Again, they can
+be a bit more confusing to read, but they allow us to compose many
+operations in one quite easily.
 
 """)
 ```
 
+
+
+```{results="js"}
+example("Finding a zero")
+```
+
+
+Sometimes, the equation $f(x)=0$ is actually presented at $h(x)=
+g(x)$. This form can be rewritten as $f(x) = h(x) -g(x) = 0$, or if
+working graphically we can just look for crossing points of the graphs
+of $g(x)$ and $h(x)$. Here we shall do that.
+
+We wish to compare two trash collection plans
+
+* Plan 1: You pay 47.49 plus 0.77 per bag.
+* Plan 2: You pay 30.00 plus 2.00 per bag.
+
+There are some cases where plan 1 is cheaper and some where plan 2 is. Categorize them.
+
+
+Both plans are *linear model* and may be written in *slope-intercept* form:
+
+```
+plan1(x) = 47.49 + 0.77x
+plan2(x) = 30.00 + 2.00x
+```
+
+Assuming this is a realistic problem and an average American household might produce 10-20 bags of trash a month (yes, that seems too much!) we plot in that range:
+
+```
+plot([plan1, plan2], 10, 20)
+```	      
+
+
+We can see the intersection point is around 14 and that if a family
+generates between 0-14 bags of trash per month that plan 2 would be
+cheaper.
 
 ### Practice
 
@@ -479,6 +527,46 @@ choices = round([x, -5 + 10*rand(2)], 3);
 ans = 1;
 radioq(choices, ans)
 ```
+
+
+#### Question
+
+Let $y(x)$ be defined as above to model the flight of an arrow. If $\gamma=1/2$ when will the arrow strike the ground after launch?
+
+```{results="js"}
+function y(x; theta=pi/4, g=-32, v0=200, gamma=1) 
+	 a = gamma * v0 * cos(theta)
+	 (g/a + tan(theta)) * x - g/gamma^2 * log((a-gamma^2 * x)/a)
+end
+gamma = 1/2
+a = gamma * 200 * cos(pi/4)
+b = a/gamma^2
+val = fzero(x ->y(x, gamma=gamma), b/2)
+numericq(val, 2)
+```
+
+
+#### Question
+
+
+Let $y(x)$ be defined as above to model the flight of an arrow. Suppose a hill is in the path of the arrow. The hill is given by this function:
+
+```
+hill(x) = x > 100 ? 2.0*(x-100) : 0.0
+```
+
+By solving `y(x) = hill(x)` solve for how far the arrow will fly before hitting the hill.
+
+```{results="js"}
+function y(x; theta=pi/4, g=-32, v0=200, gamma=1) 
+	 a = gamma * v0 * cos(theta)
+	 (g/a + tan(theta)) * x - g/gamma^2 * log((a-gamma^2 * x)/a)
+end
+hill(x) = x > 100 ? 2.0*(x-100) : 0.0
+val = fzero(x ->y(x) - hill(x), 100)
+numericq(val, 2)
+```
+
 
 
 
@@ -665,8 +753,11 @@ zero, then
 * use the bisection method to find the zero to many decimal points.
 
 Here we illustrate with the problem of finding all intersection points
-of $e^x = x^4$ over the interval $[0,10]$. That is, for the function
-$f(x) = e^x - x^4$ find the zeros.
+of $e^x = x^4$ over the interval $[0,10]$. 
+
+
+
+Recall, solving for $g(x) = h(x)$ is identical to the problem of solving $f(x) = 0$, where we define $f(x) = g(x) - h(x)$. So our problem is to find solutions to $e^x - x^4 = 0$.
 
 
 A quick plot shows that the function has such a wide range that
@@ -701,7 +792,9 @@ bisection(f, [0, 3])
 ### The Roots package and fzero
 
 The bisection method, while easy to describe and understand, can be
-made more efficient. The `fzero` (**f**unction **zero**) function In the `Roots` package does so. It is used like our `bisection` method -- but does not need to typed in.
+made more efficient. The `fzero` (**f**unction **zero**) function In
+the `Roots` package does so. It is used like our `bisection` method --
+but does not need to typed in.
 
 For example, to find a root of $f(x) = 2x \cdot \exp(-20) - 2 \cdot
 \exp(-20x) + 1$ in the interval $[0,1]$ we have:
@@ -786,10 +879,11 @@ Mersenne, launched a cannonball straight up into the air in an attempt
 to help Descartes prove facts about the rotation of the earth. Though
 the experiment was not successful, Mersenne later observed that the
 time for the cannonball to go up was greater than the time to come
-down.
+down. [According to "Vertical Projection in a Resisting Medium: Reflections on Observations of Mersenne
+".](http://www.maa.org/publications/periodicals/american-mathematical-monthly/american-mathematical-monthly-contents-junejuly-2014)
 
 This isn't the case for simple ballistic motion where the time to go
-up is equal. We can "prove" this numerically. For simple ballistic
+up is equal to the time to come down. We can "prove" this numerically. For simple ballistic
 motion, $f(t) = -(1/2)\cdot 32 t^2 + v_0t$. The time to go up and down are found by
 the two zeros of this function. The peak time is related to a zero of
 a function given by `D(f)`, which for now we'll take as a mystery

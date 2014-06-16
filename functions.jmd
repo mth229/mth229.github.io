@@ -580,26 +580,26 @@ The line `return(x^2)`, could have just been `x^2` as it is the last (and) only 
 Imagine we have a complicated function, such as:
 
 $$
- g(x) = \tan(\theta) x + \frac{32/k}{200 \cos\theta} x -
-    \frac{32}{k} \log\left(\frac{200 \cos\theta}{200\cos\theta - x}\right).
+ g(x) = \tan(\theta) x + \frac{32}{200 \cos\theta} x -
+    32 \log\left(\frac{200 \cos\theta}{200\cos\theta - x}\right).
 $$
 
 where $k$ is the constant 1/2 and $\theta=\pi/4$. To avoid errors in
 transcribing, it can be be useful to break such definitions up into
-steps. Here we note the repeated use of $200\cos(\theta)$ and $32/k$ in the defintion of $g(x)$,
-so we give them the intermediate names of `a` and `b`:
+steps. Here we note the repeated use of $200\cos(\theta)$ in the defintion of $g(x)$,
+so we give that value the intermediate name of `a`
 
 ```
 function g(x)
 	 theta = pi/4
-	 k = 1/2
 	 a = 200*cos(theta)
-	 b = 32/k
-	 tan(theta)*x + (b/a)*x - b*log(a/(a-x))
+	 tan(theta)*x + (32/a)*x  b*log((a-x)/a)
 end
 ```
 
-From this, we can easily see that we would need to be concerned as $x$ approaches the value of `a`, as when $x \geq a$ the logarithm won't be defined.
+From this, we can easily see that we would need to be concerned as $x$
+approaches the value of `a`, as when $x \geq a$ the logarithm won't be
+defined.
 
 
 ## Functions defined by cases
@@ -905,29 +905,30 @@ mxplusb(2, m=2, b=3)		        ## 2*2 + 3, using passed in values
 For a more complicated example, we revisit this function
 
 $$
- g(x) = \tan(\theta) x + \frac{32/k}{200 \cos\theta} x -
-    \frac{32}{k} \log\left(\frac{200 \cos\theta}{200\cos\theta - x}\right).
+ g(x) = \tan(\theta) x + \frac{32}{200 \cos\theta} x -
+     32 \log\left(\frac{200 \cos\theta}{200\cos\theta - x}\right).
 $$
 
 
-Rather than define the values of $k$ and $\theta$ outside the function, we can pass in values
-for these _parameters_ with this definition
+Rather than define the value of and $\theta$ outside the function, we can pass in the value
+for this _parameter_ in this definition
 
 ```
-function g(x; theta=pi/4, k=1/2)
+function g(x; theta=pi/4)
 	 a = 200*cos(theta)
-	 b = 32/k
-	 tan(theta)*x + (b/a)*x - b*log(a/(a-x))
+	 tan(theta)*x + (32/a)*x - 32*log(a/(a-x))
 end
 ```
 
-The defaults mean `g(50, theta=pi/4, k=1/2)` would be the same as
+The default means `g(50, theta=pi/4)` would be the same as
 
 ```
 g(50)
 ```
 
-The parameters make it easy to look at other types of problems. For example, if the angle were less, would the value of $f$ be smaller or larger?
+The parameter make it easy to look at other types of problems. For
+example, if the angle were less, would the value of $f$ be smaller or
+larger?
 
 ```
 g(50, theta=pi/8)		## smaller in this case. 
@@ -1001,10 +1002,9 @@ Weave.numericq(val)
 Let $g$ be defined by:
 
 ```
-function g(x; theta=pi/4, k=1/2)
+function g(x; theta=pi/4)
 	 a = 200*cos(theta)
-	 b = 32/k
-	 tan(theta)*x + (b/a)*x - b*log(a/(a-x))
+	 tan(theta)*x + (32/a)*x + 32*log((a-x)/a)
 end
 ```
 
@@ -1013,17 +1013,14 @@ For `x` in 20, 25, 30, 35, 40, 45 degrees, what value will maximize
 
 
 ```{results="js"}
-function whichmax(x)
-       i = 1
-       for j in 2:length(x)
-       x[j] > x[i] ? i=j : nothing
-       end
-       i
+function g(x; theta=pi/4)
+	 a = 200*cos(theta)
+	 tan(theta)*x + (32/a)*x + 32*log((a-x)/a)
 end
 x = 20:5:45;
 out = map(u -> g(125, theta=u*pi/180), x);
-ans = x[whichmax(out)];
-Weave.numericq(ans)
+ans, ind = findmax(out)
+Weave.numericq(x[ind])
 ```
 
 <hr/>
@@ -1051,9 +1048,13 @@ x -> -16x^2 + 32x
 ```
 
 This expression creates a function object, but since we didn't bind it
-to a variable (that is, we didn't give the function a name) it will be immediately forgotten. Such functions without
-a name are known as _anonymous functions_. 
+to a variable (that is, we didn't give the function a name) it will be
+immediately forgotten. Such functions without a name are known as
+_anonymous functions_.
 
+
+
+Anonymous functions are very useful when working with functions defined by parameters.
 
 ### Operators
 
@@ -1108,6 +1109,8 @@ We can use the output of `tform` directly in a function call, or make
 a specific version of the function, as above, by defining it for
 certain values of its parameters.
 
+
+### trimming large values in a plot
 
 Here is another example, which is used to replace large or small
 values with `NaN`. (Recall, `NaN` is a floating-point value
