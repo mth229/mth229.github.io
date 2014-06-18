@@ -1132,9 +1132,17 @@ x = Sym(<span class="st">&quot;x&quot;</span>)</code></pre>
 <p>The &quot;x&quot; on the right-hand side is a character argument to the <code>Sym</code> constructor which returns a symbolic object stored as <code>x</code>:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">x |&gt; typeof</code></pre>
 <pre class="output"><code>Sym (constructor with 6 methods)</code></pre>
-<p>That was painless. While we are here, lets define symbolic objects <code>h</code> and <code>y</code>:</p>
+<p>That was painless. The type is <code>Sym</code>.</p>
+
+<div class="alert alert-info">
+<strong></strong>
+<p>We use the pipeline operator <code>|&gt;</code> to compose functions in this project, as it makes the expressions a bit easier to read. That above would be simply <code>typeof(x)</code> so there is no advantage in clarity, but there is elsewhere.</p>
+</div>
+
+<p>While we are here, lets define some other symbolic objects <code>h</code> and <code>y</code>:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">h, y = Sym(<span class="st">&quot;h&quot;</span>, <span class="st">&quot;y&quot;</span>)        <span class="co"># two at once</span></code></pre>
 <pre class="output"><code>(h,y)</code></pre>
+<p>(There are a few other different ways to define symbolic objects.)</p>
 <p>Most of the typical math functions have been overloaded to work with these symbolic expressions: the functions accept a symbolic expression and return a newly computed one. For example, the expression <code>x^2 -2x +2</code> when evaluated becomes a new symbolic expression:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">x^<span class="fl">2</span> - <span class="fl">2</span>x + <span class="fl">2</span> |&gt; typeof</code></pre>
 <pre class="output"><code>Sym (constructor with 6 methods)</code></pre>
@@ -1200,26 +1208,42 @@ x  - 5⋅x  + 6⋅x  - x  + 5⋅x - 6</code></pre>
 <pre class="sourceCode julia"><code class="sourceCode julia">factor(p)</code></pre>
 <pre class="output"><code>                        ⎛ 2        ⎞
 (x - 3)⋅(x - 2)⋅(x - 1)⋅⎝x  + x + 1⎠</code></pre>
-<p>From this we can see clearly the linear terms correspond to roots. The <code>roots</code> function returns a dictionary of roots:</p>
+<p>From this we can see clearly the linear terms correspond to roots. The <code>roots</code> function returns a dictionary of roots and their multiplicities.</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">roots(p)</code></pre>
 <pre class="output"><code>Dict{Any,Any} with 5 entries:
-  3                        =&gt; 1
-          ___  …           =&gt; 1
-          ___  …           =&gt; 1
   2                        =&gt; 1
-  1                        =&gt; 1</code></pre>
-<p>In this case we see the two complex roots as well, that <code>factor</code> leaves alone. Factoring reduces over the rational numbers -- not the real numbers (the domain can be adjusted). For example, this quadratic will not be factor, even though the answers are real:</p>
+  1                        =&gt; 1
+          ___  …           =&gt; 1
+          ___  …           =&gt; 1
+  3                        =&gt; 1</code></pre>
+<p>Huh? The print out is messed up. This is a tradeoff: the return value is a dictionary whose keys are the roots as symbolic objects. The default printing isn't kind to slightly more complicated expressions. If the multiplicities are not of interest, we can get just the keys via:</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">[k <span class="kw">for</span> (k,v) <span class="kw">in</span> roots(p)]</code></pre>
+<pre class="output"><code>5-element Array{Any,1}:
+ 1                                                      
+ 3                                                      
+         ___  
+  1   ╲╱ 3 ⋅ⅈ
+- ─ + ───────
+  2      2   
+ 2                                                      
+         ___  
+  1   ╲╱ 3 ⋅ⅈ
+- ─ - ───────
+  2      2   </code></pre>
+<p>In this case there are two complex roots as well, that <code>factor</code> leaves alone. Factoring reduces over the rational numbers -- not the real numbers (the domain can be adjusted). For example, this quadratic will not be factored, even though the answers are real:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">q = x^<span class="fl">2</span> - <span class="fl">8</span>x + <span class="fl">8</span>
 factor(q)</code></pre>
 <pre class="output"><code> 2          
 x  - 8⋅x + 8</code></pre>
-<p>However, <code>roots</code> will work:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">roots(q)</code></pre>
-<pre class="output"><code>Dict{Any,Any} with 2 entries:
-      ___    …             =&gt; 1
-        ___    …           =&gt; 1</code></pre>
+<p>However, <code>roots</code> will work, though we have to work to get the print out:</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">[k <span class="kw">for</span> (k,v) <span class="kw">in</span> roots(q)]</code></pre>
+<pre class="output"><code>2-element Array{Any,1}:
+       ___    
+- 2⋅╲╱ 2  + 4
+     ___    
+2⋅╲╱ 2  + 4    </code></pre>
 <p>The basic theorem is that for each linear factor over the complex numbers there corresponds a root and vice versa after accounting for multiplicity.</p>
-<p>The <code>real_roots</code> function tries to return the real roots (omitting the non-real, complex roots). Here we see that it fails for some polynomials when <code>roots</code> does not:</p>
+<p>The <code>real_roots</code> function tries to return the real roots (omitting the non-real roots). Here we see that it fails for some polynomials when <code>roots</code> does not:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">q = x^<span class="fl">4</span> - <span class="fl">8</span>x^<span class="fl">2</span> + <span class="fl">8</span>
 real_roots(q)           <span class="co"># should find 4</span></code></pre>
 <pre class="output"><code>4-element Array{Sym,1}:
@@ -1247,14 +1271,14 @@ RootOf⎝x  - 8⋅x  + 8, 3⎠</code></pre>
   ╱     ___     
 ╲╱  2⋅╲╱ 2  + 4          </code></pre>
 <p>If it isn't clear which of these are real, they can be converted to numeric values via <code>N</code>:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">ans = solve(q)
-map(N, ans)         <span class="co"># all are real</span></code></pre>
+<pre class="sourceCode julia"><code class="sourceCode julia">as = solve(q)
+map(N, as)          <span class="co"># all are real</span></code></pre>
 <pre class="output"><code>4-element Array{Sym,1}:
  -1.08239220029239
  1.08239220029239 
  -2.61312592975275
  2.61312592975275 </code></pre>
-<p>One could also try converting to complex (<code>complex(ans)</code>) and seeing which have <code>0.0im</code> for an imaginary part.</p>
+<p>One could also try converting to complex (<code>complex(as)</code>) and seeing which have <code>0.0im</code> for an imaginary part.</p>
 <p>The <code>solve</code> function solves for when an expression is 0. Sometimes, the problem is to find when <code>f(x) = g(x)</code>, for example, <code>2x^2 = exp(x)</code>. Here we see:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">solve(exp(x) - <span class="fl">2</span>x^<span class="fl">2</span>, x)     <span class="co"># 1.487...</span></code></pre>
 <pre class="output"><code>1-element Array{Sym,1}:
@@ -1266,7 +1290,7 @@ map(N, ans)         <span class="co"># all are real</span></code></pre>
 <pre class="sourceCode julia"><code class="sourceCode julia">nsolve(exp(x) - <span class="fl">2</span>x^<span class="fl">2</span>, x, <span class="fl">3</span>) <span class="co"># 2.617...</span></code></pre>
 <pre class="output"><code>2.6178666130668127</code></pre>
 <p>Trigonometric functions have infinitely many solutions, with the <code>sin</code> function <code>SymPy</code> solves only within the range <span class="math">\([-90, 90]\)</span> degrees (the range of the <code>asin</code> function).</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">solve(sin(x)^<span class="fl">2</span> - (<span class="fl">1</span>/<span class="fl">2</span>)^<span class="fl">2</span>) * (<span class="fl">180</span> /pi)</code></pre>
+<pre class="sourceCode julia"><code class="sourceCode julia">solve(sin(x)^<span class="fl">2</span> - (<span class="fl">1</span>/<span class="fl">2</span>)^<span class="fl">2</span>) * <span class="fl">180</span> / pi</code></pre>
 <pre class="output"><code>4-element Array{Sym,1}:
  -30.0000000000000
  30.0000000000000 
@@ -1287,7 +1311,7 @@ map(N, ans)         <span class="co"># all are real</span></code></pre>
  -0.866025
   0.866025</code></pre>
 <p>You can even do systems of equations. For this you specify the system and the variables to solve for using a vector:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">x, y = @syms x y
+<pre class="sourceCode julia"><code class="sourceCode julia">x, y = Sym(<span class="st">&quot;x&quot;</span>, <span class="st">&quot;y&quot;</span>)
 eq1 = x + y -<span class="fl">1</span>
 eq2 = x - y - (-<span class="fl">1</span>)
 solve([eq1, eq2], [x,y])</code></pre>
@@ -2133,44 +2157,26 @@ function draw_with_data(data, parent_id) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
            .attr("x", 57.63)
-           .attr("y", -31.98)
+           .attr("y", -6.3)
            .attr("text-anchor", "end")
            .style("dominant-baseline", "central")
             .call(function(text) {
-      text.text("10.0000000000000");
+      text.text("8.00000000000000");
     })
 ;
       }(g.append("g")));
-      g.append("svg:text")
-         .attr("x", 57.63)
-         .attr("y", 45.06)
-         .attr("text-anchor", "end")
-         .style("dominant-baseline", "central")
-         .call(function(text) {
-     text.text("4.00000000000000");
-   })
-;
       (function (g) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
            .attr("x", 57.63)
-           .attr("y", 70.74)
+           .attr("y", -44.82)
            .attr("text-anchor", "end")
            .style("dominant-baseline", "central")
             .call(function(text) {
-      text.text("2.00000000000000");
+      text.text("11.0000000000000");
     })
 ;
       }(g.append("g")));
-      g.append("svg:text")
-         .attr("x", 57.63)
-         .attr("y", 32.22)
-         .attr("text-anchor", "end")
-         .style("dominant-baseline", "central")
-         .call(function(text) {
-     text.text("5.00000000000000");
-   })
-;
       (function (g) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
@@ -2180,18 +2186,6 @@ function draw_with_data(data, parent_id) {
            .style("dominant-baseline", "central")
             .call(function(text) {
       text.text("9.00000000000000");
-    })
-;
-      }(g.append("g")));
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 57.63)
-           .attr("y", -57.66)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("12.0000000000000");
     })
 ;
       }(g.append("g")));
@@ -2208,6 +2202,18 @@ function draw_with_data(data, parent_id) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
            .attr("x", 57.63)
+           .attr("y", 70.74)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("2.00000000000000");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 57.63)
            .attr("y", 122.1)
            .attr("text-anchor", "end")
            .style("dominant-baseline", "central")
@@ -2216,25 +2222,13 @@ function draw_with_data(data, parent_id) {
     })
 ;
       }(g.append("g")));
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 57.63)
-           .attr("y", -44.82)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("11.0000000000000");
-    })
-;
-      }(g.append("g")));
       g.append("svg:text")
          .attr("x", 57.63)
-         .attr("y", 6.54)
+         .attr("y", 32.22)
          .attr("text-anchor", "end")
          .style("dominant-baseline", "central")
          .call(function(text) {
-     text.text("7.00000000000000");
+     text.text("5.00000000000000");
    })
 ;
       (function (g) {
@@ -2253,6 +2247,30 @@ function draw_with_data(data, parent_id) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
            .attr("x", 57.63)
+           .attr("y", -31.98)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("10.0000000000000");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 57.63)
+           .attr("y", -57.66)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("12.0000000000000");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 57.63)
            .attr("y", 109.26)
            .attr("text-anchor", "end")
            .style("dominant-baseline", "central")
@@ -2261,18 +2279,24 @@ function draw_with_data(data, parent_id) {
     })
 ;
       }(g.append("g")));
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 57.63)
-           .attr("y", -6.3)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("8.00000000000000");
-    })
+      g.append("svg:text")
+         .attr("x", 57.63)
+         .attr("y", 19.38)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("6.00000000000000");
+   })
 ;
-      }(g.append("g")));
+      g.append("svg:text")
+         .attr("x", 57.63)
+         .attr("y", 6.54)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("7.00000000000000");
+   })
+;
       (function (g) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
@@ -2287,11 +2311,11 @@ function draw_with_data(data, parent_id) {
       }(g.append("g")));
       g.append("svg:text")
          .attr("x", 57.63)
-         .attr("y", 19.38)
+         .attr("y", 45.06)
          .attr("text-anchor", "end")
          .style("dominant-baseline", "central")
          .call(function(text) {
-     text.text("6.00000000000000");
+     text.text("4.00000000000000");
    })
 ;
     }(g.append("g")));
@@ -2506,35 +2530,35 @@ function draw_with_data(data, parent_id) {
            .attr("stroke-width", 0.2)
            .attr("class", "guide ygridlines xfixed");
           g.append("svg:path")
-             .attr("d", "M58.63,45.06 L 115 45.06");
+             .attr("d", "M58.63,-44.82 L 115 -44.82");
           g.append("svg:path")
-             .attr("d", "M58.63,32.22 L 115 32.22");
+             .attr("d", "M58.63,57.9 L 115 57.9");
+          g.append("svg:path")
+             .attr("d", "M58.63,122.1 L 115 122.1");
+          g.append("svg:path")
+             .attr("d", "M58.63,83.58 L 115 83.58");
           g.append("svg:path")
              .attr("d", "M58.63,-57.66 L 115 -57.66");
           g.append("svg:path")
-             .attr("d", "M58.63,122.1 L 115 122.1");
+             .attr("d", "M58.63,19.38 L 115 19.38");
+          g.append("svg:path")
+             .attr("d", "M58.63,96.42 L 115 96.42");
+          g.append("svg:path")
+             .attr("d", "M58.63,45.06 L 115 45.06");
           g.append("svg:path")
              .attr("d", "M58.63,6.54 L 115 6.54");
           g.append("svg:path")
              .attr("d", "M58.63,109.26 L 115 109.26");
           g.append("svg:path")
-             .attr("d", "M58.63,96.42 L 115 96.42");
+             .attr("d", "M58.63,-31.98 L 115 -31.98");
           g.append("svg:path")
-             .attr("d", "M58.63,19.38 L 115 19.38");
-          g.append("svg:path")
-             .attr("d", "M58.63,-6.3 L 115 -6.3");
-          g.append("svg:path")
-             .attr("d", "M58.63,83.58 L 115 83.58");
-          g.append("svg:path")
-             .attr("d", "M58.63,-44.82 L 115 -44.82");
-          g.append("svg:path")
-             .attr("d", "M58.63,57.9 L 115 57.9");
-          g.append("svg:path")
-             .attr("d", "M58.63,-19.14 L 115 -19.14");
+             .attr("d", "M58.63,32.22 L 115 32.22");
           g.append("svg:path")
              .attr("d", "M58.63,70.74 L 115 70.74");
           g.append("svg:path")
-             .attr("d", "M58.63,-31.98 L 115 -31.98");
+             .attr("d", "M58.63,-19.14 L 115 -19.14");
+          g.append("svg:path")
+             .attr("d", "M58.63,-6.3 L 115 -6.3");
         }(g.append("g")));
         (function (g) {
           g.attr("stroke", "#F0F0F3")
@@ -2689,7 +2713,7 @@ return module;
 //@ sourceURL=gadflyplot-8wo76lNmsNT6yCui2yGr.js
 </script>
 
-<p>Graphing more than one function at a time is, of course, possible. For example, to graph a function and its tangent line at a point we can do this.</p>
+<p>Graphing more than one expression at a time is, of course, possible. For example, to graph a function and its tangent line at a point we can do this.</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">f(x) = sqrt(x);
 c = <span class="fl">2</span>;
 fp = diff(f(x));        <span class="co"># diff finds derivative, fp an expression (not function)</span>
@@ -2730,11 +2754,11 @@ function draw_with_data(data, parent_id) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
            .attr("x", 57.63)
-           .attr("y", -44.82)
+           .attr("y", 83.58)
            .attr("text-anchor", "end")
            .style("dominant-baseline", "central")
             .call(function(text) {
-      text.text("2.60000000000000");
+      text.text("0.600000000000000");
     })
 ;
       }(g.append("g")));
@@ -2742,23 +2766,14 @@ function draw_with_data(data, parent_id) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
            .attr("x", 57.63)
-           .attr("y", -19.14)
+           .attr("y", 70.74)
            .attr("text-anchor", "end")
            .style("dominant-baseline", "central")
             .call(function(text) {
-      text.text("2.20000000000000");
+      text.text("0.800000000000000");
     })
 ;
       }(g.append("g")));
-      g.append("svg:text")
-         .attr("x", 57.63)
-         .attr("y", 6.54)
-         .attr("text-anchor", "end")
-         .style("dominant-baseline", "central")
-         .call(function(text) {
-     text.text("1.80000000000000");
-   })
-;
       (function (g) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
@@ -2775,23 +2790,47 @@ function draw_with_data(data, parent_id) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
            .attr("x", 57.63)
-           .attr("y", 70.74)
+           .attr("y", -44.82)
            .attr("text-anchor", "end")
            .style("dominant-baseline", "central")
             .call(function(text) {
-      text.text("0.800000000000000");
+      text.text("2.60000000000000");
     })
 ;
       }(g.append("g")));
       g.append("svg:text")
          .attr("x", 57.63)
-         .attr("y", 32.22)
+         .attr("y", 6.54)
          .attr("text-anchor", "end")
          .style("dominant-baseline", "central")
          .call(function(text) {
-     text.text("1.40000000000000");
+     text.text("1.80000000000000");
    })
 ;
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 57.63)
+           .attr("y", 96.42)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("0.400000000000000");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 57.63)
+           .attr("y", -57.66)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("2.80000000000000");
+    })
+;
+      }(g.append("g")));
       g.append("svg:text")
          .attr("x", 57.63)
          .attr("y", 45.06)
@@ -2805,45 +2844,21 @@ function draw_with_data(data, parent_id) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
            .attr("x", 57.63)
-           .attr("y", 83.58)
+           .attr("y", -19.14)
            .attr("text-anchor", "end")
            .style("dominant-baseline", "central")
             .call(function(text) {
-      text.text("0.600000000000000");
-    })
-;
-      }(g.append("g")));
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 57.63)
-           .attr("y", 109.26)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("0.200000000000000");
-    })
-;
-      }(g.append("g")));
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 57.63)
-           .attr("y", 122.1)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("0");
+      text.text("2.20000000000000");
     })
 ;
       }(g.append("g")));
       g.append("svg:text")
          .attr("x", 57.63)
-         .attr("y", 57.9)
+         .attr("y", 32.22)
          .attr("text-anchor", "end")
          .style("dominant-baseline", "central")
          .call(function(text) {
-     text.text("1.00000000000000");
+     text.text("1.40000000000000");
    })
 ;
       g.append("svg:text")
@@ -2859,23 +2874,32 @@ function draw_with_data(data, parent_id) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
            .attr("x", 57.63)
-           .attr("y", -57.66)
+           .attr("y", 109.26)
            .attr("text-anchor", "end")
            .style("dominant-baseline", "central")
             .call(function(text) {
-      text.text("2.80000000000000");
+      text.text("0.200000000000000");
     })
 ;
       }(g.append("g")));
+      g.append("svg:text")
+         .attr("x", 57.63)
+         .attr("y", 57.9)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("1.00000000000000");
+   })
+;
       (function (g) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
            .attr("x", 57.63)
-           .attr("y", 96.42)
+           .attr("y", 122.1)
            .attr("text-anchor", "end")
            .style("dominant-baseline", "central")
             .call(function(text) {
-      text.text("0.400000000000000");
+      text.text("0");
     })
 ;
       }(g.append("g")));
@@ -3179,35 +3203,35 @@ function draw_with_data(data, parent_id) {
            .attr("stroke-width", 0.2)
            .attr("class", "guide ygridlines xfixed");
           g.append("svg:path")
-             .attr("d", "M58.63,-19.14 L 100.33 -19.14");
+             .attr("d", "M58.63,70.74 L 100.33 70.74");
           g.append("svg:path")
-             .attr("d", "M58.63,-6.3 L 100.33 -6.3");
-          g.append("svg:path")
-             .attr("d", "M58.63,32.22 L 100.33 32.22");
-          g.append("svg:path")
-             .attr("d", "M58.63,83.58 L 100.33 83.58");
-          g.append("svg:path")
-             .attr("d", "M58.63,122.1 L 100.33 122.1");
-          g.append("svg:path")
-             .attr("d", "M58.63,19.38 L 100.33 19.38");
+             .attr("d", "M58.63,-44.82 L 100.33 -44.82");
           g.append("svg:path")
              .attr("d", "M58.63,96.42 L 100.33 96.42");
           g.append("svg:path")
-             .attr("d", "M58.63,-31.98 L 100.33 -31.98");
+             .attr("d", "M58.63,45.06 L 100.33 45.06");
           g.append("svg:path")
-             .attr("d", "M58.63,-57.66 L 100.33 -57.66");
-          g.append("svg:path")
-             .attr("d", "M58.63,57.9 L 100.33 57.9");
+             .attr("d", "M58.63,32.22 L 100.33 32.22");
           g.append("svg:path")
              .attr("d", "M58.63,109.26 L 100.33 109.26");
           g.append("svg:path")
-             .attr("d", "M58.63,45.06 L 100.33 45.06");
+             .attr("d", "M58.63,122.1 L 100.33 122.1");
           g.append("svg:path")
-             .attr("d", "M58.63,70.74 L 100.33 70.74");
+             .attr("d", "M58.63,-31.98 L 100.33 -31.98");
+          g.append("svg:path")
+             .attr("d", "M58.63,57.9 L 100.33 57.9");
+          g.append("svg:path")
+             .attr("d", "M58.63,19.38 L 100.33 19.38");
+          g.append("svg:path")
+             .attr("d", "M58.63,-19.14 L 100.33 -19.14");
+          g.append("svg:path")
+             .attr("d", "M58.63,-57.66 L 100.33 -57.66");
           g.append("svg:path")
              .attr("d", "M58.63,6.54 L 100.33 6.54");
           g.append("svg:path")
-             .attr("d", "M58.63,-44.82 L 100.33 -44.82");
+             .attr("d", "M58.63,-6.3 L 100.33 -6.3");
+          g.append("svg:path")
+             .attr("d", "M58.63,83.58 L 100.33 83.58");
         }(g.append("g")));
         (function (g) {
           g.attr("stroke", "#F0F0F3")
@@ -3257,16 +3281,16 @@ function draw_with_data(data, parent_id) {
             g.attr("fill", "none")
              .attr("stroke-width", 0.3);
             (function (g) {
-              g.attr("stroke", "#00BFFF")
-               .attr("class", "geometry color_f1");
-              g.append("svg:path")
-                 .attr("d", "M59.81,57.9 L 59.97 57.64 60.12 57.39 60.28 57.13 60.44 56.88 60.6 56.62 60.76 56.37 60.91 56.12 61.07 55.87 61.23 55.62 61.39 55.37 61.55 55.12 61.7 54.88 61.86 54.63 62.02 54.39 62.18 54.14 62.34 53.9 62.49 53.66 62.65 53.42 62.81 53.17 62.97 52.93 63.13 52.7 63.28 52.46 63.44 52.22 63.6 51.98 63.76 51.75 63.92 51.51 64.07 51.28 64.23 51.05 64.39 50.81 64.55 50.58 64.71 50.35 64.86 50.12 65.02 49.89 65.18 49.66 65.34 49.43 65.5 49.21 65.65 48.98 65.81 48.75 65.97 48.53 66.13 48.3 66.29 48.08 66.44 47.86 66.6 47.63 66.76 47.41 66.92 47.19 67.08 46.97 67.23 46.75 67.39 46.53 67.55 46.31 67.71 46.09 67.87 45.88 68.02 45.66 68.18 45.44 68.34 45.23 68.5 45.01 68.66 44.8 68.81 44.58 68.97 44.37 69.13 44.16 69.29 43.95 69.45 43.73 69.6 43.52 69.76 43.31 69.92 43.1 70.08 42.89 70.24 42.69 70.39 42.48 70.55 42.27 70.71 42.06 70.87 41.86 71.03 41.65 71.18 41.44 71.34 41.24 71.5 41.04 71.66 40.83 71.82 40.63 71.97 40.42 72.13 40.22 72.29 40.02 72.45 39.82 72.61 39.62 72.76 39.42 72.92 39.22 73.08 39.02 73.24 38.82 73.4 38.62 73.55 38.42 73.71 38.23 73.87 38.03 74.03 37.83 74.18 37.64 74.34 37.44 74.5 37.24 74.66 37.05 74.82 36.86 74.97 36.66 75.13 36.47 75.29 36.27 75.45 36.08 75.61 35.89 75.76 35.7 75.92 35.51 76.08 35.32 76.24 35.13 76.4 34.94 76.55 34.75 76.71 34.56 76.87 34.37 77.03 34.18 77.19 33.99 77.34 33.8 77.5 33.62 77.66 33.43 77.82 33.24 77.98 33.06 78.13 32.87 78.29 32.69 78.45 32.5 78.61 32.32 78.77 32.13 78.92 31.95 79.08 31.76 79.24 31.58 79.4 31.4 79.56 31.22 79.71 31.03 79.87 30.85 80.03 30.67 80.19 30.49 80.35 30.31 80.5 30.13 80.66 29.95 80.82 29.77 80.98 29.59 81.14 29.41 81.29 29.23 81.45 29.06 81.61 28.88 81.77 28.7 81.93 28.52 82.08 28.35 82.24 28.17 82.4 28 82.56 27.82 82.72 27.64 82.87 27.47 83.03 27.29 83.19 27.12 83.35 26.95 83.51 26.77 83.66 26.6 83.82 26.43 83.98 26.25 84.14 26.08 84.3 25.91 84.45 25.74 84.61 25.56 84.77 25.39 84.93 25.22 85.09 25.05 85.24 24.88 85.4 24.71 85.56 24.54 85.72 24.37 85.88 24.2 86.03 24.03 86.19 23.86 86.35 23.7 86.51 23.53 86.67 23.36 86.82 23.19 86.98 23.03 87.14 22.86 87.3 22.69 87.46 22.53 87.61 22.36 87.77 22.19 87.93 22.03 88.09 21.86 88.25 21.7 88.4 21.53 88.56 21.37 88.72 21.2 88.88 21.04 89.04 20.88 89.19 20.71 89.35 20.55 89.51 20.39 89.67 20.22 89.83 20.06 89.98 19.9 90.14 19.74 90.3 19.58 90.46 19.42 90.62 19.25 90.77 19.09 90.93 18.93 91.09 18.77 91.25 18.61 91.41 18.45 91.56 18.29 91.72 18.13 91.88 17.98 92.04 17.82 92.2 17.66 92.35 17.5 92.51 17.34 92.67 17.18 92.83 17.03 92.99 16.87 93.14 16.71 93.3 16.55 93.46 16.4 93.62 16.24 93.78 16.08 93.93 15.93 94.09 15.77 94.25 15.62 94.41 15.46 94.57 15.31 94.72 15.15 94.88 15 95.04 14.84 95.2 14.69 95.36 14.53 95.51 14.38 95.67 14.23 95.83 14.07 95.99 13.92 96.15 13.77 96.3 13.62 96.46 13.46 96.62 13.31 96.78 13.16 96.94 13.01 97.09 12.86 97.25 12.7 97.41 12.55 97.57 12.4 97.72 12.25 97.88 12.1 98.04 11.95 98.2 11.8 98.36 11.65 98.51 11.5 98.67 11.35 98.83 11.2 98.99 11.05 99.15 10.9");
-            }(g.append("g")));
-            (function (g) {
               g.attr("stroke", "#D4CA3A")
                .attr("class", "geometry color_f2");
               g.append("svg:path")
                  .attr("d", "M59.81,54 L 59.97 53.82 60.12 53.64 60.28 53.46 60.44 53.28 60.6 53.09 60.76 52.91 60.91 52.73 61.07 52.55 61.23 52.36 61.39 52.18 61.55 52 61.7 51.82 61.86 51.63 62.02 51.45 62.18 51.27 62.34 51.09 62.49 50.91 62.65 50.72 62.81 50.54 62.97 50.36 63.13 50.18 63.28 49.99 63.44 49.81 63.6 49.63 63.76 49.45 63.92 49.26 64.07 49.08 64.23 48.9 64.39 48.72 64.55 48.54 64.71 48.35 64.86 48.17 65.02 47.99 65.18 47.81 65.34 47.62 65.5 47.44 65.65 47.26 65.81 47.08 65.97 46.89 66.13 46.71 66.29 46.53 66.44 46.35 66.6 46.17 66.76 45.98 66.92 45.8 67.08 45.62 67.23 45.44 67.39 45.25 67.55 45.07 67.71 44.89 67.87 44.71 68.02 44.52 68.18 44.34 68.34 44.16 68.5 43.98 68.66 43.8 68.81 43.61 68.97 43.43 69.13 43.25 69.29 43.07 69.45 42.88 69.6 42.7 69.76 42.52 69.92 42.34 70.08 42.15 70.24 41.97 70.39 41.79 70.55 41.61 70.71 41.43 70.87 41.24 71.03 41.06 71.18 40.88 71.34 40.7 71.5 40.51 71.66 40.33 71.82 40.15 71.97 39.97 72.13 39.78 72.29 39.6 72.45 39.42 72.61 39.24 72.76 39.06 72.92 38.87 73.08 38.69 73.24 38.51 73.4 38.33 73.55 38.14 73.71 37.96 73.87 37.78 74.03 37.6 74.18 37.41 74.34 37.23 74.5 37.05 74.66 36.87 74.82 36.69 74.97 36.5 75.13 36.32 75.29 36.14 75.45 35.96 75.61 35.77 75.76 35.59 75.92 35.41 76.08 35.23 76.24 35.04 76.4 34.86 76.55 34.68 76.71 34.5 76.87 34.32 77.03 34.13 77.19 33.95 77.34 33.77 77.5 33.59 77.66 33.4 77.82 33.22 77.98 33.04 78.13 32.86 78.29 32.67 78.45 32.49 78.61 32.31 78.77 32.13 78.92 31.95 79.08 31.76 79.24 31.58 79.4 31.4 79.56 31.22 79.71 31.03 79.87 30.85 80.03 30.67 80.19 30.49 80.35 30.3 80.5 30.12 80.66 29.94 80.82 29.76 80.98 29.58 81.14 29.39 81.29 29.21 81.45 29.03 81.61 28.85 81.77 28.66 81.93 28.48 82.08 28.3 82.24 28.12 82.4 27.93 82.56 27.75 82.72 27.57 82.87 27.39 83.03 27.21 83.19 27.02 83.35 26.84 83.51 26.66 83.66 26.48 83.82 26.29 83.98 26.11 84.14 25.93 84.3 25.75 84.45 25.56 84.61 25.38 84.77 25.2 84.93 25.02 85.09 24.84 85.24 24.65 85.4 24.47 85.56 24.29 85.72 24.11 85.88 23.92 86.03 23.74 86.19 23.56 86.35 23.38 86.51 23.19 86.67 23.01 86.82 22.83 86.98 22.65 87.14 22.47 87.3 22.28 87.46 22.1 87.61 21.92 87.77 21.74 87.93 21.55 88.09 21.37 88.25 21.19 88.4 21.01 88.56 20.82 88.72 20.64 88.88 20.46 89.04 20.28 89.19 20.1 89.35 19.91 89.51 19.73 89.67 19.55 89.83 19.37 89.98 19.18 90.14 19 90.3 18.82 90.46 18.64 90.62 18.45 90.77 18.27 90.93 18.09 91.09 17.91 91.25 17.73 91.41 17.54 91.56 17.36 91.72 17.18 91.88 17 92.04 16.81 92.2 16.63 92.35 16.45 92.51 16.27 92.67 16.08 92.83 15.9 92.99 15.72 93.14 15.54 93.3 15.36 93.46 15.17 93.62 14.99 93.78 14.81 93.93 14.63 94.09 14.44 94.25 14.26 94.41 14.08 94.57 13.9 94.72 13.71 94.88 13.53 95.04 13.35 95.2 13.17 95.36 12.99 95.51 12.8 95.67 12.62 95.83 12.44 95.99 12.26 96.15 12.07 96.3 11.89 96.46 11.71 96.62 11.53 96.78 11.34 96.94 11.16 97.09 10.98 97.25 10.8 97.41 10.62 97.57 10.43 97.72 10.25 97.88 10.07 98.04 9.89 98.2 9.7 98.36 9.52 98.51 9.34 98.67 9.16 98.83 8.97 98.99 8.79 99.15 8.61");
+            }(g.append("g")));
+            (function (g) {
+              g.attr("stroke", "#00BFFF")
+               .attr("class", "geometry color_f1");
+              g.append("svg:path")
+                 .attr("d", "M59.81,57.9 L 59.97 57.64 60.12 57.39 60.28 57.13 60.44 56.88 60.6 56.62 60.76 56.37 60.91 56.12 61.07 55.87 61.23 55.62 61.39 55.37 61.55 55.12 61.7 54.88 61.86 54.63 62.02 54.39 62.18 54.14 62.34 53.9 62.49 53.66 62.65 53.42 62.81 53.17 62.97 52.93 63.13 52.7 63.28 52.46 63.44 52.22 63.6 51.98 63.76 51.75 63.92 51.51 64.07 51.28 64.23 51.05 64.39 50.81 64.55 50.58 64.71 50.35 64.86 50.12 65.02 49.89 65.18 49.66 65.34 49.43 65.5 49.21 65.65 48.98 65.81 48.75 65.97 48.53 66.13 48.3 66.29 48.08 66.44 47.86 66.6 47.63 66.76 47.41 66.92 47.19 67.08 46.97 67.23 46.75 67.39 46.53 67.55 46.31 67.71 46.09 67.87 45.88 68.02 45.66 68.18 45.44 68.34 45.23 68.5 45.01 68.66 44.8 68.81 44.58 68.97 44.37 69.13 44.16 69.29 43.95 69.45 43.73 69.6 43.52 69.76 43.31 69.92 43.1 70.08 42.89 70.24 42.69 70.39 42.48 70.55 42.27 70.71 42.06 70.87 41.86 71.03 41.65 71.18 41.44 71.34 41.24 71.5 41.04 71.66 40.83 71.82 40.63 71.97 40.42 72.13 40.22 72.29 40.02 72.45 39.82 72.61 39.62 72.76 39.42 72.92 39.22 73.08 39.02 73.24 38.82 73.4 38.62 73.55 38.42 73.71 38.23 73.87 38.03 74.03 37.83 74.18 37.64 74.34 37.44 74.5 37.24 74.66 37.05 74.82 36.86 74.97 36.66 75.13 36.47 75.29 36.27 75.45 36.08 75.61 35.89 75.76 35.7 75.92 35.51 76.08 35.32 76.24 35.13 76.4 34.94 76.55 34.75 76.71 34.56 76.87 34.37 77.03 34.18 77.19 33.99 77.34 33.8 77.5 33.62 77.66 33.43 77.82 33.24 77.98 33.06 78.13 32.87 78.29 32.69 78.45 32.5 78.61 32.32 78.77 32.13 78.92 31.95 79.08 31.76 79.24 31.58 79.4 31.4 79.56 31.22 79.71 31.03 79.87 30.85 80.03 30.67 80.19 30.49 80.35 30.31 80.5 30.13 80.66 29.95 80.82 29.77 80.98 29.59 81.14 29.41 81.29 29.23 81.45 29.06 81.61 28.88 81.77 28.7 81.93 28.52 82.08 28.35 82.24 28.17 82.4 28 82.56 27.82 82.72 27.64 82.87 27.47 83.03 27.29 83.19 27.12 83.35 26.95 83.51 26.77 83.66 26.6 83.82 26.43 83.98 26.25 84.14 26.08 84.3 25.91 84.45 25.74 84.61 25.56 84.77 25.39 84.93 25.22 85.09 25.05 85.24 24.88 85.4 24.71 85.56 24.54 85.72 24.37 85.88 24.2 86.03 24.03 86.19 23.86 86.35 23.7 86.51 23.53 86.67 23.36 86.82 23.19 86.98 23.03 87.14 22.86 87.3 22.69 87.46 22.53 87.61 22.36 87.77 22.19 87.93 22.03 88.09 21.86 88.25 21.7 88.4 21.53 88.56 21.37 88.72 21.2 88.88 21.04 89.04 20.88 89.19 20.71 89.35 20.55 89.51 20.39 89.67 20.22 89.83 20.06 89.98 19.9 90.14 19.74 90.3 19.58 90.46 19.42 90.62 19.25 90.77 19.09 90.93 18.93 91.09 18.77 91.25 18.61 91.41 18.45 91.56 18.29 91.72 18.13 91.88 17.98 92.04 17.82 92.2 17.66 92.35 17.5 92.51 17.34 92.67 17.18 92.83 17.03 92.99 16.87 93.14 16.71 93.3 16.55 93.46 16.4 93.62 16.24 93.78 16.08 93.93 15.93 94.09 15.77 94.25 15.62 94.41 15.46 94.57 15.31 94.72 15.15 94.88 15 95.04 14.84 95.2 14.69 95.36 14.53 95.51 14.38 95.67 14.23 95.83 14.07 95.99 13.92 96.15 13.77 96.3 13.62 96.46 13.46 96.62 13.31 96.78 13.16 96.94 13.01 97.09 12.86 97.25 12.7 97.41 12.55 97.57 12.4 97.72 12.25 97.88 12.1 98.04 11.95 98.2 11.8 98.36 11.65 98.51 11.5 98.67 11.35 98.83 11.2 98.99 11.05 99.15 10.9");
             }(g.append("g")));
           }(g.append("g")));
         }(g.append("g")));
@@ -3418,7 +3442,12 @@ Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
 <p>We can do other similar questions:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">limit((<span class="fl">1</span>-cos(x))/x^<span class="fl">2</span>, x, <span class="fl">0</span>)</code></pre>
 <pre class="output"><code>1/2</code></pre>
-<p>Limits can be taken at infinity as well. We specify that value using <code>oo</code>:</p>
+<p>The second argument is needed, as the expression may have more than one variable:</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">lambda = Sym(<span class="st">&quot;lambda&quot;</span>)
+limit((<span class="fl">1</span> - lambda *x)^(<span class="fl">1</span>/x), x, <span class="fl">0</span>)</code></pre>
+<pre class="output"><code> -λ
+ℯ  </code></pre>
+<p>Limits can be taken at infinity as well. We specify infinity using <code>oo</code> and not the floating point value <code>Inf</code></p>
 <pre class="sourceCode julia"><code class="sourceCode julia">limit(sin(x)/x, x, oo)</code></pre>
 <pre class="output"><code>0</code></pre>
 <p>We can even compute derivatives using limits. Here we do so symbolically:</p>
@@ -3760,11 +3789,74 @@ function draw_with_data(data, parent_id) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
            .attr("x", 57.63)
-           .attr("y", -55.09)
+           .attr("y", -34.55)
            .attr("text-anchor", "end")
            .style("dominant-baseline", "central")
             .call(function(text) {
-      text.text("20.0000000000000");
+      text.text("16.0000000000000");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 57.63)
+           .attr("y", -24.27)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("14.0000000000000");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 57.63)
+           .attr("y", -44.82)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("18.0000000000000");
+    })
+;
+      }(g.append("g")));
+      g.append("svg:text")
+         .attr("x", 57.63)
+         .attr("y", 37.36)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("2.00000000000000");
+   })
+;
+      g.append("svg:text")
+         .attr("x", 57.63)
+         .attr("y", 16.81)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("6.00000000000000");
+   })
+;
+      g.append("svg:text")
+         .attr("x", 57.63)
+         .attr("y", 27.08)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("4.00000000000000");
+   })
+;
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 57.63)
+           .attr("y", 109.26)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-12.0000000000000");
     })
 ;
       }(g.append("g")));
@@ -3784,11 +3876,59 @@ function draw_with_data(data, parent_id) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
            .attr("x", 57.63)
-           .attr("y", 88.71)
+           .attr("y", 68.17)
            .attr("text-anchor", "end")
            .style("dominant-baseline", "central")
             .call(function(text) {
-      text.text("-8.00000000000000");
+      text.text("-4.00000000000000");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 57.63)
+           .attr("y", 98.99)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-10.0000000000000");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 57.63)
+           .attr("y", 119.53)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-14.0000000000000");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 57.63)
+           .attr("y", -14)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("12.0000000000000");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 57.63)
+           .attr("y", -55.09)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("20.0000000000000");
     })
 ;
       }(g.append("g")));
@@ -3804,57 +3944,15 @@ function draw_with_data(data, parent_id) {
     })
 ;
       }(g.append("g")));
-      g.append("svg:text")
-         .attr("x", 57.63)
-         .attr("y", 57.9)
-         .attr("text-anchor", "end")
-         .style("dominant-baseline", "central")
-         .call(function(text) {
-     text.text("-2.00000000000000");
-   })
-;
       (function (g) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
            .attr("x", 57.63)
-           .attr("y", -24.27)
+           .attr("y", 88.71)
            .attr("text-anchor", "end")
            .style("dominant-baseline", "central")
             .call(function(text) {
-      text.text("14.0000000000000");
-    })
-;
-      }(g.append("g")));
-      g.append("svg:text")
-         .attr("x", 57.63)
-         .attr("y", 37.36)
-         .attr("text-anchor", "end")
-         .style("dominant-baseline", "central")
-         .call(function(text) {
-     text.text("2.00000000000000");
-   })
-;
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 57.63)
-           .attr("y", -34.55)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("16.0000000000000");
-    })
-;
-      }(g.append("g")));
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 57.63)
-           .attr("y", 98.99)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("-10.0000000000000");
+      text.text("-8.00000000000000");
     })
 ;
       }(g.append("g")));
@@ -3876,84 +3974,15 @@ function draw_with_data(data, parent_id) {
      text.text("0");
    })
 ;
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 57.63)
-           .attr("y", 109.26)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("-12.0000000000000");
-    })
-;
-      }(g.append("g")));
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 57.63)
-           .attr("y", 119.53)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("-14.0000000000000");
-    })
-;
-      }(g.append("g")));
       g.append("svg:text")
          .attr("x", 57.63)
-         .attr("y", 27.08)
+         .attr("y", 57.9)
          .attr("text-anchor", "end")
          .style("dominant-baseline", "central")
          .call(function(text) {
-     text.text("4.00000000000000");
+     text.text("-2.00000000000000");
    })
 ;
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 57.63)
-           .attr("y", -44.82)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("18.0000000000000");
-    })
-;
-      }(g.append("g")));
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 57.63)
-           .attr("y", 68.17)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("-4.00000000000000");
-    })
-;
-      }(g.append("g")));
-      g.append("svg:text")
-         .attr("x", 57.63)
-         .attr("y", 16.81)
-         .attr("text-anchor", "end")
-         .style("dominant-baseline", "central")
-         .call(function(text) {
-     text.text("6.00000000000000");
-   })
-;
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 57.63)
-           .attr("y", -14)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("12.0000000000000");
-    })
-;
-      }(g.append("g")));
     }(g.append("g")));
     (function (g) {
       g.attr("stroke", "none")
@@ -4166,41 +4195,41 @@ function draw_with_data(data, parent_id) {
            .attr("stroke-width", 0.2)
            .attr("class", "guide ygridlines xfixed");
           g.append("svg:path")
-             .attr("d", "M58.63,-3.73 L 115 -3.73");
-          g.append("svg:path")
-             .attr("d", "M58.63,78.44 L 115 78.44");
-          g.append("svg:path")
              .attr("d", "M58.63,-24.27 L 115 -24.27");
           g.append("svg:path")
-             .attr("d", "M58.63,-34.55 L 115 -34.55");
-          g.append("svg:path")
-             .attr("d", "M58.63,6.54 L 115 6.54");
-          g.append("svg:path")
-             .attr("d", "M58.63,109.26 L 115 109.26");
+             .attr("d", "M58.63,37.36 L 115 37.36");
           g.append("svg:path")
              .attr("d", "M58.63,27.08 L 115 27.08");
           g.append("svg:path")
-             .attr("d", "M58.63,68.17 L 115 68.17");
+             .attr("d", "M58.63,-3.73 L 115 -3.73");
+          g.append("svg:path")
+             .attr("d", "M58.63,98.99 L 115 98.99");
           g.append("svg:path")
              .attr("d", "M58.63,-14 L 115 -14");
+          g.append("svg:path")
+             .attr("d", "M58.63,78.44 L 115 78.44");
+          g.append("svg:path")
+             .attr("d", "M58.63,6.54 L 115 6.54");
+          g.append("svg:path")
+             .attr("d", "M58.63,57.9 L 115 57.9");
+          g.append("svg:path")
+             .attr("d", "M58.63,47.63 L 115 47.63");
+          g.append("svg:path")
+             .attr("d", "M58.63,88.71 L 115 88.71");
+          g.append("svg:path")
+             .attr("d", "M58.63,-55.09 L 115 -55.09");
+          g.append("svg:path")
+             .attr("d", "M58.63,119.53 L 115 119.53");
+          g.append("svg:path")
+             .attr("d", "M58.63,68.17 L 115 68.17");
+          g.append("svg:path")
+             .attr("d", "M58.63,109.26 L 115 109.26");
           g.append("svg:path")
              .attr("d", "M58.63,16.81 L 115 16.81");
           g.append("svg:path")
              .attr("d", "M58.63,-44.82 L 115 -44.82");
           g.append("svg:path")
-             .attr("d", "M58.63,119.53 L 115 119.53");
-          g.append("svg:path")
-             .attr("d", "M58.63,47.63 L 115 47.63");
-          g.append("svg:path")
-             .attr("d", "M58.63,98.99 L 115 98.99");
-          g.append("svg:path")
-             .attr("d", "M58.63,37.36 L 115 37.36");
-          g.append("svg:path")
-             .attr("d", "M58.63,57.9 L 115 57.9");
-          g.append("svg:path")
-             .attr("d", "M58.63,88.71 L 115 88.71");
-          g.append("svg:path")
-             .attr("d", "M58.63,-55.09 L 115 -55.09");
+             .attr("d", "M58.63,-34.55 L 115 -34.55");
         }(g.append("g")));
         (function (g) {
           g.attr("stroke", "#F0F0F3")
@@ -4395,11 +4424,95 @@ function draw_with_data(data, parent_id) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
            .attr("x", 60.24)
-           .attr("y", 109.26)
+           .attr("y", -61.94)
            .attr("text-anchor", "end")
            .style("dominant-baseline", "central")
             .call(function(text) {
-      text.text("-1.00000000000000");
+      text.text("4.00000000000000");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 60.24)
+           .attr("y", 75.02)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("0");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 60.24)
+           .attr("y", -44.82)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("3.50000000000000");
+    })
+;
+      }(g.append("g")));
+      g.append("svg:text")
+         .attr("x", 60.24)
+         .attr("y", 40.78)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("1.00000000000000");
+   })
+;
+      g.append("svg:text")
+         .attr("x", 60.24)
+         .attr("y", 23.66)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("1.50000000000000");
+   })
+;
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 60.24)
+           .attr("y", 126.38)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-1.50000000000000");
+    })
+;
+      }(g.append("g")));
+      g.append("svg:text")
+         .attr("x", 60.24)
+         .attr("y", 6.54)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("2.00000000000000");
+   })
+;
+      g.append("svg:text")
+         .attr("x", 60.24)
+         .attr("y", 57.9)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("0.500000000000000");
+   })
+;
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 60.24)
+           .attr("y", -10.58)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("2.50000000000000");
     })
 ;
       }(g.append("g")));
@@ -4419,44 +4532,14 @@ function draw_with_data(data, parent_id) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
            .attr("x", 60.24)
-           .attr("y", -61.94)
+           .attr("y", 109.26)
            .attr("text-anchor", "end")
            .style("dominant-baseline", "central")
             .call(function(text) {
-      text.text("4.00000000000000");
+      text.text("-1.00000000000000");
     })
 ;
       }(g.append("g")));
-      g.append("svg:text")
-         .attr("x", 60.24)
-         .attr("y", 6.54)
-         .attr("text-anchor", "end")
-         .style("dominant-baseline", "central")
-         .call(function(text) {
-     text.text("2.00000000000000");
-   })
-;
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 60.24)
-           .attr("y", -44.82)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("3.50000000000000");
-    })
-;
-      }(g.append("g")));
-      g.append("svg:text")
-         .attr("x", 60.24)
-         .attr("y", 57.9)
-         .attr("text-anchor", "end")
-         .style("dominant-baseline", "central")
-         .call(function(text) {
-     text.text("0.500000000000000");
-   })
-;
       (function (g) {
         g.attr("visibility", "hidden");
         g.append("svg:text")
@@ -4466,60 +4549,6 @@ function draw_with_data(data, parent_id) {
            .style("dominant-baseline", "central")
             .call(function(text) {
       text.text("-0.500000000000000");
-    })
-;
-      }(g.append("g")));
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 60.24)
-           .attr("y", 126.38)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("-1.50000000000000");
-    })
-;
-      }(g.append("g")));
-      g.append("svg:text")
-         .attr("x", 60.24)
-         .attr("y", 23.66)
-         .attr("text-anchor", "end")
-         .style("dominant-baseline", "central")
-         .call(function(text) {
-     text.text("1.50000000000000");
-   })
-;
-      g.append("svg:text")
-         .attr("x", 60.24)
-         .attr("y", 40.78)
-         .attr("text-anchor", "end")
-         .style("dominant-baseline", "central")
-         .call(function(text) {
-     text.text("1.00000000000000");
-   })
-;
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 60.24)
-           .attr("y", -10.58)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("2.50000000000000");
-    })
-;
-      }(g.append("g")));
-      (function (g) {
-        g.attr("visibility", "hidden");
-        g.append("svg:text")
-           .attr("x", 60.24)
-           .attr("y", 75.02)
-           .attr("text-anchor", "end")
-           .style("dominant-baseline", "central")
-            .call(function(text) {
-      text.text("0");
     })
 ;
       }(g.append("g")));
@@ -4781,29 +4810,29 @@ function draw_with_data(data, parent_id) {
            .attr("stroke-width", 0.2)
            .attr("class", "guide ygridlines xfixed");
           g.append("svg:path")
-             .attr("d", "M61.24,-27.7 L 100.33 -27.7");
-          g.append("svg:path")
-             .attr("d", "M61.24,6.54 L 100.33 6.54");
-          g.append("svg:path")
-             .attr("d", "M61.24,57.9 L 100.33 57.9");
-          g.append("svg:path")
-             .attr("d", "M61.24,126.38 L 100.33 126.38");
+             .attr("d", "M61.24,75.02 L 100.33 75.02");
           g.append("svg:path")
              .attr("d", "M61.24,40.78 L 100.33 40.78");
           g.append("svg:path")
-             .attr("d", "M61.24,75.02 L 100.33 75.02");
+             .attr("d", "M61.24,126.38 L 100.33 126.38");
+          g.append("svg:path")
+             .attr("d", "M61.24,57.9 L 100.33 57.9");
+          g.append("svg:path")
+             .attr("d", "M61.24,-27.7 L 100.33 -27.7");
+          g.append("svg:path")
+             .attr("d", "M61.24,92.14 L 100.33 92.14");
+          g.append("svg:path")
+             .attr("d", "M61.24,109.26 L 100.33 109.26");
           g.append("svg:path")
              .attr("d", "M61.24,-10.58 L 100.33 -10.58");
           g.append("svg:path")
-             .attr("d", "M61.24,23.66 L 100.33 23.66");
+             .attr("d", "M61.24,6.54 L 100.33 6.54");
           g.append("svg:path")
-             .attr("d", "M61.24,92.14 L 100.33 92.14");
+             .attr("d", "M61.24,23.66 L 100.33 23.66");
           g.append("svg:path")
              .attr("d", "M61.24,-44.82 L 100.33 -44.82");
           g.append("svg:path")
              .attr("d", "M61.24,-61.94 L 100.33 -61.94");
-          g.append("svg:path")
-             .attr("d", "M61.24,109.26 L 100.33 109.26");
         }(g.append("g")));
         (function (g) {
           g.attr("stroke", "#F0F0F3")
@@ -4847,16 +4876,16 @@ function draw_with_data(data, parent_id) {
             g.attr("fill", "none")
              .attr("stroke-width", 0.3);
             (function (g) {
-              g.attr("stroke", "#00BFFF")
-               .attr("class", "geometry color_f1");
-              g.append("svg:path")
-                 .attr("d", "M74.64,50.81 L 74.74 50.78 74.83 50.75 74.93 50.71 75.03 50.68 75.13 50.65 75.23 50.61 75.33 50.58 75.43 50.54 75.53 50.51 75.62 50.47 75.72 50.43 75.82 50.39 75.92 50.35 76.02 50.31 76.12 50.27 76.22 50.23 76.31 50.18 76.41 50.14 76.51 50.1 76.61 50.05 76.71 50.01 76.81 49.96 76.91 49.91 77.01 49.86 77.1 49.81 77.2 49.76 77.3 49.71 77.4 49.66 77.5 49.61 77.6 49.56 77.7 49.5 77.8 49.45 77.89 49.39 77.99 49.34 78.09 49.28 78.19 49.22 78.29 49.16 78.39 49.1 78.49 49.04 78.59 48.98 78.68 48.92 78.78 48.86 78.88 48.8 78.98 48.73 79.08 48.67 79.18 48.6 79.28 48.53 79.38 48.47 79.47 48.4 79.57 48.33 79.67 48.26 79.77 48.19 79.87 48.12 79.97 48.05 80.07 47.98 80.17 47.9 80.26 47.83 80.36 47.75 80.46 47.68 80.56 47.6 80.66 47.52 80.76 47.44 80.86 47.37 80.96 47.29 81.05 47.2 81.15 47.12 81.25 47.04 81.35 46.96 81.45 46.87 81.55 46.79 81.65 46.7 81.75 46.62 81.84 46.53 81.94 46.44 82.04 46.35 82.14 46.26 82.24 46.17 82.34 46.08 82.44 45.99 82.53 45.89 82.63 45.8 82.73 45.7 82.83 45.61 82.93 45.51 83.03 45.41 83.13 45.31 83.23 45.21 83.32 45.11 83.42 45.01 83.52 44.91 83.62 44.8 83.72 44.7 83.82 44.6 83.92 44.49 84.02 44.38 84.11 44.27 84.21 44.16 84.31 44.06 84.41 43.94 84.51 43.83 84.61 43.72 84.71 43.61 84.81 43.49 84.9 43.38 85 43.26 85.1 43.14 85.2 43.02 85.3 42.9 85.4 42.78 85.5 42.66 85.6 42.54 85.69 42.41 85.79 42.29 85.89 42.16 85.99 42.04 86.09 41.91 86.19 41.78 86.29 41.65 86.39 41.52 86.48 41.39 86.58 41.25 86.68 41.12 86.78 40.98 86.88 40.85 86.98 40.71 87.08 40.57 87.18 40.43 87.27 40.29 87.37 40.15 87.47 40.01 87.57 39.86 87.67 39.72 87.77 39.57 87.87 39.42 87.97 39.27 88.06 39.12 88.16 38.97 88.26 38.82 88.36 38.67 88.46 38.51 88.56 38.36 88.66 38.2 88.76 38.04 88.85 37.88 88.95 37.72 89.05 37.56 89.15 37.39 89.25 37.23 89.35 37.06 89.45 36.89 89.54 36.73 89.64 36.56 89.74 36.38 89.84 36.21 89.94 36.04 90.04 35.86 90.14 35.69 90.24 35.51 90.33 35.33 90.43 35.15 90.53 34.97 90.63 34.78 90.73 34.6 90.83 34.41 90.93 34.22 91.03 34.03 91.12 33.84 91.22 33.65 91.32 33.46 91.42 33.26 91.52 33.07 91.62 32.87 91.72 32.67 91.82 32.47 91.91 32.26 92.01 32.06 92.11 31.85 92.21 31.65 92.31 31.44 92.41 31.23 92.51 31.02 92.61 30.8 92.7 30.59 92.8 30.37 92.9 30.15 93 29.93 93.1 29.71 93.2 29.49 93.3 29.26 93.4 29.03 93.49 28.8 93.59 28.57 93.69 28.34 93.79 28.11 93.89 27.87 93.99 27.63 94.09 27.4 94.19 27.15 94.28 26.91 94.38 26.67 94.48 26.42 94.58 26.17 94.68 25.92 94.78 25.67 94.88 25.42 94.98 25.16 95.07 24.9 95.17 24.64 95.27 24.38 95.37 24.12 95.47 23.85 95.57 23.58 95.67 23.31 95.77 23.04 95.86 22.77 95.96 22.49 96.06 22.21 96.16 21.93 96.26 21.65 96.36 21.37 96.46 21.08 96.55 20.79 96.65 20.5 96.75 20.21 96.85 19.91 96.95 19.62 97.05 19.32 97.15 19.01 97.25 18.71 97.34 18.4 97.44 18.09 97.54 17.78 97.64 17.47 97.74 17.15 97.84 16.83 97.94 16.51 98.04 16.19 98.13 15.87 98.23 15.54 98.33 15.21 98.43 14.87 98.53 14.54 98.63 14.2 98.73 13.86 98.83 13.52 98.92 13.17 99.02 12.82 99.12 12.47 99.22 12.12");
-            }(g.append("g")));
-            (function (g) {
               g.attr("stroke", "#D4CA3A")
                .attr("class", "geometry color_f2");
               g.append("svg:path")
                  .attr("d", "M74.64,57.9 L 74.74 57.76 74.83 57.62 74.93 57.49 75.03 57.35 75.13 57.21 75.23 57.07 75.33 56.94 75.43 56.8 75.53 56.66 75.62 56.52 75.72 56.39 75.82 56.25 75.92 56.11 76.02 55.97 76.12 55.84 76.22 55.7 76.31 55.56 76.41 55.42 76.51 55.29 76.61 55.15 76.71 55.01 76.81 54.87 76.91 54.74 77.01 54.6 77.1 54.46 77.2 54.32 77.3 54.19 77.4 54.05 77.5 53.91 77.6 53.77 77.7 53.64 77.8 53.5 77.89 53.36 77.99 53.22 78.09 53.09 78.19 52.95 78.29 52.81 78.39 52.67 78.49 52.54 78.59 52.4 78.68 52.26 78.78 52.12 78.88 51.99 78.98 51.85 79.08 51.71 79.18 51.57 79.28 51.44 79.38 51.3 79.47 51.16 79.57 51.02 79.67 50.89 79.77 50.75 79.87 50.61 79.97 50.47 80.07 50.34 80.17 50.2 80.26 50.06 80.36 49.92 80.46 49.79 80.56 49.65 80.66 49.51 80.76 49.37 80.86 49.24 80.96 49.1 81.05 48.96 81.15 48.82 81.25 48.69 81.35 48.55 81.45 48.41 81.55 48.27 81.65 48.14 81.75 48 81.84 47.86 81.94 47.72 82.04 47.59 82.14 47.45 82.24 47.31 82.34 47.17 82.44 47.04 82.53 46.9 82.63 46.76 82.73 46.62 82.83 46.49 82.93 46.35 83.03 46.21 83.13 46.07 83.23 45.94 83.32 45.8 83.42 45.66 83.52 45.52 83.62 45.39 83.72 45.25 83.82 45.11 83.92 44.97 84.02 44.84 84.11 44.7 84.21 44.56 84.31 44.42 84.41 44.29 84.51 44.15 84.61 44.01 84.71 43.87 84.81 43.74 84.9 43.6 85 43.46 85.1 43.32 85.2 43.19 85.3 43.05 85.4 42.91 85.5 42.77 85.6 42.64 85.69 42.5 85.79 42.36 85.89 42.22 85.99 42.09 86.09 41.95 86.19 41.81 86.29 41.67 86.39 41.54 86.48 41.4 86.58 41.26 86.68 41.12 86.78 40.99 86.88 40.85 86.98 40.71 87.08 40.57 87.18 40.44 87.27 40.3 87.37 40.16 87.47 40.02 87.57 39.89 87.67 39.75 87.77 39.61 87.87 39.47 87.97 39.34 88.06 39.2 88.16 39.06 88.26 38.92 88.36 38.79 88.46 38.65 88.56 38.51 88.66 38.37 88.76 38.24 88.85 38.1 88.95 37.96 89.05 37.82 89.15 37.69 89.25 37.55 89.35 37.41 89.45 37.27 89.54 37.14 89.64 37 89.74 36.86 89.84 36.72 89.94 36.59 90.04 36.45 90.14 36.31 90.24 36.17 90.33 36.04 90.43 35.9 90.53 35.76 90.63 35.62 90.73 35.49 90.83 35.35 90.93 35.21 91.03 35.07 91.12 34.94 91.22 34.8 91.32 34.66 91.42 34.52 91.52 34.39 91.62 34.25 91.72 34.11 91.82 33.97 91.91 33.84 92.01 33.7 92.11 33.56 92.21 33.42 92.31 33.29 92.41 33.15 92.51 33.01 92.61 32.87 92.7 32.74 92.8 32.6 92.9 32.46 93 32.32 93.1 32.19 93.2 32.05 93.3 31.91 93.4 31.77 93.49 31.64 93.59 31.5 93.69 31.36 93.79 31.22 93.89 31.09 93.99 30.95 94.09 30.81 94.19 30.67 94.28 30.54 94.38 30.4 94.48 30.26 94.58 30.12 94.68 29.99 94.78 29.85 94.88 29.71 94.98 29.57 95.07 29.44 95.17 29.3 95.27 29.16 95.37 29.02 95.47 28.89 95.57 28.75 95.67 28.61 95.77 28.47 95.86 28.34 95.96 28.2 96.06 28.06 96.16 27.92 96.26 27.79 96.36 27.65 96.46 27.51 96.55 27.37 96.65 27.24 96.75 27.1 96.85 26.96 96.95 26.82 97.05 26.69 97.15 26.55 97.25 26.41 97.34 26.27 97.44 26.14 97.54 26 97.64 25.86 97.74 25.72 97.84 25.59 97.94 25.45 98.04 25.31 98.13 25.17 98.23 25.04 98.33 24.9 98.43 24.76 98.53 24.62 98.63 24.49 98.73 24.35 98.83 24.21 98.92 24.07 99.02 23.94 99.12 23.8 99.22 23.66");
+            }(g.append("g")));
+            (function (g) {
+              g.attr("stroke", "#00BFFF")
+               .attr("class", "geometry color_f1");
+              g.append("svg:path")
+                 .attr("d", "M74.64,50.81 L 74.74 50.78 74.83 50.75 74.93 50.71 75.03 50.68 75.13 50.65 75.23 50.61 75.33 50.58 75.43 50.54 75.53 50.51 75.62 50.47 75.72 50.43 75.82 50.39 75.92 50.35 76.02 50.31 76.12 50.27 76.22 50.23 76.31 50.18 76.41 50.14 76.51 50.1 76.61 50.05 76.71 50.01 76.81 49.96 76.91 49.91 77.01 49.86 77.1 49.81 77.2 49.76 77.3 49.71 77.4 49.66 77.5 49.61 77.6 49.56 77.7 49.5 77.8 49.45 77.89 49.39 77.99 49.34 78.09 49.28 78.19 49.22 78.29 49.16 78.39 49.1 78.49 49.04 78.59 48.98 78.68 48.92 78.78 48.86 78.88 48.8 78.98 48.73 79.08 48.67 79.18 48.6 79.28 48.53 79.38 48.47 79.47 48.4 79.57 48.33 79.67 48.26 79.77 48.19 79.87 48.12 79.97 48.05 80.07 47.98 80.17 47.9 80.26 47.83 80.36 47.75 80.46 47.68 80.56 47.6 80.66 47.52 80.76 47.44 80.86 47.37 80.96 47.29 81.05 47.2 81.15 47.12 81.25 47.04 81.35 46.96 81.45 46.87 81.55 46.79 81.65 46.7 81.75 46.62 81.84 46.53 81.94 46.44 82.04 46.35 82.14 46.26 82.24 46.17 82.34 46.08 82.44 45.99 82.53 45.89 82.63 45.8 82.73 45.7 82.83 45.61 82.93 45.51 83.03 45.41 83.13 45.31 83.23 45.21 83.32 45.11 83.42 45.01 83.52 44.91 83.62 44.8 83.72 44.7 83.82 44.6 83.92 44.49 84.02 44.38 84.11 44.27 84.21 44.16 84.31 44.06 84.41 43.94 84.51 43.83 84.61 43.72 84.71 43.61 84.81 43.49 84.9 43.38 85 43.26 85.1 43.14 85.2 43.02 85.3 42.9 85.4 42.78 85.5 42.66 85.6 42.54 85.69 42.41 85.79 42.29 85.89 42.16 85.99 42.04 86.09 41.91 86.19 41.78 86.29 41.65 86.39 41.52 86.48 41.39 86.58 41.25 86.68 41.12 86.78 40.98 86.88 40.85 86.98 40.71 87.08 40.57 87.18 40.43 87.27 40.29 87.37 40.15 87.47 40.01 87.57 39.86 87.67 39.72 87.77 39.57 87.87 39.42 87.97 39.27 88.06 39.12 88.16 38.97 88.26 38.82 88.36 38.67 88.46 38.51 88.56 38.36 88.66 38.2 88.76 38.04 88.85 37.88 88.95 37.72 89.05 37.56 89.15 37.39 89.25 37.23 89.35 37.06 89.45 36.89 89.54 36.73 89.64 36.56 89.74 36.38 89.84 36.21 89.94 36.04 90.04 35.86 90.14 35.69 90.24 35.51 90.33 35.33 90.43 35.15 90.53 34.97 90.63 34.78 90.73 34.6 90.83 34.41 90.93 34.22 91.03 34.03 91.12 33.84 91.22 33.65 91.32 33.46 91.42 33.26 91.52 33.07 91.62 32.87 91.72 32.67 91.82 32.47 91.91 32.26 92.01 32.06 92.11 31.85 92.21 31.65 92.31 31.44 92.41 31.23 92.51 31.02 92.61 30.8 92.7 30.59 92.8 30.37 92.9 30.15 93 29.93 93.1 29.71 93.2 29.49 93.3 29.26 93.4 29.03 93.49 28.8 93.59 28.57 93.69 28.34 93.79 28.11 93.89 27.87 93.99 27.63 94.09 27.4 94.19 27.15 94.28 26.91 94.38 26.67 94.48 26.42 94.58 26.17 94.68 25.92 94.78 25.67 94.88 25.42 94.98 25.16 95.07 24.9 95.17 24.64 95.27 24.38 95.37 24.12 95.47 23.85 95.57 23.58 95.67 23.31 95.77 23.04 95.86 22.77 95.96 22.49 96.06 22.21 96.16 21.93 96.26 21.65 96.36 21.37 96.46 21.08 96.55 20.79 96.65 20.5 96.75 20.21 96.85 19.91 96.95 19.62 97.05 19.32 97.15 19.01 97.25 18.71 97.34 18.4 97.44 18.09 97.54 17.78 97.64 17.47 97.74 17.15 97.84 16.83 97.94 16.51 98.04 16.19 98.13 15.87 98.23 15.54 98.33 15.21 98.43 14.87 98.53 14.54 98.63 14.2 98.73 13.86 98.83 13.52 98.92 13.17 99.02 12.82 99.12 12.47 99.22 12.12");
             }(g.append("g")));
           }(g.append("g")));
         }(g.append("g")));
@@ -5182,13 +5211,16 @@ log⎝x  + 1⎠
 <pre class="sourceCode julia"><code class="sourceCode julia">f(x) = <span class="fl">4</span>x^<span class="fl">3</span>
 b = Sym(<span class="st">&quot;b&quot;</span>)
 eq = integrate(f(x), (x,  <span class="fl">0</span>, b)) - <span class="fl">1</span>/<span class="fl">2</span> * integrate(f(x), (x, <span class="fl">0</span>, <span class="fl">1</span>))
-solve(eq, b)</code></pre>
-<pre class="output"><code>4-element Array{Sym,1}:
- -0.840896415253715  
- 0.840896415253715   
- -0.840896415253715⋅ⅈ
- 0.840896415253715⋅ⅈ </code></pre>
-<p>We can see that the answer is <span class="math">\(0.840896415253715\)</span>, though the mathematical expression has 3 other possibilities for solution.</p>
+xs = real_roots(eq, b)
+<span class="co">#</span>
+ispositive(x) = x &gt; <span class="fl">0</span>
+filter(ispositive, xs)</code></pre>
+<pre class="output"><code>1-element Array{Sym,1}:
+  3/4
+2   
+────
+ 2  </code></pre>
+<p>The equation <code>eq</code> is a 4th degree polynomial. It has two real and two complex roots. We used <code>real_roots</code> to get the two real ones, and then filtered for the positive one.</p>
 <h3 id="practice-4">Practice</h3>
 <h4 id="question-14">Question</h4>
 <p>Integrate <span class="math">\(f(x) = 2/(x \cdot \log(x))\)</span>. What do you get:</p>
@@ -5322,18 +5354,771 @@ Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
 <h3 id="tangent-lines-and-parabolas">tangent lines and parabolas</h3>
 <p>An interesting fact about parabolas: any two different tangent lines will intersect at the midvalue.</p>
 <p>That is the tangent line at <span class="math">\(a\)</span> and that at <span class="math">\(b\)</span> will intersect at <span class="math">\((a+b)/2\)</span>.</p>
+<p>A graph might be illuminating:</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">f(x) = x^<span class="fl">2</span>          <span class="co"># simplest parabola</span>
+a,b = -<span class="fl">3</span>, <span class="fl">1</span>
+tl(c) = x -&gt; f(c) + <span class="fl">2</span>*c*(x-c)
+plot([f, tl(a), tl(b)], a, b)</code></pre>
+<div id="gadflyplot-iuuhRjzqSIu9XLKw1sbC"></div>
+<script>
+(function (module) {
+function draw_with_data(data, parent_id) {
+  var g = d3.select(parent_id)
+            .append("svg")
+              .attr("width", "120mm")
+              .attr("height", "80mm")
+              .attr("viewBox", "0 0 120 80")
+              .attr("stroke-width", "0.5")
+              .attr("style", "stroke:black;fill:black");
+  g.append("defs");
+  var ctx = {
+      "scale": 1.0,
+      "tx": 0.0,
+      "ty": 0.0
+  };
+(function (g) {
+  g.attr("stroke", "none")
+   .attr("fill", "#000000")
+   .attr("stroke-width", 0.3)
+   .attr("font-family", "Helvetic,Arial,sans")
+   .style("font-size", "3.88px");
+  (function (g) {
+    g.attr("class", "plotroot xscalable yscalable");
+    (function (g) {
+      g.attr("stroke", "none")
+       .attr("fill", "#4C404B")
+       .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+       .style("font-size", "3.18px")
+       .attr("class", "guide ylabels");
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 21.09)
+           .attr("y", -34.55)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("30");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 21.09)
+           .attr("y", -3.73)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("15");
+    })
+;
+      }(g.append("g")));
+      g.append("svg:text")
+         .attr("x", 21.09)
+         .attr("y", 57.9)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("-15");
+   })
+;
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 21.09)
+           .attr("y", 119.53)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-45");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 21.09)
+           .attr("y", -14)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("20");
+    })
+;
+      }(g.append("g")));
+      g.append("svg:text")
+         .attr("x", 21.09)
+         .attr("y", 16.81)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("5");
+   })
+;
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 21.09)
+           .attr("y", 98.99)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-35");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 21.09)
+           .attr("y", 78.44)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-25");
+    })
+;
+      }(g.append("g")));
+      g.append("svg:text")
+         .attr("x", 21.09)
+         .attr("y", 37.36)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("-5");
+   })
+;
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 21.09)
+           .attr("y", 68.17)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-20");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 21.09)
+           .attr("y", -44.82)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("35");
+    })
+;
+      }(g.append("g")));
+      g.append("svg:text")
+         .attr("x", 21.09)
+         .attr("y", 6.54)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("10");
+   })
+;
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 21.09)
+           .attr("y", -24.27)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("25");
+    })
+;
+      }(g.append("g")));
+      g.append("svg:text")
+         .attr("x", 21.09)
+         .attr("y", 27.08)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("0");
+   })
+;
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 21.09)
+           .attr("y", 109.26)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-40");
+    })
+;
+      }(g.append("g")));
+      g.append("svg:text")
+         .attr("x", 21.09)
+         .attr("y", 47.63)
+         .attr("text-anchor", "end")
+         .style("dominant-baseline", "central")
+         .call(function(text) {
+     text.text("-10");
+   })
+;
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 21.09)
+           .attr("y", -55.09)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("40");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 21.09)
+           .attr("y", 88.71)
+           .attr("text-anchor", "end")
+           .style("dominant-baseline", "central")
+            .call(function(text) {
+      text.text("-30");
+    })
+;
+      }(g.append("g")));
+    }(g.append("g")));
+    (function (g) {
+      g.attr("stroke", "none")
+       .attr("fill", "#362A35")
+       .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+       .style("font-size", "3.88px");
+      g.append("svg:text")
+         .attr("x", 8.63)
+         .attr("y", 32.22)
+         .attr("text-anchor", "middle")
+         .style("dominant-baseline", "central")
+         .attr("transform", "rotate(-90, 8.63, 32.22)")
+         .call(function(text) {
+     text.text("f(x)");
+   })
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("stroke", "none")
+       .attr("fill", "#4C404B")
+       .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+       .style("font-size", "3.18px")
+       .attr("class", "guide xlabels");
+      g.append("svg:text")
+         .attr("x", 98.11)
+         .attr("y", 64.74)
+         .attr("text-anchor", "middle")
+         .call(function(text) {
+     text.text("1");
+   })
+;
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 5.85)
+           .attr("y", 64.74)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("-4");
+    })
+;
+      }(g.append("g")));
+      g.append("svg:text")
+         .attr("x", 42.75)
+         .attr("y", 64.74)
+         .attr("text-anchor", "middle")
+         .call(function(text) {
+     text.text("-2");
+   })
+;
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 171.92)
+           .attr("y", 64.74)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("5");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 135.02)
+           .attr("y", 64.74)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("3");
+    })
+;
+      }(g.append("g")));
+      g.append("svg:text")
+         .attr("x", 61.21)
+         .attr("y", 64.74)
+         .attr("text-anchor", "middle")
+         .call(function(text) {
+     text.text("-1");
+   })
+;
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 153.47)
+           .attr("y", 64.74)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("4");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 190.38)
+           .attr("y", 64.74)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("6");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", -12.6)
+           .attr("y", 64.74)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("-5");
+    })
+;
+      }(g.append("g")));
+      g.append("svg:text")
+         .attr("x", 24.3)
+         .attr("y", 64.74)
+         .attr("text-anchor", "middle")
+         .call(function(text) {
+     text.text("-3");
+   })
+;
+      g.append("svg:text")
+         .attr("x", 79.66)
+         .attr("y", 64.74)
+         .attr("text-anchor", "middle")
+         .call(function(text) {
+     text.text("0");
+   })
+;
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", -49.51)
+           .attr("y", 64.74)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("-7");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", 116.57)
+           .attr("y", 64.74)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("2");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", -67.96)
+           .attr("y", 64.74)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("-8");
+    })
+;
+      }(g.append("g")));
+      (function (g) {
+        g.attr("visibility", "hidden");
+        g.append("svg:text")
+           .attr("x", -31.06)
+           .attr("y", 64.74)
+           .attr("text-anchor", "middle")
+            .call(function(text) {
+      text.text("-6");
+    })
+;
+      }(g.append("g")));
+    }(g.append("g")));
+    (function (g) {
+      g.attr("stroke", "none")
+       .attr("fill", "#362A35")
+       .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+       .style("font-size", "3.88px");
+      g.append("svg:text")
+         .attr("x", 61.21)
+         .attr("y", 73)
+         .attr("text-anchor", "middle")
+         .call(function(text) {
+     text.text("x");
+   })
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("stroke", "none")
+       .attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+       .style("font-size", "3.88px")
+       .attr("fill", "#362A35");
+      g.append("svg:text")
+         .attr("x", 109.66)
+         .attr("y", 24.67)
+         .attr("text-anchor", "middle")
+         .call(function(text) {
+     text.text("f");
+   })
+;
+    }(g.append("g")));
+    (function (g) {
+      g.attr("font-family", "'PT Sans','Helvetica Neue','Helvetica',sans-serif")
+       .style("font-size", "3.18px");
+      (function (g) {
+        g.attr("class", "guide color_f2")
+         .on("click", guide_toggle_color("color_f2"));
+        (function (g) {
+          g.attr("fill", "#D4CA3A")
+           .attr("stroke", "#A8A200")
+           .attr("stroke-width", 0.3);
+          g.append("svg:path")
+             .attr("d", "M102.33,34.12 L 108.78 34.12 108.78 40.58 102.33 40.58 z");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("stroke", "none")
+           .attr("fill", "#4C404B");
+          g.append("svg:text")
+             .attr("x", 109.78)
+             .attr("y", 37.35)
+             .style("dominant-baseline", "central")
+               .call(function(text) {
+       text.append("tspan").text("f")
+           .append("tspan")
+             .attr("dy", "1ex")
+           .call(function(text) {
+             text.text("2");
+           })
+.append("tspan").attr("font-style", "normal")           ;
+     })
+;
+        }(g.append("g")));
+      }(g.append("g")));
+      (function (g) {
+        g.attr("class", "guide color_f1")
+         .on("click", guide_toggle_color("color_f1"));
+        (function (g) {
+          g.attr("fill", "#00BFFF")
+           .attr("stroke", "#0096DD")
+           .attr("stroke-width", 0.3);
+          g.append("svg:path")
+             .attr("d", "M102.33,26.67 L 108.78 26.67 108.78 33.12 102.33 33.12 z");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("stroke", "none")
+           .attr("fill", "#4C404B");
+          g.append("svg:text")
+             .attr("x", 109.78)
+             .attr("y", 29.9)
+             .style("dominant-baseline", "central")
+               .call(function(text) {
+       text.append("tspan").text("f")
+           .append("tspan")
+             .attr("dy", "1ex")
+           .call(function(text) {
+             text.text("1");
+           })
+.append("tspan").attr("font-style", "normal")           ;
+     })
+;
+        }(g.append("g")));
+      }(g.append("g")));
+      (function (g) {
+        g.attr("class", "guide color_f3")
+         .on("click", guide_toggle_color("color_f3"));
+        (function (g) {
+          g.attr("fill", "#FF5EA0")
+           .attr("stroke", "#DC2C7A")
+           .attr("stroke-width", 0.3);
+          g.append("svg:path")
+             .attr("d", "M102.33,41.58 L 108.78 41.58 108.78 48.03 102.33 48.03 z");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("stroke", "none")
+           .attr("fill", "#4C404B");
+          g.append("svg:text")
+             .attr("x", 109.78)
+             .attr("y", 44.8)
+             .style("dominant-baseline", "central")
+               .call(function(text) {
+       text.append("tspan").text("f")
+           .append("tspan")
+             .attr("dy", "1ex")
+           .call(function(text) {
+             text.text("3");
+           })
+.append("tspan").attr("font-style", "normal")           ;
+     })
+;
+        }(g.append("g")));
+      }(g.append("g")));
+    }(g.append("g")));
+    (function (g) {
+      g.on("mouseover", guide_background_mouseover("#C6C6C9"))
+       .on("mouseout", guide_background_mouseout("#F0F0F3"))
+       .call(zoom_behavior(ctx))
+;
+      (function (g) {
+        d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath0")
+    .append("svg:path")
+      .attr("d", " M22.09,5 L 100.33 5 100.33 59.44 22.09 59.44 z");g.attr("clip-path", "url(#" + parent_id + "_clippath0)");
+        (function (g) {
+          g.attr("class", "guide background")
+           .attr("stroke", "#F1F1F5")
+           .attr("fill", "#FAFAFA")
+           .attr("opacity", 1.00);
+          g.append("svg:path")
+             .attr("d", "M22.09,5 L 100.33 5 100.33 59.44 22.09 59.44 z");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("stroke", "#F0F0F3")
+           .attr("stroke-width", 0.2)
+           .attr("class", "guide ygridlines xfixed");
+          g.append("svg:path")
+             .attr("d", "M22.09,-3.73 L 100.33 -3.73");
+          g.append("svg:path")
+             .attr("d", "M22.09,119.53 L 100.33 119.53");
+          g.append("svg:path")
+             .attr("d", "M22.09,16.81 L 100.33 16.81");
+          g.append("svg:path")
+             .attr("d", "M22.09,78.44 L 100.33 78.44");
+          g.append("svg:path")
+             .attr("d", "M22.09,68.17 L 100.33 68.17");
+          g.append("svg:path")
+             .attr("d", "M22.09,6.54 L 100.33 6.54");
+          g.append("svg:path")
+             .attr("d", "M22.09,27.08 L 100.33 27.08");
+          g.append("svg:path")
+             .attr("d", "M22.09,47.63 L 100.33 47.63");
+          g.append("svg:path")
+             .attr("d", "M22.09,88.71 L 100.33 88.71");
+          g.append("svg:path")
+             .attr("d", "M22.09,-55.09 L 100.33 -55.09");
+          g.append("svg:path")
+             .attr("d", "M22.09,109.26 L 100.33 109.26");
+          g.append("svg:path")
+             .attr("d", "M22.09,-24.27 L 100.33 -24.27");
+          g.append("svg:path")
+             .attr("d", "M22.09,-44.82 L 100.33 -44.82");
+          g.append("svg:path")
+             .attr("d", "M22.09,37.36 L 100.33 37.36");
+          g.append("svg:path")
+             .attr("d", "M22.09,98.99 L 100.33 98.99");
+          g.append("svg:path")
+             .attr("d", "M22.09,-14 L 100.33 -14");
+          g.append("svg:path")
+             .attr("d", "M22.09,57.9 L 100.33 57.9");
+          g.append("svg:path")
+             .attr("d", "M22.09,-34.55 L 100.33 -34.55");
+        }(g.append("g")));
+        (function (g) {
+          g.attr("stroke", "#F0F0F3")
+           .attr("stroke-width", 0.2)
+           .attr("class", "guide xgridlines yfixed");
+          g.append("svg:path")
+             .attr("d", "M5.85,5 L 5.85 59.44");
+          g.append("svg:path")
+             .attr("d", "M171.92,5 L 171.92 59.44");
+          g.append("svg:path")
+             .attr("d", "M61.21,5 L 61.21 59.44");
+          g.append("svg:path")
+             .attr("d", "M190.38,5 L 190.38 59.44");
+          g.append("svg:path")
+             .attr("d", "M24.3,5 L 24.3 59.44");
+          g.append("svg:path")
+             .attr("d", "M-49.51,5 L -49.51 59.44");
+          g.append("svg:path")
+             .attr("d", "M-67.96,5 L -67.96 59.44");
+          g.append("svg:path")
+             .attr("d", "M-31.06,5 L -31.06 59.44");
+          g.append("svg:path")
+             .attr("d", "M116.57,5 L 116.57 59.44");
+          g.append("svg:path")
+             .attr("d", "M79.66,5 L 79.66 59.44");
+          g.append("svg:path")
+             .attr("d", "M-12.6,5 L -12.6 59.44");
+          g.append("svg:path")
+             .attr("d", "M153.47,5 L 153.47 59.44");
+          g.append("svg:path")
+             .attr("d", "M135.02,5 L 135.02 59.44");
+          g.append("svg:path")
+             .attr("d", "M42.75,5 L 42.75 59.44");
+          g.append("svg:path")
+             .attr("d", "M98.11,5 L 98.11 59.44");
+        }(g.append("g")));
+      }(g.append("g")));
+      (function (g) {
+        d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath1")
+    .append("svg:path")
+      .attr("d", " M22.09,5 L 100.33 5 100.33 59.44 22.09 59.44 z");g.attr("clip-path", "url(#" + parent_id + "_clippath1)");
+        (function (g) {
+          g.attr("class", "plotpanel");
+          (function (g) {
+            g.attr("fill", "none")
+             .attr("stroke-width", 0.3);
+            (function (g) {
+              g.attr("stroke", "#FF5EA0")
+               .attr("class", "geometry color_f3");
+              g.append("svg:path")
+                 .attr("d", "M24.3,41.46 L 24.6 41.4 24.9 41.33 25.19 41.27 25.49 41.2 25.78 41.13 26.08 41.07 26.38 41 26.67 40.94 26.97 40.87 27.27 40.8 27.56 40.74 27.86 40.67 28.16 40.61 28.45 40.54 28.75 40.47 29.05 40.41 29.34 40.34 29.64 40.28 29.93 40.21 30.23 40.14 30.53 40.08 30.82 40.01 31.12 39.95 31.42 39.88 31.71 39.81 32.01 39.75 32.31 39.68 32.6 39.62 32.9 39.55 33.2 39.48 33.49 39.42 33.79 39.35 34.08 39.29 34.38 39.22 34.68 39.15 34.97 39.09 35.27 39.02 35.57 38.96 35.86 38.89 36.16 38.82 36.46 38.76 36.75 38.69 37.05 38.63 37.35 38.56 37.64 38.49 37.94 38.43 38.23 38.36 38.53 38.3 38.83 38.23 39.12 38.16 39.42 38.1 39.72 38.03 40.01 37.97 40.31 37.9 40.61 37.83 40.9 37.77 41.2 37.7 41.5 37.64 41.79 37.57 42.09 37.5 42.38 37.44 42.68 37.37 42.98 37.31 43.27 37.24 43.57 37.17 43.87 37.11 44.16 37.04 44.46 36.98 44.76 36.91 45.05 36.84 45.35 36.78 45.65 36.71 45.94 36.65 46.24 36.58 46.53 36.51 46.83 36.45 47.13 36.38 47.42 36.32 47.72 36.25 48.02 36.18 48.31 36.12 48.61 36.05 48.91 35.99 49.2 35.92 49.5 35.85 49.8 35.79 50.09 35.72 50.39 35.66 50.68 35.59 50.98 35.52 51.28 35.46 51.57 35.39 51.87 35.33 52.17 35.26 52.46 35.19 52.76 35.13 53.06 35.06 53.35 35 53.65 34.93 53.95 34.86 54.24 34.8 54.54 34.73 54.83 34.67 55.13 34.6 55.43 34.53 55.72 34.47 56.02 34.4 56.32 34.34 56.61 34.27 56.91 34.2 57.21 34.14 57.5 34.07 57.8 34.01 58.1 33.94 58.39 33.87 58.69 33.81 58.98 33.74 59.28 33.68 59.58 33.61 59.87 33.54 60.17 33.48 60.47 33.41 60.76 33.35 61.06 33.28 61.36 33.21 61.65 33.15 61.95 33.08 62.24 33.02 62.54 32.95 62.84 32.88 63.13 32.82 63.43 32.75 63.73 32.69 64.02 32.62 64.32 32.55 64.62 32.49 64.91 32.42 65.21 32.36 65.51 32.29 65.8 32.22 66.1 32.16 66.39 32.09 66.69 32.03 66.99 31.96 67.28 31.89 67.58 31.83 67.88 31.76 68.17 31.7 68.47 31.63 68.77 31.56 69.06 31.5 69.36 31.43 69.66 31.37 69.95 31.3 70.25 31.23 70.54 31.17 70.84 31.1 71.14 31.04 71.43 30.97 71.73 30.9 72.03 30.84 72.32 30.77 72.62 30.71 72.92 30.64 73.21 30.57 73.51 30.51 73.81 30.44 74.1 30.38 74.4 30.31 74.69 30.24 74.99 30.18 75.29 30.11 75.58 30.05 75.88 29.98 76.18 29.91 76.47 29.85 76.77 29.78 77.07 29.72 77.36 29.65 77.66 29.58 77.96 29.52 78.25 29.45 78.55 29.39 78.84 29.32 79.14 29.25 79.44 29.19 79.73 29.12 80.03 29.06 80.33 28.99 80.62 28.92 80.92 28.86 81.22 28.79 81.51 28.73 81.81 28.66 82.11 28.59 82.4 28.53 82.7 28.46 82.99 28.4 83.29 28.33 83.59 28.26 83.88 28.2 84.18 28.13 84.48 28.07 84.77 28 85.07 27.93 85.37 27.87 85.66 27.8 85.96 27.74 86.26 27.67 86.55 27.6 86.85 27.54 87.14 27.47 87.44 27.41 87.74 27.34 88.03 27.27 88.33 27.21 88.63 27.14 88.92 27.08 89.22 27.01 89.52 26.94 89.81 26.88 90.11 26.81 90.41 26.75 90.7 26.68 91 26.61 91.29 26.55 91.59 26.48 91.89 26.42 92.18 26.35 92.48 26.28 92.78 26.22 93.07 26.15 93.37 26.09 93.67 26.02 93.96 25.95 94.26 25.89 94.56 25.82 94.85 25.76 95.15 25.69 95.44 25.62 95.74 25.56 96.04 25.49 96.33 25.43 96.63 25.36 96.93 25.29 97.22 25.23 97.52 25.16 97.82 25.1 98.11 25.03");
+            }(g.append("g")));
+            (function (g) {
+              g.attr("stroke", "#D4CA3A")
+               .attr("class", "geometry color_f2");
+              g.append("svg:path")
+                 .attr("d", "M24.3,8.6 L 24.6 8.79 24.9 8.99 25.19 9.19 25.49 9.39 25.78 9.59 26.08 9.78 26.38 9.98 26.67 10.18 26.97 10.38 27.27 10.58 27.56 10.77 27.86 10.97 28.16 11.17 28.45 11.37 28.75 11.57 29.05 11.76 29.34 11.96 29.64 12.16 29.93 12.36 30.23 12.56 30.53 12.75 30.82 12.95 31.12 13.15 31.42 13.35 31.71 13.55 32.01 13.74 32.31 13.94 32.6 14.14 32.9 14.34 33.2 14.54 33.49 14.73 33.79 14.93 34.08 15.13 34.38 15.33 34.68 15.53 34.97 15.72 35.27 15.92 35.57 16.12 35.86 16.32 36.16 16.52 36.46 16.71 36.75 16.91 37.05 17.11 37.35 17.31 37.64 17.51 37.94 17.7 38.23 17.9 38.53 18.1 38.83 18.3 39.12 18.5 39.42 18.69 39.72 18.89 40.01 19.09 40.31 19.29 40.61 19.49 40.9 19.68 41.2 19.88 41.5 20.08 41.79 20.28 42.09 20.48 42.38 20.67 42.68 20.87 42.98 21.07 43.27 21.27 43.57 21.47 43.87 21.66 44.16 21.86 44.46 22.06 44.76 22.26 45.05 22.46 45.35 22.65 45.65 22.85 45.94 23.05 46.24 23.25 46.53 23.45 46.83 23.64 47.13 23.84 47.42 24.04 47.72 24.24 48.02 24.44 48.31 24.63 48.61 24.83 48.91 25.03 49.2 25.23 49.5 25.43 49.8 25.62 50.09 25.82 50.39 26.02 50.68 26.22 50.98 26.42 51.28 26.61 51.57 26.81 51.87 27.01 52.17 27.21 52.46 27.41 52.76 27.6 53.06 27.8 53.35 28 53.65 28.2 53.95 28.4 54.24 28.59 54.54 28.79 54.83 28.99 55.13 29.19 55.43 29.39 55.72 29.58 56.02 29.78 56.32 29.98 56.61 30.18 56.91 30.38 57.21 30.57 57.5 30.77 57.8 30.97 58.1 31.17 58.39 31.37 58.69 31.56 58.98 31.76 59.28 31.96 59.58 32.16 59.87 32.36 60.17 32.55 60.47 32.75 60.76 32.95 61.06 33.15 61.36 33.35 61.65 33.54 61.95 33.74 62.24 33.94 62.54 34.14 62.84 34.34 63.13 34.53 63.43 34.73 63.73 34.93 64.02 35.13 64.32 35.33 64.62 35.52 64.91 35.72 65.21 35.92 65.51 36.12 65.8 36.32 66.1 36.51 66.39 36.71 66.69 36.91 66.99 37.11 67.28 37.31 67.58 37.5 67.88 37.7 68.17 37.9 68.47 38.1 68.77 38.3 69.06 38.49 69.36 38.69 69.66 38.89 69.95 39.09 70.25 39.29 70.54 39.48 70.84 39.68 71.14 39.88 71.43 40.08 71.73 40.28 72.03 40.47 72.32 40.67 72.62 40.87 72.92 41.07 73.21 41.27 73.51 41.46 73.81 41.66 74.1 41.86 74.4 42.06 74.69 42.26 74.99 42.45 75.29 42.65 75.58 42.85 75.88 43.05 76.18 43.25 76.47 43.44 76.77 43.64 77.07 43.84 77.36 44.04 77.66 44.24 77.96 44.43 78.25 44.63 78.55 44.83 78.84 45.03 79.14 45.23 79.44 45.42 79.73 45.62 80.03 45.82 80.33 46.02 80.62 46.22 80.92 46.41 81.22 46.61 81.51 46.81 81.81 47.01 82.11 47.21 82.4 47.4 82.7 47.6 82.99 47.8 83.29 48 83.59 48.2 83.88 48.39 84.18 48.59 84.48 48.79 84.77 48.99 85.07 49.19 85.37 49.38 85.66 49.58 85.96 49.78 86.26 49.98 86.55 50.18 86.85 50.37 87.14 50.57 87.44 50.77 87.74 50.97 88.03 51.17 88.33 51.36 88.63 51.56 88.92 51.76 89.22 51.96 89.52 52.16 89.81 52.36 90.11 52.55 90.41 52.75 90.7 52.95 91 53.15 91.29 53.35 91.59 53.54 91.89 53.74 92.18 53.94 92.48 54.14 92.78 54.34 93.07 54.53 93.37 54.73 93.67 54.93 93.96 55.13 94.26 55.33 94.56 55.52 94.85 55.72 95.15 55.92 95.44 56.12 95.74 56.32 96.04 56.51 96.33 56.71 96.63 56.91 96.93 57.11 97.22 57.31 97.52 57.5 97.82 57.7 98.11 57.9");
+            }(g.append("g")));
+            (function (g) {
+              g.attr("stroke", "#00BFFF")
+               .attr("class", "geometry color_f1");
+              g.append("svg:path")
+                 .attr("d", "M24.3,8.6 L 24.6 8.79 24.9 8.99 25.19 9.18 25.49 9.38 25.78 9.57 26.08 9.76 26.38 9.96 26.67 10.15 26.97 10.33 27.27 10.52 27.56 10.71 27.86 10.89 28.16 11.08 28.45 11.26 28.75 11.45 29.05 11.63 29.34 11.81 29.64 11.99 29.93 12.17 30.23 12.34 30.53 12.52 30.82 12.69 31.12 12.87 31.42 13.04 31.71 13.21 32.01 13.38 32.31 13.55 32.6 13.72 32.9 13.89 33.2 14.06 33.49 14.22 33.79 14.39 34.08 14.55 34.38 14.71 34.68 14.88 34.97 15.04 35.27 15.2 35.57 15.35 35.86 15.51 36.16 15.67 36.46 15.82 36.75 15.98 37.05 16.13 37.35 16.28 37.64 16.43 37.94 16.58 38.23 16.73 38.53 16.88 38.83 17.02 39.12 17.17 39.42 17.31 39.72 17.46 40.01 17.6 40.31 17.74 40.61 17.88 40.9 18.02 41.2 18.16 41.5 18.3 41.79 18.43 42.09 18.57 42.38 18.7 42.68 18.83 42.98 18.97 43.27 19.1 43.57 19.23 43.87 19.35 44.16 19.48 44.46 19.61 44.76 19.73 45.05 19.86 45.35 19.98 45.65 20.1 45.94 20.22 46.24 20.34 46.53 20.46 46.83 20.58 47.13 20.7 47.42 20.81 47.72 20.93 48.02 21.04 48.31 21.16 48.61 21.27 48.91 21.38 49.2 21.49 49.5 21.6 49.8 21.7 50.09 21.81 50.39 21.91 50.68 22.02 50.98 22.12 51.28 22.22 51.57 22.32 51.87 22.42 52.17 22.52 52.46 22.62 52.76 22.72 53.06 22.81 53.35 22.91 53.65 23 53.95 23.09 54.24 23.19 54.54 23.28 54.83 23.37 55.13 23.45 55.43 23.54 55.72 23.63 56.02 23.71 56.32 23.8 56.61 23.88 56.91 23.96 57.21 24.04 57.5 24.12 57.8 24.2 58.1 24.28 58.39 24.35 58.69 24.43 58.98 24.5 59.28 24.58 59.58 24.65 59.87 24.72 60.17 24.79 60.47 24.86 60.76 24.93 61.06 25 61.36 25.06 61.65 25.13 61.95 25.19 62.24 25.25 62.54 25.32 62.84 25.38 63.13 25.44 63.43 25.5 63.73 25.55 64.02 25.61 64.32 25.66 64.62 25.72 64.91 25.77 65.21 25.82 65.51 25.88 65.8 25.93 66.1 25.97 66.39 26.02 66.69 26.07 66.99 26.12 67.28 26.16 67.58 26.2 67.88 26.25 68.17 26.29 68.47 26.33 68.77 26.37 69.06 26.41 69.36 26.44 69.66 26.48 69.95 26.52 70.25 26.55 70.54 26.58 70.84 26.61 71.14 26.65 71.43 26.68 71.73 26.7 72.03 26.73 72.32 26.76 72.62 26.79 72.92 26.81 73.21 26.83 73.51 26.86 73.81 26.88 74.1 26.9 74.4 26.92 74.69 26.94 74.99 26.95 75.29 26.97 75.58 26.98 75.88 27 76.18 27.01 76.47 27.02 76.77 27.03 77.07 27.04 77.36 27.05 77.66 27.06 77.96 27.07 78.25 27.07 78.55 27.08 78.84 27.08 79.14 27.08 79.44 27.08 79.73 27.08 80.03 27.08 80.33 27.08 80.62 27.08 80.92 27.07 81.22 27.07 81.51 27.06 81.81 27.06 82.11 27.05 82.4 27.04 82.7 27.03 82.99 27.02 83.29 27 83.59 26.99 83.88 26.98 84.18 26.96 84.48 26.94 84.77 26.93 85.07 26.91 85.37 26.89 85.66 26.87 85.96 26.84 86.26 26.82 86.55 26.8 86.85 26.77 87.14 26.75 87.44 26.72 87.74 26.69 88.03 26.66 88.33 26.63 88.63 26.6 88.92 26.57 89.22 26.53 89.52 26.5 89.81 26.46 90.11 26.43 90.41 26.39 90.7 26.35 91 26.31 91.29 26.27 91.59 26.23 91.89 26.18 92.18 26.14 92.48 26.09 92.78 26.05 93.07 26 93.37 25.95 93.67 25.9 93.96 25.85 94.26 25.8 94.56 25.75 94.85 25.69 95.15 25.64 95.44 25.58 95.74 25.52 96.04 25.47 96.33 25.41 96.63 25.35 96.93 25.29 97.22 25.22 97.52 25.16 97.82 25.1 98.11 25.03");
+            }(g.append("g")));
+          }(g.append("g")));
+        }(g.append("g")));
+      }(g.append("g")));
+      (function (g) {
+        d3.select("defs")
+  .append("svg:clipPath")
+    .attr("id", parent_id + "_clippath2")
+    .append("svg:path")
+      .attr("d", " M22.09,5 L 100.33 5 100.33 59.44 22.09 59.44 z");g.attr("clip-path", "url(#" + parent_id + "_clippath2)");
+        (function (g) {
+          g.attr("stroke", "none")
+           .attr("class", "guide zoomslider")
+           .attr("opacity", 0.00);
+          (function (g) {
+            g.attr("stroke", "#6A6A6A")
+             .attr("stroke-opacity", 0.00)
+             .attr("stroke-width", 0.3)
+             .attr("fill", "#EAEAEA")
+             .on("click", zoomin_behavior(ctx))
+.on("dblclick", function() { d3.event.stopPropagation(); })
+.on("mouseover", zoomslider_button_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_button_mouseover("#6a6a6a"))
+;
+            g.append("svg:path")
+               .attr("d", "M93.33,8 L 97.33 8 97.33 12 93.33 12 z");
+            (function (g) {
+              g.attr("fill", "#6A6A6A")
+               .attr("class", "button_logo");
+              g.append("svg:path")
+                 .attr("d", "M94.13,9.6 L 94.93 9.6 94.93 8.8 95.73 8.8 95.73 9.6 96.53 9.6 96.53 10.4 95.73 10.4 95.73 11.2 94.93 11.2 94.93 10.4 94.13 10.4 z");
+            }(g.append("g")));
+          }(g.append("g")));
+          (function (g) {
+            g.attr("fill", "#EAEAEA")
+             .on("click", zoomslider_track_behavior(ctx, 67.33, 84.33));
+            g.append("svg:path")
+               .attr("d", "M73.83,8 L 92.83 8 92.83 12 73.83 12 z");
+          }(g.append("g")));
+          (function (g) {
+            g.attr("fill", "#6A6A6A")
+             .attr("class", "zoomslider_thumb")
+             .call(zoomslider_behavior(ctx, 67.33, 84.33))
+.on("mouseover", zoomslider_thumb_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_thumb_mouseover("#6a6a6a"))
+;
+            g.append("svg:path")
+               .attr("d", "M82.33,8 L 84.33 8 84.33 12 82.33 12 z");
+          }(g.append("g")));
+          (function (g) {
+            g.attr("stroke", "#6A6A6A")
+             .attr("stroke-opacity", 0.00)
+             .attr("stroke-width", 0.3)
+             .attr("fill", "#EAEAEA")
+             .on("click", zoomout_behavior(ctx))
+.on("dblclick", function() { d3.event.stopPropagation(); })
+.on("mouseover", zoomslider_button_mouseover("#cd5c5c"))
+.on("mouseout", zoomslider_button_mouseover("#6a6a6a"))
+;
+            g.append("svg:path")
+               .attr("d", "M69.33,8 L 73.33 8 73.33 12 69.33 12 z");
+            (function (g) {
+              g.attr("fill", "#6A6A6A")
+               .attr("class", "button_logo");
+              g.append("svg:path")
+                 .attr("d", "M70.13,9.6 L 72.53 9.6 72.53 10.4 70.13 10.4 z");
+            }(g.append("g")));
+          }(g.append("g")));
+        }(g.append("g")));
+      }(g.append("g")));
+    }(g.append("g")));
+  }(g.append("g")));
+}(g.append("g")));
+    d3.select(parent_id)
+      .selectAll("path")
+      .each(function() {
+          var sw = parseFloat(window.getComputedStyle(this).getPropertyValue("stroke-width"));
+          d3.select(this)
+            .attr("vector-effect", "non-scaling-stroke")
+            .style("stroke-width", sw + "mm");
+      });
+}
+
+var data = [
+];
+
+var draw = function(parent_id) {
+    draw_with_data(data, parent_id);
+};
+
+if ('undefined' !== typeof module) {
+    module.exports = draw;
+} else if ('undefined' !== typeof window) {
+    window.draw = draw
+}
+
+return module;
+})({}).exports("#gadflyplot-iuuhRjzqSIu9XLKw1sbC");
+//@ sourceURL=gadflyplot-iuuhRjzqSIu9XLKw1sbC.js
+</script>
+
+<p>The intersection point is clearly <span class="math">\(c=-1 = (a+b)/2\)</span>.</p>
 <p>Let's see if we can get this fact using <code>SymPy</code>. First we define many variables:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">x, c2, c1, c0, a, b = @syms x c1 c2 c0 a b
+<pre class="sourceCode julia"><code class="sourceCode julia">x, c2, c1, c0, a, b = Sym(<span class="st">&quot;x&quot;</span>, <span class="st">&quot;c2&quot;</span>, <span class="st">&quot;c1&quot;</span>, <span class="st">&quot;c0&quot;</span>, <span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>)
 p = c2*x^<span class="fl">2</span> + c1*x + c0</code></pre>
-<pre class="output"><code>         2       
-c₀ + c₁⋅x  + c₂⋅x</code></pre>
+<pre class="output"><code>                2
+c₀ + c₁⋅x + c₂⋅x </code></pre>
 <p>Then we create values for the tangent lines at <code>a</code> and <code>b</code></p>
 <pre class="sourceCode julia"><code class="sourceCode julia">fa, fb = [replace(p, x, c) <span class="kw">for</span> c <span class="kw">in</span> [a,b]]
 ma, mb = [replace(diff(p, x), x, c) <span class="kw">for</span> c <span class="kw">in</span> [a,b]]
 tla = fa + ma*(x-a)
 tlb = fb + mb*(x-b)</code></pre>
 <pre class="output"><code> 2                                        
-b ⋅c₁ + b⋅c₂ + c₀ + (-b + x)⋅(2⋅b⋅c₁ + c₂)</code></pre>
+b ⋅c₂ + b⋅c₁ + c₀ + (-b + x)⋅(2⋅b⋅c₂ + c₁)</code></pre>
 <p>Finally, we solve for the intersection:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">solve(tla - tlb, x)</code></pre>
 <pre class="output"><code>1-element Array{Sym,1}:
@@ -5345,11 +6130,10 @@ b ⋅c₁ + b⋅c₂ + c₀ + (-b + x)⋅(2⋅b⋅c₁ + c₂)</code></pre>
 <p><span class="math">\[
 y(x) = \tan(\theta) x - (1/2) \cdot g(\frac{x}{v_0 \cos\theta})^2.
 \]</span></p>
-<p>Which we code with:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">x, theta, v0, grav =  @syms x theta v0 grav</code></pre>
-<pre class="output"><code>(x,θ,v₀,grav)</code></pre>
-<p>and then</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">y = tan(theta) * x - (<span class="fl">1</span>//<span class="fl">2</span>)*grav*(x / (v0*cos(theta)))^<span class="fl">2</span></code></pre>
+<p>This is valid for <span class="math">\(\theta \in [0,\pi/2]\)</span> and for <span class="math">\(x \in [0, x^*]\)</span>, where <span class="math">\(x^*\)</span> is when the projectile returns to ground, that is <span class="math">\(y(x*) = 0\)</span>.</p>
+<p>We code this expression with:</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">x, theta, v0, grav =  Sym(<span class="st">&quot;x&quot;</span>, <span class="st">&quot;theta&quot;</span>, <span class="st">&quot;v0&quot;</span>, <span class="st">&quot;grav&quot;</span>)
+y = tan(theta) * x - (<span class="fl">1</span>//<span class="fl">2</span>)*grav*(x / (v0*cos(theta)))^<span class="fl">2</span></code></pre>
 <pre class="output"><code>           2              
      grav⋅x               
 - ───────────── + x⋅tan(θ)
@@ -5365,13 +6149,13 @@ v₀ ⋅sin(2⋅θ)
 ────────────
     grav    </code></pre>
 <p>There are, of course, two values. The first is 0, the starting point. We want the latter:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">x = xs[<span class="fl">2</span>]</code></pre>
+<pre class="sourceCode julia"><code class="sourceCode julia">xstar = xs[<span class="fl">2</span>]</code></pre>
 <pre class="output"><code>  2         
 v₀ ⋅sin(2⋅θ)
 ────────────
     grav    </code></pre>
-<p>Now, we want to find the critical point for <code>x</code>, when we take the derivative with respect to <code>theta</code>:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">solve(diff(x, theta), theta)</code></pre>
+<p>Now, we want to find the critical point for <code>xstar</code>. We take the derivative with respect to <code>theta</code> and solve for when that is 0:</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">solve(diff(xstar, theta), theta)</code></pre>
 <pre class="output"><code>2-element Array{Sym,1}:
  π
 ─
@@ -5381,16 +6165,16 @@ v₀ ⋅sin(2⋅θ)
  4 </code></pre>
 <p>The value of <span class="math">\(3\pi/4\)</span> is clearly, wrong (it shoots in the opposite direction). We get <span class="math">\(\pi/4\)</span> as expected.</p>
 <h3 id="more-on-tangent-lines">More on tangent lines</h3>
-<p>For parabolas, we just saw that the tangent lines intersect in the midpoint (and only for parabolas). Not only that, the area to the left and right of this intersection will be equal and depend only on <span class="math">\(|b-a|\)</span>. Can we demonstrate that?</p>
+<p>For parabolas, we just saw that the tangent lines intersect in the midpoint. Let <span class="math">\(c\)</span> be that midpoint. That's not the only fact about that picture that is true for parabolas. For a given parabola, the area between the parabola and the tangent lines over <span class="math">\([a,c]\)</span> equals that over <span class="math">\([c,b]\)</span> and the total area over <span class="math">\([a,b]\)</span> depends only on <span class="math">\(|b-a|\)</span> and not the position of either. Can we demonstrate that?</p>
 <p>We start with the same setup to create the tangent lines as symbolic expressions</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">x, c2, c1, c0, a, b = @syms x c1 c2 c0 a b
+<pre class="sourceCode julia"><code class="sourceCode julia">x, c2, c1, c0, a, b = Sym(<span class="st">&quot;x&quot;</span>, <span class="st">&quot;c2&quot;</span>, <span class="st">&quot;c1&quot;</span>, <span class="st">&quot;c0&quot;</span>, <span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>)
 p = c2*x^<span class="fl">2</span> + c1*x + c0
 fa, fb = [replace(p, x, c) <span class="kw">for</span> c <span class="kw">in</span> [a,b]]
 ma, mb = [replace(diff(p, x), x, c) <span class="kw">for</span> c <span class="kw">in</span> [a,b]]
 tla = fa + ma*(x-a)
 tlb = fb + mb*(x-b)</code></pre>
 <pre class="output"><code> 2                                        
-b ⋅c₁ + b⋅c₂ + c₀ + (-b + x)⋅(2⋅b⋅c₁ + c₂)</code></pre>
+b ⋅c₂ + b⋅c₁ + c₀ + (-b + x)⋅(2⋅b⋅c₂ + c₁)</code></pre>
 <p>We need to solve for the intersection point:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">c = solve(tla - tlb, x)[<span class="fl">1</span>]  <span class="co"># only one solution</span></code></pre>
 <pre class="output"><code>a   b
@@ -5402,27 +6186,27 @@ area_cb = integrate(p - tlb, (x, c, b))
 area_ac, area_cb</code></pre>
 <pre class="output"><code>(                                                    3
                                              ⎛a   b⎞ 
-   3                                  2   c₁⋅⎜─ + ─⎟ 
-  a ⋅c₁    2    ⎛a   b⎞        ⎛a   b⎞       ⎝2   2⎠ 
-- ───── + a ⋅c₁⋅⎜─ + ─⎟ - a⋅c₁⋅⎜─ + ─⎟  + ───────────
+   3                                  2   c₂⋅⎜─ + ─⎟ 
+  a ⋅c₂    2    ⎛a   b⎞        ⎛a   b⎞       ⎝2   2⎠ 
+- ───── + a ⋅c₂⋅⎜─ + ─⎟ - a⋅c₂⋅⎜─ + ─⎟  + ───────────
     3           ⎝2   2⎠        ⎝2   2⎠         3     ,                                                  3
                                            ⎛a   b⎞ 
- 3                                  2   c₁⋅⎜─ + ─⎟ 
-b ⋅c₁    2    ⎛a   b⎞        ⎛a   b⎞       ⎝2   2⎠ 
-───── - b ⋅c₁⋅⎜─ + ─⎟ + b⋅c₁⋅⎜─ + ─⎟  - ───────────
+ 3                                  2   c₂⋅⎜─ + ─⎟ 
+b ⋅c₂    2    ⎛a   b⎞        ⎛a   b⎞       ⎝2   2⎠ 
+───── - b ⋅c₂⋅⎜─ + ─⎟ + b⋅c₂⋅⎜─ + ─⎟  - ───────────
   3           ⎝2   2⎠        ⎝2   2⎠         3     )</code></pre>
 <p>Okay, are they equal?</p>
 <pre class="sourceCode julia"><code class="sourceCode julia">area_ac - area_cb</code></pre>
 <pre class="output"><code>                                                                                 
                                                                                  
    3                                  2    3                                  2  
-  a ⋅c₁    2    ⎛a   b⎞        ⎛a   b⎞    b ⋅c₁    2    ⎛a   b⎞        ⎛a   b⎞   
-- ───── + a ⋅c₁⋅⎜─ + ─⎟ - a⋅c₁⋅⎜─ + ─⎟  - ───── + b ⋅c₁⋅⎜─ + ─⎟ - b⋅c₁⋅⎜─ + ─⎟  +
+  a ⋅c₂    2    ⎛a   b⎞        ⎛a   b⎞    b ⋅c₂    2    ⎛a   b⎞        ⎛a   b⎞   
+- ───── + a ⋅c₂⋅⎜─ + ─⎟ - a⋅c₂⋅⎜─ + ─⎟  - ───── + b ⋅c₂⋅⎜─ + ─⎟ - b⋅c₂⋅⎜─ + ─⎟  +
     3           ⎝2   2⎠        ⎝2   2⎠      3           ⎝2   2⎠        ⎝2   2⎠   
 
              3
       ⎛a   b⎞ 
- 2⋅c₁⋅⎜─ + ─⎟ 
+ 2⋅c₂⋅⎜─ + ─⎟ 
       ⎝2   2⎠ 
  ─────────────
        3      </code></pre>
@@ -5431,18 +6215,18 @@ b ⋅c₁    2    ⎛a   b⎞        ⎛a   b⎞       ⎝2   2⎠
 <pre class="output"><code>0</code></pre>
 <p>Ahh, 0, as expected.</p>
 <p>Now, is the sum only dependent on the distance -- and not the values?</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">area_ac + area_cb |&gt; simplify</code></pre>
+<pre class="sourceCode julia"><code class="sourceCode julia">simplify(area_ac + area_cb)</code></pre>
 <pre class="output"><code>   ⎛   3      2          2    3⎞
-c₁⋅⎝- a  + 3⋅a ⋅b - 3⋅a⋅b  + b ⎠
+c₂⋅⎝- a  + 3⋅a ⋅b - 3⋅a⋅b  + b ⎠
 ────────────────────────────────
                12               </code></pre>
-<p>Hard to tell, we factor:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">area_ac + area_cb |&gt; simplify |&gt; factor</code></pre>
+<p>Hard to tell, we also factor:</p>
+<pre class="sourceCode julia"><code class="sourceCode julia">simplify(area_ac + area_cb) |&gt; factor</code></pre>
 <pre class="output"><code>           3 
--c₁⋅(a - b)  
+-c₂⋅(a - b)  
 ─────────────
       12     </code></pre>
-<p>We see in fact, that it only depends on the distance (<code>b-a</code>) and the value of <code>c1</code>, the linear term, and not the quadratic or constant term.</p>
+<p>We see in fact, that it only depends on the distance (<code>b-a</code>) and the value of <code>c2</code>, the quadratic term, and not the linear or constant term.</p>
 </div>
 </div>
 </div>

@@ -339,10 +339,11 @@ tabs.next("Implementation")
 
 ## Implementing a Newton's method function
 
-The `@take5` macro makes doing interactive work easier, but it is
-better to encapsulate algorithms into a function for reuse. In this
-case, we need a criteria to decide if the algorithm has converged. We
-shall use the following:
+The `@take5` macro makes doing interactive work easier. Our macro
+simple repeats the expression 5 times. For iterative algorithms it is
+better to repeat the expression until something happens -- not a fixed
+number of times.  In this case, we need a criteria to decide if the
+algorithm has converged. We shall use the following:
 
 * If the value of $|x_{n+1} - x_n| < tol$ the algorithm has converged
 * If the value of $|f(x_n)| < tol$ the algorithm has converged
@@ -357,7 +358,9 @@ sufficient when the answers are moderate in size. This is not very
 good if the answers are very large.
 
 
-A basic algorithm is to repeat a step of Newton's method until the above occurs. We use a `while` loop to repeat:
+A basic algorithm is to repeat a step of Newton's method until the
+above occurs. We wrap this up in a function for reuse and employ a
+`while` loop to repeat the update step until something happens:
 
 ```
 function nm(f, fp, x)
@@ -368,7 +371,7 @@ function nm(f, fp, x)
 	 ctr = 1
 
 	 while (ctr < 100) && (abs(xnew - xold) > tol) && ( abs(fn - fo) > tol )
-	   x = xnew - f(xnew)/fp(xnew)
+	   x = xnew - f(xnew)/fp(xnew) # update step
 	   xnew, xold = x, xnew
            fn, fo = f(xnew), fn
 	   ctr = ctr + 1

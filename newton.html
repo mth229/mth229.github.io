@@ -2011,7 +2011,7 @@ Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
 <div  class="tab-pane" id="_implementation_">
 
 <h2 id="implementing-a-newtons-method-function">Implementing a Newton's method function</h2>
-<p>The <code>@take5</code> macro makes doing interactive work easier, but it is better to encapsulate algorithms into a function for reuse. In this case, we need a criteria to decide if the algorithm has converged. We shall use the following:</p>
+<p>The <code>@take5</code> macro makes doing interactive work easier. Our macro simple repeats the expression 5 times. For iterative algorithms it is better to repeat the expression until something happens -- not a fixed number of times. In this case, we need a criteria to decide if the algorithm has converged. We shall use the following:</p>
 <ul>
 <li>If the value of <span class="math">\(|x_{n+1} - x_n| &lt; tol\)</span> the algorithm has converged</li>
 <li>If the value of <span class="math">\(|f(x_n)| &lt; tol\)</span> the algorithm has converged</li>
@@ -2019,7 +2019,7 @@ Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
 </ul>
 <p>This isn't perfect, but will be sufficient. (Well, in fact no stopping rule can be perfect.)</p>
 <p>The first two steps require a tolerance. We will use <code>1e-14</code> for this. This is about 100 times the machine precision, <code>eps()</code>, which is sufficient when the answers are moderate in size. This is not very good if the answers are very large.</p>
-<p>A basic algorithm is to repeat a step of Newton's method until the above occurs. We use a <code>while</code> loop to repeat:</p>
+<p>A basic algorithm is to repeat a step of Newton's method until the above occurs. We wrap this up in a function for reuse and employ a <code>while</code> loop to repeat the update step until something happens:</p>
 <pre class="sourceCode julia"><code class="sourceCode julia"><span class="kw">function</span> nm(f, fp, x)
      xnew, xold = x, Inf
      fn, fo = f(xnew), Inf
@@ -2028,7 +2028,7 @@ Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
      ctr = <span class="fl">1</span>
 
      <span class="kw">while</span> (ctr &lt; <span class="fl">100</span>) &amp;&amp; (abs(xnew - xold) &gt; tol) &amp;&amp; ( abs(fn - fo) &gt; tol )
-       x = xnew - f(xnew)/fp(xnew)
+       x = xnew - f(xnew)/fp(xnew) <span class="co"># update step</span>
        xnew, xold = x, xnew
            fn, fo = f(xnew), fn
        ctr = ctr + <span class="fl">1</span>

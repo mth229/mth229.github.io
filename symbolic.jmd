@@ -100,12 +100,28 @@ constructor which returns a symbolic object stored as `x`:
 x |> typeof
 ```
 
-That was painless. While we are here, lets define symbolic objects `h`
+That was painless. The type is `Sym`.
+
+```{results="html"}
+alert("""
+
+We use the pipeline operator `|>` to compose functions in this project, as it makes the expressions a bit easier to read. That above would be simply `typeof(x)` so there is no advantage in clarity, but there is elsewhere.
+
+""")
+```
+
+
+
+
+While we are here, lets define some other symbolic objects `h`
 and `y`:
 
 ```
 h, y = Sym("h", "y")		# two at once
 ```
+
+(There are a few other different ways to define symbolic objects.)
+
 
 Most of the typical math functions have been overloaded to work with
 these symbolic expressions: the functions accept a symbolic expression
@@ -215,16 +231,25 @@ p = expand((x-1)*(x-2)*(x-3)*(x^2 + x + 1))
 factor(p)
 ```
 
-From this we can see clearly the linear terms correspond to roots. The `roots` function returns a dictionary of roots:
+From this we can see clearly the linear terms correspond to roots. The
+`roots` function returns a dictionary of roots and their
+multiplicities.
 
 ```
 roots(p)
 ```
 
-In this case we see the two complex roots as well, that `factor`
-leaves alone.  Factoring reduces over the rational numbers -- not the
-real numbers (the domain can be adjusted). For example, this quadratic will not
-be factor, even though the answers are real:
+
+Huh? The print out is messed up. This is a tradeoff: the return value is a dictionary whose keys are the roots as symbolic objects. The default printing isn't kind to slightly more complicated expressions. If the multiplicities are not of interest, we can get just the keys via:
+
+```
+[k for (k,v) in roots(p)]
+```
+
+In this case there are two complex roots as well, that `factor` leaves
+alone.  Factoring reduces over the rational numbers -- not the real
+numbers (the domain can be adjusted). For example, this quadratic will
+not be factored, even though the answers are real:
 
 ```
 q = x^2 - 8x + 8
@@ -232,17 +257,21 @@ factor(q)
 ```
 
 
-However, `roots` will work:
+However, `roots` will work, though we have to work to get the print out:
 
 ```
-roots(q)
+[k for (k,v) in roots(q)]
 ```
 
-The basic theorem is that for each linear factor over the complex numbers there corresponds a root and vice versa after accounting for multiplicity. 
+The basic theorem is that for each linear factor over the complex
+numbers there corresponds a root and vice versa after accounting for
+multiplicity.
 
 
 
-The `real_roots` function tries to return the real roots (omitting the non-real, complex roots). Here we see that it fails for some polynomials when `roots` does not:
+The `real_roots` function tries to return the real roots (omitting the
+non-real roots). Here we see that it fails for some
+polynomials when `roots` does not:
 
 ```
 q = x^4 - 8x^2 + 8
@@ -259,11 +288,11 @@ solve(q)
 If it isn't clear which of these are real, they can be converted to numeric values via `N`:
 
 ```
-ans = solve(q)
-map(N, ans)			# all are real
+as = solve(q)
+map(N, as)			# all are real
 ```
 
-One could also try converting to complex (`complex(ans)`) and seeing which have `0.0im` for an imaginary part.
+One could also try converting to complex (`complex(as)`) and seeing which have `0.0im` for an imaginary part.
 
 
 The `solve` function solves for when an expression is 0. Sometimes, the problem is to find when `f(x) = g(x)`, for example, `2x^2 = exp(x)`. Here we see:
@@ -272,7 +301,9 @@ The `solve` function solves for when an expression is 0. Sometimes, the problem 
 solve(exp(x) - 2x^2, x)  	# 1.487...
 ```
 
-This finds only one of two answers. The second can be found with `nsolve`, which is a numeric algorithm to find a zero starting with an initial guess (which often comes from making a simple plot):
+This finds only one of two answers. The second can be found with
+`nsolve`, which is a numeric algorithm to find a zero starting with an
+initial guess (which often comes from making a simple plot):
 
 ```
 nsolve(exp(x) - 2x^2, x, 3)	# 2.617...
@@ -283,7 +314,7 @@ Trigonometric functions have infinitely many solutions, with the `sin`
 function `SymPy` solves only within the range $[-90, 90]$ degrees (the range of the `asin` function).
 
 ```
-solve(sin(x)^2 - (1/2)^2) * (180 /pi)
+solve(sin(x)^2 - (1/2)^2) * 180 / pi
 ```
 
 
@@ -305,7 +336,7 @@ out |> replace(x, 1/2) |> float
 You can even do systems of equations. For this you specify the system and the variables to solve for using a vector:
 
 ```
-x, y = @syms x y
+x, y = Sym("x", "y")
 eq1 = x + y -1
 eq2 = x - y - (-1)
 solve([eq1, eq2], [x,y])
@@ -408,7 +439,8 @@ f(u) = float(subs(ex, x, u))
 plot(f, -1, 3)
 ```
 
-This is  automatically done by `SymPy` provided the `Gadfly` package is loaded before the `SymPy` one. That is, one can plot directly:
+This is automatically done by `SymPy` provided the `Gadfly` package is
+loaded before the `SymPy` one. That is, one can plot directly:
 
 ```
 f(x) = x^2 - 2x + 4
@@ -416,7 +448,7 @@ plot(f(x), -1, 3)		# not plot(f, -1, 3) though that works with Gadfly directly
 ```
 
 
-Graphing more than one function at a time is, of course, possible. For
+Graphing more than one expression at a time is, of course, possible. For
 example, to graph a function and its tangent line at a point we can do
 this.
 
@@ -471,7 +503,15 @@ We can do other similar questions:
 limit((1-cos(x))/x^2, x, 0)
 ```
 
-Limits can be taken at infinity as well. We specify that value using `oo`:
+The second argument is needed, as the expression may have more than one variable:
+
+```
+lambda = Sym("lambda")
+limit((1 - lambda *x)^(1/x), x, 0)
+```
+
+
+Limits can be taken at infinity as well. We specify infinity using `oo` and not the floating point value `Inf`
 
 ```
 limit(sin(x)/x, x, oo)
@@ -843,11 +883,13 @@ solving with the  resulting symbolic answer from `integrate`:
 f(x) = 4x^3
 b = Sym("b")
 eq = integrate(f(x), (x,  0, b)) - 1/2 * integrate(f(x), (x, 0, 1))
-solve(eq, b)
+xs = real_roots(eq, b)
+#
+ispositive(x) = x > 0
+filter(ispositive, xs)
 ```
 
-
-We can see that the answer is $0.840896415253715$, though the mathematical expression has 3 other possibilities for solution.
+The equation `eq` is a 4th degree polynomial. It has two real and two complex roots. We used `real_roots` to get the two real ones, and then filtered for the positive one.
 
 ### Practice
 
@@ -899,10 +941,26 @@ An interesting fact about parabolas: any two different tangent lines will inters
 
 That is the tangent line at $a$ and that at $b$ will intersect at $(a+b)/2$.
 
+
+A graph might be illuminating:
+
+```
+f(x) = x^2			# simplest parabola
+a,b = -3, 1
+tl(c) = x -> f(c) + 2*c*(x-c)
+plot([f, tl(a), tl(b)], a, b)
+```
+
+The intersection point is clearly $c=-1 = (a+b)/2$.
+
+
+
+
+
 Let's see if we can get this fact using `SymPy`. First we define many variables:
 
 ```
-x, c2, c1, c0, a, b = @syms x c1 c2 c0 a b
+x, c2, c1, c0, a, b = Sym("x", "c2", "c1", "c0", "a", "b")
 p = c2*x^2 + c1*x + c0
 ```
 
@@ -930,20 +988,21 @@ $$
 y(x) = \tan(\theta) x - (1/2) \cdot g(\frac{x}{v_0 \cos\theta})^2.
 $$
 
-Which we code with:
+This is valid for $\theta \in [0,\pi/2]$ and for $x \in [0, x^*]$,
+where $x^*$ is when the projectile returns to ground, that is $y(x*) =
+0$.
+
+We code this expression with:
 
 
 ```
-x, theta, v0, grav =  @syms x theta v0 grav
-```
-
-and then 
-
-```
+x, theta, v0, grav =  Sym("x", "theta", "v0", "grav")
 y = tan(theta) * x - (1//2)*grav*(x / (v0*cos(theta)))^2
 ```
 
-The use of the rational value for $1/2$ (the `1//2`) is needed, as this will convert to a symbolic value of $1/2$, and not	a floating point value of $0.5$.
+The use of the rational value for $1/2$ (the `1//2`) is needed, as
+this will convert to a symbolic value of $1/2$, and not a floating
+point value of $0.5$.
 
 First we need to solve when `y(x)=0`:
 
@@ -954,13 +1013,14 @@ xs = solve(y, x)
 There are, of course, two values. The first is 0, the starting point. We want the latter:
 
 ```
-x = xs[2]
+xstar = xs[2]
 ```
 
-Now, we want to find the critical point for `x`, when we take the derivative with respect to `theta`:
+Now, we want to find the critical point for `xstar`. We take the
+derivative with respect to `theta` and solve for when that is 0:
 
 ```
-solve(diff(x, theta), theta)
+solve(diff(xstar, theta), theta)
 ```
 
 
@@ -969,12 +1029,18 @@ The value of $3\pi/4$ is clearly, wrong (it shoots in the opposite direction). W
 
 ### More on tangent lines
 
-For parabolas, we just saw that the tangent lines intersect in the midpoint (and only for parabolas). Not only that, the area to the left and right of this intersection will be equal and depend only on $|b-a|$. Can we demonstrate that?
+For parabolas, we just saw that the tangent lines intersect in the
+midpoint. Let $c$ be that midpoint. That's not the only fact about
+that picture that is true for parabolas. For a given parabola, the
+area between the parabola and the tangent lines over $[a,c]$ equals
+that over $[c,b]$ and the total area over $[a,b]$ depends only on
+$|b-a|$ and not the position of either. Can we demonstrate that?
 
-We start with the same setup to create the tangent lines as symbolic expressions
+We start with the same setup to create the tangent lines as symbolic
+expressions
 
 ```
-x, c2, c1, c0, a, b = @syms x c1 c2 c0 a b
+x, c2, c1, c0, a, b = Sym("x", "c2", "c1", "c0", "a", "b")
 p = c2*x^2 + c1*x + c0
 fa, fb = [replace(p, x, c) for c in [a,b]]
 ma, mb = [replace(diff(p, x), x, c) for c in [a,b]]
@@ -1014,16 +1080,18 @@ Ahh, 0, as expected.
 Now, is the sum only dependent on the distance -- and not the values?
 
 ```
-area_ac + area_cb |> simplify
+simplify(area_ac + area_cb)
 ```
 
-Hard to tell, we factor:
+Hard to tell, we also factor:
 
 ```
-area_ac + area_cb |> simplify |> factor
+simplify(area_ac + area_cb) |> factor
 ```
 
-We see in fact, that it only depends on the distance (`b-a`) and the value of `c1`, the linear term, and not the quadratic or constant term.
+We see in fact, that it only depends on the distance (`b-a`) and the
+value of `c2`, the quadratic term, and not the linear or constant
+term.
 
 
 ```{results="html"}
