@@ -8,7 +8,6 @@ tabs = tabbable()
 
 ```{hide=true, results="js"}
 using Gadfly
-Gadfly.prepare_display()
 ```
 
 
@@ -47,9 +46,15 @@ f(x) = x^3 - cos(x) + x*log(x)
 integrate(f)
 ```
 
-(Working with this value requires some conversions we don't discuss here.)
+To find the definite integral, say from $1$ to $10$ we have:
 
-However, it is a fact of life that not all nice functions will have an antiderivative in a convenient form. In these cases, the above approach is of no help. Rather, to find the area, one can turn to approximations that progressively get better as more approximations are taken.
+```
+integrate(f, 1, 10)
+```
+
+
+
+If all functions had antiderivatives that could be found symbolically, there wouldn't be much more to say.  However, it is a fact of life that not all nice functions will have an antiderivative in a convenient form, only those that pass `SymPy`'s implementation of [Risch's algorithm](http://en.wikipedia.org/wiki/Risch_algorithm). In these cases, the above approach is of no help. Rather, to find the area, one can turn to approximations that progressively get better as more approximations are taken.
 
 One such approximation is given by the familiar Riemann sums, which we
 will look at here. However, the problem of trying to find the area of
@@ -145,7 +150,7 @@ Okay, just one subtlety, we really only want the points
 for the left Riemann sum and the points 
 
 ```
-[ a + (1:n) * delta ]
+[ a + (1:n) * delta ]'
 ```
 
 for the right.
@@ -154,7 +159,7 @@ Putting this together, here are commands to approximate the area under the curve
 
 ```
 f(x) = x^2
-a, b, n = 1, 3, 5;		   ## note n=5
+a, b, n = 1, 3, 10;		   ## note n=10
 delta = (b - a)/n;		   ## nothing to change below here
 xs = a + (0:n-1) * delta;          ## n, right is 1:n * delta 
 fx = map(f, xs);               
@@ -168,8 +173,7 @@ F(x) = x^3/3
 F(b) - F(a)
 ```
 
-Boy, not too close. We need a better approximation of course, which means
-simply that we need `n` to be bigger.
+Boy, not too close. We need a better approximation of course. This can be achieved by using larger values for `n`.
 
 
 
@@ -256,6 +260,8 @@ Different possibilities are:
 * using a trapezoid formed by joining the left and right endpoints (`method="trapezoid"`)
 * making the cap a quadratic polynomial that goes through the left and right endpoints and the midpoint (`method="simpsons"`)
 
+We don't use `sum` below as we pass in values for
+
 ```
 function riemann(f::Function, a::Real, b::Real, n::Int; method="right")
   if method == "right"
@@ -263,18 +269,14 @@ function riemann(f::Function, a::Real, b::Real, n::Int; method="right")
   elseif method == "left"
      meth(f,l,r) = f(l) * (r-l)
   elseif method == "trapezoid"
-     meth(f,l,r) = (f(l) + f(r))/2 * (r-l)
+     meth(f,l,r) = (1/2) * (f(l) + f(r)) * (r-l)
   elseif method == "simpsons"
-     meth(f,l,r) = (f(l) + 4*(f((l+r)/2)) + f(r))/6 * (r-l)
+     meth(f,l,r) = (1/6) * (f(l) + 4*(f((l+r)/2)) + f(r)) * (r-l)
   end
 
-  x(i) = a + i * (b-a) / n
-
-  tot = 0
-  for i in 0:(n-1)
-    tot = tot + meth(f, x(i), x(i+1))
-  end
-  tot
+  xs = a + (0:n) * (b-a)/n
+  as = [meth(f, l, r) for (l,r) in zip(xs[1:end-1], xs[2:end])]
+  sum(as)
 end
 ```
 
@@ -562,13 +564,13 @@ tabs.next("Gauss quadrature")
 quadrature, a modern, fast and accurate means to compute 1-dimensional
 integrals numerically.
 The use is straightforward, and
-similar to `integrate` above: you specify a function object, and the
+similar to `riemann` above: you specify a function object, and the
 limits of integration. You don't specify $n$ -- as this is computed
 adaptively -- but you can optionally specify a tolerance which
-controls the accuracy, though we don't do so here. For example, as typical usage might be:
+controls the accuracy, though we don't do so here. For example, a typical usage might be:
 
 ```
-quadgk(sin, 0, pi)		## 2 is exact
+a, err = quadgk(sin, 0, pi)		## 2 is exact
 ```
 
 Two values are returned, the answer and an estimate of the error. In
@@ -576,14 +578,26 @@ the above, $2$ is the exact answer to this integral, the estimated
 value a just a bit more $2$, but is guaranteed to be off my no more than
 the second value, $1.78 \cdot 10^{-12}$.
 
+
+If just the answer is of interest, then it can be extracted using *index notation*:
+
+```
+quadgk(sin, 0, pi)[1]		# [1] picks out the first component or two
+```
+
 ---
 
-The known answer for $\int_0^1 x^2 dx$ is $1/3$, and `quadgk` gets it right for all the digits:
+For another illustration, since Archimedes the known answer for $\int_0^1 x^2 dx$ is $1/3$. We see that `quadgk` gets it right for all the digits:
 
 ```
 quadgk(x -> x^2, 0, 1)
 ```
 
+
+The `riemann` function is good for pedagogical purposes, but the `quadgk` function should be used instead of the `riemann` function -- besides being built-in to `julia` it is more accurate, more robust, fast, and less work to use.
+
+```{results="html"}
+alert(:info, """
 
 For other integration routines, the `Cubature` package is an interface
 to the Cubature library (http://ab-initio.mit.edu/wiki/index.php/Cubature)
@@ -591,6 +605,9 @@ which provides serveral. Cubature is the term for higher dimensional
 integrals, quadrature refers to finding area. In that package, the
 function `hquadrature` is similar to `quadgk`. (The two are written by
 the same author.)
+
+""")
+```
 
 ### Practice
 
@@ -702,7 +719,17 @@ In each case one integrates a function related to the one describing the problem
 
 ### Volume as a function of radius.
 
-The volume of a solid of revolution about the $y$-axis is illustrated [here](https://www.khanacademy.org/math/integral-calculus/solid_revolution_topic/disc-method/v/disc-method-around-y-axis). The basic formula requires the description of the radius as a function of the height, $h$. If this is given by $r(h)$, then the following formula holds:
+The volume of a solid of revolution about the $y$-axis is illustrated [here](https://www.khanacademy.org/math/integral-calculus/solid_revolution_topic/disc-method/v/disc-method-around-y-axis). 
+
+
+This figure shows a volume of revolution (a glass) with an emphasis on the radius of the solid. The volume can be determined if the radius is known.
+
+```{results="html"}
+inline_img("figures/integration/integration-glass.jpg")
+```
+
+
+The basic formula requires the description of the radius as a function of $x$ (if oriented as the figure) or the height, $h$, (if oriented as in real life). Suppose we specify the radius with $r(h)$, then the following formula holds with $b$ the total height.
 
 $$
 V(b) = \int_0^b \pi r(h)^2 dh.
@@ -743,7 +770,7 @@ Beverages](http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.00
 the authors demonstrate that the shape of the glass can have an effect
 on the rate of consumption, presumably people drink faster when they
 aren't sure how much they have left. In particular, they comment that
-people have difficulty judging the half finished by volume mark.
+people have difficulty judging the half-finished-by-volume mark.
 
 This figure shows some of the wide variety of beer-serving glasses:
 
@@ -834,20 +861,29 @@ So $b$ is basically $9.17$.  Given this, how much volume is left at `b/2`?
 r_vol(r_b/2)
 ```
 
-That is about `j r_vol(r_b/2) / r_vol(r_b) *100` percent ($\approx
-173.28/450 \cdot 100$). As this height is often mistaken for the
-half-way by volume mark, people tend to drink these pints faster than
-they think.
+Which is what percent of the whole?
+
+```
+r_vol(r_b/2) / r_vol(r_b) * 100
+```
+
+
+As this height is often mistaken for the half-way by volume mark, people tend to drink these pints faster than they think.
 
 Now compare to the height to get half the volume (225 ml):
 
 ```
-fzero(x -> r_vol(x) - 225,  5)
+r_half = fzero(x -> r_vol(x) - 225,  5)
 ```
 
-Or about $5.6038$. That is, when you are at `j x/r_b*100` percent
-$\approx 5.6038/9.169 \cdot 100$ of the height you have only half the
-volume remaining (and not at 50% of the height.)
+This value is more than half of $b$:
+
+```
+r_half / r_b
+```
+
+
+At this height only half the volume is remaining (and not at 50% of the original height.)
 
 
 
@@ -942,7 +978,7 @@ plot(x -> x^2, 0, 1)
 This curve has length no more than $2 = 1 + 1$ -- the distance along
 the $x$ axis starting at $0$ to $1$ and then going up. It is also
 longer than $\sqrt{2} = \sqrt{1^2 + 1^2}$ -- the straight line
-distance between the two endpoint. But how long is it?
+distance between the two endpoints. But how long is it?
 
 
 In general, the _arc length_ of the curve $y=f(x)$ between $a \leq x
@@ -955,7 +991,7 @@ $$
 
 
 The formula is from the length of the hypotenuse of a right triangle with lengths $1$ and $f'(x)$, 
-This is implicit in this image.
+This image suggests an approximation for the length and why the hypotenuse of some triangle might be involved.
 
 
 ```{results="html"}
@@ -972,6 +1008,10 @@ f(x) = x^2
 quadgk(x -> sqrt(1 + D(f)(x)^2), 0, 1)
 ```
 
+(We use an *anonymous function* for the integrand which involved the derivative being found by `D` from the `Roots` package. If the graph is described by `f`, then this expression be the same for all these problems.)
+
+----
+
 Whereas, the length of the $f(x) = \sin(x)$ over $[0, \pi]$ would be:
 
 ```
@@ -983,9 +1023,9 @@ Next we look at a more practical problem.
 
 ### Example: the caternary shape
 
-A _caternary_ shape (http://en.wikipedia.org/wiki/Catenary) is the shape a hanging chain will take 
-as it is suspended between two posts. Of course, power wires will also have this shape between towers. 
-A formula for a caternary can be written in terms of the hyperbolic cosine, `cosh` in `julia`:
+A [caternary shape](http://en.wikipedia.org/wiki/Catenary) is the shape a hanging chain will take 
+as it is suspended between two posts. It appears elsewhere, for example, power wires will also have this shape as they are suspended between towers. 
+A formula for a caternary can be written in terms of the hyperbolic cosine, `cosh` in `julia` or exponentials.
 
 $$
 y = a \cosh(x/a) = a \cdot \frac{e^{x/a} + e^{-x/a}}{2}.
@@ -994,14 +1034,13 @@ $$
 Suppose we have the following wire hung between $x=-1$ and $x=1$ with $a = 2$:
 
 ```
-a = 2;
-f(x) = a * cosh(x/a)
+f(x; a=2) = a * cosh(x/a)
 plot(f, -1, 1)
 ```
 
 How long is the chain? Looking at the graph we can guess an answer is
-between $2$ and $2.5$, say, but it isn't much work to get much closer
-to the answer:
+between $2$ and $2.5$, say, but it isn't much work to get
+the answer:
 
 ```
 quadgk(x -> sqrt(1 + D(f)(x)^2), -1, 1)
@@ -1018,8 +1057,7 @@ Suppose your chain has parameter `a=3` what is the length? (Use `quadgk`)
 
 
 ```{results="js"}
-a = 3
-f(x) = a*cosh(x/a);
+f(x; a=3) = a*cosh(x/a);
 val <- quadgk(x -> sqrt(1 + D(f)(x)^2), -1, 1)[1];
 numericq(val, .001)
 ```
@@ -1029,8 +1067,7 @@ numericq(val, .001)
 
 Suspension bridges, like the Verrazano bridge, have different loading
 than a cable and hence a different shape. A parabola is the shape the
-cable takes under uniform loading (cf. page 19 of
-http://calteches.library.caltech.edu/4007/1/Calculus.pdf for a
+cable takes under uniform loading (cf. [page 19](http://calteches.library.caltech.edu/4007/1/Calculus.pdf) for a
 picture).
 
 The Verrazano-Narrows
