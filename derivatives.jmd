@@ -236,7 +236,7 @@ Compute the derivative at $c=-3$ using $h=0.0001$.
 
 
 ```{results="js"}
-f(x) = airy
+f(x) = airy(x)
 c, h = -3, 0.0001;
 val = (f(c+h) - f(c))/h;
 numericq(val, 1e-6)
@@ -588,6 +588,8 @@ You can tell from the graph of $f(x)$ that this value should be more than 1, as 
 plot([f, x -> 0, x -> f(c) + fp(c)*(x-c)], .5, 2.1) 
 ```
 
+<hr/>
+
 ```{results="html"}
 note("More generally ...")
 ```
@@ -661,18 +663,19 @@ tabs.next("Automatic differentiation")
 We discuss now [Forward Mode Automatic Differentiation](http://en.wikipedia.org/wiki/Automatic_differentiation). 
 
 
-The `Roots` package provides an operator `D` that (essentially)
-implements this. It is used like our previously defined `Df` and `Dc`
-functions, only it need not be redefined each `julia` session -- just
-the `Roots` package need be loaded.
-
-
-
 
 Automatic differentiation avoids the numeric instability issues of
 finite differences by using a different approach. Whereas finite
 differences have a long history, automatic differentiation only dates
 back to the 60s.
+
+The `Roots` package provides an operator `D` that (essentially)
+implements this. It is used like our previously defined `Df` and `Dc`
+functions, only it need not be redefined each `julia` session -- just
+the `Roots` package need be loaded. 
+
+
+
 
 
 Unlike, finite differences automatic differentiation does not have
@@ -777,7 +780,7 @@ Be warned, higher order derivatives of degree 8 or more require extra attention.
 ```
 
 
-Finally, here is an example where we plot the tangent line and the
+Here is an example where we plot the tangent line and the
 function. We first define a tangent line operator that returns a
 function representing the tangent line at a point `c`:
 
@@ -791,6 +794,122 @@ Then this is employed as follows:
 f(x) = x^x
 c = 1
 plot([f, tangent(f, c)], 1/2, 2)
+```
+
+<hr/>
+
+```{results="html"}
+
+example("""
+AP Calculus question
+""")
+
+```
+
+The 2014 AP$^\textregistered$ Calculus exam included this question:
+
+Grass clippings are placed in a bin, where they decompose. For $0 \leq
+t \leq 30$, the amount of grass clippings remaining in the bin is
+modeled by $A(t) = 6.687(0.931)^t$. Where $A(t)$ is measured in pounds
+and $t$ is measured in days.
+
+* Find the average rate of change of $A(t) over the interval of $0
+  \leq t \leq 30$. Indicate units of measure
+
+* Find the value of $A'(15)$. Using correct units, interpret the
+  meaning of the value in the context of the problem.
+
+* Find the time $t$ for which the amount of grass clippings in the bin
+  is equal to the average amount of grass clippings in the bin over
+  the interval $0 \leq t \leq 30$.
+
+* For $t > 30$, $L(t)$, the linear approximation to $A$ at $t=30$ is a
+  better model for the amount of grass clippings remaining in the
+  bin. Use $L(t)$ to predict the time at which there will be $0.5%
+  pound of grass clippings remaining in the bin. Show the work that
+  leads to your answer.
+
+
+We can do all this relatively quickly with `D` and the `fzero` function from the `Roots` package.
+
+First, we define $A(t)$:
+
+```
+A(t) = 6.687(0.931)^t
+```
+
+The first question is answered by the slope of the secant line connecting $(0,A(0))$ and $(30, A(30))$:
+
+```
+m = (A(30) - A(0)) / (30 - 0)
+```
+
+The units are in pounds per day.
+
+The second question is done with `D` as follows:
+
+```
+D(A)(15)
+```
+
+This also has units in pounds per day. This is the instantaneous rate
+of decomposition, and is less (in absolute value) than the average
+decay rate.
+
+The mean value theorem tells us that there is at least one time where
+the instantaneous decomposition rate equals the average rate over the
+interval $[0,30]$. Thus the endpoints form a bracketing interval for
+the equation $A'(t) = m$, which we solve with:
+
+```
+fzero(t -> D(A)(t) - m, [0, 30])
+```
+
+So at 12.4 days, the instantaneous rate is equal to the average rate
+of decomposition over the first 30 days.
+
+But this doesn't really answer the question asked, which is about the
+average amount of grass clippings in the bin. For this we need the
+integral form of the mean value theorem. Skipping ahead a few lessons to solve this problem, we have:
+
+```
+a, err = quadgk(A, 0, 30)	# area under A from 0,30
+avg = a/(30-0)
+fzero(t -> A(t) - avg, [0, 30])
+```
+
+We get the same answer -- think about whether that is a coincidence.
+
+
+
+Finally, we can define $L(t)$ using the point-slope form of the line. The point is $(30, A(30))$ and the slope is $A'(30)$:
+
+```
+L(t) = A(30) + D(A)(30) * (t - 30) # t > 30
+```
+
+We could restrict $L$ to insist that $t > 30$, but this isn't necessary. We are asked to solve this. Using `fzero` requires a bracket. We check that $L(30) > 0.5$ and that $L(100)$ is negative:
+
+
+```
+L(30), L(100)
+```
+
+So, we can use $[30, 100]$ as a bracket for $L(t) - 0.5 = 0$:
+
+```
+fzero(t -> L(t) - 0.5, [30, 100])
+```
+
+
+So a bit over 35 days to decompose to half a pound.
+
+
+Here is a picture, showing the decay:
+
+```
+f(t) = t <= 30 ? A(t) : L(t)
+plot(f, 0, 40)
 ```
 
 

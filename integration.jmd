@@ -1062,6 +1062,60 @@ val <- quadgk(x -> sqrt(1 + D(f)(x)^2), -1, 1)[1];
 numericq(val, .001)
 ```
 
+#### Question: in the artist studio
+
+This picture of Jasper John's [Near the Lagoon](http://www.artic.edu/aic/collections/artwork/184095) was taken at The Art Institute Chicago. 
+
+
+```{results="html"}
+inline_img("figures/integration/johns-catenary.jpg")
+```
+
+
+
+The museum notes have
+
+>    For his Catenary series (1997–2003), of which Near the Lagoon is
+>    the largest and last work, Johns formed catenaries—a term used to
+>    describe the curve assumed by a cord suspended freely from two
+>    points—by tacking ordinary household string to the canvas or its
+>    supports. 
+
+This particular catenary has a certain length. The basic dimensions
+are 78in wide and 118in drop. If our shifted function is
+
+$$
+f(x; a, b) = a \cosh(x/a) - b
+$$
+
+Then we have $f(0) = -118$ and $f(78/2) = 0$ using the origin midway
+between the two tops of the curve. Solving the first gives
+
+$$
+-118 = a - b \text{ or } b = a + 118.
+$$
+
+The second gives $a \cdot \cosh(78/(2a)) - (a + 118) = 0$. This can be solved numerically for a:
+
+```
+cat(x; a=1, b=0) = a*cosh(x/a) - b
+a = fzero(a -> cat(78/2, a=a, b=118 + a), 1)
+```
+
+Rounding, we take $a=13$. With these parameters ($a=13$, $b = 131$),
+compute the length of John's catenary.
+
+```{results="js"}
+a = 13
+b = 118 + a
+f(x) = cat(x, a=13, b=118+13)
+val = quadgk(x -> sqrt(1 + D(f)(x)^2), -78/2, 78/2)[1];
+numericq(val, 1)
+```
+
+
+
+
 
 #### Question Bridges are parabolas
 
@@ -1095,6 +1149,7 @@ f(x) = (-b/a^2)*(x^2 - a^2);
 val = quadgk(x -> sqrt(1 + D(f)(x)^2), -1, 1)[1];
 numericq(val, 1e-3)
 ```
+
 
 #### Question The tractrix
 

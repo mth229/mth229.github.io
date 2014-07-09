@@ -732,8 +732,8 @@ The `nextfloat` and `prevfloat` functions find the floating point values just bi
 f(x) * f(nextfloat(x))
 ```
 
-So $f$ is crossing sign between the value we found, `x` and the
-floating point value just smaller. We can't expect to do any better
+So $f$ is crossing $0$ between the value we found, `x` and the
+floating point value just smaller. We can't realistically expect to get any closer
 than that.
 
 
@@ -902,18 +902,21 @@ radioq(choices, ans)
 
 For simple ballistic motion you find that the time to go up is the
 time to come down. For motion within a resistant medium, such as air,
-this isn't the case. Suppose a model for the height is given by
+this isn't the case. Suppose a model for the height as a function of time is given by
 
 $$
-f(t) = (\frac{g}{\gamma^2} + \frac{v_0}{\gamma})(1 - e^{-\gamma t}) - \frac{gt}{\gamma}
+h(t) = (\frac{g}{\gamma^2} + \frac{v_0}{\gamma})(1 - e^{-\gamma t}) - \frac{gt}{\gamma}
 $$
 
 ([From "On the trajectories of projectiles depicted in early ballistic Woodcuts"](http://www.researchgate.net/publication/230963032_On_the_trajectories_of_projectiles_depicted_in_early_ballistic_woodcuts))
 
-Here $g=32$, again we take $v_0=390$, and $\gamma$ is a drag coefficient that we will take to be $1$. Then 
+Here $g=32$, again we take $v_0=390$, and $\gamma$ is a drag
+coefficient that we will take to be $1$.  This is valid when $h(t)
+\geq 0$.  In `Julia`, rather than hard-code the parameter values, for
+added flexibility we can pass them in as keyword arguments:
 
 ```
-f(t; g=32, v0=390, gamma=1) = (g/gamma^2 + v0/gamma)*(1 - exp(-gamma*t)) - g*t
+h(t; g=32, v0=390, gamma=1) = (g/gamma^2 + v0/gamma)*(1 - exp(-gamma*t)) - g*t/gamma
 ```
 
 Now find the three times: $t_0$, the starting time; $t_a$, the time at
@@ -922,11 +925,11 @@ ground.
 
 ```{results="js"}
 t0 = 0.0
-tf = fzero(f, 10, 20)
-ta = fzero(D(f), t0, tf)
+tf = fzero(h, 10, 20)
+ta = fzero(D(h), t0, tf)
 choices = ["(0, 13.187, 30.0)",
 	"(0, 32.0, 390.0)",
-	"(0, 2.569, 13.187)"]
+	"(0, 2.579, 13.187)"]
 ans = 3
 radioq(choices, ans)
 ```
