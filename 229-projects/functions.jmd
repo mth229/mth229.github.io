@@ -1,0 +1,247 @@
+# Questions to be handed in for project 2: Functions in Julia
+
+Read about this [here](http://mth229.github.io/functions.html).
+
+For the impatient, it is easy with `Julia` to create mathematical
+functions, as the notation is identical:
+
+```
+f(x) = x^2 - 2
+f(2)
+```
+
+As with typical mathematical notation the function is called by passing a value to it with parentheses.
+
+That covers most of the uses within this project, but there is more...
+
+* Julia functions can have more than one variable:
+
+```
+rectarea(b, h) = b * h		# area of rectangle
+```
+
+* Julia functions with different signatures, can have the same name!
+
+```
+rectarea(b) = area(b,b)		# area of square
+```
+
+* Multiline functions are defined with the `function` keyword
+
+```
+function multiline_function(x)
+	 top = x^2 - 2x
+	 bottom = x^4 - 4x
+	 top/bottom		# last line is return value
+end				# don't forget the end
+```
+
+* Functions can have keyword arguments (like parameters). These can have default values:
+
+```
+mxplusb(x; m=0, b=1) = m*x + b
+mxplusb(10, m=3, b=4)		# arguments are named
+```
+
+* Functions can be used as arguments to other functions:
+
+```
+using Gadfly			# for plotting
+plot(sin, 0, 2pi)		# pass function for first argument plot(f,a,b)
+```
+
+
+* Functions can be *anonymous*. These are defined via "`args -> body`":
+
+```
+plot(x -> sin(x)*cos(2x), 0, 2pi)
+```
+
+* Functions can be *returned* by other functions (see the "arrow"):
+
+```
+secant_line(f, a, b) = x -> f(a) + (f(b) - f(a))/(b-a)*(x-a)
+```
+
+----
+
+#### Controlling what gets returned by `IJulia`
+
+When `IJulia` evaluates a cell, it will only display the last command
+executed (without explicitly printing).  One useful trick to output more than one value at a time is
+to place them into a container. Grouping values within parentheses will produce a "tuple":
+
+```
+(1, 2, "a")
+```
+
+Tuples will be implicitly constructed if the parentheses are left off. So separating values by commas can be used to have multiple values printed in a cell.
+
+
+If the values are all of the same type, the preferred container would
+be made with `[]`, as in:
+
+```
+[1, 2]
+```
+
+If the comma is left out, the results are combined "horizontally", which can be a space saver in some cases:
+
+```
+[1 2 3 4 5]
+```
+
+
+----
+
+### Questions
+
+
+* Write a function that describes a line with slope $2$ going through
+  the point $(1,3)$. What is the value of $f(10)$, $f(-10)$?
+
+```
+```
+
+
+* Write a function to convert Celsius to Fahrenheit $F=9/5 C +
+  32$. Use it to find the Fahrenheit value when $C=56.7$ and when
+  $C=-89.2$. (The record high and low temperatures.)
+
+```
+```
+
+
+* Write a function that computes
+
+$$
+f(x) = 4x^2 - 3x  - 7 - \frac{1}{x}
+$$
+
+Use it to find the values of $f(1)$, $f(2)$, and $f(3)$.
+
+```
+```
+
+* Write a function that computes:
+
+$$
+f(t) = A\sin(Bt - C) + D
+$$
+
+where $A=3.1$, $B=2\pi/365$, $C=1.35$, and $D=12.12$.
+
+This function models the amount of daylight in Boston when $t$ records
+the day of the year. How much daylight is there for $t=1$, $t=365/2$,
+$t = 35$?
+
+```
+```
+
+* Person A starts at the origin and moves west at 60 MPH. Person B
+  starts 200 miles north of the origin and moves south at 70
+  MPH. Write a function that computes the distance between the two
+  people as a function of $t$ in minutes.
+
+(The $(x,y)$ position of person A is $(60\cdot t/60), 0)$ and the
+$(x,y)$ position of person B is $(0, 200 - 70 \cdot t/60)$)
+
+Compute the distance at $t=0$, $t=30$ and $t=120$ using a
+function. (You might start by defining the $x$ and $y$ distances with
+the following, then using the distance formula as a function of $t$.)
+
+```
+x(t) = 60t/60 - 0
+y(t) = 0 - (200 - 70t/60)
+```
+
+
+```
+```
+
+## Cases 
+
+* The following function is useful in probability
+
+$$
+f(x)=
+\begin{cases}
+\frac{1}{b-a} & a \leq x \leq b\\
+0 & otherwise
+\end{cases}
+$$
+
+
+Defaults are $a=0, b=1$.
+
+Write a function using the ternary operator to compute this. Find
+$f(.5, a=0, b=1)$; $f(.5, a=1, b=2)$, $f(.5,a=0, b=100)$.
+
+```
+```
+
+* Define a function $Sin(x) = \sin(x)$ if $-pi/2 < x < \pi/2$ and
+  `NaN` otherwise.
+
+```
+```
+
+* Define a function 
+
+$$
+signal(x) = \begin{cases}
+0 & x\leq 0 \\ 
+\sin^2(\pi /2 x) & 0<x<1 \\ 
+1 & x\geq 1 
+\end{cases}
+$$
+
+Compare the difference between `signal(0.999)` and `signal(1.001)`.
+
+```
+```
+
+## Parameters
+
+
+* The formula for a [catenary](http://en.wikipedia.org/wiki/Catenary) has a parameter $a$:
+
+$$
+y = a \cosh(x/a)
+$$
+
+($\cosh(x)$ is the hyperbolic cosine, defined by $(1/2) \cdot (e^x + e^{-x})$. 
+
+Write a function, `c(x;a=1)`, with `a` as a parameter defaulting to
+$1$. Compute `c(1)`, `c(1,a=2)`, and `c(1, a=1/2)`.
+
+```
+```
+
+* Write the following function using parameters for $A$, $B$, $C$, and $D$:
+
+$$
+f(t;A,B,C,D) = A\sin(Bt - C) + D
+$$
+
+Let the default values be $A=1$, $B=1$, $C=D=0$.
+
+Compute $f(1)$ (using the defaults $A=1$, $C=D=0$), $f(1; B=2\pi)$, $f(1; A=2\pi, B=2\pi)$
+
+```
+```
+
+
+
+
+## returning a function
+
+* Describe what the following function does to the argument $f$, when
+  $f$ is a function. (There isn't anything to do but recognize that
+  `n` takes a function as input and returns a function as output, this
+  question is how is `n(f)` related to `f`.)
+
+```
+n(f::Function) = x -> -f(x)
+``` 
+

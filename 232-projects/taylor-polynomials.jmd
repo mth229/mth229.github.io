@@ -1,0 +1,239 @@
+# Questions to be handed in for project *Taylor Polynomials*
+
+
+We begin by loading  packagse for plotting, automatic differentiation, and symbolic manipulations:
+
+```
+using Gadfly	
+using Roots
+using SymPy
+```
+
+
+### Quick background
+
+A **Taylor polynomial** of a function $f(x)$ about $x=c$ of degree $n$ is formally defined by
+
+$$
+T_n(x) = f(c) + \frac{f'(c)}{1!}(x-c)  \frac{f''(c)}{2!}(x-c)^2 + \cdots + \frac{f^{(n)}(c)}{n!}(x-c)^n.
+$$
+
+
+When $n=1$ this is the familiar tangent line approximation. Higher
+orders, generally yield better approximations. 
+
+In `julia` we can create this series numerically using the `D` function. It is
+useful to write our function so that it returns a function, as is done
+with the following. We use a quadratic approximation for the default
+order and expand around $0$ as the default (the Maclaurin polynomial).
+
+
+```
+function taylor(f, n=2; c::Real=0)
+	 x -> f(c) + sum([D(f, k)(c)/factorial(k)*(x-c)^k for k in 1:n])
+end
+```
+
+
+We can see graphically that the Taylor polynomial approximates the
+function $f(x)$ around the $x=c$. For example, we approximate
+$\cos(x)$ at $x=0$ and $x=1$:
+
+```
+f(x) = cos(x)
+plot([f, taylor(f, 2, c=0), taylor(f, 2, c=pi/4)], -pi/2, pi/2)
+```
+
+
+We can see that taking higher orders can lead to better
+approximations. In the following we use a comprehension and
+*splatting* to avoid having to type `plot([f, taylor(f,1),
+taylor(f,2), taylor(f,3), ..., taylor(f,6) ], 0, 4)`:
+
+```
+f(x) = exp(x)
+plot([f, [taylor(f,n) for n in 1:6]...], 0, 4) # 6 polynomial approximations
+```
+
+By toggling the display of the various approximations, you should be
+able to confirm that the higher-order approximations do a better job.
+
+
+Mathematically, the above picture is governed by the following *error bound* for Taylor polynomials:
+
+$$
+| f(x) - T_n(x) | \leq | \frac{f^{(n+1)}(z^*)}{(n+1)!} \cdot (x-c)^{n+1} |
+$$
+
+where $z^*$ is chosen to maximize the above expression between $x$ and
+$c$. That is, the largest possible value for the next term in the
+Taylor polynomial provides a bound for the error. 
+
+
+
+
+
+
+
+----
+
+ 
+### Questions
+
+#### Maclaurin Polynomials. <small>Useful approximations</small>
+
+* Verify graphically that the approximation $\log(1 + x) \approx x$
+  comes from using the Maclaurin polynomial of degree 1. The
+  approximation is not good for all $x$. What seems like a reasonable
+  range of $x$ for where it is "good?"
+
+```
+```
+
+
+#### Maclaurin Polynomials
+
+* Let $f(x) = \tan(x)$. Plot the first $6$ Maclaurin polynomials and
+  $f$ over $[-\pi/3, \pi/3]$. Is the approximation good at $x=0$? Are
+  any of the approximations good at $\pi/3$?
+
+```
+```
+
+#### Maclaurin Polynomials <small>better for bigger $k$?</small>
+
+* Let $f(x) = \sin(x)$. Plot the first $6$ Maclaurin polynomials and
+  $f$ over $[-\pi/2, \pi/2]$.  Is the approximation good at $x=0$? Are any of the
+  approximations good at $\pi/2$?
+
+```
+```
+
+
+
+#### Is 4th better then 3rd?
+
+* Again for $f(x) = \sin(x)$. Plot the function and the Maclaurin
+  polynomials of degree $3$ and $4$. Is the $4$th degree polynomial a
+  better approximation? Why or why not?
+
+```
+```
+
+
+#### Approximate integration by approximating the function -- not the area.
+
+* The function $f(x) = e^{-x^2}$ does not have an antiderivative,
+  hence can not be integrated by the fundamental theorem of
+  calculus. One can estimate the integral using Riemann sums *or* one
+  can estimate the function by an easily integrable function and
+  integrate that. Of course, Maclaurin polynomials are easily
+  integrable.
+
+  Plot several Maclaurin polynomials that approximate $f(x)$ over the
+  interval $[0, 0.5]$. Choose the lowest order one that graphically
+  matches over that interval. Integrate that approximation and compare
+  to the value given by:
+
+```
+f(x) = exp(-x^2)
+quadgk(f, 0, 0.5)
+```
+
+
+```
+```
+
+
+#### Verifying the error bound
+
+* Let $f(x) = e^x$ a monotone function. Let $T_3(x)$ be the 3rd-order
+  Maclaurin polynomial. Verify graphically that over the interval
+  $[0,4]$ the difference $|f(x) - T_3(x)| < f''''(4)/4! \cdot
+  (x-0)^4$. (We know that for this function $f''''(4)$ is monotone
+  increasing, so is largest at the right end point, hence the use of
+  $f''''(4)$ in the bound.)
+
+  Is the bound a "tight" bound over the entire interval, in that the
+  actual error is close to the given bound?
+
+```
+```
+
+
+#### A physics application 
+
+* The following two formulas come from different eras of physics:
+
+$$
+k_1(v) = \frac{1}{2}v^2, \quad k_2(v,c) =c^2((1-(v/c)^2)^{-1/2} - 1).
+$$
+
+Which we can express via:
+
+```
+k1(v) = v^2 / 2
+k2(v; c=10) = c^2 * (1/sqrt(1 - (v/c)^2) - 1)
+```
+
+
+Both describe the kinetic energy, but one uses Einstein's theory of
+relativity. For any value of $c > 0$, show that the two agree up to
+second order approximations by Taylor polynomials.
+
+```
+```
+
+#### A different motivation for the polynomials
+
+* Here is a different motivation of the Maclaurin polynomial that can
+  be explored symbolically.  (This is a generalization of the tangent
+  line, where the "polynomial" is the secant line, and the limiting
+  values there combine to give the tangent line.)
+
+For concreteness let $f(x) = e^x$. For any $b > 0$, there is just one
+fifth degree polynomial, $p(x)$, satisfying $p(i\cdot b) = f(i\cdot
+b)$ for $i=0,1,2,3,4,5$. This is polynomial interpolation at 6
+points.
+
+
+
+This particular solution can be found as follows using
+`SymPy`:
+
+```
+a0,a1,a2,a3,a4,a5,b = symbols("a0, a1, a2, a3, a4, a5, b")
+f(x) = exp(x)
+g(x) = a0 + a1*x + a2*x^(2//1) + a3*x^(3//1) + a4*x^(4//1) + a5*x^(5//1) - f(x)
+di = solve(Sym[g(i*b) for i in 0:5], [a0, a1,a2,a3,a4,a5])
+```
+
+At first glance, this seems to have nothing to do with the Maclaurin
+polynomial for $f(x)$, $T_5(x) = 1 + x + x^2/2 + x^3/6 + x^4/24 +
+x^5/120$. But wait, let's take the limit as $b$ goes to zero of each
+value in `di`. For example, the fifth term:
+
+```
+limit(di["a5"], b, 0)
+```
+
+The answer is the `a5` coefficient of $T_5(x)$. Verify that this is the case for each of `a0`, ..., `a4`.
+
+```
+```
+
+
+<script>
+// f(x) = sin(x)
+// x, b = @syms x b
+// n = 10
+
+// bs = b*[0:n]
+
+// A = hcat(ones(Sym, n+1), [bs.^(i//1) for i in 1:n]... )
+
+// Ai = inverse(A) ## NOT inv(A)!!!
+// fs = Sym[subs(f(x),x,i*b) for i in 0:n]
+
+// [limit((Ai * fs)[i], b, 0) for i in 1:n+1]
+</script>

@@ -1,0 +1,295 @@
+# Questions to be handed in on integration:
+
+To get started, we load `Gadfly` so that we can make plots, and load the `Roots` package for `D`:
+
+```
+using Gadfly
+using Roots			# for D and fzero
+using SymPy
+```
+
+### Quick background
+
+Read about this material here: [integration](http://mth229.github.io/integration.html).
+
+
+For the impatient, in many cases, the task of evaluating a definite integral is made easy
+by the fundamental theorem of calculus which says that for a
+continuous function $f$ that the following holds for any of its
+antiderivatives, $F$:
+
+$$
+\int_a^b f(x) dx = F(b) - F(a).
+$$
+
+That is the definite integral is found by evaluating a related
+function at the endpoints, $a$ and $b$.
+
+
+The `SymPy` package can compute many antiderivatives using a version
+of the Risch algorithm that works for _elementary functions_. Its
+`integrate` function can be used to find an indefinite integral:
+
+```
+f(x) = x^2
+integrate(f)
+```
+
+Or a definite integral:
+
+```
+integrate(f, 0, 1)		# returns a "symbolic" number
+```
+
+
+However, this only works *if* there is a known antiderivative $F(x)$
+-- which is not always the case. If not, what to do?
+
+In this case, we can appeal to the definition of the definite
+integral. For continuous, non-negative $f(x)$, the definite integral
+is the area under the graph of $f$ over the interval $[a,b]$. This
+area can be directly *approximated* using Riemann sums, or some other
+approximation scheme.
+
+
+Imagine one didn't know, $F$. Then the Riemann approximation can
+help. The following pattern will compute the sum using right-hand
+endpoints:
+
+```
+f(x) = x^2
+a, b, n = 0, 1, 5		# 5 partitions of [0,1] requested
+delta = (b - a)/n		# size of partition
+xs = a + (1:n) * delta	
+fxs = [f(x) for x in xs]
+sum(fxs * delta)		# a new function `sum` to add up values in a container
+```
+
+That isn't very close to $1/3$. But we only took $n=5$. Bigger $n$s mean better approximations:
+
+```
+f(x) = x^2
+a, b, n = 0, 1, 50_000		# 50,000 partitions of [0,1] requested
+delta = (b - a)/n		
+xs = a + (1:n) * delta	
+fxs = [f(x) for x in xs]
+sum(fxs * delta)
+```
+
+Note that only the first two lines need changing to adjust to a new
+problem. This makes it easy to wrap this in a function. We borrow this
+more elaborate one from the notes:
+
+```
+function riemann(f::Function, a::Real, b::Real, n::Int; method="right")
+  if method == "right"
+     meth(f,l,r) = f(r) * (r-l)
+  elseif method == "left"
+     meth(f,l,r) = f(l) * (r-l)
+  elseif method == "trapezoid"
+     meth(f,l,r) = (1/2) * (f(l) + f(r)) * (r-l)
+  elseif method == "simpsons"
+     meth(f,l,r) = (1/6) * (f(l) + 4*(f((l+r)/2)) + f(r)) * (r-l)
+  end
+
+  xs = a + (0:n) * (b-a)/n
+  as = [meth(f, l, r) for (l,r) in zip(xs[1:end-1], xs[2:end])]
+  sum(as)
+end
+```
+
+
+The Riemann sum is very slow to converge here. There are faster
+algorithms both mathematically and computationally. We will discuss
+two: the trapezoid rule, which replaces rectangles with
+trapezoids; and Simpson's rule which is a quadratic approximation.
+
+```
+f(x) = x^2
+riemann(f, 0, 1, method="trapezoid"), riemann(f, 0, 1, method="simpsons")
+```
+
+Base `julia` provides the `quadgk` function which uses a different
+approach altogether. It is used quite easily:
+
+```
+f(x) = x^2
+ans, err = quadgk(f, 0, 1)
+```
+
+This function returns two values, an answer and an estimated maximum
+possible error.  The ans is the first number, clearly it is $1/3$, and
+the estimated maximum error is the second. In this case it is small
+($10^{-17}$) and is basically 0.
+
+### Questions
+
+
+* Let $g(x) = x^4 + 10x^2 - 60x + 71$. Find the integral $\int_0^1
+  g(x) dx$ exactly using the fundamental theorem of calculus.
+
+```
+```
+
+
+* For $f(x) = x/\sqrt{g(x)}$ (for $g(x)$ from the last problem) estimate the following using 1000 Riemann sums:
+
+$$
+\int_0^1 f(x) dx
+$$
+
+```
+```
+
+* Let $f(x) = \sin(\pi x^2)$. Estimate $\int_0^1 f(x) dx$ using 20 Riemann sums
+
+```
+```
+
+* For the same $f(x)$, compare your estimate with 20 Riemann sums to that with 20,000 Riemann sums. How many digits after the decimal point do they agree?
+
+```
+```
+
+
+#### Left Riemann
+The left Riemann sum uses left-hand endpoints, not right-hand ones. 
+
+* For $f(x) = e^{x}$ use the left Riemann sum with $n=10,000$ to estimate $\int_0^1 f(x) dx$.
+
+```
+```
+
+
+* The left and right Riemann sums for an increasing function are also
+  lower and upper bounds for the answer. Find the difference between
+  the left and right Riemann sum for $\int_0^1 e^x dx$ when
+  $n=10,000$. (Use your last answer.) What is the approximate value
+  $1/100$, $1/1000$, $1/10000$, or $1/100000$?
+
+```
+```
+
+#### trapezoid, Simpson's
+
+* The answer to $\int_0^1 e^x dx$ is simply $e^1 - e^0$ =
+  $e-1$. Compare the error of the trapezoid method when $n=10,000$.
+
+```
+```
+
+
+
+* The answer to $\int_0^1 e^x dx$ is simply $e^1 - e^0$ =
+  $e-1$. Compare the error of the Simpson's method when $n=10,000$.
+
+```
+```
+
+(The error for Riemann sums is like $1/n$, the error for trapezoid sums is $1/n^2$ and that for Simpson's is $1/n^4$.)
+
+## quadgk
+
+* Use `quadgk` to find $\int_{-3}^{3} (1 + x^2)^{-1} dx$. What is the answer? What is the estimated maximum error?
+
+```
+```
+
+* Use `quadgk` to find the integral of $e^{-|x|}$ over $[-1,1]$.
+
+```
+```
+
+### Improper integrals
+
+An _improper integral_ is one which involves infinity one of  few ways:
+
+* one or both limits is infinite
+
+* the function $f$ has a vertical asymptote in the interval $[a,b]$ (e.g., $f(x) = 1/x$ on $[0,1]$.
+
+
+For these cases, the fundamental theorem of calculus does not apply,
+but the definite integral can be defined in terms of limiting values
+over sub-ranges. (For example, $\lim_{M} \int_0^M e^{-x} dx =
+\int_0^\infty e^{-x} dx$.)
+
+[Kahan](http://www.hpl.hp.com/hpjournal/pdfs/IssuePDFs/1980-08.pdf)
+(in a very interesting article about integration on a calculator)
+goes on to add these as troubling:
+
+* the integrand oscillates infinitely rapidly in the interval $[a,b]$ (e.g., $f(x) = \sin(1/x)$ on $[-1,1]$.
+
+* the integrand or its first derivative changes wildly within a relatively narrow subinterval or oscillates frequently.
+
+The `quadgk` function can handle these cases well, as we see through some examples
+
+* The integral $\int_0^1 1/\sqrt{x}dx$ is an improper integral that is defined. What is the value?
+
+```
+```
+
+* The integral $\int_0^1 x^{-2} dx$ is an improper integral that is not defined. How does `julia` report the error?
+
+```
+```
+
+* The integral $\int_0^\infty e^{-x^2} dx$ is important in probability theory and many other areas. Compute its value with `quadgk`. (`Inf` is infinity.)
+
+```
+```
+
+* The function $\sin(1/x)$ has no limit at $0$, but the integral $\int_0^1 \sin(1/x)dx$ can be defined in terms of a limit. What is the value estimated by `quadgk`? Any thoughts on why this integral may take so long to be computed?
+
+```
+```
+
+* Define
+
+$$
+f(u) = \frac{\sqrt{u}}{u-1} - \frac{1}{\log{u}}
+$$
+
+The improper integral $\int_0^1 f(u) du$ is defined. What is the
+value? What is the estimated error? Is this consistent with a value of
+$0.03649$ plus or minus $0.00000007$?
+
+```
+```
+
+## Applications
+
+We discuss an application of the integral to finding the volumes --
+not just areas.  The first is a formula for a solid of revolution. For
+cylindrically symmetric volume, such as a drinking glass, if the
+radius as a function of height is given by $r(h)$, the the volume is
+$\int_a^b \pi r(h)^2 dh$.
+
+
+### glass half full
+
+
+
+* A glass is formed as a volume of revolution with radius as a
+  function of height given the equation $r(h) = 2 + (h/20)^4$. The
+  volume as a function of height $b$ is given by $V(b) = \int_0^b \pi
+  r(h)^2 dh$. Find $V(25)$.
+
+```
+```
+
+
+* Find a value of $b$ so that $V(b) = 455$.
+
+```
+```
+
+* Now find a value of $b$ for which $V(b) = 455/2$. This height will
+  have half the volume as the height just found. Compare the two
+  values. Is the ratio of smallest to largest 1/2, more than 1/2 or
+  less?
+
+```
+```
+
+

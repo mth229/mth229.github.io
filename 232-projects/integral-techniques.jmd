@@ -1,0 +1,403 @@
+# Questions to be handed in for project Techniques of Integration
+
+Begin by loading our package for plotting our package that allows symbolic math:
+
+```
+using Gadfly		
+using SymPy
+```
+
+This project covers some of the techniques of integration utilizing
+the symbolic algebra capabilities provide by the `SymPy` package. 
+
+
+The basic techniques of integration involve 
+
+* substitution (reverse chain rule)
+* integration by parts (reversed product rule)
+* partial fractions (for rational functions)
+
+The `SymPy` function `integrate` is a implementation of the [Risch
+Algorithm](http://en.wikipedia.org/wiki/Risch_algorithm).  This
+algorithm can decide if a function comprised of elementary functions
+has an antiderivative expressed in elementary function.  For example,
+neither $\sin(x^2)$ or $\e^{x^2}$ has such a "nice" antiderivative,
+whereas $\sin(x)^2$ and $xe^{-x^2}$ do. Risch's algorithme exploits
+[Liouville's Theorem](http://asmeurersympy.wordpress.com/2010/08/)
+which gives an representation for any potential antiderivative of
+$f(x)$ using *elementary functions* such as polynomials, logarithms,
+exponentials and trigonometric functions.
+
+
+### Questions
+
+#### When `integrate` works
+
+* use `integrate` to find an antiderivative for 
+
+$$
+\int \cos(x) \log(\sin(x)) dx.
+$$
+
+Judging from the answer does it appear to use parts, substitution, both, or something else.
+
+
+```
+```
+
+* use `integrate` to find an antiderivative for 
+
+$$
+\int \log(\log(x)) / x dx.
+$$
+
+Judging from the answer does it appear to use parts, substitution, both, or something else.
+
+
+```
+```
+
+* use `integrate` to find an antiderivative for 
+
+$$
+\int x \sec^2(x) dx.
+$$
+
+Judging from the answer does it appear to use parts, substitution, both, or something else.
+
+
+```
+```
+
+* use `integrate` to find an antiderivative for 
+
+$$
+\int (\log(x))^2 dx.
+$$
+
+Judging from the answer does it appear to use parts, substitution, both, or something else.
+
+
+```
+```
+
+* use `integrate` to find an antiderivative for 
+
+$$
+\int sin(x) \cdot e^x dx.
+$$
+
+Judging from the answer does it appear to use parts, substitution, both, or something else.
+
+
+```
+```
+
+
+### It doesn't always work ...
+
+
+The `integrate` function works for many functions, but for some one
+can help by performing substitutions by hand first.
+
+Here is an example from
+[here](http://faculty.uml.edu/jpropp/142/Integration.pdf) where
+performing the substitution by hand is needed to give a boost:
+
+```
+x, dx = symbols("x, dx")
+f(x) = sqrt(x^2 + 1)
+u = x*log(x)
+ex = f(u) * diff(u,x)
+integrate(ex, x)
+```
+
+Sympy can't do this integral, and so returns the expression. But this
+is really ripe for substitution with $u = x\log(x)$.
+
+Let's introduce a variable `dx` into our expression, and then we have:
+
+```
+ex =  f(u) * diff(u,x) * dx
+```
+
+Then we can have this substitution $u = x\log(x)$ 
+Then $du = (x \cdot \log(x))' dx$.
+
+We replace each $x \log(x)$ with a `u`, and replace $dx$ with $dy/(x
+\cdot \log(x))'$. The `subs` function can do so:
+
+
+```
+u, du = symbols("u, du")
+## replace x*log(x) with u and diff(x*log(x),x) * dx with du
+ex1 = subs(ex, x*log(x), u) |> subs(dx, du/diff(x*log(x),x))
+```
+
+This latter function can be integrated (after stripping off the differential we added for familiarity):
+
+```
+ex = integrate(ex1 / du)
+```
+
+If needed we can resubstitute in $x \log(x)$ for $u$ to get an answer.
+
+```
+subs(ex, u, x*log(x))
+```
+
+For future use, we codify the above steps in a function:
+
+```
+function usub(ex, let_u_equal)
+    u, du, dx = symbols("u, du, dx")
+    ex1 = ex * dx
+    ex2 = subs(ex1, dx, du/diff(let_u_equal, x))
+    ex3 = subs(ex2, let_u_equal, u)
+    ex3 / du
+end
+```
+
+This can be used as follow:
+
+```
+ex = log(log(x))/x
+usub(ex, log(x))
+```        
+
+While we are here, we also give this quick function for integration by parts. Just pick "u" and let `SymPy` do the ret:
+
+```
+function udv_parts(ex, let_u_equal)
+    u, dv = let_u_equal, ex/let_u_equal
+    du = diff(u, x)
+    v = integrate(dv)
+    [u*v, v*du]			# return two pieces. One for FTC, one to integrate
+end
+
+ex = x*sin(x)
+uv, vdu = udv_parts(ex, sin(x))
+```
+
+
+### Questions
+
+
+#### The absolute value
+
+* Does `integrate` know how to integrate $|x|$?
+
+```
+```
+
+
+* Assert to `SymPy` that $x > 0$ by defining it via:
+
+```
+x = symbols("x", positive=true)
+```
+
+Does `integrate` now know how to integrate $|x|$?
+
+```
+```
+
+
+* What is a simple antiderivative for $\int |x| dx$?
+
+
+#### Helping `integrate` out
+
+* The following integral exists, but is not found by `integrate`:
+
+$$
+\int \frac{\sqrt{-\log(x)^2 + 1}}{x} dx
+$$
+
+Make a $u$-substitution to help `integrate` out with finding an answer:
+
+```
+```
+
+* The following integral exists, but is not found by `integrate`:
+
+$$
+\int \frac{1}{x \sqrt{1 - \log(x)^2}}dx.
+$$
+
+Make a $u$-substitution to help `integrate` out with finding an answer:
+
+```
+```
+
+
+
+* What do you get if you try a "u"-"dv" integration by parts for $\int
+  e^x \sin(x) dx$?  Does it seem to help find the integral?
+
+```
+```
+
+* The [LIATE rule](http://en.wikipedia.org/wiki/Integration_by_parts#LIATE_rule) is a rule of thumb for identifying what $u$ should be in integrating by parts. Apply it to 
+
+$$
+\int x^2 e^x dx.
+$$
+
+What is $u$? What is the "$v \cdot du$" term? Does it seem "easier"
+than what you started with? Why?
+
+```
+```
+
+
+### Integration of rational functions:
+
+Some background reading on the implementation is
+[here](http://asmeurersympy.wordpress.com/2010/06/11/integration-of-rational-functions/)
+
+
+A *rational function* is a ratio of polynomial functions. Using
+polynomial long division and dividing out common factors, up to
+removable singularities, one can uniquely write a rational function in
+terms of three other polynomials:
+
+
+$$
+a(x)/b(x) =  s(x) + r(x)/q(x)
+$$ 
+
+where the degree of $r(x)$ is less than the degree of $q(x)$ and there
+are no common roots to $r(x)$ and $q(x)$. It is easy to integrate
+$s(x)$. What about the $r(x)/q(x)$?
+
+We know from the *fundamental theorem of algebra* that we can factor
+$q(x) = p_1(x)^n_1 \cdots p_k(x)^{n_k}$, where $p_i$ is a linear or
+quadratic factor. Further, the [partial fraction
+decomposition](http://en.wikipedia.org/wiki/Partial_fraction_decomposition)
+ensures then that the ratio can be written as:
+
+$$
+\frac{r(x)}{q(x)} = \sum_i^k (\frac{a_{i1}(x)}{p_i(x)} + \frac{a_{i2}(x)}{p_i(x)^2} + \cdots + \frac{a_{in_i}(x)}{p_i(x)^n_i}
+$$
+
+with $a_{ij}(x)$ being polynomials with degree less than or equal the $p_i(x)$,
+so in this case either a constant of linear polynomial.
+
+So, if the polynomials of the form $(ax+b)/(cx^2 + dx + e)^j$ can be
+integrated, by the linearity of integration all rational functions can
+be integrated. Let's investigate this question.
+
+
+### Questions
+
+
+* The `apart` function separates rational functions into pieces. Use `apart` to find the partial fraction decomposition of 
+
+$$
+f(x) = \frac{1}{x(x+1)}
+$$
+
+```
+```
+
+*  Use `apart` to find the partial fraction decomposition of 
+
+$$
+f(x) = \frac{1}{x(x+1)^5}
+$$
+
+```
+```
+
+
+*  Use `apart` to find the partial fraction decomposition of 
+
+$$
+f(x) = \frac{1}{x(x^2+1)}
+$$
+
+```
+```
+
+
+*  Use `apart` to find the partial fraction decomposition of 
+
+$$
+f(x) = \frac{1}{x(x^2+1)^3}
+$$
+
+```
+```
+
+
+*  Use `apart` to find the partial fraction decomposition of 
+
+$$
+f(x) = \frac{1}{(x^2+2)^2 (x^2+3)^3}
+$$
+
+```
+```
+
+* Let $m$ be a positive integer. For which values of $m$ will 
+
+$$
+\int \frac{1}{x^m} dx
+$$
+
+will have a rational function for an answer? What is the answer when
+it isn't a rational function?
+
+```
+```
+
+* What is the integral of a term like:
+
+$$
+\int \frac{1}{x^2 + 1} dx
+$$
+
+```
+```
+
+
+* What is the integral of a term like
+
+$$
+\int \frac{x}{x^2 + 1} dx
+$$ 
+
+```
+```
+
+* For non-negative, integer values of $m$, do these integrals appear
+  to always be rational functions? (Just try some different values
+  starting with $m=1$.)
+
+$$
+\int \frac{1}{(x^2+1)^m} dx
+$$
+
+```
+```
+
+
+
+* For non-negative, integer values of $m$, do these integrals appear
+  to always be rational functions?
+
+$$
+\int \frac{x}{(x^2+1)^m} dx
+$$
+
+
+Verify this is the case for any $m$ by integrating the above
+symbolically. (You might also try to do the substitution manually.)
+
+
+```
+```
+
+
+
