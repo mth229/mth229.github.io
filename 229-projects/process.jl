@@ -12,5 +12,7 @@ for (j,h) in zip(jmd_files, ipynb_files)
       println("process $j")
       cmd = "using WeavePynb; markdownToPynb(\"$j\");"
       run(`julia -e "$cmd"`)  
+      cmd = "using WeavePynb; markdownToLaTex(\"$j\");"
+      run(`julia -e "$cmd"`)  
     end    		       
 end

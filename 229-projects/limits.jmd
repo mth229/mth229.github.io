@@ -1,16 +1,16 @@
-# Questions to be handed in for project 5:
+# Questions to be handed in for project 5 on limits
+
 To get started, we load `Gadfly` so that we can make plots.
 
 ```
-using Gadfly			# ignore any warnings
+using Gadfly		
 ```
 
 ----
 
 ### Quick background
 
-Read about this material here: [Investigating limits with
-julia](http://mth229.github.io/limits.html).
+Read about this material here: [Investigating limits with Julia](http://mth229.github.io/limits.html).
 
 For the impatient, the expression
 
@@ -121,6 +121,11 @@ $$
 ```
 ```
 
+```julia
+val = 5/2
+numericq(val, 1e-1, "limit of sin(5t)/sin(2t)")
+```
+
 
 * Plot the function to estimate the limit. What is the value?
 
@@ -131,6 +136,11 @@ $$
 ```
 ```
 
+```julia
+using SymPy
+val = float(limit(x -> (2^x - cos(x))/x, 0))
+numericq(val, 1e-1, "limit of \\( (2^x  - \cos(x))/x \\)")
+```
 
 * Plot the function to estimate the limit. What is the value?
 
@@ -141,6 +151,11 @@ $$
 ```
 ```
 
+```julia
+f(x) = sin(4x)^2 / (cos(x) - 1)
+val = float(limit(f, 0))
+numericq(val, 1e-1, "limit of \\( sin(4x)^2 / (cos(x) - 1) \\)")
+```
 
 ## Questions: Tables
 
@@ -157,23 +172,51 @@ $$
 ```
 ```
 
+```julia
+longq("Which return NaN?", "All but \\( x^{1/\\log(x)} \\)")
+```
+
 * Let $c=0$. Which of these functions is indeterminate at $x=c$:
 
-- $f(x) = \sin(x)/x$
-- $f(x) = \sqrt{x}/(x-2)$
-- $f(x) = x^x$
-- $f(x) = (1 + 1/x)^x$.
+1) $f(x) = \sin(x)/x$
+2) $f(x) = \sqrt{x}/(x-2)$
+3) $f(x) = x^x$
+4) $f(x) = (1 + 1/x)^x$.
 
 ```
 ```
 
-*  Find the limit using a table. What is the estimated value? 
+```julia
+choices = ["\\( f(x) = \\sin(x)/x \\)",
+	  "\\( f(x) = \\sqrt{x}/(x-2) \\)",
+	  "\\( f(x) = x^x \\)",
+	  "\\( f(x) = (1 + 1/x)^x \\)"]
+ans = [1,2,4]
+multiq(choices, ans, "which are indeterminate?")
+```
+
+*  Find the limit using a table. Show your commands. 
 
 $$
 \lim_{x \rightarrow 0+} \frac{\cos(x) - 1}{x}.
 $$
 
 ```
+```
+
+```julia
+longq("Commands for a table to investigate limit of (cos(x) -1)/x")
+```
+
+What is the estimated value? 
+
+```
+```
+
+```julia
+f(x) = (cos(x) - 1)/x
+val = float(limit(f, 0))
+numericq(val, 1e-2, "estimate limit")
 ```
 
 *  Find the limit using a table. What is the estimated value?
@@ -185,14 +228,36 @@ $$
 ```
 ```
 
-* Find the limit using a table. What is the estimated value? (You need
+```julia
+f(x) = sin(5x)/x
+val = float(limit(f, 0))
+numericq(val, 1e-2, "estimate limit")
+```
+* Find the limit using a table. What are your commands? What is the estimated value? (You need
    values getting close to $3$ not $0$.)
 
 $$
 \lim_{x \rightarrow 3} \frac{x^3 - 2x^2 -9}{x^2 - 2x -3}.
 $$
 
+The commands are:
+
 ```
+```
+
+```julia
+longq("Command to find limit at 3 of \\( \\frac{x^3 - 2x^2 -9}{x^2 - 2x -3} \\)")
+```
+
+The value is
+
+```
+```
+
+```julia
+f(x) = (x^3 - 2x^2 - 9) / (x^2 - 2x - 3)
+val = limit(f, 3)
+numericq(val, 1e-2, "limit of \\( \\frac{x^3 - 2x^2 -9}{x^2 - 2x -3} \\)")
 ```
 
 *  Find the limit using a table. What is the estimated value?
@@ -204,11 +269,24 @@ $$
 ```
 ```
 
+
+```julia
+f(x) = (x - sin(abs(x)))/x^3
+val = float(limit(f, 0))
+numericq(val, 1e-2, "limit of \\( (x - sin(abs(x)))/x^3 \\)")
+```
+
 * Find the _left_ limit of `f(x) = cos(pi/2*(x - floor(x)))` as $x$
    goes to $2$. 
 
 ```
 ```
+
+```julia
+val = 0
+numericq(val, 1e-3, "limit of f(x) = cos(pi/2*(x - floor(x)))")
+```
+
 
 * Find the limit using a table. What is the estimated value? Recall,
    `atan` and `asin` are the names for the appropriate inverse
@@ -221,6 +299,11 @@ $$
 ```
 ```
 
+```julia
+f(x) = (atan(x) - 1)/(asin(x) - 1)
+val = float(limit(f, 0, dir="+"))
+numericq(val, 1e-2, "limit of   (atan(x) - 1)/(asin(x) - 1)")
+```
 
 ## Other questions
 
@@ -231,6 +314,9 @@ $$
 ```
 ```
 
+```julia
+longq("For which values does the limit not exist?", "k=3")
+```
 
 * Let `l(x) = (a^x - 1)/x` and _define_ $L(a) = \lim_{x\rightarrow 0} l(x,a)$.
 
@@ -239,6 +325,10 @@ numerically. (In general, you can show algebraically that $L(a\cdot b)
 = L(a) + L(b)$ like a logarithm.
 
 ```
+```
+
+```julia
+longq("Show that \\( L(3 \cdot 4) = L(3) + L(4) \\) by computing all three limits numerically")
 ```
 
 ## Limits at infinity. 
@@ -261,11 +351,22 @@ ys = [f(x) for x in xs]
 ```
 ```
 
+```julia
+f(x) = x^5/exp(x)
+val = float(limit(f, Inf))
+numericq(val, 1e-2, "limit at oo of \\( x^5/e^x \\)")
+```
+
 * Find the limit at infinity of $f(t) = e^t / (1 + e^t)$.
 
 ```
 ```
 
+```julia
+f(t) = e^t / (1 + e^t)
+val = float(limit(f, Inf))
+numericq(val, 1e-2, "limit at oo of \\( e^t / (1 + e^t) \\)")
+```	
 
 ## Symbolic limits
 
@@ -282,7 +383,7 @@ f(x) = sin(x)/x
 limit(f, 0)
 ```
 
-* Find this limit using `SymPy`:
+* Find this limit using `SymPy` (use a decimal value for your answer, not a fraction):
 
 $$
 \lim_{x \rightarrow 3} \frac{1/x - 1/3}{x^2 - 9}.
@@ -291,6 +392,11 @@ $$
 ```
 ```
 
+```julia
+f(x) = (1/x - 1/3) / (x^2 - 9)
+val = float(limit(f, 3))
+numericq(val, 1e-2, "limit at 3 of \\( (1/x - 1/3) / (x^2 - 9) \\)")
+```
 
 * Find this limit using `SymPy`:
 
@@ -302,6 +408,12 @@ $$
 ```
 
 
+```julia
+f(x) = asin(4x)/asin(5x)
+val = float(limit(f, 0))
+numericq(val, 1e-2, "limit at 0 of \\( asin(4x)/asin(5x) \\)")
+```
+
 * Find this limit using `SymPy`:
 
 $$
@@ -309,4 +421,11 @@ $$
 $$
 
 ```
+```
+
+
+```julia
+f(x) = sin(x^2)/(x*tan(x))
+val = float(limit(f, 0))
+numericq(val, 1e-2, "limit at 0 of \\( sin(x^2)/(x*tan(x)) \\)")
 ```

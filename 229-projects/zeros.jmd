@@ -75,22 +75,45 @@ fzeros(f, [-5,5])
 ```
 ```
 
-* The parabola $f(x) = -16x^2 + 200x$ has one zero at $x=0$. Graphically find the other one.
+```julia
+using Roots
+f(x) = 216 - 0.65x
+val = fzero(f, 0)
+numericq(val, 1e-3, "zero of f(x) = 216 - 0.65x")
+```
+
+* The parabola $f(x) = -16x^2 + 200x$ has one zero at $x=0$. Graphically find the other one. What is the value
 
 ```
+```
+
+```julia
+f(x) = -16x^2 + 200x
+rts = roots(f)
+val = maximum(rts)
+numericq(val, 1e-3, "\\(Other root of -16x^2 + 200x\\)")
 ```
 
 * Use the [quadratic equation](http://en.wikipedia.org/wiki/Quadratic_equation) to find
-  the roots of $f(x) = x^2 + x - 1$.
+  the roots of $f(x) = x^2 + x - 1$. Show your work.
 
 ```
 ```
 
-* Use the `roots` function to find the zeros of $p(x)=x^3 -4x^2 -7x + 10$.
+```julia
+longq("quadratic equation to solve \\(x^2 + x - 1\\)")
+```
+
+* Use the `roots` function to find the zeros of $p(x)=x^3 -4x^2 -7x + 10$. What are they?
 
 ```
 ```
 
+```julia
+choices = ["-2.0, 1.0, 5.0", "-0.788376+1.08241im,  -0.788376-1.08241im, 5.57675+0.0im", "-2.33333, 0.0"]
+ans = 1
+radioq(choices, ans, "zeros of \\(p(x)=x^3 -4x^2 -7x + 10\\)")
+```
 
 * Use the `fzeros` function to find the _real_ zeros of $p(x) = x^5
 -5x^4 -2x^3 + 13x^2 -17x + 10$. (The `fzero` function returns all 5
@@ -98,6 +121,15 @@ zeros guaranteed by the Fundamental Theorem of Algebra, not all of them are real
 
 
 ```
+```
+
+```julia
+choices = ["-2.000 + 0.0im, 0.500 + 0.866im, 0.500 - 0.866im, 1.0 + 0.0im, 5.0 + 0.0im",
+	"-2.0, 5.0, 1.0",
+	"0.0, 2.0, 6.0",
+	"1.0, 5.0"]
+ans = 2
+radioq(choices, ans, "zeros of \\( x^5-5x^4 -2x^3 + 13x^2 -17x + 1\\)")
 ```
 
 * Descarte's [rule of
@@ -112,7 +144,22 @@ zeros guaranteed by the Fundamental Theorem of Algebra, not all of them are real
   3$. What are the possible numbers of positive real roots? What is
   the exact number?
 
+The possible number of real roots
+
 ```
+```
+
+```julia
+numericq(3,0, "possible positive roots")
+```
+
+The actual number of positive real roots is:
+
+```
+```
+
+```julia
+numericq(1,0, "actual number of positive roots")
 ```
 
 * The *rational root test* is taught as an aid to factoring. It isn't
@@ -130,15 +177,26 @@ Do these roots satisfy the rational root test or are the rational approximations
 ```
 ```
 
+```julia
+choices = ["Yes they do satisfy the rational root test. For example 2 divides 10 and 3 divides 12",
+	"No they do not satisfy the rational root test. For example 2 divides 12 but 3 \\bold{does not} divide 12"]
+ans = 1
+radioq(choices, ans, "rational root test")
+```
 
 ### Other types of functions
 
 * Graph the function $f(x)= x^2 - 2^x$. Try to graphically estimate
-  all the zeros. Write answers to one decimal point.
+  all the zeros. Answers to one decimal point.
 
 ```
 ```
 
+```julia
+choices = ["0.0, 2.0", "-1.0, 1.0", "2.0, 4.0", "-1.414, 1.414"]
+ans = 3
+radioq(choices, ans, "roots of \\( x^2 - 2^x \\)")
+```
 
 * Plot the conversion of Celsius to Fahrenheit ($f(x) = 9/5x + 32$)
   and the line $y=x$. The intersection point is the temperature where
@@ -147,10 +205,18 @@ Do these roots satisfy the rational root test or are the rational approximations
 ```
 ```
 
+```julia
+numericq(-40, 1e-1, "intersection of F and C")
+```
+
 * Graphically find the point(s) of intersection of the graphs of $f(x) = 2.5-
   2e^{-x}$ and $g(x) = 1 + x^2$.
 
 ```
+```
+
+```julia
+longq("intersections of \\(f(x) = 2.5-2e^{-x}\\) and \\(g(x) = 1 + x^2\\)", "around 0.4 and 0.7")
 ```
 
 * The notes have a `bisection` method, here is an abbreviated version.
@@ -189,6 +255,10 @@ both the zero, `x`, and `f(x)`.
 ```
 ```
 
+```julia
+longq("Commands to find zero of sin(x) in [3,4]")
+```
+
 * Let $f(x) = \exp(x) - x^5$. In the long run the exponential
   dominates the polynomial and this function grows unbounded. By
   graphing over the interval $[0,15]$ you can see that the largest
@@ -196,6 +266,12 @@ both the zero, `x`, and `f(x)`.
   identify the value of the largest zero.
 
 ```
+```
+
+```julia
+f(x) = exp(x) - x^5
+val = maximum(fzeros(f, 0, 15))
+numericq(val, 1e-4, "largest root of \\( e^x - x^5 \\) in [0,15]")
 ```
 
 * Find the intersection point of $4 - e^{x/10} = e^{x/15}$ by first
@@ -206,6 +282,11 @@ both the zero, `x`, and `f(x)`.
 ```
 ```
 
+```julia
+h(x) = 4 - exp(x/10) - exp(x/15)
+val = maximum(fzeros(h, 0, 30))
+numericq(val, 1e-3, "largest intersection point of  4 - exp(x/10) = exp(x/15)")
+```
 
 * The `Roots` package has a built-in function `fzero` that does
   different things, with one of them being a (faster) replacement for
@@ -215,9 +296,16 @@ both the zero, `x`, and `f(x)`.
 
 Show that it works by finding a zero of the function `f(x) = (1 + (1 -
 n)^2)*x - (1 - n*x)^2` when $n=10$. Use $[0, 0.5]$ as a bracketing
-interval.
+interval. What is the value?
 
 ```
+```
+
+```julia
+n = 10
+f(x) = (1 + (1-n)^2)*x - (1-n*x)^2
+val = fzero(f, [0, 0.5])
+numericq(val, 1e-4, "zero of  \\( (1 + (1-n)^2)*x - (1-n*x)^2 \\)")
 ```
 
 
@@ -229,6 +317,11 @@ interval.
 ```
 ```
 
+```julia
+val = fzero(airy, -3, 0)
+numericq(val, 1e-4, "largest negative root of airy function")
+```
+
 
 * Suppose a crisis manager models the number of cases of water left
   after $x$ days by $f(x) = 550,000 \cdot (1 - 0.25)^x$. When does the
@@ -238,10 +331,20 @@ interval.
 ```
 ```
 
+```julia
+longq("When does the supply of water dip below 100,000?", "\\(f(x) = 550000*(1-0.25)^x\\);\\verb+fzero(x->f(x)-100000,[0,10])+; 5.92580")
+```
+
 
 * Use `fzeros` to find the roots of $e^x = x^5$ over $[-20,20]$.
 
 ```
+```
+
+```julia
+choices = [".129856",".129856, 12.7132", "1.85718, 4.53640", "-0.8155, 1.42961, 8.6131"]
+ans = 2
+radioq(choices, ans, "roots of \\( e^x - x^5 in [-20,20] \\)")
 ```
 
 ### Issues with numerics
@@ -252,6 +355,11 @@ interval.
   you expect? (Compare with `fzeros`.)
 
 ```
+```
+
+```julia
+longq("what does roots find for \\( x-1)^20 \\)? What is expected?",
+	    "roots found sit on unit circle. Answer should be just 1.0")
 ```
 
 
@@ -268,15 +376,31 @@ This finds three roots. What happens if `delta = 0.001`? (The `roots` function d
 ```
 ```
 
+```julia
+longq("What happens when roots are nearby? (delta=0.001)", "The algorithm only finds two of three")
+```
 
-* The `fzeros` function for general functions is a very nieve function: it simply splits the interval into many pieces and looks for bracketing intervals. It will have problems with nearby roots and roots which don't have a sign change. Apply it to this function over the interval $[-10,10]$. Are any of the three zeros found?
+
+* The `fzeros` function for general functions is a very nieve
+  function: it simply splits the interval into many pieces and looks
+  for bracketing intervals. It will have problems with nearby roots
+  and roots which don't have a sign change. Apply it to this function
+  over the interval $[-10,10]$. Are any of the three zeros found?
 
 ```
 delta = 0.01
 f(x) = (x-1-delta)*(x-1)*(x-1+delta) * exp(x)
 ```
 
+```julia
+longq("Are any of the three zeros found?", "Just one, not 3 as there should be.")
+```
+
 * Will `fzeros` find all zeros of the function $f(x) = \cos(x) + \cos(2x)$ over the interval $[0,2\pi]$?
 
 ```
+```
+
+```julia
+longq("will fzeros find all the zeros?", "No, it misses the obvious zero at \\( \pi \\)")
 ```

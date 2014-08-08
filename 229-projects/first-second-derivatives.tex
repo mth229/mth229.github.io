@@ -1,0 +1,367 @@
+\documentclass[12pt]{article}
+\usepackage[fleqn]{amsmath}     %puts eqns to left, not centered
+\usepackage{graphicx}
+\usepackage{hyperref}
+\begin{html}
+<style>
+pre {font-size: 1.2em; background-color: #EEF0F5;}
+ul li {list-style-image: url(http://www.math.csi.cuny.edu/static/images/julia.png);}  
+</style>
+\end{html}
+\begin{document}
+
+\section{Questions to be handed in for project 7:}
+
+To get started, we load \texttt{Gadfly} so that we can make plots, and
+load the \texttt{Roots} package for \texttt{D} and \texttt{fzero}:
+
+
+
+\begin{verbatim}
+using Gadfly            
+using Roots         
+\end{verbatim}
+\subsubsection{Quick background}
+
+Read about this material here:
+\href{http://mth229.github.io/first-second-derivatives.html}{Exploring
+first and second derivatives with Julia}.
+
+For the impatient, this assignment looks at the relationship between a
+function, $f(x)$, and its first and second derivatives, $f'(x)$ and
+$f''(x)$. The basic relationship can be summarized (though the devil is
+in the details) by:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\item
+  if the first derivative is \emph{positive} on $(a,b)$ then the
+  function is \emph{increasing} on $(a,b)$.
+\item
+  If the second derivative is \emph{positive} on $(a,b)$ then the
+  function is \emph{concave up} on $(a,b)$.
+\end{enumerate}
+
+We will use the \texttt{D} operator from the \texttt{Roots} package to
+find the first and second derivatives of \texttt{f}. The usage follows
+this pattern:
+
+
+
+\begin{verbatim}
+f(x) = sin(x)           # some function
+fp(x) = D(f)(x)         # makes fp the first derivative
+fpp(x) = D(f,2)(x)      # makes fpp the second derivative
+\end{verbatim}
+In the notes, the following function is used to plot a function
+\texttt{f} two ways: once as usual, the second time showing the function
+\texttt{f} \emph{only if} the function \texttt{g} is positive.
+
+
+
+\begin{verbatim}
+function plotif(f, g, a, b)
+  plot([f, x -> g(x) > 0.0 ? f(x) : NaN], a, b)
+end
+\end{verbatim}
+This allows a graphical exploration of the above facts:
+
+
+
+\begin{verbatim}
+plotif(f, fp, 0, 2pi)       # shows sin(x) and when derivative is 0
+\end{verbatim}
+Clicking on the \texttt{f1} in the legend on the right will hide the
+graph of \texttt{f} and leave only the graph of \texttt{f} where
+\texttt{fp(x) \textgreater{} 0}.
+
+
+
+Many questions resolve to finding zeros of some function. The
+\texttt{fzeros} function can be useful for this -{}- but it only finds
+simple roots. A repeated use of \texttt{fzero} with good initial guesses
+is more reliable. For example, from the graph of
+$f(x) = 1 + \cos(x) + \cos(2x)$, we can see in $[0,2\pi]$ that there are
+zeros \emph{near} 1.5, 2, 4 and 5. These can be improved with:
+
+
+
+\begin{verbatim}
+f(x) = 1 + cos(x) + cos(2x)
+guesses = [1.5, 2, 4, 5]
+[fzero(f, x) for x in guesses] # do 4 things at once
+\end{verbatim}
+\subsubsection{Questions, Graphical approach}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Make a graph using \texttt{plotif} to investigate when the
+  \texttt{airy} function is positive on the interval $(-5,5)$. Your
+  answer should use interval notation.
+\end{itemize}
+
+\begin{answer}
+type: longtext
+reminder: Commands to plot airy to see when it is positive
+
+rows: 3
+cols: 60
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Make a graph using \texttt{plotif} to investigate when the function
+  $f(x) =   x^x$ is \emph{increasing} on the interval $(0,2)$. Your
+  answer should use interval notation.
+\end{itemize}
+
+\begin{answer}
+type: longtext
+reminder: Interval(s) in (0,2) where \( x^x \) is increasing.
+answer_text: Roughly (0.3678, 2) 
+rows: 3
+cols: 60
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Make a graph using \texttt{plotif} to investigate when the function
+\end{itemize}
+
+\[
+f(x) = \frac{x}{x^2+9}
+\]
+
+is \emph{concave up} on the interval $(-10,10)$. Your answer should use
+interval notation.
+
+\begin{answer}
+type: longtext
+reminder: When on (-10, 10) is \( x/(x^2 + 9) \) concave up?
+answer_text: (-5.196, 0), (5.196, oo) 
+rows: 3
+cols: 60
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Make a graph using \texttt{plotif} to identify any \emph{critical
+  points} of $f(x) = x \ln(x)$ on the interval $(0,4)$.
+\end{itemize}
+
+\begin{answer}
+type: longtext
+reminder: Critical point of \( x \log(x) \) on (0,4)
+answer_text: 0.367879 is only one 
+rows: 3
+cols: 60
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Make a graph using \texttt{plotif} to identify any \emph{inflection
+  points} of $f(x) = \sin(x) - x$ over the interval $(-5,5)$.
+\end{itemize}
+
+\begin{answer}
+type: longtext
+reminder: inflection points of sin(x) - x in (-5,5)
+answer_text: -pi, 0, pi 
+rows: 3
+cols: 60
+\end{answer}
+
+\subsubsection{Finding numeric values}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  We can graphically identify \emph{critical points} of $f(x)$ by
+  graphing the function's derivative and looking for when the derivative
+  is 0 or undefined. Numerically, we can locate values where the
+  derivative crosses $0$ using the \texttt{fzero} function from the
+  \texttt{Roots} package.
+\end{itemize}
+
+Use \texttt{fzero} to numerically identify all \emph{critical points} to
+the function $f(x) = 2x^3 - 6x^2 - 2x + 4$. (There are no more than
+$2$.)
+
+\begin{answer}
+type: longtext
+reminder: critical points of \( f(x) = 2x^3 - 6x^2 - 2x + 4 \)
+answer_text: \verb+fzeros(D(f), -10,10)+ gives -0.15455, 2.1547 
+rows: 3
+cols: 60
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Use \texttt{fzero} to numerically identify all \emph{inflection
+  points} for the function $f(x) = \ln(x^2 + 2x + 5)$.
+\end{itemize}
+
+\begin{answer}
+type: radio
+reminder: all inflection points
+values: 1 | 2 | 3 | 4
+labels: There are none | There is one at x=-1.0 | There is one at x=1.0 and one at x=-3.0 | There are three at-4.4641, -1.0, and 2.4641
+answer: 3
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Suppose $f'(x) = x^3 - 6x^2 + 11x - 6$. Where is $f(x)$ increasing?
+  Use interval notation in your answer.
+\end{itemize}
+
+\begin{answer}
+type: radio
+reminder: When is f(x) increasing?
+values: 1 | 2 | 3 | 4
+labels: It is always increasing | (-oo, 1.42265) and (2.57735, oo) | (1.0, 2.0) and (3.0, oo) | (2.0, oo)
+answer: 3
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Suppose $f''(x) = x^2 - 3x + 2$. Where is $f(x)$ concave up? Use
+  interval notation in your answer.
+\end{itemize}
+
+\begin{answer}
+type: radio
+reminder: When is f(x) concave up?
+values: 1 | 2 | 3 | 4
+labels: (-oo, oo) -- it is always concave up | (1.5, oo) | (1.0, 2.0) | (-oo, 1.0) and (2.0, oo)
+answer: 4
+\end{answer}
+
+\subsubsection{the derivative tests}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  The first derivative test states that for a differentiable function
+  $f(x)$ with a critical point at $c$ then if $f'(x)$ changes sign from
+  $+$ to $-$ at $c$ then $f(c)$ is a local maximum and if it changes
+  sign from $-$ to $+$ then $f(c)$ is a local maximum.
+\end{itemize}
+
+For the function $f(x)$ suppose you know $f'(x)=x^3 - 5x^2 + 8x - 4$.
+Find \emph{all} the critical points. Use the first derivative test to
+classify them as local extrema \emph{if} you can. If you can't say why.
+
+\begin{answer}
+type: longtext
+reminder: Find critical points of f(x), when \( f'(x)=x^3 - 5x^2 + 8x -4 \). Classify
+answer_text: 1,2 are cps, changes sign - to + at 1, so a min; does not change sign at 2, not an extrema 
+rows: 3
+cols: 60
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  The second derivative test states that if $c$ is a critical point of
+  $f(x)$ and $f''(c) > 0$ then $f(c)$ is a local minimum and if
+  $f''(c) < 0$ then $f(c)$ is a local maximum.
+\end{itemize}
+
+Suppose $f'(x) = (x^2 - 2) \cdot e^{-x}$. First find the critical points
+of $f(x)$, then use the second derivative test to classify them.
+
+The critical points are:
+
+
+
+\begin{verbatim}
+choices = ["-1.41421, 1.41421", "0.0", "-0.732051", "-0.732051, 2.73205"]
+ans = 1
+radioq(choices, ans, "critical points")
+\end{verbatim}
+Classify your critical points using the second derivative test
+
+\begin{answer}
+type: longtext
+reminder: Classify critical points with second derivative test
+answer_text: \verb+[D(fp)(x) for x in sort(fzeros(fp, -5,5))]+ indicates max at -sqrt(2) and min at sqrt(2) 
+rows: 3
+cols: 60
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  For a polynomial $p(x)$ between any two zeros there must be a critical
+  point, and perhaps more than one. Verify this is the case for
+  $p(x) =x^4 + x^3 - 7x^2 - x + 6$. You can do this graphically or
+  numerically.
+\end{itemize}
+
+\begin{answer}
+type: longtext
+reminder: Verify that between each zero of \( p(x) \) is at least one zero of \( p'(x) \)
+answer_text: Compare, say, \verb+fzeros(p)+ with \verb+fzeros(D(p), -4, 3)+ 
+rows: 3
+cols: 60
+\end{answer}
+
+\subsubsection{Concave up has alternate definitions}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  The Rogawski book defines $f(x)$ to be concave up for differentiable
+  functions by: $f(x)$ is concave up on $(a,b)$ if $f'(x)$ is increasing
+  on $(a,b)$. More generally, one can define $f(x)$ as concave up on
+  $(a,b)$ if for any pair of points, $c$ and $d$ with $a < c < d < b$
+  one has the secant line connecting $(c,f(c))$ and $(d,f(d))$ lies
+  \emph{above} the graph of $f(x)$ over $(c,d)$.
+\end{itemize}
+
+For the function $f(x) = x^2 - 2x$, graphically verify this is the case
+for 3 pairs of points between $(-5,5)$. The following can be used to
+create a function for a secant line between $c$ and $d$:
+
+
+
+\begin{verbatim}
+function secline(f, c, d)
+  x0, y0, m = c, f(c), (f(c) - f(d)) / (c - d)
+  x -> y0 + m * (x - x0)    # pt-slope form as function
+end
+\end{verbatim}
+\begin{answer}
+type: longtext
+reminder: Commands to produce graph of \( x^2 - 2x \) and three secant lines
+
+rows: 3
+cols: 60
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  For the function $f(x) = x^3 - 2x$ find a pair of points, $c$ and $d$,
+  in $(-3,3)$ which illustrate that the function is not concave up.
+\end{itemize}
+
+\begin{answer}
+type: longtext
+reminder: Commands to produce graph of \( x^3 - 2x \) and a secant line that is not always above graph
+
+rows: 3
+cols: 60
+\end{answer}
+
+\end{document}
+

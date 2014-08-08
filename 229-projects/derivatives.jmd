@@ -83,6 +83,11 @@ fp(pi)			        # finds cos(pi). Also D(sin)(pi)
 ```
 ```
 
+```julia
+f(x) = 2x^2 + 5
+val = (f(5) - f(2))/(5-2)
+numericq(val, 1e-3, "slope of secant line")
+```
 
 * Verify that the derivative of $f(x) = \sin(x)$ at $\pi/3$ is $1/2$
   by finding the following limit using a table:
@@ -96,12 +101,22 @@ $$
 ```
 ```
 
+```julia
+longq("Verify derivative using a table", "\\verb+[hs map(x->sin(x), hs)]+")
+```
 
 
 * Let $f(x) = 1/x$ and $c=2$. Find the approximate derivative (forward) when
   `h=1e-6`.
 
 ```
+```
+
+```julia
+f(x) = 1/x
+c, h = 2, 1e-6
+val = (f(c + h) - f(c))/h
+numericq(val, 1e-4, "approxderivative \\verb+(1/x)'(2)+")
 ```
 
 
@@ -111,16 +126,51 @@ $$
 ```
 ```
 
+
+```julia
+f(x) = x^x
+c, h = 3, 1e-8
+val = (f(c + h) - f(c))/h
+numericq(val, 1e-4, "approxderivative \\verb+(x^x)'($c)+")
+```
+
+
+
 * Let $f(x) = (x + 2)/(1 + x^3)$. Plot both $f$ and its approximate
   derivative on the interval $[0,5]$. Identify the zero of the
   derivative. What is its value? What is the value of $f(x)$ at this
   point?
 
 
+What commands produce the plot?
 
 ```
 ```
 
+```julia
+longq("what commands produce a plot of f and its derivative over [0,5]?")
+```
+
+What is the zero of the derivative on this interval?
+
+```
+```
+
+```julia
+using Roots
+f(x) = (x+2)/ (1 + x^3)
+val = fzero(D(f), [0,5])
+numericq(val, 1e-2, "zero of derivative")
+```
+
+What is the value of $f$ at this point:
+
+```
+```
+
+```julia
+numericq(f(val), 1e-2, "value of f(x0)")
+```
 
 * Let $f(x) = (x^3 + 5)(x^3 + x + 1)$. The derivative of this function
   has one real zero. Find it. (You can use `fzero` with the derivative
@@ -129,6 +179,11 @@ $$
 ```
 ```
 
+```julia
+f(x) = (x^3 + 5)*(x^3 + x + 1)
+val = fzero(D(f), -10, 10)
+numericq(val, 1e-4, "zero of f'(x)")
+```
 
 
 * Let $f(x) = \sin(x)$. Following the example on p124 of the Rogawski
@@ -144,7 +199,12 @@ c = pi/6
 hs = [(1/10)^i for i in 1:12]
 ys = [forward(f, c, h=h) for h in hs] - sqrt(3)/2
 [hs ys]
+```
 
+```julia
+choices = ["1e-"*string(i) for i in 1:12]
+ans = 8
+radioq(choices, ans, "smallest error")
 ```
 
 * The `D` operator is easy to use. Here is how we can plot both the
@@ -157,15 +217,35 @@ plot([f, D(f)], 0, 2pi)
 ```
 
 Make a plot of $f(x) = \log(x+1) - x + x^2/2$ and its derivative over
-the interval $[-3/4, 4]$. Is the derivative always increasing?
+the interval $[-3/4, 4]$. The commands are:
+
 
 ```
+```
+
+```julia
+longq("Commands to plot f and its derivative", "\\verb+plot([f,D(f)], -3/4, 4)+")
+```
+
+Is the derivative always increasing?
+
+```
+```
+
+```julia
+booleanq(false, "is derivative increasing?")
 ```
 
 * The function $f(x) = x^x$ has a derivative for $x > 0$. Use `fzero`
   to find a zero of its derivative.
 
 ```
+```
+
+```julia
+f(x) = x^x
+val = fzero(D(f), [1/4, 4])
+numericq(val, 1e-4, "zero of derivative of \\( x^x \\)")
 ```
 
 * Higher-order derivates can be approximated as well. One can use,
@@ -189,6 +269,10 @@ correct answer.)
 ```
 ```
 
+```julia
+longq("Do D(f,4) and f'''' mostly agree?")
+```
+
 ## some applications
 
 
@@ -199,6 +283,14 @@ correct answer.)
 
 ```
 ```
+
+```julia
+h(t) = 300 - 16t^2
+t0 = fzero(h, 0, 10)
+val = D(h)(val)
+numericq(val, 1e-4, "value of derivative when h is 0")
+```
+
 
 
 * A formula for blood alcohol level in the body based on time is based on the number of drinks and the time [wikipedia](http://en.wikipedia.org/wiki/Blood_alcohol_content).
@@ -221,7 +313,12 @@ From the plot below, describe when the peak blood alcohol level occurs and is th
 plot([bal, bal'], .5,6)
 ```
 
+```
+```
 
+```jula
+longq("Descrive when peak BAL occurs, is it ever above 0.10?")
+```
 
 
 ### Tangent lines
@@ -245,6 +342,10 @@ plot([f, tangent(f, 1)], 0, 2)
 ```
 ```
 
+```julia
+longq("Commands to plot witch of Agnesi over [-3,3] with tangent line at x=1")
+```
+
 
 * Let $f(x) = x^3 -2x - 5$. Find the intersection of the tangent line
   at $x=3$ with the $x$-axis.
@@ -252,8 +353,16 @@ plot([f, tangent(f, 1)], 0, 2)
 ```
 ```
 
+```julia
+f(x) = x^3 - 2x - 5
+m = D(f)(3)
+tl(x) = f(3) + m * (x-3)
+val = fzero(tl, -100, 100)
+numericq(val, 1e-4, "intersection of tangent line with x axis", "x-f(x)/f'(x)")
+```
 
-* Let $f(x)$ be given by the expression below. Verify that the
+
+* Let $f(x)$ be given by the expression below. 
 
 ```
 f(x; a=1) = a * log((a + sqrt(a^2 - x^2))/x ) - sqrt(a^2 - x^2)
@@ -272,3 +381,12 @@ $y$ axis is the same for $c=.25$ and $c=0.75$. (You can do this by
 making an appropriate right triangle whose ratio $opp/adj$ is related
 to the derivative, the length is the hypotenuse of this triangle.)
 
+
+```
+```
+
+
+```julia
+longq("Verify lengths of two lines are same", 
+"Write a function to compute length squared: \\verb#c^2 + (f(c)-(f(c)+D(f)(c)*(0-c)))^2#")
+```

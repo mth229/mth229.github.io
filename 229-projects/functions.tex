@@ -1,0 +1,603 @@
+\documentclass[12pt]{article}
+\usepackage[fleqn]{amsmath}     %puts eqns to left, not centered
+\usepackage{graphicx}
+\usepackage{hyperref}
+\begin{html}
+<style>
+pre {font-size: 1.2em; background-color: #EEF0F5;}
+ul li {list-style-image: url(http://www.math.csi.cuny.edu/static/images/julia.png);}  
+</style>
+\end{html}
+\begin{document}
+
+\section{Questions to be handed in for project 2: Functions in Julia}
+
+Read about this \href{http://mth229.github.io/functions.html}{here}.
+
+For the impatient, it is easy with \texttt{Julia} to create mathematical
+functions, as the notation is identical:
+
+
+
+\begin{verbatim}
+f(x) = x^2 - 2
+f(2)
+\end{verbatim}
+As with typical mathematical notation the function is called by passing
+a value to it with parentheses.
+
+That covers most of the uses within this project, but there is more...
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Julia functions can have more than one variable:
+\end{itemize}
+
+
+
+\begin{verbatim}
+rectarea(b, h) = b * h      # area of rectangle
+\end{verbatim}
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Julia functions with different signatures, can have the same name!
+\end{itemize}
+
+
+
+\begin{verbatim}
+rectarea(b) = area(b,b)     # area of square
+\end{verbatim}
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Multiline functions are defined with the \texttt{function} keyword
+\end{itemize}
+
+
+
+\begin{verbatim}
+function multiline_function(x)
+     top = x^2 - 2x
+     bottom = x^4 - 4x
+     top/bottom     # last line is return value
+end             # don't forget the end
+\end{verbatim}
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Functions can have keyword arguments (like parameters). These can have
+  default values:
+\end{itemize}
+
+
+
+\begin{verbatim}
+mxplusb(x; m=0, b=1) = m*x + b
+mxplusb(10, m=3, b=4)       # arguments are named
+\end{verbatim}
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Functions can be used as arguments to other functions:
+\end{itemize}
+
+
+
+\begin{verbatim}
+using Gadfly            # for plotting
+plot(sin, 0, 2pi)       # pass function for first argument plot(f,a,b)
+\end{verbatim}
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Functions can be \emph{anonymous}. These are defined via
+  "\texttt{args -\textgreater{} body}":
+\end{itemize}
+
+
+
+\begin{verbatim}
+plot(x -> sin(x)*cos(2x), 0, 2pi)
+\end{verbatim}
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Functions can be \emph{returned} by other functions (see the "arrow"):
+\end{itemize}
+
+
+
+\begin{verbatim}
+secant_line(f, a, b) = x -> f(a) + (f(b) - f(a))/(b-a)*(x-a)
+\end{verbatim}
+\begin{center}\rule{3in}{0.4pt}\end{center}
+
+\paragraph{Controlling what gets returned by \texttt{IJulia}}
+
+When \texttt{IJulia} evaluates a cell, it will only display the last
+command executed (without explicitly printing). One useful trick to
+output more than one value at a time is to place them into a container.
+Grouping values within parentheses will produce a "tuple":
+
+
+
+\begin{verbatim}
+(1, 2, "a")
+\end{verbatim}
+Tuples will be implicitly constructed if the parentheses are left off.
+So separating values by commas can be used to have multiple values
+printed in a cell.
+
+If the values are all of the same type, the preferred container would be
+made with \texttt{{[}{]}}, as in:
+
+
+
+\begin{verbatim}
+[1, 2]
+\end{verbatim}
+If the comma is left out, the results are combined "horizontally", which
+can be a space saver in some cases:
+
+
+
+\begin{verbatim}
+[1 2 3 4 5]
+\end{verbatim}
+\begin{center}\rule{3in}{0.4pt}\end{center}
+
+\subsubsection{Questions}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Write a function that describes a line with slope $2$ going through
+  the point $(1,3)$. What is the value of $f(10)$?
+\end{itemize}
+
+The function is:
+
+\begin{answer}
+type: shorttext
+reminder: function m=2, p = (1,3)
+answer: f(x) = 3+2*(x-1)
+answer_text: f(x) = 3+2*(x-1) 
+\end{answer}
+
+The value of $f(10)$ is:
+
+\begin{answer}
+    type: numeric
+    reminder: 
+    answer: [20.9999, 21.0001]
+
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Write a function to convert Celsius to Fahrenheit $F=9/5 C +   32$.
+  Use it to find the Fahrenheit value when $C=56.7$ and when $C=-89.2$.
+  (The record high and low temperatures.)
+\end{itemize}
+
+The function is
+
+\begin{answer}
+type: shorttext
+reminder: F=9/5 C + 32
+answer: f(x) = 9/5*x+32
+answer_text: f(x) =  9/5*x+32 
+\end{answer}
+
+The value at $C=56.7$ is
+
+\begin{answer}
+    type: numeric
+    reminder: 
+    answer: [134.0599, 134.0601]
+
+\end{answer}
+
+The value at $C=-89.2$ is:
+
+\begin{answer}
+    type: numeric
+    reminder: 
+    answer: [192.5599, 192.5601]
+
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Write a function that computes
+\end{itemize}
+
+\[
+f(x) = 4x^2 - 3x  - 7 - \frac{1}{x}
+\]
+
+Use it to find the values of $f(1)$, and $f(3)$.
+
+The function is
+
+\begin{answer}
+type: shorttext
+reminder: \( 4x^2 - 3x  - 7 - \frac{1}{x} \)
+answer: f(x) = 4x^2 - 3x  - 7 - 1/x
+
+\end{answer}
+
+The value $f(1)$ is
+
+\begin{answer}
+    type: numeric
+    reminder: 
+    answer: [-7.0001, -6.9999]
+
+\end{answer}
+
+The value $f(3)$ is
+
+\begin{answer}
+    type: numeric
+    reminder: 
+    answer: [19.666566666666668, 19.666766666666668]
+
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Write a function that computes:
+\end{itemize}
+
+\[
+f(t) = A\sin(Bt - C) + D
+\]
+
+where $A=3.1$, $B=2\pi/365$, $C=1.35$, and $D=12.12$.
+
+This function models the amount of daylight in Boston when $t$ records
+the day of the year. How much daylight is there for $t=1$, $t=365/2$,
+$t = 35$?
+
+The function is
+
+\begin{answer}
+type: shorttext
+reminder: Asin(Bt - C) + D
+answer: f(t) = 3.1 * sin(2pi/365*t - 1.35) + 12.12
+answer_text: \( f(t) = 3.1\sin(2pi/365*t - 1.35) + 12.12 \) 
+\end{answer}
+
+The value at $t=1$ is
+
+\begin{answer}
+    type: numeric
+    reminder: 
+    answer: [9.107292243291802, 9.107492243291802]
+
+\end{answer}
+
+The value at $t=365/2$ is:
+
+\begin{answer}
+    type: numeric
+    reminder: 
+    answer: [9.107292243291802, 9.107492243291802]
+
+\end{answer}
+
+The value at $t=35$ is:
+
+\begin{answer}
+    type: numeric
+    reminder: 
+    answer: [9.107292243291802, 9.107492243291802]
+
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Person A starts at the origin and moves west at 60 MPH. Person B
+  starts 200 miles north of the origin and moves south at 70 MPH. Write
+  a function that computes the distance between the two people as a
+  function of $t$ in minutes.
+\end{itemize}
+
+(The $(x,y)$ position of person A is $(60\cdot t/60), 0)$ and the
+$(x,y)$ position of person B is $(0, 200 - 70 \cdot t/60)$)
+
+Compute the distance at $t=0$, $t=30$ and $t=120$ using a function. (You
+might start by defining the $x$ and $y$ distances with the following,
+then using the distance formula as a function of $t$.)
+
+
+
+\begin{verbatim}
+x(t) = 60t/60 - 0
+y(t) = 0 - (200 - 70t/60)
+\end{verbatim}
+The distance at $t=0$ is:
+
+\begin{answer}
+    type: numeric
+    reminder: value at t=0
+    answer: [199.9999, 200.0001]
+
+\end{answer}
+
+The distance at $t=30$ is:
+
+\begin{answer}
+    type: numeric
+    reminder: value at t=30
+    answer: [167.70499831248424, 167.70519831248424]
+
+\end{answer}
+
+The distance at $t=120$ is:
+
+\begin{answer}
+    type: numeric
+    reminder: value at t=120
+    answer: [134.16397864998737, 134.16417864998738]
+
+\end{answer}
+
+\subsection{Cases}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  The following function is useful in probability
+\end{itemize}
+
+\[
+f(x)= \frac{1}{b-a} \text{ if } a \leq x \leq b, 
+\] \[
+0  \text{ otherwise.}
+\]
+
+Defaults are $a=0, b=1$.
+
+Write a function using the ternary operator to compute this. The
+condition may be expressed with
+\texttt{a \textless{}= x \textless{}= b}. Find $f(.5, a=0, b=1)$;
+$f(.5, a=1, b=2)$, $f(.5,a=0, b=100)$.
+
+The function is:
+
+\begin{answer}
+type: shorttext
+reminder: function for 1/(b-a) in [a,b]
+answer: f(x;a=0,b=1) = a <= x <= b ? 1/(b-a) : 0.0
+
+\end{answer}
+
+The value of $f(.5, a=0, b=1)$ is:
+
+\begin{answer}
+    type: numeric
+    reminder: 1.0
+    answer: [0.9999, 1.0001]
+
+\end{answer}
+
+The value of $f(.5, a=1, b=2)$ is:
+
+\begin{answer}
+    type: numeric
+    reminder: 0.0
+    answer: [-0.0001, 0.0001]
+
+\end{answer}
+
+The value of $f(.5,a=0, b=100)$ is:
+
+\begin{answer}
+    type: numeric
+    reminder: 0.01
+    answer: [0.0099, 0.0101]
+
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Define a function $Sin(x) = \sin(x)$ if $-pi/2 < x < \pi/2$ and
+  \texttt{NaN} otherwise.
+\end{itemize}
+
+\begin{answer}
+type: shorttext
+reminder: restrict sin(x) to -pi/2 to pi/2
+answer: Sin(x) = -pi/2 < x < pi/2 ? sin(x) : NaN
+
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Define a function
+\end{itemize}
+
+\[
+signal(x) = 0 \text{ if } x\leq 0,
+\] \[
+\sin^2(\pi /2 x) \text{ if } 0<x<1, \text{ and }
+\] \[
+1 \text{ if } x\geq 1 
+\]
+
+Compare the difference between \texttt{signal(0.999)} and
+\texttt{signal(1.001)}.
+
+The function is
+
+\begin{answer}
+type: shorttext
+reminder: signal function
+answer: signal(x) = (x <= 0) ? 0.0 : ((x <= 1) ? sin(pi/2*x)^2 : 1.0)
+answer_text: signal(x) = (x <= 0) ? 0.0 : ((x <= 1) ? sin(pi/2*x)^2 : 1.0) 
+\end{answer}
+
+The value at $0.999$ is:
+
+\begin{answer}
+    type: numeric
+    reminder: f(0.9999)
+    answer: [0.9998999753259891, 1.0000999753259892]
+
+\end{answer}
+
+The value at \$1.0001 is:
+
+\begin{answer}
+    type: numeric
+    reminder: f(1.0001)
+    answer: [0.9999, 1.0001]
+
+\end{answer}
+
+\subsection{Parameters}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  The formula for a
+  \href{http://en.wikipedia.org/wiki/Catenary}{catenary} has a parameter
+  $a$:
+\end{itemize}
+
+\[
+y = a \cosh(x/a)
+\]
+
+($\cosh(x)$ is the hyperbolic cosine, defined by
+$(1/2) \cdot (e^x + e^{-x})$.
+
+Write a function, \texttt{c(x;a=1)}, with \texttt{a} as a parameter
+defaulting to $1$. Compute \texttt{c(1)}, \texttt{c(1,a=2)}, and
+\texttt{c(1, a=1/2)}.
+
+The function is:
+
+\begin{answer}
+type: shorttext
+reminder: \( y = a \cosh(x/a) \)
+answer: c(x; a=1) = a * cosh(x/a)
+answer_text: c(x; a=1) = a * cosh(x/a) 
+\end{answer}
+
+The value of \texttt{c(1)}:
+
+\begin{answer}
+    type: numeric
+    reminder: c(1)
+    answer: [1.5429806348152437, 1.5431806348152437]
+
+\end{answer}
+
+The value of \texttt{c(1, a=2)}:
+
+\begin{answer}
+    type: numeric
+    reminder: c(1, a=2)
+    answer: [2.255151930412761, 2.2553519304127616]
+
+\end{answer}
+
+The value of \texttt{c(1, a=1/2)}:
+
+\begin{answer}
+    type: numeric
+    reminder: c(1, a=1/2)
+    answer: [1.8809978455418157, 1.8811978455418157]
+
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Write the following function using parameters for $A$, $B$, $C$, and
+  $D$:
+\end{itemize}
+
+\[
+f(t;A,B,C,D) = A\sin(Bt - C) + D
+\]
+
+Let the default values be $A=1$, $B=1$, $C=D=0$.
+
+Compute $f(1)$ (using the defaults $A=1$, $C=D=0$), $f(1; B=2\pi)$,
+$f(1; A=2\pi, B=2\pi)$
+
+The function is
+
+\begin{answer}
+type: shorttext
+reminder: \(f(t;A,B,C,D) = Asin(Bt - C) + D \)
+answer: f(t;A=1,B=1,C=0,D=0) = A*sin(B*t - C) + D
+
+\end{answer}
+
+The value $f(1)$ is:
+
+\begin{answer}
+    type: numeric
+    reminder: f(1)
+    answer: [0.8413709848078965, 0.8415709848078965]
+
+\end{answer}
+
+The value $f(1; B=2\pi)$ is:
+
+\begin{answer}
+    type: numeric
+    reminder: f(1;B=2pi)
+    answer: [-0.00010000000000024494, 9.999999999975507e-5]
+
+\end{answer}
+
+The value $f(1; A=2\pi, B=2\pi)$ is:
+
+\begin{answer}
+    type: numeric
+    reminder: f(1;A=2pi, B=2pi)
+    answer: [-0.00010000000000153893, 9.999999999846107e-5]
+
+\end{answer}
+
+\subsection{returning a function}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Describe what the following function does to the argument $f$, when
+  $f$ is a function. (There isn't anything to do but recognize that
+  \texttt{n} takes a function as input and returns a function as output,
+  this question is how is \texttt{n(f)} related to \texttt{f}.)
+\end{itemize}
+
+
+
+\begin{verbatim}
+n(f::Function) = x -> -f(x)
+\end{verbatim}
+\begin{answer}
+type: longtext
+reminder: Describe \verb+n(f::Function) = x -> -f(x)+
+answer_text: The defines g(x) = -f(x) 
+rows: 3
+cols: 60
+\end{answer}
+
+\end{document}
+
