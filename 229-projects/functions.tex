@@ -28,33 +28,38 @@ a value to it with parentheses.
 
 That covers most of the uses within this project, but there is more...
 
-\begin{itemize}
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
   Julia functions can have more than one variable:
-\end{itemize}
+\end{enumerate}
 
 
 
 \begin{verbatim}
 rectarea(b, h) = b * h      # area of rectangle
 \end{verbatim}
-\begin{itemize}
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\setcounter{enumi}{1}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
   Julia functions with different signatures, can have the same name!
-\end{itemize}
+\end{enumerate}
 
 
 
 \begin{verbatim}
-rectarea(b) = area(b,b)     # area of square
+rectarea(b) = rectarea(b,b) # area of square using area of rectangle
 \end{verbatim}
-\begin{itemize}
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\setcounter{enumi}{2}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
   Multiline functions are defined with the \texttt{function} keyword
-\end{itemize}
+\end{enumerate}
 
 
 
@@ -65,12 +70,14 @@ function multiline_function(x)
      top/bottom     # last line is return value
 end             # don't forget the end
 \end{verbatim}
-\begin{itemize}
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\setcounter{enumi}{3}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
-  Functions can have keyword arguments (like parameters). These can have
+  Functions can have keyword arguments (like parameters). These have
   default values:
-\end{itemize}
+\end{enumerate}
 
 
 
@@ -78,11 +85,13 @@ end             # don't forget the end
 mxplusb(x; m=0, b=1) = m*x + b
 mxplusb(10, m=3, b=4)       # arguments are named
 \end{verbatim}
-\begin{itemize}
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\setcounter{enumi}{4}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
   Functions can be used as arguments to other functions:
-\end{itemize}
+\end{enumerate}
 
 
 
@@ -90,23 +99,28 @@ mxplusb(10, m=3, b=4)       # arguments are named
 using Gadfly            # for plotting
 plot(sin, 0, 2pi)       # pass function for first argument plot(f,a,b)
 \end{verbatim}
-\begin{itemize}
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\setcounter{enumi}{5}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
-  Functions can be \emph{anonymous}. These are defined via
-  "\texttt{args -\textgreater{} body}":
-\end{itemize}
+  Functions can be \emph{anonymous}. These are defined via the pattern:
+  "\texttt{args -\textgreater{} body}". Look for the arrow
+  \texttt{-\textgreater{}}:
+\end{enumerate}
 
 
 
 \begin{verbatim}
 plot(x -> sin(x)*cos(2x), 0, 2pi)
 \end{verbatim}
-\begin{itemize}
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\setcounter{enumi}{6}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
   Functions can be \emph{returned} by other functions (see the "arrow"):
-\end{itemize}
+\end{enumerate}
 
 
 
@@ -223,7 +237,7 @@ f(x) = 4x^2 - 3x  - 7 - \frac{1}{x}
 
 Use it to find the values of $f(1)$, and $f(3)$.
 
-The function is
+The function is defined by:
 
 \begin{answer}
 type: shorttext
@@ -356,6 +370,24 @@ The distance at $t=120$ is:
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
+  Write a function to express the following: If a person buys up to 100
+  units the cost per unit is 5 dollars, for every additional unit beyond
+  100 the cost is 4 dollars. The function should return the total cost
+  to by $x$ units. (Use the ternary operator with
+  \texttt{x \textless{}= 100} as the condition.
+\end{itemize}
+
+\begin{answer}
+type: longtext
+reminder: Total cost for x units
+answer_text: \verb#f(x) = x <= 100 ? 5.0 * x : (5.0*100) + 4*(x-100) # 
+rows: 3
+cols: 60
+\end{answer}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
   The following function is useful in probability
 \end{itemize}
 
@@ -411,7 +443,7 @@ The value of $f(.5,a=0, b=100)$ is:
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
-  Define a function $Sin(x) = \sin(x)$ if $-pi/2 < x < \pi/2$ and
+  Define a function $Sin(x) = \sin(x)$ if $-\pi/2 < x < \pi/2$ and
   \texttt{NaN} otherwise.
 \end{itemize}
 
@@ -536,8 +568,8 @@ f(t;A,B,C,D) = A\sin(Bt - C) + D
 
 Let the default values be $A=1$, $B=1$, $C=D=0$.
 
-Compute $f(1)$ (using the defaults $A=1$, $C=D=0$), $f(1; B=2\pi)$,
-$f(1; A=2\pi, B=2\pi)$
+Compute $f(1)$ (using the defaults $A=1$, $C=D=0$), $f(1; B=\pi/2)$,
+$f(1; A=2\pi, B=\pi/2)$
 
 The function is
 
@@ -557,25 +589,25 @@ The value $f(1)$ is:
 
 \end{answer}
 
-The value $f(1; B=2\pi)$ is:
+The value $f(1; B=\pi/2)$ is:
 
 \begin{answer}
     type: numeric
-    reminder: f(1;B=2pi)
-    answer: [-0.00010000000000024494, 9.999999999975507e-5]
+    reminder: f(1;B=pi/2)
+    answer: [0.9999, 1.0001]
 
 \end{answer}
 
-The value $f(1; A=2\pi, B=2\pi)$ is:
+The value $f(1; A=2\pi, B=\pi/2)$ is:
 
 \begin{answer}
     type: numeric
-    reminder: f(1;A=2pi, B=2pi)
-    answer: [-0.00010000000000153893, 9.999999999846107e-5]
+    reminder: f(1;A=2pi, B=pi/2)
+    answer: [6.2830853071795865, 6.283285307179586]
 
 \end{answer}
 
-\subsection{returning a function}
+\subsection{Returning a function}
 
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt

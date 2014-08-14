@@ -50,15 +50,16 @@ the \texttt{roots} function:
 
 
 \begin{verbatim}
+f(x) = x^5 - x - 1
 roots(f)
 \end{verbatim}
 We see 5 roots -{}- as expected from a fifth degree polynomial -{}- with
 one real root (the one with \texttt{0.0im}) that is approximately
-1.1673. Finding such a value usually requires some root-finding
-algorithm.
+1.1673. Finding such a value usually requires some iterative
+root-finding algorithm.
 
 Newton's method is a root-finding algorithm like the bisection method
-discussed earlier. As an \emph{algorithm} it starts with some
+discussed earlier. As an \emph{iterative algorithm} it starts with some
 \emph{guess} for a \emph{root} to an equation $f(x) = 0$. If this guess
 is called $x_0$, then the algorithm gives a \emph{new (and improved)}
 guess $x_1$. It is expected that $x_1$ is a better guess, but may not be
@@ -70,7 +71,7 @@ is taken to be $x_n$.
 What is the algorithm? It is simple. If we start with some $x_i$, then
 $x_{i+1}$ is given by the intersection point of the $x$-axis of the
 tangent line of $f(x)$ at $x_i$. See a figure
-{[}here{]}(http://mth229.github.io/newton.html\#\_basic\_idea\_{]}.
+{[}here{]}(http://mth229.github.io/newton.html\#\emph{basic}idea\_{]}.
 Mathematically then we can equate our two means to compute the slope of
 a tangent line:
 
@@ -135,8 +136,8 @@ is confirmed by the value of \texttt{f(x)}.
 
 Repeating steps in \texttt{IJulia} can be a bit of a chore, so here we
 define a \emph{macro} to repeat some expression 5 times and then show
-how to use it. (A macro does not evaluate its expression immediately,
-unlike functions.)
+how to use it. (This macro basically replaces the expression internally
+with 5 repeats of the expression.)
 
 
 
@@ -149,19 +150,9 @@ called without parentheses:
 
 
 \begin{verbatim}
+x = 2               # starting value
 @take5     x = x - f(x) / fp(x)
-\end{verbatim}
-We now show how we can get the above in a more efficient manner:
-
-
-
-\begin{verbatim}
-f(x) = x^3 - 2x -5
-x = 2               # initial guess
-fp(x) = 3x^2 - 2
-
-@take5  x = x - f(x)/fp(x)
-(x, f(x))           # has converged, as f(x) is basically 0
+(x, f(x))           # x has the new value
 \end{verbatim}
 \subsubsection{Questions}
 
@@ -312,13 +303,13 @@ newton's method. For example:
 
 \begin{verbatim}
 f(x) = sin(x)
-fp(x) = cos(X)
+fp(x) = cos(x)
 x = 3
 newton(f, fp, x)
 \end{verbatim}
 However, the \texttt{fzero} function -{}- that we have seen before -{}-
 will use a derivative-free algorithm, similar to Newton's method to find
-a zero. So, the above could be achieved with:
+a zero. So, the above zero can be found with:
 
 
 

@@ -124,7 +124,7 @@ Simpson's rule which is a quadratic approximation.
 
 \begin{verbatim}
 f(x) = x^2
-riemann(f, 0, 1, method="trapezoid"), riemann(f, 0, 1, method="simpsons")
+riemann(f, 0, 1, 1000, method="trapezoid"), riemann(f, 0, 1, 1000, method="simpsons")
 \end{verbatim}
 Base \texttt{julia} provides the \texttt{quadgk} function which uses a
 different approach altogether. It is used quite easily:
@@ -412,13 +412,13 @@ answer: 2
   (\texttt{Inf} is infinity.)
 \end{itemize}
 
+\begin{answer}
+    type: numeric
+    reminder: integral \( exp(-x^2) \)
+    answer: [0.8862259254527578, 0.8862279254527579]
 
+\end{answer}
 
-\begin{verbatim}
-f(x) = exp(-x^2)
-val, err = quadgk(f, 0, Inf)
-numericq(val, 1e-6, "integral \\( exp(-x^2) \\)")
-\end{verbatim}
 Why is this integral "improper?"
 
 \begin{answer}
@@ -432,9 +432,9 @@ answer: 1
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
-  The function $x \cdot \sin(1/x)$ must be redefined to have a limit at
-  $0$. The integral $\int_0^1 x \cdot \sin(1/x)dx$ is defined. What is
-  the value estimated by \texttt{quadgk}?
+  The function $f(x) = x \cdot \sin(1/x)$ must be redefined to have a
+  limit at $0$. The integral $\int_0^1 x \cdot \sin(1/x)dx$ is defined.
+  What is the value estimated by \texttt{quadgk}?
 \end{itemize}
 
 \begin{answer}
@@ -444,7 +444,7 @@ answer: 1
 
 \end{answer}
 
-Why is this integral "improper?"
+Why is this integral "improper?" (In Kahan's widening of the sense.)
 
 \begin{answer}
 type: radio
@@ -468,13 +468,14 @@ The improper integral $\int_0^1 f(u) du$ is defined. What is the value?
 What is the estimated error? Is this consistent with a value of
 $0.03649$ give or take \texttt{1e-10}?
 
+\begin{answer}
+type: radio
+reminder: Consistent with the value
+values: 1 | 2
+labels: yes | no
+answer: 1
+\end{answer}
 
-
-\begin{verbatim}
-choices=["yes","no"]
-ans=1
-radioq(choices, ans, "Consistent with the value")
-\end{verbatim}
 \subsection{Applications}
 
 We discuss an application of the integral to finding the volumes -{}-
