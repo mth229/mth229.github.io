@@ -51,6 +51,12 @@ For example to _factor_ the polynomial `p` we have the `factor` function:
 factor(p)
 ```
 
+Or if we used a function:
+
+```
+factor(q(x))
+```
+
 (`factor` applied to a symbolic expression tries to factor as a polynomial, say; whereas `factor` applied to an integer tries to find prime factors. The `factor` function is generic, so can have different implementations depending on the type of its argument.)
 
 To solve for `p=0` we have `solve`:
@@ -59,13 +65,30 @@ To solve for `p=0` we have `solve`:
 solve(p, x)			# or just solve(p) as x can be implied
 ```
 
-The two answers are $2$ and $4$, as one could read from the factorization of `p`. The `solve` function tries to solve when the expression is equal to $0$. To solve something of the type $g(x) = h(x)$, use $g(x) - h(x) = 0$, as is done with `fzero`, our numeric solver.
+The two answers are $2$ and $4$, as one could read from the
+factorization of `p`. The `solve` function tries to solve when the
+expression is equal to $0$. To solve something of the type $g(x) =
+h(x)$, use $g(x) - h(x) = 0$, as is done with `fzero`, our numeric
+solver.
 
-Symbolic expressions are not functions, so there isn't an easy way to replace the `x` with a concrete value, like $2$.  To replace a symbolic value with a number use the `replace` function (`replace(ex, x, value)`). For example here is how one can evaluate a polynomial at $x=2$:
+Symbolic expressions are not functions, so there isn't an easy way to
+replace the `x` with a concrete value, like $2$.  To replace a
+symbolic value with a number use the `replace` function (`replace(ex,
+x, value)`). For example here is how one can evaluate a polynomial at
+$x=2$:
 
 ```
 replace(x^2 - 2x + 3, x, 2)
 ```
+
+This can be called differently using a pipeline (a syntax that can be clearer to read):
+
+```
+x^2 - 2x + 3 |> replace(x, 2)
+```
+
+
+
 
 ### Questions
 
@@ -311,8 +334,11 @@ integrate(x*exp(-x))		# indefinite integral
 or 
 
 ```
-integrate(x*exp(-x), 0, 10)	# definite
+integrate(x*exp(-x), (x, 0, 10))	# definite
 ```
+
+The limits of integration are lumped together as a tuple of the form
+`(symbol, a, b)`, this syntax allows for multiple integration.
 
 
 #### Questions

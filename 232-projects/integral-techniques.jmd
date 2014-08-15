@@ -21,10 +21,10 @@ The `SymPy` function `integrate` is a implementation of the [Risch
 Algorithm](http://en.wikipedia.org/wiki/Risch_algorithm).  This
 algorithm can decide if a function comprised of elementary functions
 has an antiderivative expressed in elementary function.  For example,
-neither $\sin(x^2)$ or $\e^{x^2}$ has such a "nice" antiderivative,
-whereas $\sin(x)^2$ and $xe^{-x^2}$ do. Risch's algorithme exploits
+neither $\sin(x^2)$ or $e^{x^2}$ has such a "nice" antiderivative,
+whereas $\sin(x)^2$ and $xe^{-x^2}$ do. Risch's algorithm exploits
 [Liouville's Theorem](http://asmeurersympy.wordpress.com/2010/08/)
-which gives an representation for any potential antiderivative of
+which gives a representation for any potential antiderivative of
 $f(x)$ using *elementary functions* such as polynomials, logarithms,
 exponentials and trigonometric functions.
 
@@ -45,29 +45,6 @@ Judging from the answer does it appear to use parts, substitution, both, or some
 ```
 ```
 
-* use `integrate` to find an antiderivative for 
-
-$$
-\int \log(\log(x)) / x dx.
-$$
-
-Judging from the answer does it appear to use parts, substitution, both, or something else.
-
-
-```
-```
-
-* use `integrate` to find an antiderivative for 
-
-$$
-\int x \sec^2(x) dx.
-$$
-
-Judging from the answer does it appear to use parts, substitution, both, or something else.
-
-
-```
-```
 
 * use `integrate` to find an antiderivative for 
 
@@ -84,10 +61,22 @@ Judging from the answer does it appear to use parts, substitution, both, or some
 * use `integrate` to find an antiderivative for 
 
 $$
-\int sin(x) \cdot e^x dx.
+\int \sin(x) \cdot e^x dx.
 $$
 
 Judging from the answer does it appear to use parts, substitution, both, or something else.
+
+
+```
+```
+
+* The `integrate` function might fail on
+
+$$
+\int x \sec^2(x) dx.
+$$
+
+But, replacing $\sec(x)$ with $1/\cos(x)$ may work. Does it?
 
 
 ```
@@ -102,18 +91,30 @@ can help by performing substitutions by hand first.
 
 Here is an example from
 [here](http://faculty.uml.edu/jpropp/142/Integration.pdf) where
-performing the substitution by hand is needed to give a boost:
+performing the substitution by hand is needed to give a boost. Find
+
+$$
+\int (1 + \log(x)) \cdot \sqrt{1 + (x\cdot\log(x))^2} dx.
+$$
+
+
+
 
 ```
 x, dx = symbols("x, dx")
 f(x) = sqrt(x^2 + 1)
 u = x*log(x)
 ex = f(u) * diff(u,x)
+```
+
+This is written to look like a substitution problem. Will `SymPy` be able to see that?
+
+```
 integrate(ex, x)
 ```
 
-Sympy can't do this integral, and so returns the expression. But this
-is really ripe for substitution with $u = x\log(x)$.
+Sympy can't do this integral, and so returns the expression. We can help.
+
 
 Let's introduce a variable `dx` into our expression, and then we have:
 
@@ -161,7 +162,7 @@ end
 This can be used as follow:
 
 ```
-ex = log(log(x))/x
+ex = log(x)/x
 usub(ex, log(x))
 ```        
 
@@ -205,8 +206,24 @@ Does `integrate` now know how to integrate $|x|$?
 
 * What is a simple antiderivative for $\int |x| dx$?
 
+```
+```
 
 #### Helping `integrate` out
+
+* Does `integrate`  find an antiderivative for 
+
+$$
+\int \log(\log(x)) / x dx?
+$$
+
+If not, help it out.
+
+
+```
+```
+
+
 
 * The following integral exists, but is not found by `integrate`:
 
@@ -278,11 +295,11 @@ decomposition](http://en.wikipedia.org/wiki/Partial_fraction_decomposition)
 ensures then that the ratio can be written as:
 
 $$
-\frac{r(x)}{q(x)} = \sum_i^k (\frac{a_{i1}(x)}{p_i(x)} + \frac{a_{i2}(x)}{p_i(x)^2} + ... + \frac{a_{in_i}(x)}{p_i(x)^n_i}
+\frac{r(x)}{q(x)} = \sum_i^k \frac{a_{i1}(x)}{p_i(x)} + \frac{a_{i2}(x)}{p_i(x)^2} + ... + \frac{a_{in_i}(x)}{p_i(x)^{n_i}}
 $$
 
-with $a_{ij}(x)$ being polynomials with degree less than or equal the $p_i(x)$,
-so in this case either a constant of linear polynomial.
+with the $a_{ij}(x)$ being polynomials of degree less than or equal the $p_i(x)$,
+so in this case either a constant or linear polynomial.
 
 So, if the polynomials of the form $(ax+b)/(cx^2 + dx + e)^j$ can be
 integrated, by the linearity of integration all rational functions can

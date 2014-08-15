@@ -63,7 +63,7 @@ extra work, as the functions are well behaved.)
   $b$ is given by
 
 $$
-Volume = \int_a^b \pi f(x)^s dx.
+Volume = \int_a^b \pi f(x)^2 dx.
 $$
 
 
@@ -118,8 +118,8 @@ than the cross sectional circles formed by revolution. That is $\pi
 
 #### Area between two curves
 
-* Find the area between the curves $\sin(x)$ and $\cos(x)$ between
-  $-\pi$ and $\pi$ **when** $\sin(x) \geq \cos(x)$.
+* Find the area between the curves $\cos(x)$ and $\sin(x)$ between
+  $-\pi$ and $\pi$ **when** $\cos(x) \geq \sin(x)$.
 
 ```
 ```
@@ -165,21 +165,28 @@ guess that the entire sculpture is more or less than a ton? two tons?
 * For any quadratic polynomial, Archimedes proved that the the area
   bounded by the secant line between $[a,b]$ is known multiple more
   than the area of the triangle constructed by connecting the points
-  on the parabola at $x=a$, $x=b$ and $x=(a + b)/2$.
+  on the parabola at $x=a$, $x=b$ and $x=(a + b)/2$. 
+  [Figure](http://en.wikipedia.org/wiki/The_Quadrature_of_the_Parabola#mediaviewer/File:Parabola_and_inscribed_triangle.svg)
 
-  We want to find that multiple. The following shows how to find the
-  area of the triangle for $f(x)=x^2$:
+  We want to find that multiple. Since it doesn't depend on the
+  parabola, $a$ or $b$, take $f(x) = x^2$, $a=-2$ and $b=1$.
+
+
+  Here is how we can compute the area bounded by the secant line between $a$ and $b$ and the parabola:
+
+
 
 ```
 f(x) = x^2
-a,b = symbols("a,b")
-c = (a + b)/2
+a,b = -2, 1
+mid = (a + b)/2
 secant(f, a, b) = x->f(a) + (f(b)-f(a))/(b-a)*(x-a)
-Top = secant(f,a,b)(x)
-integrate(Top-secant(f,a,c)(x),(x,a,c)) + integrate(Top-secant(f,c,b)(x),(x,c,b)) |> simplify
+topline = secant(f,a,b)
+h(x) = topline(x) - f(x)
+a, err = quadgk(h, a, b)
 ```
 
-Now compute the other area and take a ratio to find the answer.
+Now compute the other area of the triangle and take a ratio to find the answer.
 
 ```
 ```	
@@ -238,9 +245,9 @@ What is the total area? Is it more than half the total area?
   rotating an ellipse. Suppose the dimensions of a particular
   watermelon has a major axis of 30cm and a minor axis of 20 cm. What
   is the volume in cubic centimeters? What is the weight if 1000 cubic
-  centimeters weight 2.2 pounds.
+  centimeters weighs $(2/3) \cdot 2.2$ pounds (about 2/3rd the weight of plain water).
 
-  (You might model the watermelon via $(x/30)^2  + (y/20)^2 = 1$ and rotate about the $x$ axis..)
+  (You might model the watermelon via $(x/15)^2  + (y/10)^2 = 1$ and rotate about the $x$ axis..)
 
 ```
 ```
