@@ -50,7 +50,7 @@ This allows a graphical exploration of the above facts:
 plotif(f, fp, 0, 2pi)		# shows sin(x) and when derivative is 0
 ```
 
-Clicking on the `f1` in the legend on the right will hide the graph of
+Clicking on the `f1` in the legend on the right will hide the entire graph of
 `f` and leave only the graph of `f` where `fp(x) > 0`.
 
 <br/>
@@ -131,6 +131,19 @@ longq("Critical point of \\( x \\log(x) \\) on (0,4)",
 longq("inflection points of sin(x) - x in (-5,5)", "-pi, 0, pi")
 ```
 
+
+* For a polynomial $p(x)$ between any two zeros there must be a
+  critical point, and perhaps more than one. Verify graphically this is the case
+  for $p(x) =x^4 + x^3 - 7x^2 - x + 6$.
+
+```
+```
+
+```julia
+longq("Verify that between each zero of \\( p(x) \\) is at least one zero of \\( p'(x) \\)", 
+"Compare, say, \\verb+fzeros(p)+ with \\verb+fzeros(D(p), -4, 3)+")
+```
+
 ### Finding numeric values
 
 
@@ -195,8 +208,7 @@ ans = 4
 radioq(choices, ans, "When is f(x) concave up?")
 ```
 
-
-### the derivative tests
+### The derivative tests
 
 * The first derivative test states that for a differentiable function
   $f(x)$ with a critical point at $c$ then if $f'(x)$ changes sign
@@ -243,27 +255,158 @@ Classify your critical points using the second derivative test
 longq("Classify critical points with second derivative test", "\\verb+[D(fp)(x) for x in sort(fzeros(fp, -5,5))]+ indicates max at -sqrt(2) and min at sqrt(2)")
 ```
 
-* For a polynomial $p(x)$ between any two zeros there must be a
-  critical point, and perhaps more than one. Verify this is the case
-  for $p(x) =x^4 + x^3 - 7x^2 - x + 6$. You can do this graphically or
-  numerically.
+
+
+* Suppose $f'(x) = x^3 - 7x^2 + 14$. Based on  the plot over the interval
+  $[-4, 8]$. On what subintervals is $f(x)$ increasing?
 
 ```
 ```
 
 ```julia
-longq("Verify that between each zero of \\( p(x) \\) is at least one zero of \\( p'(x) \\)", 
-"Compare, say, \\verb+fzeros(p)+ with \\verb+fzeros(D(p), -4, 3)+")
+choices = ["(-1.29, 1.61) and (6.69, oo)",
+	"(-oo, 0) and (4.67, oo)",
+	"(-oo, 0)",
+	"(-oo, 00) and (6.69, oo)"]
+ans = 1
+radioq(choices, ans, "when is f increasing")
 ```
+
+What did you use to find your last answer?
+
+```
+```
+
+```julia
+choices = [
+"f'(x) > 0 on these subintervals",
+"f''(x) > 0 on these subintervals",
+"f'(x) < 0 on these subintervals",
+"f''(x) < 0 on these subintervals"
+]
+ans = 1
+radioq(choices, ans, "how?")
+```
+
+What are the $x$-coordinates of the relative minima of $f(x)$?
+
+```
+```
+
+```julia
+choices = ["4.56", "-1.29 and 6.69", "4.56 and 0", "-1.29 and 1.61"]
+ans = 2
+radioq(choices, ans, "where are minima?")
+```
+
+On what subintervals is $f(x)$ concave up?
+
+```
+```
+
+```julia
+choices = [
+"(-oo, 0) and (4.67, oo)",
+"(1.167, oo)",
+"(-oo, 1.167)",
+"It is always concave down"
+]
+ans = 1
+radioq(choices, ans, "Where is f(x) concave up?")
+```
+
+What did you use to decide?
+
+```
+```
+
+```julia
+choices = [
+"f'(x) > 0 on these subintervals",
+"f''(x) > 0 on these subintervals",
+"f'(x) < 0 on these subintervals",
+"f''(x) < 0 on these subintervals"
+]
+ans = 2
+radioq(choices, ans, "Where is f(x) concave up?")
+```
+
+Find the $x$ coordinates of the inflection points of $f(x)$.
+
+```
+```
+
+```julia
+choices = ["4.56", "4.67", "0 and 4.67", "Not listed"]
+ans = 3
+radioq(choices, ans, "inflection points")
+```
+
+
+
+* A simplified model for the concentration of a certain slow-reacting
+  medicine in the bloodstream $t$ hours after injection into muscle
+  tissue is given by
+
+$$
+f(t) =  3t^2 \cdot e^{-t/5}, quad t \geq 0.
+$$
+
+When will there be maximum concentration?
+
+```
+```
+
+```julia
+using Roots
+conc(t) =  3*t^2*exp(-t/5)
+val = Roots.fzero(D(conc), 10)
+numericq(val, 1e-4, "when is max. concentration?")
+```
+
+In the units given, how much is the maximum concentration?
+
+```
+```
+
+```julia
+c(t) =  3t^2*exp(-t/5)
+val = fzero(D(c), 10)
+numericq(f(val), 1e-2, "what is max. concentration?")
+```
+
+When will the concentration dip below a level of 1.0?
+
+```
+```
+
+```julia
+c(t) =  3t^2*exp(-t/5)
+val = fzero(x -> c(x) - 1, 40)
+numericq(val, 1e-2, "when will it dip below 1.0?")
+```
+
+Estimate from a graph when the concentration function changes concavity:
+
+```
+```
+
+```julia
+longq("When does concentration change concavity?", "At 2.92 and 17.07, e.g. fzeros(D(f,2), 0, 30)")
+```
+
 
 ### Concave up has alternate definitions
 
-* The Rogawski book defines $f(x)$ to be concave up for differentiable
-  functions by: $f(x)$ is concave up on $(a,b)$ if $f'(x)$ is
-  increasing on $(a,b)$. More generally, one can define $f(x)$ as
-  concave up on $(a,b)$ if for any pair of points, $c$ and $d$ with  $a < c < d < b$ one
-  has the secant line connecting $(c,f(c))$ and $(d,f(d))$ lies
-  _above_ the graph of $f(x)$ over $(c,d)$.
+The Rogawski book defines $f(x)$ to be concave up for differentiable
+functions by: 
+
+> $f(x)$ is concave up on $(a,b)$ if $f'(x)$ is increasing on $(a,b)$.
+
+More generally, one can define $f(x)$ as concave up on $(a,b)$ if for
+any pair of points, $c$ and $d$ with $a < c < d < b$ one has the
+secant line connecting $(c,f(c))$ and $(d,f(d))$ lies _above_ the
+graph of $f(x)$ over $(c,d)$.
 
 For the function $f(x) = x^2 - 2x$, graphically verify this is the
 case for 3 pairs of points between $(-5,5)$. The following can be used

@@ -22,9 +22,9 @@ quadratic formula. Even an innocuous polynomial like $f(x) = x^5 - x -
 1$ has no easy algebraic solution:
 
 ```
-using SymPy			# a symbolic math program
-x = Sym("x")
-solve(x^5 - x - 1)
+import SymPy			# a symbolic math program
+x = SymPy.Sym("x")
+SymPy.solve(x^5 - x - 1)
 ```
 
 We see that `SymPy` basically punts on this question.
@@ -39,7 +39,7 @@ roots(f)
 We see 5 roots -- as expected from a fifth degree polynomial -- with
 one real root (the one with `0.0im`) that is approximately
 1.1673. Finding such a value usually requires some iterative root-finding
-algorithm.
+algorithm (though not in the case above which uses linear algebra).
 
 Newton's method is a root-finding algorithm like the bisection method
 discussed earlier. As an _iterative algorithm_ it starts with some _guess_ for a
@@ -52,9 +52,8 @@ fails for some reason. The _approximate root_ is taken to be $x_n$.
 
 What is the algorithm? It is simple. If we start with some $x_i$, then
 $x_{i+1}$ is given by the intersection point of the $x$-axis of the
-tangent line of $f(x)$ at $x_i$. See a figure
-[here](http://mth229.github.io/newton.html#_basic_idea_]. Mathematically
-then we can equate our two means to compute the slope of a tangent
+tangent line of $f(x)$ at $x_i$. (See the notes for a figure.) Mathematically
+then we can equate our two methods to compute the slope of a tangent
 line:
 
 $$
@@ -117,7 +116,7 @@ a *macro* to repeat some expression 5 times and then show how to use
 it. (This macro basically replaces the expression internally with 5 repeats of the expression.)
 
 ```
-macro take5(body) quote [$(esc(body)) for _ in 1:5] end end # take5 macro
+macro take5(body) quote Float64[$(esc(body)) for _ in 1:5] end end # take5 macro
 ```
 
 Macros are prefaced with a `@` in their name and are typically called
@@ -126,7 +125,12 @@ without parentheses:
 ```
 x = 2				# starting value
 @take5     x = x - f(x) / fp(x)
-(x, f(x))			# x has the new value
+```
+
+and to see that `x` has been updated we have:
+
+```
+x, f(x)
 ```
 
 
@@ -142,7 +146,7 @@ x = 2				# starting value
   What is the value of `sin` at the answer?
 
 
-The value after 5 iterations is:
+The value of $f(x)$ after 5 iterations is:
 
 ```
 ```
@@ -276,7 +280,7 @@ numericq(vals[2], 1e-8, "larger zero")
 ```
 
 
-### using `newton` and `fzero` from the `Roots` package
+### Using `newton` and `fzero` from the `Roots` package
 
 The `newton` function in the `Roots` package will compute newton's method. For example:
 
@@ -287,9 +291,16 @@ x = 3
 newton(f, fp, x)
 ```
 
+The extra argument `verbose=true` will show the iterations:
+
+```
+newton(f, fp, 3, verbose=true)
+```
+
+
 However, the `fzero` function -- that we have seen before -- will use
 a derivative-free algorithm, similar to Newton's method to find a
-zero. So, the above zero can be found with:
+zero. So, the above zero can also be found with:
 
 ```
 fzero(sin, 3)
@@ -403,8 +414,8 @@ Not so for multiple roots.
 * For the function `f(x) = (8x*exp(-x^2) -2x - 3)^8`, starting with
   `x=-2.0` Newton's method will converge, but it will take many steps
   to get to an answer that has $f(x)$ around $10^{-16}$. How many?
-  Roughly how many iterations do you need? (A single call of `@take5 x
-  = x-f(x)/D(f)(x)` gives an answer with `f(x) = 0.00028` only.)
+  Roughly how many iterations do you need? (A single call of 
+  `@take5 x = x-f(x)/D(f)(x)` gives an answer with `f(x) = 0.00028` only.)
 
 ```
 ```
