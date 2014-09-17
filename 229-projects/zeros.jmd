@@ -26,14 +26,14 @@ We can see the answer is near $0.7$. We could re-plot to get closer,
 but if more accurate answers are needed, numeric methods are
 preferred.
 
-
+----
 
 The notes talk about a special case - zeros of a polynomial. Due to
 the special nature of polynomials, there are special facts known about
 the zeros (e.g., the quadratic equation). These can be exploited. The
 `Roots` package provides the `roots` function to *numerically* find
-all the zeros of a polynomial function (real and complex) and `fzeros`
-function to find just the real roots. (The heavy lifting is done by
+all the zeros of a polynomial function (real and complex) and the `fzeros`
+function to find just the real roots. (The heavy lifting here is done by
 the `Polynomials` package.)
 
 ```
@@ -46,25 +46,33 @@ fzeros(f)
 ```
 
 For the general case, the notes mention the bisection method for
-zero-finding. This is based on the intermediate value theorem. For this, one
-needs a continuous function and a bracketing interval $[a,b]$ (that is
-$f(a)$ and $f(b)$ have different signs). Then a zero must exist and
-the algorithm finds it by successive division of the interval. The
-notes define a `bisection` method, but more conveniently `Roots`
-implements this in `fzero`, when called as `fzero(f, [a,b])`.
+zero-finding. This is based on the intermediate value theorem which guarantees a zero for a continuous function $f(x)$ over any interval $[a,b]$ _when_ $f(a)$ and $f(b)$ have _different_ signs. Such an interval is called a **bracket**.
+
+The algorithm finds a zero by successive division of the
+interval. Either the midpoint is a zero, or one of the two sub
+intervals must be a bracket. The notes define a `bisection` method and
+a stripped down version is given below.  More conveniently the `Roots`
+package implements this in its `fzero` function -- when it is called
+through `fzero(f, [a,b])`. For example,
 
 ```
 f(x) = x^2 - 2
 fzero(f, [1,2])			# find sqrt(2)
 ```
 
-The `fzeros` function for general functions needs to have a hint as to
-where to search. This call will attempt to find all zeros within
+As mentioned, for polynomial function the `fzeros` function finds the
+real roots. In general, the `fzeros` function will try to locate real
+roots for any function but it needs to have an interval in which to
+search. For example this call will attempt to find all zeros within
 $[-5,5]$ of $f(x)$:
 
 ```
+f(x) = x^2 - 2
 fzeros(f, [-5,5])
 ```
+
+[This function will have issues with non-simple roots and with roots that are very close together, so should be used with care.]
+
 
 ## Questions to answer
 
@@ -239,8 +247,8 @@ The `bisection` function is used to find a zero, when $[a,b]$ bracket
 a zero for $f$. It is called like `bisection(f, [a,b])`, for a
 suitable `f`, `a`, and `b`.
 
-Use this function to find a zero of $f(x) = \sin(x)$ on $[3,4]$. Show
-both the zero, `x`, and `f(x)`.
+Use this function to find a zero of $f(x) = \sin(x)$ on $[3,4]$. Show your commands and
+both the zero (`x`) and its value `f(x)`.
 
 ```
 ```
@@ -253,7 +261,7 @@ longq("Commands to find zero of sin(x) in [3,4]")
   dominates the polynomial and this function grows unbounded. By
   graphing over the interval $[0,15]$ you can see that the largest
   zero is less than 15. Find a bracket and then use `bisection` to
-  identify the value of the largest zero.
+  identify the value of the largest zero. Show your commands.
 
 ```
 ```
@@ -300,7 +308,7 @@ numericq(val, 1e-4, "zero of  \\( (1 + (1-n)^2)*x - (1-n*x)^2 \\)")
 
 
 * The `airy` function is a special function of historical
-  importance. Find its largest negative zero by first plotting, then
+  importance. (It is a built-in function.) Find its largest _negative_ zero by first plotting, then
   finding a bracketing interval and finally using `fzero` to get a
   numeric value.
 
@@ -361,7 +369,7 @@ f(x) = (x-1-delta)*(x-1)*(x-1+delta)
 fzeros(f)
 ```
 
-This finds three roots. What happens if `delta = 0.001`? (The `roots` function does better.
+This finds three roots. What happens if `delta = 0.001`? (The `roots` function does better.)
 
 ```
 ```

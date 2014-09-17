@@ -19,9 +19,14 @@ as specifying a function object and the $x$ limits to plot over:
 plot(sin, 0, 2pi)		# plot(f, a, b)
 ```
 
+[The `Gadfly` package and the _first_ time you call `plot` can take a _long_ time.]
+
+
 Often most of the battle is *judiciously* choosing the values of $a$
-and $b$ so that the graph highlights a feature of interest (a zero, a
-relative peak or valley, an intersection point, ...).
+and $b$ so that the graph highlights a feature of interest. Such as a relative maximum or minimum, a zero, a vertical asymptote, a horizontal asymptote, a slant asymptote...
+
+
+----
 
 A plot is nothing more than a connect-the-dot graph of $x$ and $y$
 values. It can be useful to know how to do the steps. The above could
@@ -30,13 +35,19 @@ be done with:
 ```
 a, b = 0, 2pi
 xs = linspace(a, b)		# 100 points between a and b
-ys = [sin(x) for x in xs]	# or ys = map(sin, xs) (see the notes)
+ys = map(sin, xs)	        # or ys = [sin(x) for x in xs] (see the notes)
 plot(x=xs, y=ys, Geom.line)	# Geom.line connects the points. Try without to see.
 ```
 
-The `xs` and `ys` are written as though they are "plural" because these
-variables contain 100 values each in a container (a vector in this
-case). Containers (vectors in this case) are often constructed by combining like values
+The `xs` and `ys` are written as though they are "plural" because
+these variables contain 100 values each in a container (a vector in
+this case). The `map` command "maps" a function to each value in the
+container and returns a new container with the "mapped" values. In the
+example above, these are the values for the `sin` at each `x`.
+
+
+
+Containers (vectors in this case) are often constructed by combining like values
 within square brackets separated by commas: e.g., `[a,b]`. For plotting, we can combine
 functions using `[]` and all will plot:
 
@@ -210,6 +221,14 @@ longq("Describe the relationship of g and f in terms of the values 1,2 and 3",
       "graph of g is shift up 1, scaled by 2, shifted right by 3 units")
 ```		
 
+## NaN values. 
+
+The value `NaN` is a floating point value that arises during some
+indeterminate operations, such as `0/0`. The `Gadfly` plotting
+function will stop connecting the dots when it encounters an `NaN`
+value. This can be useful. The following uses it to graph a straight
+line _only_ when the cosine is positive.
+
 
 * Make a plot of `f(x) = sin(x)` and `g(x) = cos(x) > 0 ? 0.0 : NaN`
 over $[0, 2\pi]$. What is the relationship? (Notice, the graph of
@@ -224,16 +243,9 @@ longq("What is the relationship between graph of sin and graph of cos when cosin
 
 ## creating sequences
 
-(There are two ways to generate sequences of numbers: the range operator `a:h:b` and `linspace`.)
-
-* write a simple command to produce the values: $1, 3, 5, \dots, 99$
-
-```
-```
-
-```julia
-shortq("1:2:99", "write a simple command to produce the values 1, 3, 5, ..., 99")
-```
+The `linspace(a, b)` command creates (by default) $100$ evenly spaced
+values between `a` and `b`. This is a useful set of values to use when
+plotting using the lower-level commands.
 
 * write a simple command to produce 100 values between $0$ and $2\pi$
 
@@ -245,29 +257,35 @@ shortq("linspace(0, 2pi)", "write a simple command to produce  100 values betwee
 ```
 
 
+* Write a simple command to produce 100 evenly-spaced values between $1/10$ and $10$.
+
+```
+```
+
+```julia
+shortq("linspace(1/10, 10)", "write a simple command to produce  100 values between 0 and 10")
+```
+
+
 
 ## mapping a function
 
-* If `a = [1,2,3,4,5]` find `a^3` for each value. (There are many different ways: using `map`, using a comprehension, using a "dot", ...)
+* If `a = [1,2,3,4,5]` find `a^3` for each value. (Use the `map` function.)
 
 ```
 ```
 
 ```julia
-longq("find \\verb+a^3+ for a=[1,2,3,4,5]", "Use dot, map or comprehension")
+longq("find \\verb+a^3+ for a=[1,2,3,4,5]", "Use  map")
 ```
 
 
-* Explain in words what this particular construct is doing:
-
-```
-[x^2 for x in 1:5]
-```
+* The command `xs = linspace(0, 10pi)` creates a 100 points between 0 and `10pi`. Map the function $f(x) = \cos^2(x^{1/2})$ to these values. Write your commands here:
 
 
 ```
 ```
 
 ```julia
-longq("What is \\verb+[x^2 for x in 1:5]+?")
+longq("Commands to map f(x) = cos^2(x^(1/2))")
 ```
