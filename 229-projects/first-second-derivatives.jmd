@@ -25,13 +25,16 @@ is in the details) by:
 2) If the second derivative is _positive_ on $(a,b)$ then the function
   is _concave up_ on $(a,b)$.
 
-We will use the `D` operator from the `Roots` package to find the
+As well, use the definition of a _critical point_ being a value in the
+domain of $f(x)$ for which the derivative is $0$ or undefined.
+
+We can use the `D` operator from the `Roots` package to find the
 first and second derivatives of `f`. The usage follows this pattern:
 
 ```
 f(x) = sin(x)			# some function
-fp(x) = D(f)(x)			# makes fp the first derivative
-fpp(x) = D(f,2)(x)		# makes fpp the second derivative
+fp(x) = D(f)(x)			# makes fp the first derivative, though using D(f) is maybe better.
+fpp(x) = D(f,2)(x)		# makes fpp the second derivative, though using D(f,2) is maybe better.
 ```
 
 In the notes, the following function is used to plot a function `f`
@@ -47,11 +50,12 @@ end
 This allows a graphical exploration of the above facts:
 
 ```
-plotif(f, fp, 0, 2pi)		# shows sin(x) and when derivative is 0
+plotif(f, D(F), 0, 2pi)		# shows sin(x) and when its derivative is 0
 ```
 
-Clicking on the `f1` in the legend on the right will hide the entire graph of
-`f` and leave only the graph of `f` where `fp(x) > 0`.
+Clicking on the `f1` in the legend on the right will hide the entire
+graph of `f` and leave only the graph of `f` where `fp(x) > 0`. That
+is, where $f$ is known to be increasing by the basic fact above.
 
 <br/>
 
@@ -79,7 +83,7 @@ guesses = [1.5, 2, 4, 5]
 ```
 
 ```julia
-longq("Commands to plot airy to see when it is positive")
+longq("Commands to plot airy to see when it is positive", "(-5,-4.08) and (-2.33, 5)")
 ```
 
 * Make a graph using `plotif` to investigate when the function $f(x) =
@@ -134,7 +138,7 @@ longq("inflection points of sin(x) - x in (-5,5)", "-pi, 0, pi")
 
 * For a polynomial $p(x)$ between any two zeros there must be a
   critical point, and perhaps more than one. Verify graphically this is the case
-  for $p(x) =x^4 + x^3 - 7x^2 - x + 6$.
+  for $p(x) =x^4 + x^3 - 7x^2 - x + 6$. What commands do you use?
 
 ```
 ```
@@ -145,6 +149,12 @@ longq("Verify that between each zero of \\( p(x) \\) is at least one zero of \\(
 ```
 
 ### Finding numeric values
+
+As a reminder, a _critical_ point of $f$ is a value in the domain of
+$f(x)$ for which the derivative is $0$ or undefined. An _inflection
+point_ is a point where the concavity of $f$ changes. (These are
+_often_ but **not always** where $f''(x)=0$.)
+
 
 
 * We can graphically identify _critical points_ of $f(x)$ by graphing
@@ -172,7 +182,7 @@ longq("critical points of \\( f(x) = 2x^3 - 6x^2 - 2x + 4 \\)", "\\verb+fzeros(D
 choices = ["There are none",
 	"There is one at x=-1.0",
 	"There is one at x=1.0 and one at x=-3.0",
-	"There are three at-4.4641, -1.0, and 2.4641"]
+	"There is one at each of x=-4.4641, -1.0, and 2.4641"]
 ans = 3
 radioq(choices, ans, "all inflection points")
 ```
@@ -213,7 +223,7 @@ radioq(choices, ans, "When is f(x) concave up?")
 * The first derivative test states that for a differentiable function
   $f(x)$ with a critical point at $c$ then if $f'(x)$ changes sign
   from $+$ to $-$ at $c$ then $f(c)$ is a local maximum and if it
-  changes sign from $-$ to $+$ then $f(c)$ is a local maximum.
+  changes sign from $-$ to $+$ then $f(c)$ is a local minimum.
 
 For the function $f(x)$ suppose you know $f'(x)=x^3 - 5x^2 + 8x -
 4$. Find *all* the critical points. Use the first derivative test to
@@ -370,8 +380,8 @@ In the units given, how much is the maximum concentration?
 ```
 
 ```julia
-c(t) =  3t^2*exp(-t/5)
-val = fzero(D(c), 10)
+conc(t) =  3t^2*exp(-t/5)
+val = fzero(D(conc), 10)
 numericq(f(val), 1e-2, "what is max. concentration?")
 ```
 

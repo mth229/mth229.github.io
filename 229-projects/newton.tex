@@ -39,8 +39,8 @@ algebraic solution:
 
 \begin{verbatim}
 import SymPy            # a symbolic math program
-x = SymPy.Sym("x")
-SymPy.solve(x^5 - x - 1)
+x = Sym("x")
+solve(x^5 - x - 1)
 \end{verbatim}
 We see that \texttt{SymPy} basically punts on this question.
 
@@ -71,9 +71,8 @@ is taken to be $x_n$.
 
 What is the algorithm? It is simple. If we start with some $x_i$, then
 $x_{i+1}$ is given by the intersection point of the $x$-axis of the
-tangent line of $f(x)$ at $x_i$. (See the notes for a figure.)
-Mathematically then we can equate our two methods to compute the slope
-of a tangent line:
+tangent line of $f(x)$ at $x_i$. Mathematically then we can equate our
+two methods to compute the slope of a tangent line:
 
 \[
 f'(x_i) = \frac{f(x_i) - 0}{x_i - x_{i+1}}
@@ -134,10 +133,30 @@ updates to \texttt{x} do not change its value. We see that the algorithm
 has converged to an answer, \texttt{x}, and the fact that it is a zero
 is confirmed by the value of \texttt{f(x)}.
 
-Repeating steps in \texttt{IJulia} can be a bit of a chore, so here we
-define a \emph{macro} to repeat some expression 5 times and then show
-how to use it. (This macro basically replaces the expression internally
-with 5 repeats of the expression.)
+Repeating steps in \texttt{IJulia} can be a bit of a chore. There a few
+ways to make this easier. For example, encapsulate the algorithm into a
+function or use a programming construct to repeat the task.
+
+For the former, you might have:
+
+
+
+\begin{verbatim}
+newt(x, f, fp) = x - f(x)/fp(x)
+\end{verbatim}
+and then for a given f, do something like
+
+
+
+\begin{verbatim}
+f(x) =  x^3 - 2x -5; fp(x) = 3x^2 - 2
+newt(x) = newt(x, f, fp)
+x = 2.0
+newt(newt(newt(newt(newt(x)))))
+\end{verbatim}
+That is kinda ugly. Here we use a programming construct, a \emph{macro},
+to repeat some \emph{expression} 5 times. (This macro basically replaces
+the expression internally with 5 repeats of the expression.)
 
 
 
@@ -276,9 +295,9 @@ algorithm in \texttt{julia} becomes \texttt{x = x - f(x)/D(f)(x)}.
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
-  Use Newton's method to find \emph{both} positive intersection point of
-  $f(x) = e^x$ and $g(x) = 2x^2$. Make a graph to identify good initial
-  guesses.
+  Use Newton's method to find \emph{both} positive intersection points
+  of $f(x) = e^x$ and $g(x) = 2x^2$. Make a graph to identify good
+  initial guesses.
 \end{itemize}
 
 The smallest value is:
@@ -286,7 +305,7 @@ The smallest value is:
 \begin{answer}
     type: numeric
     reminder: smaller zero
-    answer: [1.487962055498177, 1.4879620754981768]
+    answer: [1.4879520654981768, 1.487972065498177]
 
 \end{answer}
 
@@ -295,7 +314,7 @@ The largest value is:
 \begin{answer}
     type: numeric
     reminder: larger zero
-    answer: [2.6178666030668127, 2.6178666230668126]
+    answer: [2.6178566130668126, 2.6178766130668127]
 
 \end{answer}
 
@@ -389,7 +408,7 @@ cols: 60
 \begin{answer}
     type: numeric
     reminder: zero of derivative of \( 5/cos(x) + 7/sin(x) \)
-    answer: [0.8413596562250458, 0.8413596762250459]
+    answer: [0.8413496662250459, 0.8413696662250458]
 
 \end{answer}
 
