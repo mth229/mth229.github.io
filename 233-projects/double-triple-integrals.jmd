@@ -1,0 +1,257 @@
+# Double  Integration
+
+Let $f: R^2 \rightarrow R$ be a continuous, real-valued function of two variables. If $f(x,y) \geq 0$ over a region $D$, then the volume under $f$ above the $x-y$ plan is given by an integral
+
+$$
+\int_D f(x,y) dA
+$$
+
+More generally, if $f(x,y)$ is possibly negative, then the above is interpreted as the signed volume. As with one-dimensional integrals, this insight can lead to methods to numerically compute the integral above. For now we focus on applying the fundamental theorem of calculus to perform the integration. For this, the double integral must be turned into a sequence of single integrals.
+
+## Fubini's thereom, iterated integrals
+
+[Fubini's theorem](http://en.wikipedia.org/wiki/Fubini%27s_theorem) gives conditions on when it is possible to turn a double (or higher dimensional integral) into a sequence of iterated integrals. Fubini's theorem will apply if the region $D$ is the rectangle $[a,b] \times [c,d]$ and the function $f$ is continuous, in which case we have
+
+$$
+\int_D f(x,y) dA = \int_a^b [\int_c^d f(x,y) dy] dx = \int_c^d [\int_a^b f(x,y) dx] dy.
+$$
+
+The value on the right can be computed by hand or with `SymPy`'s `integrate` function within `julia`.
+
+For example, consider the area under the plane $f(x,y) = 1 - (x + y)/2$ over the region $[0,1] \times [0,1]$. Fubini's theorem says this is simply
+
+$$
+\int_0^1 [\int_0^1 (1 - (x+y)/2) dy] dx.
+$$
+
+This can be computed as:
+
+```
+using SymPy
+x,y,z = symbols("x,y,z", real=true)
+
+integrate(1 - (x + y)/2, (y, 0, 1), (x, 0, 1))
+```
+
+The limits of integration are specified with the innermost first and outermost last. They are specified with a triple. So the math notation
+
+$$
+\int_a^b (...) dx
+$$
+
+Becomes `integrate( ..., (x, a, b))` for whatever `...` means.
+
+## Limits of integration
+
+More generally, the region may be more complicated than a rectangle. If $D$ is "simple", then one can say either $a \leq x \leq b$ and $g_1(x) \leq y \leq g_2(x)$ (or vice-versa in $x$ and $y$) for some functions $g_1$ and $g_2$, then the double integral over $D$ can be iterated to:
+
+$$
+\int_a^b \int_{g_1(x)}^{g_2(x)} f(x,y) dy dx.
+$$
+
+For example, suppose $D$ is the region in the $x-y$ plane described by $0 \leq x \leq 1$ and $0 \leq y \leq x^2$, then the integral of $(x+y)^2$ over $D$ can be computed by
+
+```
+integrate((x+y)^2, (y, 0, x^2), (x,0,1))
+```
+
+
+### Using quadgk for numeric integration
+
+The use of numeric integration is possible -- and necessary for some integrands --  but slightly more cumbersome. For rectangular regions, the `Cubature` package provides high-quality algorithms for the task. However, with some work we can use the built-in `quadgk` function as well by iterating the integrals. the above problem would be done as follows:
+
+```
+g1(x) = 0
+g2(x) = x^2
+f(x,y) = (x+y)^2
+inner(x) = quadgk(y -> (x + y)^2, g1(x), g2(x))[1]
+quadgk(inner, 0, 1)[1]
+```
+
+We see that we have to write out `inner` function in terms of `x` and extract just the first answer. This allows us to pass this to the outer `quadgk`. The error term from the last one is misleading, as it won't take into consideration any error in the inner integral. However, in this case, The integral is basically exact, though `29/70` is a nicer answer than `0.4142857142857142`.
+
+## polar coordinates
+
+If it is more convenient to express the domain $D$ in _polar coordinates_, then the double integral of $f$ over $D$ can be re-expressed as:
+
+$$
+\int_D f(x,y) dA =  \int_\theta \int_r f(r\cos(\theta), r\sin(\theta)) r \cdot dr \cdot d\theta.
+$$
+
+The $r \cdot dr \cdot d\theta$ matches $dA$ after the transformation, of which more is described later.
+
+
+For example, consider the problem of integrating $f(x,y) = x^2 + y^2$ over the unit circle. Using rectangular coordinates we have an error:
+
+```
+# integrate(x^2 + y^2, (y, -sqrt(1-x^2), sqrt(1-x^2)), (x, -1, 1))  ## uncomment to see error
+```
+
+We can see where the error comes from by doing it one at a time:
+
+```
+x, y = symbols("x, y", real=true)
+ex = integrate(x^2 + y^2, y)
+ex1 = subs(ex, y, sqrt(1-x^2)) - subs(ex, y, -sqrt(1-x^2))
+```
+
+Trying `integrate(ex1)` should work -- and does -- but for some reason it also fails at times. here we break this up into two pieces and integrate each:
+
+```
+exa = 2 * x^2 * sqrt(1 - x^2)
+exb = (2//3) * sqrt(1 - x^2)^3
+```
+
+The second integral gives:
+
+```
+outb = integrate(exb, x)
+```
+
+(Though there can be errors some times when this is computed.)
+
+The first integral has a condition:
+
+```
+out = integrate(exa, x)
+```
+
+We can fish out the value for $|x| < 1$, but it isn't pretty:
+
+```
+outa = 2*collect((out/2).x[:args][2].x)[1]
+```
+
+With this we can see the issue -- evaluating at 1 or -1 gives an `NaN`. We could take a limit -- but this doesn't work -- rather we just put in a small value of $h$ and see:
+
+```
+h = 0.0001
+subs(outa + outb, x, 1- h) - subs(outa + outb, x, -1 + h)
+```
+
+An answer that looks like $\pi/2$.
+
+
+Okay, that was too much work and still not that satisfying! Let's see
+what happens if we change coordinate systems. The unit circle is
+described by $0 \leq r \leq 1$ and $0 \leq \theta \leq 2\pi$ -- a
+simple region, and we have
+
+```
+r, theta = symbols("r, theta", real=true)
+f(x,y) = x^2 + y^2
+x, y = r * cos(theta), r * sin(theta)
+integrate(f(x, y) * r, (theta, 0, 2PI), (r, 0, 1)) # note extra "* r"
+```
+
+
+
+## Triple integrals
+
+Triple integrals are conceptually no more difficult than double integrals. Fubini's theorem is used to iterate the integrals, and if a region can be written iteratively, then the process is similar.
+
+For example, compute $\int\int\int_D z dV$ where $D$ is the region between the planes $z=x+y$, $z=3x+5y$ lying over the rectangle $[0,3] \times [0,2]$. This becomes:
+
+```
+x,y,z = symbols("x,y,z")
+integrate(z, (z, x+y, 3x+5y), (y, 0, 2), (x, 0,3))
+```
+
+
+## cylindrical, spherical
+
+As polar coordinates make certain double integrals easier, triple integrals can be easier to compute using either cylindrical coordinate systems or spherical. This relates them:
+
+$$
+\int_D f(x,y,z) dV = \int_\theta \int_r \int_z f(r\cos(\theta), r\sin(\theta)z) r dz dr d\theta
+= \int_\theta \int_\phi \int_\rho f(\rho\cos\theta\sin\phi, \rho\sin\theta\sin\phi, \rho\cos\phi) \rho^2 \sin\phi d\rho d\phi d\theta.
+$$
+
+
+For example, computing the integral of $z$ over the region $D$ described by it fitting in the cylinder $x^2 + y^2\leq 4$ with $0 \leq z \leq y$ we have noting that the cylinder is a circle with radius 2:
+
+```
+integrate(z * r, (z, 0, r*sin(theta)), (r, 0, 2), (theta, 0, PI))
+```
+
+The subtlety above is the limit of integration on $\theta$ which is only $[0,\pi]$, as the condition that $0 \leq z \leq y$ only allows values when the plane $z=y$ is positive, or the upper half of the $x-y$ plane.
+
+## Change of variables
+
+The integrands for polar, cylindrical, and spherical integrals look like $f \cdot G$ for some term $G$. (For example, $G=r$ for polar and cylindrical.) The $G$ comes from investigating the change in the "$dA$" or "$dV$" under the tranformation. What exactly $G$ is follows from the change of variable formula, written in two dimensions here:
+
+$$
+\int_D f(x,y) dx dy = \int_D f(u,v) G(x,y;u,v) du dv.
+$$
+
+The $G$ is the determinant of the Jacobian, $J$, that is the determinant of the matrix (in this case) $\partial x_i/ \partial u_j$.
+
+* For example, suppose we have the transformation $x = r\sin(\theta)$ and $y=r\cos(\theta)$. Then $J$ is computed with:
+
+```
+us = r, theta = symbols("r, theta", real=true)
+xs = [r*cos(theta), r*sin(theta)]
+J = Sym[diff(x, u) for x in xs, u in us]
+```
+
+We help `SymPy` out by specifying the type of the output on the comprehension. We see `J` is a 2 by 2 matrix and its determinant can be taken with `det` and then simplified through:
+
+```
+det(J) |> simplify
+```
+
+
+* To see how spherical coordinates can fit into the change of variable formula, we have:
+
+```
+us = rho, phi, theta = symbols("rho, phi, theta", real=true)
+xs = [rho*cos(theta)*sin(phi), rho*sin(theta)*sin(phi), rho*cos(phi)]
+J = Sym[diff(x, u) for x in xs, u in us]
+det(J) |> simplify
+```
+
+* Here is an application where we aren't just verifying an output. Let $D$ be the region between the lines $y=1$, $y=3$ and the parallel lines $x+2y=6$ and $x+2y=10$. Integrate $(x+3y)$.
+
+The change of variable $x =  u - 2v, $y=v$ translates into
+
+```
+us = u, v = symbols("u, v", real=true)
+xs = x, y = u - 2v, v
+x+2y
+```
+
+So with these coordinate, $D$ becomes a rectangular region $1 \leq v \leq 3$ and $6 \leq u \leq 10$. We then have:
+
+```
+J = Sym[diff(x, u) for x in xs, u in us]
+integrate((x + 3y) * det(J), (v, 1, 3), (u, 6, 10))
+```
+
+As an aside, this is an example of a _linear transformation_ called a shear. From the linear algebra viewpoint, the transformation can be written in matrix notation as `xs = J * us` (if `us` and `xs` were vectors and not tuples). That `J` is the same as the Jacobian is related to the linear nature of the transformation.
+
+## Applications
+
+* Compute the area of the right half of the centroid $r^2 = \cos(2\theta)$.
+
+The key is $\theta$ goes from $-\pi/4$ to $\pi/4$ to trace out the region, giving:
+
+```
+integrate(1*r, (r, 0, sqrt(cos(2theta))), (theta, -PI/4, PI/4))
+```
+
+* Find the center of mass of the domain bounded by $y=1-x^2$ and the $x$ axis with density $\rho(x,y) = y$.
+
+The center of mass in the $x$ direction is given by $(\int_D x \cdot \rho \cdot DA)/M$ and similarly with a $y$.
+
+We have:
+
+```
+x, y = symbols("x, y", real=true)
+rho = y
+M  = integrate(rho, (y, 0, 1-x^2), (x, -1, 1))
+Mx = integrate(x * rho, (y, 0, 1-x^2), (x, -1, 1))
+My = integrate(y * rho, (y, 0, 1-x^2), (x, -1, 1))
+Mx/M, My/M
+```
+
+That $M_x$ is $0$ is no surprise, as there is symmetry in both the region and the density to the left and right of the line $x=0$.

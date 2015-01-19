@@ -10,11 +10,115 @@ ul li {list-style-image: url(http://www.math.csi.cuny.edu/static/images/julia.pn
 \end{html}
 \begin{document}
 
-\subsection{Questions to be handed in for project 1: Julia as a
-calculator}
+\section{Questions to be handed in on Julia as a calculator}
+
+\subsubsection{Quick background}
 
 Read about this material here:
 \href{http://mth229.github.io/calculator.html}{Julia as a calculator}.
+
+For the impatient, these questions cover the use of \texttt{julia} to
+replace what a calculator can do:
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  the common operations on numbers: addition, subtraction,
+  multiplication, division, and powers. For the most part there is no
+  surprise, once you learn the notations: \texttt{+}, \texttt{-},
+  \texttt{*}, \texttt{/}, and \texttt{\^{}}. (Though you may find that
+  copying and pasting minus signs will often cause an error, as only
+  something that looks like a minus sign is pasted in.)
+\end{itemize}
+
+Using \texttt{IJulia}, one types the following into a cell, and then
+presses the "run" button (or "shift-enter"):
+
+
+
+\begin{verbatim}
+2 + 2
+\end{verbatim}
+The answer follows below the cell.
+
+Here is how one does a slightly more complicated computation:
+
+
+
+\begin{verbatim}
+(2 + 3)^4/(5 + 6)
+\end{verbatim}
+As with your calculator, it is very important to use parentheses as
+appropriate to circumvent the usual order of operations.
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  The use of the basic families of function: trigonometric, exponential,
+  logarithmic.
+\end{itemize}
+
+On a calculator, there are buttons used to compute various functions. In
+\texttt{julia}, there are \emph{many} pre-defined functions that serve a
+similar role (and you will see how to define your own). Functions in
+\texttt{julia} have names and are called using parentheses to enclose
+their argument(s), as with:
+
+
+
+\begin{verbatim}
+sin(pi/4), cos(pi/3)
+\end{verbatim}
+(With \texttt{IJulia}, when a cell is executed only the last command
+computed is displayed, the above shows that using a comma to separate
+commands on the same line can be used to get two or more commands to be
+displayed.)
+
+Most basic functions in \texttt{julia} have easy to guess names, though
+you will need to learn some differences, such as \texttt{log} is for
+$\ln$ and \texttt{asin} for $\sin^{-1}$.
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  the use of memory registers to remember intermediate values.
+\end{itemize}
+
+Rather than have numbered memory registers, it is \emph{easy} to assign
+a name to a value. For example,
+
+
+
+\begin{verbatim}
+x = 42
+\end{verbatim}
+Names can be reassigned (though at times names for functions can not be
+reassigned to different types of values). For assigning more than one
+value at once, commas can be used as with the output:
+
+
+
+\begin{verbatim}
+a,b,c = 1,2,3
+\end{verbatim}
+Unlike a calculator, \texttt{julia} has different types for these types
+of numbers: integers, rational numbers, real numbers, and complex
+numbers. For the most part the distinction isn't much to worry about,
+but there are times where one must, such as overflow with integers. (One
+can only take the factorial of 20 with 64-bit integers, whereas on most
+calculators a factorial of 69 can be taken, but not 70.) Julia
+automatically assigns a type when it parses a value. a \texttt{1} will
+be an integer, a \texttt{1.0} an floating point number. Rational numbers
+are made by using two division symbols, \texttt{1//2}.
+
+For many operations the type will be conserved, such as adding to
+integers. For some operations, the type will be converted, such as
+dividing two integer values. Mathematically, we know we can divide some
+integers and still get an integer, but \texttt{julia} usually opts for
+the same output for its functions (and division is also a function)
+based on the type of the input, not the values of the input.
+
+Okay, maybe that is too much. Let's get started.
 
 \subsubsection{Expressions}
 
@@ -149,8 +253,6 @@ Read about this material here:
 e^{(1/2)\cdot(3 - 2.3)^2}
 \]
 
-``
-
 \begin{answer}
     type: numeric
     reminder: \( e^{(1/2)\cdot(3 - 2.3)^2} \)
@@ -192,6 +294,22 @@ answer_text: \verb+1 + rac{1}{2} + rac{1}{2cdot 3} + rac{1}{2cdot 3cdot4} + 
 
 \end{answer}
 
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  In mathematics a function is defined not only by a rule but also by a
+  \emph{domain} of possible values. Similarly with \texttt{julia}. What
+  kind of error does \texttt{julia} respond with if you try this
+  command: \texttt{sqrt(-1)}?
+\end{itemize}
+
+\begin{answer}
+type: shorttext
+reminder: What kind of error of `sqrt(-1)`?
+answer: DomainError
+
+\end{answer}
+
 \subsection{Precedence}
 
 \begin{itemize}
@@ -214,15 +332,21 @@ answer_text: \( (1 - 2) + ((3 * (4 ^ 5)) / 6) \)
 \end{answer}
 
 \begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
 \item
   Which of these will also produce $1/(3\cdot4)$:
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\itemsep1pt\parskip0pt\parsep0pt
 \item
   \texttt{1/3*4}
 \item
   \texttt{1/3/4}
 \item
   \texttt{1*3/4}
-\end{itemize}
+\end{enumerate}
 
 \begin{answer}
 type: radio
@@ -403,25 +527,55 @@ If $A=115^\circ$, $a=123$, and $b=16$, find $B$ (in degrees).
 
 \subsection{Numbers}
 
+Scientific notation represents real numbers as $a \cdot 10^b$, where $b$
+is an integer, and $a$ may be a real number in the range $-1$ to $1$. In
+\texttt{julia} such numbers are represented with an \texttt{e} to
+replace the 10, as with \texttt{1.2e3} which would be $1.2 \cdot 10^3$
+(1,230) or \texttt{3.2e-1}, which would be $3.2 \cdot 10^{-1}$ (0.32).
+
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
-  \texttt{7e-10} is greater than \texttt{8e-9}?
+  The output of \texttt{sin(pi)} in \texttt{julia} gives
+  \texttt{1.2246467991473532e-16}. Is this number
 \end{itemize}
 
 \begin{answer}
 type: radio
-reminder: is 7e-10 greater 8e-9?
-values: 1 | 2
-labels: True | False
-answer: 2
+reminder: 
+values: 1 | 2 | 3
+labels: close to 1.22 | close to -1.22 | close to 0
+answer: 3
 \end{answer}
 
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
-  The values \texttt{2}, \texttt{2.0}, \texttt{2 + 0im} and
-  \texttt{2//1} are all the same and yet all different. How so?
+  Is \texttt{7e-10} greater than \texttt{8e-9}?
+\end{itemize}
+
+\begin{answer}
+type: radio
+reminder: Is 7e-10 greater 8e-9?
+values: 1 | 2
+labels: True | False
+answer: 2
+\end{answer}
+
+Julia has different storage type for integers (which are stored exactly,
+but have smaller bounds on their size); rational numbers (which are
+stored exactly in terms of a numerator and a denominator); real numbers
+(which are \emph{approximated} by floating point numbers); and complex
+numbers (which may have either have integer or floating point values for
+the two components.) When \texttt{julia} parses a value, it will
+determine the type by how it is entered.
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  For example, the values \texttt{2}, \texttt{2.0}, \texttt{2 + 0im} and
+  \texttt{2//1} are all the same and yet all different. What type is
+  each?
 \end{itemize}
 
 \begin{answer}
@@ -442,7 +596,8 @@ cols: 60
 2^{-1}.
 \]
 
-(This isn't quite as easy as it looks.)
+(This isn't quite as easy as it looks, as the output of the power
+function (\texttt{\^{}}) depends on the type of the input variable.)
 
 \begin{answer}
     type: numeric

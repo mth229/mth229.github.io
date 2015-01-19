@@ -1,0 +1,463 @@
+# Vectors and Vector-Valued Functions
+
+
+## Vectors
+
+
+In `julia`, creating vectors is very straightforward: rather than use $\langle 1,2,3 \rangle$, we use square brackets, as in
+
+```
+[1,2,3]
+```
+
+In Julia, this creates a vector. The output describes itself as
+`Array{Int64,1}`. This translates into an array of integers with one 
+dimension. An array is a collection of objects stored in a
+multi-dimensional grid. For vectors the dimension is 1, for matrices
+-- two-dimensional, rectangular arrays -- the dimension is 2. This is
+important, note the difference if we leave the commas out of the
+above:
+
+```
+[1 2 3]
+```
+
+This creates a `1x3 Array{Int64,2}`, which has 1 row, 3 columns, 2 dimensions and stores integers. The only moral here -- use commas to create vectors.
+
+
+> The `[]` notation is used in many different ways in `julia`. In the above we see its use to combine like-type items into a collection, in this case a vector or matrix. As well, the `[]` notation is used to access vector components, for example `x[2]` would be the second component of the collection `x`. It is also common with _list comprehensions_ of the form `[x^2 for x in 1:5]`, though this is related to the first use. More generally, identifying the different uses of matched braces: `[]`, `()`, and `{}` is important in trying to read `julia` syntax.
+
+
+### Algebra of vectors
+
+Vectors have many arithmetic operations defined for them. These fit naturally into `julia`'s syntax.
+
+```
+u = [1,2,3]
+v = [4,5,6]
+w = [1,3,5]
+2*u, u + v, v - w
+```
+
+The number of entries in a vector is determined by `length`:
+
+```
+length(u)
+```
+
+The norm of the vector is returned by `norm`. The default is to use the Euclidean norm (`p=2`), though others are possible:
+
+```
+norm(u)
+```
+
+This makes finding a unit vector trivial:
+
+```
+u/norm(u)
+```
+
+We make a function to compute the unit vector of any vector:
+
+```
+uvec(u) = u/norm(u)
+```
+
+If we give our variable names `u\hat<tab>` then a "hat" will match the book for a unit vector:
+
+```
+û = uvec(u)
+```
+
+(There is nothing but a naming convention. Using a hat does not by itself make something a unit vector.)
+
+<p>
+
+Here we verify that the triangle inequality holds for `u` and `v`:
+
+```
+norm(u+v) <= norm(u) + norm(v)
+```
+
+The [dot product](http://en.wikipedia.org/wiki/Dot_product) is defined
+for any two vectors of the same length and is implemented via `dot`:
+
+```
+dot(u, v)
+```
+
+For those who like to match the text book, you can use `\cdot<tab>` as an [infix](http://en.wikipedia.org/wiki/Infix_notation) operation:
+
+```
+u ⋅ v
+```
+
+
+using $\hat{u} \cdot \hat{v} = \cos(\theta)$ To find the angle between the two vectors `u` and `v` we have:
+
+```
+acos(uvec(u) ⋅ uvec(v))
+```
+
+
+The projection of `u` along `v` is given by the projection formula $u \cdot \hat{v} \hat{v}$:
+
+```
+ev = uvec(v)
+(u ⋅ ev) * ev          # parentheses are not needed here, as dot happens before *
+```
+
+
+Lets break `u` up into a parallel and perpendicular components in terms of `v`:
+
+```
+ev = uvec(v)
+upar = (u ⋅ ev) * ev 
+uperp = u - upar
+```
+
+And we check that `uperp` is indeed perpendicular, as it should have a 0 dot product with `v`:
+
+```
+uperp ⋅ v          # 0 up to roundoff errors
+```
+
+---
+
+For 3D vectors, like `u` and `v`, the
+[cross product](http://en.wikipedia.org/wiki/Cross_product) is defined
+and implemented in `cross`:
+
+```
+cross(u, v)
+```
+
+Again, an infix operator is available: `\times<tab>`:
+
+```
+u × v
+```
+
+
+Here we verify for these vectors that the cross product is not commutative, but rather anti-commutative:
+
+```
+(u × v) - (v × u), (u × v) + (v × u)
+```
+
+Here we verify that the cross product is not-associative
+
+```
+left = (u × v) × w              # also cross(cross(u, v), w)
+right = u × (v × w)              # and  cross(u, cross(v, w))
+left - right
+```
+
+And this finds, again, the angle between `u` and `v`:
+
+```
+û, v̂ = uvec(u), uvec(v)   # u\hat<tab>and v\hat<tab> to enter
+asin(norm( û × v̂ ))
+```
+
+Let's verify that $\| u \times v \|^2 = \| u \|^2 \| v\|^2 - (u \cdot v)^2$:
+
+```
+left = norm( u × v )^2
+right = norm(u)^2 * norm(v)^2 - (u ⋅ v)^2
+left - right                        # up to round off error
+```
+
+
+## Vector-valued functions
+
+A general definition of a function is a mapping from a domain to a range. A _vector-valued function_ is a function which takes a value from the real line and returns a vector. In shorthand, $f: R \rightarrow R^n$, where $n=2,3, ...$. In this section, we see how to define such functions, how to operate on them, and visualize them. In this specific case of a function from the real line to 2 or 3 dimensions, the term parameterized curve is used to describe the function.
+
+### Parameterizing a line
+
+As with most cases in math, we begin with lines. A line in 2 or 3 dimensions can be thought of in terms of scalar multiples of a vector from a fixed point. Let $p$ be the fixed point, and $v$ the vector, then we can represent any point on a line going through $p$ in the direction of $v$ by:
+
+$$
+p + t v, \quad -\infty < t < \infty.
+$$
+
+In `julia`, we have, for example:
+
+```
+p = [1,2,3]
+v = [3,2,1]
+f(t) = p + t*v
+f(0), f(1), f(2)
+```
+
+
+
+### space curves
+
+Creating a vector valued function isn't more difficult than creating a
+one-dimensional function. We just need to make sure the output is a
+vector.
+
+For some examples, this defines a helix:
+
+```
+helix(t) = [cos(t), sin(t), t]
+```
+
+This function when graphed will make a "pringle"
+
+```
+pringle(t) = [cos(t), sin(t), sin(2t)]
+```
+
+Two-dimensional vector-valued are done in a similar manner with just two components being satisfied.
+
+### Visualizing vector-valued functions.
+
+
+We will use the `PyPlot` package to graph vector-valued functions, as this package provides 3D visualizations on top of 2D ones. The package is loaded as others:
+
+```
+using PyPlot
+pygui(false)   # force display within IJulia
+```
+
+`PyPlot` has the function `plot` for plotting 2D curves and `plot3D`
+for plotting 3D curves. In each case, we need to give vectors of
+values for each of `x`, `y`. For 3D graphs, we need `z` values as
+well. Unlike plotting with `Gadfly`, we need to generate this values
+for `PyPlot` to plot and connect with lines.
+
+This requires some extra steps:
+
+* generate `xs` via a command like `linspace(a,b)`
+
+* map a function over the `xs` to generate some other values. This is
+  conveniently done with either `map`, or more usually here with a
+  _comprehension_ of the type `[f(x) for x in xs]`.
+
+
+
+For example, here is how we can plot two rotations of the helix:
+
+```
+ts = linspace(0, 4pi)           # 100 evenly spaced points between 0 and 4pi
+xs = [helix(t)[1] for t in ts]
+ys = [helix(t)[2] for t in ts]
+zs = [helix(t)[3] for t in ts]
+plot3D(xs, ys, zs)
+```
+
+When we find ourselves repeating work, we usually look to simplify
+it. Here is one no so efficient way to do the above with less typing:
+
+```
+ts = linspace(0, 4pi)
+out = [ [helix(t)[i] for t in ts] for i in 1:3]
+plot3D(out...)
+```
+
+Here we extend the `plot` function of `PyPlot` to handle a vector-valued function of 1, 2 or 3 dimensions
+
+```
+function PyPlot.plot(f::Function, a::Real, b::Real, args...; test_pt=0, kwargs...)
+	n = length(f(test_pt))
+	ts = linspace(a, b, 250)
+    out = [ [f(t)[i] for t in ts] for i in 1:n]
+	n == 1 && plot(ts, out[1], args...; kwargs...)
+	n == 2 && plot(out...,     args...; kwargs...)
+	n == 3 && plot3D(out...,   args...; kwargs...)
+end
+```	
+
+(The above makes a vector of `n` vectors, where each has 100 values. Using the splatting operation, `...`, passes the  vectors in as `n` arguments to the appropriate `plot` function.)
+
+To visualize the pringle, we only need one revolution:
+
+```
+plot(pringle, 0, 2pi)
+```
+
+
+
+## Calculus of vector-valued functions
+
+The derivative of a parameterized curve is performed component by component. The following central difference approximation is used to allow `r'` and `r''` to approximate the first and second derivatives:
+
+```
+Base.ctranspose(r::Function, h=1e-4) = t -> (r(t+h) - r(t-h)) / (2h)
+```
+
+Then we can compute the approximate derivative as:
+
+```
+r(t) = [sin(t), cos(t), t]
+r'(pi/6), r''(pi/4)
+```
+
+The approximation here isn't bad. This tests the maximum difference of the second derivative's error
+
+```
+maximum([norm(r''(t) - [-sin(t), -cos(t), 0]) for t in linspace(0, 2pi, 1000)])
+```
+
+
+### visualizing tangent vectors
+
+Adding an arrow to the plot is not as easy as it should be, but adding a simple line segment can be done with `plot3D` or `plot`. Here is a helper function that is included with `SymPy`:
+
+```
+function add_arrow(p::Vector, v::Vector, args...; kwargs...)
+  n = length(p)
+  if n == 2
+    arrow(p..., v...; kwargs...)
+  elseif n==3
+    out = [hcat(p,p+v)'[:,i] for i in 1:n]
+    plot3D(out..., args...; kwargs...)
+  end
+end
+```
+
+Now we plot the pringle again, but add in tangent vectors of unit length along the curve:
+
+```
+plot(pringle, 0, 2pi)
+ts = linspace(0, 2pi, 10)
+for t0 in ts
+  p = pringle(t0)
+  T = pringle'(t0)
+  add_arrow(p, uvec(T))
+end
+```
+
+
+### Arclength
+
+The length of a parameterized curve is given by the formula
+
+$$
+s = \int_a^b \| r'(t) \| dt
+$$
+
+We can compute this easily in `julia`. For our pringle we have the length of one turn is found with:
+
+```
+r(t) = [cos(t), sin(t), sin(2t)]
+ds(t) = norm(r'(t))
+quadgk(ds, 0, 2pi)[1]        # first value returned is answer (second is error)
+```
+
+We put this into a function for convenient usage:
+
+```
+arclength(r::Function, a::Real, b::Real) = quadgk(t -> norm(r'(t)), a, b)[1]
+```
+
+
+### Parameterizing by arc length.
+
+Let $r(t)$ be a parameterization of a curve. The same space curve can have many different parameterizations, in fact any monotonically increasing function `g` gives a new parameterization via `r(g(t))`. Parameterizing by arclength is a useful way to talk about a specific parameter. Basically, this is a parameterization so the that arclength between 0 and $s$ is just $s$. Mathematically, the arclength function is monotonic, so we just need to take its inverse and call that `g`. Finding the inverse is always possible due to monotonicity, but may not be algebraically possible. However, we have numeric tools to approximate it. For example,
+
+
+```
+r(t) = [cos(t), sin(t), sin(2t)]      # pringle
+s(t) = arclength(r, 0, t)
+```
+
+How to invert? We use the `fzero` method from `Roots` and bracketing, making an assumption that `t` is positive and the arclength is less than 100:
+
+```
+using Roots
+g(u) = Roots.fzero(t -> s(t) - u, [-1, 100])
+```
+
+Then the parameterization is found by composition
+
+```
+rs(t) = r(g(t))
+arclength(rs, 0, 2)     # should be 2 (numerically close anyways)
+```
+
+#### Curvature
+
+The curvature can be computed different ways. One is that the curvature is the norm of the derivative of the tangent vector when the curve is parameterized by arc length. But more importantly, we have this formula  which does not require a special parameterization, but does require a 3D vector-valued function:
+
+$$
+\kappa = \frac{\| r'(t) \times r''(t) \|}{\| r'(t) \|^3}
+$$
+
+```
+kappa(t) = norm( r'(t) × r''(t) ) / norm(r'(t))^3
+```
+
+
+
+
+## Symbolic math and parameterized curves
+
+Many of the above computations can be done symbolically to match the work done with paper and pencil. Here we see how:
+
+```
+using SymPy
+t = Sym("t")
+```
+
+With the function
+
+```
+r(t) = [sin(t), cos(t), t]
+```
+
+We can create a symbolic expression by evaluating `r` at `t`:
+
+```
+u = r(t)
+```
+
+The usual operations work as expected:
+
+```
+2u
+u + u
+u ⋅ u
+u × u
+```
+
+More complicated expressions are possible
+
+```
+u ⋅ u - norm(u)^2  
+```
+
+The above should be $0$ -- for real valued vectors, but as `SymPy` does not make that assumption. Here we try again:
+
+```
+t = symbols("t", real=true)
+u = r(t)
+u ⋅ u - norm(u)^2
+```
+
+
+Symbolic expressions can be plotted using `parametricplot` in a similar manner as before, only here the first argument is an expression, not a function:
+
+```
+parametricplot(u, 0, 2pi)
+```
+
+We can compute quantities symbolically. For example, the arclength (where we use t twice, though differently):
+
+```
+integrate(norm(diff(u)), t, 0, t) |> simplify   # integrate(ex, var, a, b)
+```
+
+
+And the curvature:
+
+```
+κ = norm(diff(u) × diff(u,t,2)) / norm(diff(u))^3 |> simplify
+```
+
+Of course, not all functions are so tractable as this example.
+
+
+

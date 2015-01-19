@@ -30,13 +30,26 @@ general the derivative of a function $f(x)$ is the function $f'(x)$,
 which returns the slope of the tangent line for each $x$ where it is
 defined.
 
-Approximating the tangent line can be done several ways. The *forward
-difference quotient* takes a small value of $h$ and uses the values
-$(f(x+h) - f(x))/h$ as an approximation. In `julia` we can write a
-function that does this:
+Approximating the slope of the tangent line can be done
+[several ways](XXX). The *forward difference quotient* takes a small value of $h$ and
+uses the values $(f(x+h) - f(x))/h$ as an approximation.
+
+
+For example to estimate the derivative of $x^x$ at $c=1$ with `h=1e-6` we could have
 
 ```
-forward(f, x; h=1e-6) = (f(x+h) - f(x))/h
+f(x) = x^x
+c, h = 1, 1e-6
+(f(c+h) - f(c))/h
+```
+
+
+
+In `julia` we can write a function that does this, allowing us to pass
+in any function:
+
+```
+forward(f, c; h=1e-6) = (f(c+h) - f(c))/h
 ```
 
 We can define an *operator* -- something which takes a function and
@@ -65,8 +78,8 @@ f'(pi)
 In the `Roots` package, an operator `D` (using Euler's notation) is
 given which uses a numeric approach to compute the derivative. This is
 more accurate, but conceptually a bit more difficult to understand and
-does not work for all functions. It is used like an operator, e.g.,
-`D(f)` is a function derived from the function `f`:
+does not work for all functions. It is also used like an operator,
+e.g., `D(f)` is a function derived from the function `f`:
 
 ```
 using Roots
@@ -131,7 +144,7 @@ numericq(val, 1e-4, "approx forward derivative \\verb+(1/x)'(2)+")
 f(x) = x^x
 c, h = 3, 1e-8
 val = (f(c + h) - f(c))/h
-numericq(val, 1e-4, "approx forward derivative \\verb+(x^x)'($c)+")
+numericq(val, 1e-6, "approx forward derivative \\verb+(x^x)'($c)+")
 ```
 
 
@@ -233,7 +246,7 @@ Is the derivative always increasing?
 ```
 
 ```julia
-booleanq(false, "is derivative increasing?")
+booleanq(false, "is derivative always increasing?")
 ```
 
 * The function $f(x) = x^x$ has a derivative for $x > 0$. Use `fzero`
@@ -270,7 +283,7 @@ correct answer.)
 ```
 
 ```julia
-longq("Do D(f,4) and f'''' mostly agree?")
+longq("Do D(f,4) and f'''' mostly agree?", "No, they are quite different -- f'''' is way off.")
 ```
 
 ## Some applications
@@ -341,12 +354,24 @@ radioq(choices, ans, "Is bal' ever positive")
 
 The tangent line to the graph of $f(x)$ at $x=c$ is given by $y = f(c)
 + f'(c)(x-c)$. It is fairly easy to plot both the function and its
-tangent line. This function is a helper, though it can be done
-directly:
+tangent line -- we just need a function to compute the tangent
+line.
+
+
+Here we write an operator to return such a function.  The operator
+needs to know both the function name and the value $c$ to find the
+tangent line at $(c, f(c))$ (notice the `x->` bit indicating the
+following returns a  function):
+
+
+```
+tangent(f, c) = x -> f(c) + D(f)(c)*(x-c) # returns a function
+```
+
+Here we see how to use it:
 
 ```
 f(x) = x^2			# replace me
-tangent(f, c) = x -> f(c) + D(f)(c)*(x-c) # returns a function
 plot([f, tangent(f, 1)], 0, 2)
 ```
 
@@ -383,7 +408,7 @@ numericq(val, 1e-4, "intersection of tangent line with x axis", "x-f(x)/f'(x)")
 f(x; a=1) = a * log((a + sqrt(a^2 - x^2))/x ) - sqrt(a^2 - x^2)
 ```
 
-The value of `a` is a parameter, for which $a=1$ is fine.
+The value of `a` is a parameter, the default value of $a=1$ is fine.
 
 For $x=0.25$ and $x=0.75$ the tangent lines can be drawn with
 
@@ -392,7 +417,10 @@ plot([f, tangent(f, 0.25), tangent(f, 0.75)], 0.01, 0.8)
 ```
 
 Verify that the length of the tangent line between $(c, f(c))$ and the
-$y$ axis is the same for $c=0.25$ and $c=0.75$. (For any $c$, the distance formula can be used to find the distance between the point $(c, f(c))$ and $(0, y_0)$ where, $y_0$ is where the tangent line at $c$ crosses the $y$ axis.)
+$y$ axis is the same for $c=0.25$ and $c=0.75$. (For any $c$, the
+distance formula can be used to find the distance between the point
+$(c, f(c))$ and $(0, y_0)$ where, $y_0$ is where the tangent line at
+$c$ crosses the $y$ axis.)
 
 ```
 ```

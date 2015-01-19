@@ -45,7 +45,7 @@ solve(x^5 - x - 1)
 We see that \texttt{SymPy} basically punts on this question.
 
 Numeric solutions are available. As this is a polynomial, we could use
-the \texttt{roots} function:
+the \texttt{roots} function for \texttt{Roots}:
 
 
 
@@ -57,22 +57,28 @@ We see 5 roots -{}- as expected from a fifth degree polynomial -{}- with
 one real root (the one with \texttt{0.0im}) that is approximately
 1.1673. Finding such a value usually requires some iterative
 root-finding algorithm (though not in the case above which uses linear
-algebra).
+algebra). For polynomials, the \texttt{fzeros} function uses such an
+algorithm \emph{for polynomials} to find the real roots:
 
-Newton's method is a root-finding algorithm like the bisection method
-discussed earlier. As an \emph{iterative algorithm} it starts with some
-\emph{guess} for a \emph{root} to an equation $f(x) = 0$. If this guess
-is called $x_0$, then the algorithm gives a \emph{new (and improved)}
-guess $x_1$. It is expected that $x_1$ is a better guess, but may not be
-the best that can be. The algorithm is then repeated \emph{again} to
-produce $x_2$. This is done until some guess $x_n$ is as close as we can
-get or the algorithm fails for some reason. The \emph{approximate root}
-is taken to be $x_n$.
 
-What is the algorithm? It is simple. If we start with some $x_i$, then
-$x_{i+1}$ is given by the intersection point of the $x$-axis of the
-tangent line of $f(x)$ at $x_i$. Mathematically then we can equate our
-two methods to compute the slope of a tangent line:
+
+\begin{verbatim}
+fzeros(f)                # no a, b range needed for polynomials.
+\end{verbatim}
+Newton's method is a root-finding algorithm. Like the bisection method
+discussed earlier, it is an \emph{iterative algorithm}. The algorithm
+starts with some \emph{guess} for a \emph{zero} to an equation
+$f(x) = 0$. If this guess is called $x_0$, then the algorithm gives a
+\emph{new (and improved)} guess $x_1$. It is expected that $x_1$ is a
+better guess, but may not be the best that can be. The algorithm is then
+repeated \emph{again} to produce $x_2$. This is done until some guess
+$x_n$ is as close as we can get or the algorithm fails for some reason.
+The \emph{approximate zero} is taken to be $x_n$.
+
+What is the algorithm for Newton's method? It is simple. If we start
+with some $x_i$, then $x_{i+1}$ is given by the intersection point of
+the $x$-axis of the tangent line of $f(x)$ at $x_i$. Mathematically then
+we can equate our two methods to compute the slope of a tangent line:
 
 \[
 f'(x_i) = \frac{f(x_i) - 0}{x_i - x_{i+1}}
@@ -85,8 +91,8 @@ x_{i+1} = x_i - f(x_i)/f'(x_i)
 \]
 
 Let's see this algorithm for \texttt{f(x) = x\^{}3−2x−5}, a function
-that Newton considered. He was looking for a solution near $2$, so let's
-start there:
+that Newton himself considered. He was looking for a solution near $2$,
+so let's start there:
 
 
 
@@ -114,7 +120,7 @@ simply repeat to (hopefully) get a better guess:
 x = x - f(x) / fp(x)
 x, f(x)
 \end{verbatim}
-Here are a few repeats:
+Here are a few more repeats:
 
 
 
@@ -204,7 +210,7 @@ The value of $f(x)=\sin(x)$ at this approximate zero:
 \begin{answer}
     type: numeric
     reminder: value of f at approximate zero
-    answer: [-9.99999987753532e-9, 1.000000012246468e-8]
+    answer: [-9.999999999987754e-5, 0.00010000000000012247]
 
 \end{answer}
 
@@ -222,7 +228,7 @@ The value after 5 iterations
 \begin{answer}
     type: numeric
     reminder: 5 iterations of Newton's method for \( x^5 -x - 1 \), x0=1.6
-    answer: [1.167303969733408, 1.1673039897334079]
+    answer: [1.167203979733408, 1.167403979733408]
 
 \end{answer}
 
@@ -423,22 +429,24 @@ Newton's method can fail due to various cases:
 \item
   the derivative, $\vert f'(x)\vert $ is too small
 \item
-  the second derivative $\vert f''(x)\vert $ is too big
+  the second derivative $\vert f''(x)\vert $ is too big, or possibly
+  undefined
 \end{enumerate}
 
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
-  Let $f(x) = x^5 - x - 1$. Try Newton's method with an initial guess of
-  $x_0=0$. Why does this fail? (You can look graphically. Otherwise, you
-  could look at the output of \texttt{newton} with this extra argument:
+  Earlier was considered the roots of $f(x) = x^5 - x - 1$. Try Newton's
+  method with an initial guess of $x_0=0$ to find a real root. Why does
+  this fail? (You can look graphically. Otherwise, you could look at the
+  output of \texttt{newton} with this extra argument:
   \texttt{newton(f, fp, x0, verbose=true)}.
 \end{itemize}
 
 \begin{answer}
 type: longtext
 reminder: Why does Newton's method fail?
-answer_text: Too flat, or f'(x) is too small 
+answer_text: Too far from x0 (on other side of min) 
 rows: 3
 cols: 60
 \end{answer}

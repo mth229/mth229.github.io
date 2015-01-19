@@ -43,12 +43,14 @@ if more accurate answers are needed, numeric methods are preferred.
 \begin{center}\rule{3in}{0.4pt}\end{center}
 
 The notes talk about a special case - zeros of a polynomial. Due to the
-special nature of polynomials, there are special facts known about the
-zeros (e.g., the quadratic equation). These can be exploited. The
-\texttt{Roots} package provides the \texttt{roots} function to
-\emph{numerically} find all the zeros of a polynomial function (real and
-complex) and the \texttt{fzeros} function to find just the real roots.
-(The heavy lifting here is done by the \texttt{Polynomials} package.)
+special nature of polynomials, there are many facts known about the
+zeros. A typical example is the quadratic equation which finds both
+answers to any quadratic polynomial. These facts can be exploited to
+find roots. The \texttt{Roots} package provides the \texttt{roots}
+function to \emph{numerically} find all the zeros of a polynomial
+function (real and complex) and the \texttt{fzeros} function to find
+just the real roots. (The heavy lifting here is done by the
+\texttt{Polynomials} package.)
 
 
 
@@ -61,6 +63,10 @@ roots(f)
 \begin{verbatim}
 fzeros(f)
 \end{verbatim}
+(Notice that in both cases the argument is a function. This is a
+recurring pattern in these projects: A function is operated on by some
+action which is encapsulated in some function call like \texttt{roots}.)
+
 For the general case, the notes mention the bisection method for
 zero-finding. This is based on the intermediate value theorem which
 guarantees a zero for a continuous function $f(x)$ over any interval
@@ -72,7 +78,8 @@ Either the midpoint is a zero, or one of the two sub intervals must be a
 bracket. The notes define a \texttt{bisection} method and a stripped
 down version is given below. More conveniently the \texttt{Roots}
 package implements this in its \texttt{fzero} function -{}- when it is
-called through \texttt{fzero(f, {[}a,b{]})}. For example,
+called through \texttt{fzero(f, {[}a,b{]})} (or
+\texttt{fzero(f, a, b)}). For example,
 
 
 
@@ -94,6 +101,24 @@ fzeros(f, [-5,5])
 \end{verbatim}
 {[}This function will have issues with non-simple roots and with roots
 that are very close together, so should be used with care.{]}
+
+This summary might help:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  the \texttt{roots} function finds all roots of a polynomial, even
+  complex
+\item
+  the \texttt{fzeros} function finds all \emph{real} roots of polynomial
+\item
+  the \texttt{fzero} function finds a root of a function between a
+  bracketing interval, \texttt{{[}a,b{]}}, using the bisection method.
+\item
+  the \texttt{fzeros} function \emph{attempts} to find all \emph{simple}
+  roots of a function in an interval \texttt{{[}a,b{]}}.
+\end{enumerate}
 
 \subsection{Questions to answer}
 
@@ -161,7 +186,7 @@ answer: 1
 \itemsep1pt\parskip0pt\parsep0pt
 \item
   Use the \texttt{fzeros} function to find the \emph{real} zeros of
-  $p(x) = x^5 -5x^4 -2x^3 + 13x^2 -17x + 10$. (The \texttt{fzero}
+  $p(x) = x^5 -5x^4 -2x^3 + 13x^2 -17x + 10$. (The \texttt{roots}
   function returns all 5 zeros guaranteed by the Fundamental Theorem of
   Algebra, not all of them are real.)
 \end{itemize}
@@ -187,8 +212,8 @@ answer: 2
 \end{itemize}
 
 Apply this rule to the polynomial $x^5 - 4x^4 + 5x^3 - 16x^2 -   3$.
-What are the possible numbers of positive real roots? What is the exact
-number?
+What is the maximal possible number of positive real roots? What is the
+exact number?
 
 The maximal possible number of real roots
 
@@ -231,7 +256,7 @@ approximations just approximations?
 type: radio
 reminder: rational root test
 values: 1 | 2
-labels: Yes they do satisfy the rational root test. For example 2 divides 10 and 3 divides 12 | No they do not satisfy the rational root test. For example 2 divides 12 but 3 \bold{does not} divide 12
+labels: Yes they do satisfy the rational root test. For example 2 divides 10 and 3 divides 12 | No they do not satisfy the rational root test. For example 2 divides 12 but 3 \bold{does not} divide 10
 answer: 1
 \end{answer}
 
@@ -338,8 +363,8 @@ cols: 60
 \item
   Find the intersection point of $4 - e^{x/10} = e^{x/15}$ by first
   graphing to see approximately where the answer is. From the graph,
-  identify a bracket and then use \texttt{fzero} to numerically estimate
-  the intersection point.
+  identify a bracket and then use \texttt{bisection} to numerically
+  estimate the intersection point.
 \end{itemize}
 
 \begin{answer}
@@ -467,7 +492,7 @@ cols: 60
   function: it simply splits the interval into many pieces and looks for
   bracketing intervals. It will have problems with nearby roots and
   roots which don't have a sign change. Apply it to this function over
-  the interval $[-10,10]$. Are any of the three zeros found?
+  the interval $[-10,10]$. Are all of the three zeros found?
 \end{itemize}
 
 
@@ -478,7 +503,7 @@ f(x) = (x-1-delta)*(x-1)*(x-1+delta) * exp(x)
 \end{verbatim}
 \begin{answer}
 type: longtext
-reminder: Are any of the three zeros found?
+reminder: Are all of the three zeros found?
 answer_text: Just one, not 3 as there should be. 
 rows: 3
 cols: 60
@@ -494,7 +519,7 @@ cols: 60
 \begin{answer}
 type: longtext
 reminder: will fzeros find all the zeros?
-answer_text: No, it misses the obvious zero at \( pi \) 
+answer_text: No, it misses the obvious zero at \( pi \) as the function does not cross zero there. 
 rows: 3
 cols: 60
 \end{answer}

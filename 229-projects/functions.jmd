@@ -4,7 +4,7 @@
 
 Read about this [here](http://mth229.github.io/functions.html).
 
-For the impatient, it is easy with `Julia` to create mathematical
+For the impatient, it is easy with `Julia` to create basic mathematical
 functions, as the notation is identical:
 
 ```
@@ -144,7 +144,7 @@ The value at $C=56.7$ is
 ```julia
 f(C) = 9/5 * C + 32
 val = f(56.7)
-numericq(val, 1e-4, "farenheit at 56.7C")
+numericq(val, 1e-4, "Fahrenheit at 56.7C")
 ```
 
 The value at $C=-89.2$ is:
@@ -155,7 +155,7 @@ The value at $C=-89.2$ is:
 
 ```julia
 val = f(-89.2)
-numericq(val, 1e-4, "fahrenheit at -89.2C")
+numericq(val, 1e-4, "Fahrenheit at -89.2C")
 ```
 
 * Write a function that computes
@@ -265,16 +265,8 @@ numericq(val, 1e-4, "value at 35")
   people as a function of $t$ in minutes.
 
 (The $(x,y)$ position of person A is $(60\cdot t/60), 0)$ and the
-$(x,y)$ position of person B is $(0, 200 - 70 \cdot t/60)$)
-
-Compute the distance at $t=0$, $t=30$ and $t=120$ using a
-function. (You might start by defining the $x$ and $y$ distances with
-the following, then using the distance formula as a function of $t$.)
-
-```
-x(t) = 60t/60 - 0
-y(t) = 0 - (200 - 70t/60)
-```
+$(x,y)$ position of person B is $(0, 200 - 70 \cdot t/60)$. Use the
+distance formula to write a function.)
 
 
 The distance at $t=0$ is:
@@ -313,6 +305,130 @@ val = f(t)
 numericq(val, 1e-4, "value at t=$t")
 ```
 
+
+
+## Cases 
+
+
+The ternary operator `predicate ? expression1 : expression2` has three
+pieces: a predicate question, such as `x < 10` and two expressions,
+the first is evaluated if the predicate is `true` and the second if
+the predicate is `false`. They are useful to write functions that are
+defined by cases. (They are a light-weight form of the traditional
+`if-then-else` construct.)
+
+* Write a function to express the following: If a person buys up to
+  100 units the cost per unit is 5 dollars, for every additional unit
+  beyond 100 the cost is 4 dollars. The function should return the
+  total cost to buy $x$ units. (Use the ternary operator with `x <=
+  100` as the condition.
+
+```
+```
+
+```julia
+longq("Total cost for x units", "\\verb#f(x) = x <= 100 ? 5.0 * x : (5.0*100) + 4*(x-100) #")
+```
+
+* Use the ternary operator to write a function $f(x)$ which takes a
+  value of $x$ when $x$ is less than 10 and is otherwise a constant
+  value of 10.
+
+```
+```
+
+```julia
+shortq("f(x) = x < 10 ? x : 10", "Function which is x for x < 10 and 10 otherwise")
+```
+
+* Define a function $Sin(x) = \sin(x)$ if $-\pi/2 < x < \pi/2$ and
+  `NaN` otherwise.
+
+
+```
+```
+
+```julia
+shortq("Sin(x) = -pi/2 < x < pi/2 ? sin(x) : NaN", "restrict sin(x) to -pi/2 to pi/2")
+```
+
+* Define a function 
+
+$$
+signal(x) = 0 \text{ if } x\leq 0,
+$$
+$$
+\sin^2(\pi /2 x) \text{ if } 0<x<1, \text{ and }
+$$
+$$
+1 \text{ if } x\geq 1 
+$$
+
+Compare the difference between `signal(0.999)` and `signal(1.001)`.
+
+The function is
+
+```
+```
+
+```julia
+shortq("signal(x) = (x <= 0) ? 0.0 : ((x <= 1) ? sin(pi/2*x)^2 : 1.0)", "signal function", "signal(x) = (x <= 0) ? 0.0 : ((x <= 1) ? sin(pi/2*x)^2 : 1.0)")
+```
+
+The value at $0.999$ is:
+
+```
+```
+
+```julia
+f(x) = (x <= 0) ? 0.0 : ((x <= 1) ? sin(pi/2*x)^2 : 1.0)
+x = 0.9999
+val = f(x)
+numericq(val, 1e-4, "f($x)")
+```
+
+
+The value at $1.0001$ is:
+
+```
+```
+
+```julia
+x = 1.0001
+val = f(x)
+numericq(val, 1e-4, "f($x)")
+```
+
+## Composition
+
+Composition of functions is a useful means to break complicated
+problems into easier to solve one. The math notation is typically
+$f(g(x))$ and in `julia` this is no different. When thinking about the
+operation of composition, the notation $f \circ g$ is used. For that,
+there isn't any built-in `julia` notation.
+
+* For the function $h(x) = ((x+1)/(x-1))^{2/3}$ write this as the
+  composition of two functions $f(x)$ and $g(x)$. Use these to evaluate
+  $h(3)$. Show your work and the answer.
+
+```
+```
+
+```julia
+longq("write h(x) = ((x+1)/(x-1))^(2/3) as a composition, f(g(x)) and compute it at 10")
+```
+
+
+* Write the function $h(x) = (\cos(12x))^3$ as the
+  composition of two functions $f(x)$ and $g(x)$ and use these to evaluate
+  $h(2)$. Show your work and the answer.
+
+```
+```
+
+```julia
+longq("write h(x) =  (\cos(12x))^3 as a composition, f(g(x)) and compute it at 2")
+```
 
 ## Parameters
 
@@ -377,196 +493,9 @@ numericq(val, 1e-4, "$ex")
 
 
 
-* Write the following function using parameters for $A$, $B$, $C$, and $D$:
-
-$$
-f(t;A,B,C,D) = A\sin(Bt - C) + D
-$$
-
-Let the default values be $A=1$, $B=1$, $C=D=0$.
-
-Compute $f(1)$ (using the defaults $A=1$, $C=D=0$), $f(1; B=\pi/2)$, $f(1; A=2\pi, B=\pi/2)$
-
-The function is
-
-```
-```
-
-```julia
-shortq("f(t;A=1,B=1,C=0,D=0) = A*sin(B*t - C) + D", "\\(f(t;A,B,C,D) = A\sin(Bt - C) + D \\)")
-```
-
-The value $f(1)$ is:
-
-```
-```
-
-```julia
-f(t;A=1,B=1,C=0,D=0) = A*sin(B*t - C) + D
-ex = "f(1)"
-val = eval(parse(ex))
-numericq(val, 1e-4, "$ex")
-```
-
-The value $f(1; B=\pi/2)$ is:
-
-
-```
-```
-
-```julia
-ex = "f(1;B=pi/2)"
-val = eval(parse(ex))
-numericq(val, 1e-4, "$ex")
-```
-
-The value $f(1; A=2\pi, B=\pi/2)$ is:
-
-
-
-```
-```
-
-```julia
-ex = "f(1;A=2pi, B=pi/2)"
-val = eval(parse(ex))
-numericq(val, 1e-4, "$ex")
-```
-
-
-
-## Cases 
-
-* Write a function to express the following: If a person buys up to 100 units the cost per unit is 5 dollars, for every additional unit beyond 100 the cost is 4 dollars. The function should return the total cost to by $x$ units. (Use the ternary operator with `x <= 100` as the condition.
-
-```
-```
-
-```julia
-longq("Total cost for x units", "\\verb#f(x) = x <= 100 ? 5.0 * x : (5.0*100) + 4*(x-100) #")
-```
-
-* The following function is useful in probability
-
-$$
-f(x)= \frac{1}{b-a} \text{ if } a \leq x \leq b, 
-$$
-$$
-0  \text{ otherwise.}
-$$
-
-
-Defaults are $a=0, b=1$.
-
-Write a function using the ternary operator to compute this. The
-condition may be expressed with `a <= x <= b`. Find $f(.5, a=0, b=1)$;
-$f(.5, a=1, b=2)$, $f(.5,a=0, b=100)$.
-
-The function is:
-
-```
-```
-
-```julia
-shortq("f(x;a=0,b=1) = a <= x <= b ? 1/(b-a) : 0.0", "function for 1/(b-a) in [a,b]" )
-```
-
-The value of $f(.5, a=0, b=1)$ is:
-
-```
-```
-
-```julia
-f(x;a=0,b=1) = a <= x <= b ? 1/(b-a) : 0.0
-val = f(0.5, a=0, b=1)
-numericq(val, 1e-4, f(0.5, a=0, b=1))
-```
-
-The value of  $f(.5, a=1, b=2)$ is:
-
-
-```
-```
-
-```julia
-val = f(0.5, a=1, b=1)
-numericq(val, 1e-4, f(0.5, a=1, b=2))
-```
-
-
-The value of $f(.5,a=0, b=100)$ is:
-
-
-```
-```
-
-```julia
-val = f(0.5, a=0, b=100)
-numericq(val, 1e-4, f(0.5, a=0, b=100))
-```
-
-
-* Define a function $Sin(x) = \sin(x)$ if $-\pi/2 < x < \pi/2$ and
-  `NaN` otherwise.
-
-
-```
-```
-
-```julia
-shortq("Sin(x) = -pi/2 < x < pi/2 ? sin(x) : NaN", "restrict sin(x) to -pi/2 to pi/2")
-```
-
-* Define a function 
-
-$$
-signal(x) = 0 \text{ if } x\leq 0,
-$$
-$$
-\sin^2(\pi /2 x) \text{ if } 0<x<1, \text{ and }
-$$
-$$
-1 \text{ if } x\geq 1 
-$$
-
-Compare the difference between `signal(0.999)` and `signal(1.001)`.
-
-The function is
-
-```
-```
-
-```julia
-shortq("signal(x) = (x <= 0) ? 0.0 : ((x <= 1) ? sin(pi/2*x)^2 : 1.0)", "signal function", "signal(x) = (x <= 0) ? 0.0 : ((x <= 1) ? sin(pi/2*x)^2 : 1.0)")
-```
-
-The value at $0.999$ is:
-
-```
-```
-
-```julia
-f(x) = (x <= 0) ? 0.0 : ((x <= 1) ? sin(pi/2*x)^2 : 1.0)
-x = 0.9999
-val = f(x)
-numericq(val, 1e-4, "f($x)")
-```
-
-
-The value at $1.0001$ is:
-
-```
-```
-
-```julia
-x = 1.0001
-val = f(x)
-numericq(val, 1e-4, "f($x)")
-```
-
-
-
 ## Returning a function
+
+Familiar mathematical functions take a real number and return a real number. However, the concept of a function is more general. With `julia` it is useful to write functions that take functions as arguments, and return a derived function as an output. For the return value an _anonymous function_ is typically used. These are specified as `arg -> rule`, where the arg is a variable, like `x`, and the rule can depend on the value of `x`. 
 
 * Describe what the following function does to the argument $f$, when
   $f$ is a function. (There isn't anything to do but recognize that
@@ -577,8 +506,7 @@ numericq(val, 1e-4, "f($x)")
 n(f::Function) = x -> -f(x)
 ``` 
 
-```
-```
+
 
 ```julia
 longq("Describe \\verb+n(f::Function) = x -> -f(x)+", "The defines g(x) = -f(x)")

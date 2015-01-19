@@ -29,12 +29,13 @@ preferred.
 ----
 
 The notes talk about a special case - zeros of a polynomial. Due to
-the special nature of polynomials, there are special facts known about
-the zeros (e.g., the quadratic equation). These can be exploited. The
-`Roots` package provides the `roots` function to *numerically* find
-all the zeros of a polynomial function (real and complex) and the `fzeros`
-function to find just the real roots. (The heavy lifting here is done by
-the `Polynomials` package.)
+the special nature of polynomials, there are many facts known about
+the zeros. A typical example is the quadratic equation which finds
+both answers to any quadratic polynomial. These facts can be exploited
+to find roots. The `Roots` package provides the `roots` function to
+*numerically* find all the zeros of a polynomial function (real and
+complex) and the `fzeros` function to find just the real roots. (The
+heavy lifting here is done by the `Polynomials` package.)
 
 ```
 f(x) = x^5 + x - 1
@@ -45,15 +46,22 @@ roots(f)
 fzeros(f)
 ```
 
+
+(Notice that in both cases the argument is a function. This is a recurring pattern in these projects: A function is operated on by some action which is encapsulated in some function call like `roots`.)
+
+
 For the general case, the notes mention the bisection method for
-zero-finding. This is based on the intermediate value theorem which guarantees a zero for a continuous function $f(x)$ over any interval $[a,b]$ _when_ $f(a)$ and $f(b)$ have _different_ signs. Such an interval is called a **bracket**.
+zero-finding. This is based on the intermediate value theorem which
+guarantees a zero for a continuous function $f(x)$ over any interval
+$[a,b]$ _when_ $f(a)$ and $f(b)$ have _different_ signs. Such an
+interval is called a **bracket**.
 
 The algorithm finds a zero by successive division of the
 interval. Either the midpoint is a zero, or one of the two sub
 intervals must be a bracket. The notes define a `bisection` method and
 a stripped down version is given below.  More conveniently the `Roots`
 package implements this in its `fzero` function -- when it is called
-through `fzero(f, [a,b])`. For example,
+through `fzero(f, [a,b])` (or `fzero(f, a, b)`). For example,
 
 ```
 f(x) = x^2 - 2
@@ -72,6 +80,13 @@ fzeros(f, [-5,5])
 ```
 
 [This function will have issues with non-simple roots and with roots that are very close together, so should be used with care.]
+
+This summary might help:
+
+1) the `roots` function finds all roots of a polynomial, even complex
+2) the `fzeros` function finds all *real* roots of polynomial
+3) the `fzero` function finds a root of a function between a bracketing interval, `[a,b]`, using the bisection method.
+4) the `fzeros` function *attempts* to find all *simple* roots of a function in an interval `[a,b]`.
 
 
 ## Questions to answer
@@ -124,7 +139,7 @@ radioq(choices, ans, "zeros of \\(p(x)=x^3 -4x^2 -7x + 10\\)")
 ```
 
 * Use the `fzeros` function to find the _real_ zeros of $p(x) = x^5
--5x^4 -2x^3 + 13x^2 -17x + 10$. (The `fzero` function returns all 5
+-5x^4 -2x^3 + 13x^2 -17x + 10$. (The `roots` function returns all 5
 zeros guaranteed by the Fundamental Theorem of Algebra, not all of them are real.)
 
 
@@ -149,7 +164,7 @@ radioq(choices, ans, "zeros of \\( x^5-5x^4 -2x^3 + 13x^2 -17x + 1\\)")
   roots is this number or this number minus $2k$ for some $k$.
 
   Apply this rule to the polynomial $x^5 - 4x^4 + 5x^3 - 16x^2 -
-  3$. What are the possible numbers of positive real roots? What is
+  3$. What is the maximal possible number of positive real roots? What is
   the exact number?
 
 The maximal possible number of real roots
@@ -187,7 +202,7 @@ Do these roots satisfy the rational root test or are the rational approximations
 
 ```julia
 choices = ["Yes they do satisfy the rational root test. For example 2 divides 10 and 3 divides 12",
-	"No they do not satisfy the rational root test. For example 2 divides 12 but 3 \\bold{does not} divide 12"]
+	"No they do not satisfy the rational root test. For example 2 divides 12 but 3 \\bold{does not} divide 10"]
 ans = 1
 radioq(choices, ans, "rational root test")
 ```
@@ -274,7 +289,7 @@ numericq(val, 1e-4, "largest root of \\( e^x - x^5 \\) in [0,15]")
 
 * Find the intersection point of $4 - e^{x/10} = e^{x/15}$ by first
   graphing to see approximately where the answer is. From the graph,
-  identify a bracket and then use `fzero` to numerically estimate the
+  identify a bracket and then use `bisection` to numerically estimate the
   intersection point.
 
 ```
@@ -383,7 +398,7 @@ longq("What happens when roots are nearby? (delta=0.001)", "The algorithm only f
   function: it simply splits the interval into many pieces and looks
   for bracketing intervals. It will have problems with nearby roots
   and roots which don't have a sign change. Apply it to this function
-  over the interval $[-10,10]$. Are any of the three zeros found?
+  over the interval $[-10,10]$. Are all of the three zeros found?
 
 ```
 delta = 0.01
@@ -391,7 +406,7 @@ f(x) = (x-1-delta)*(x-1)*(x-1+delta) * exp(x)
 ```
 
 ```julia
-longq("Are any of the three zeros found?", "Just one, not 3 as there should be.")
+longq("Are all of the three zeros found?", "Just one, not 3 as there should be.")
 ```
 
 * Will `fzeros` find all zeros of the function $f(x) = \cos(x) + \cos(2x)$ over the interval $[0,2\pi]$?
@@ -400,5 +415,5 @@ longq("Are any of the three zeros found?", "Just one, not 3 as there should be."
 ```
 
 ```julia
-longq("will fzeros find all the zeros?", "No, it misses the obvious zero at \\( \pi \\)")
+longq("will fzeros find all the zeros?", "No, it misses the obvious zero at \\( \pi \\) as the function does not cross zero there.")
 ```

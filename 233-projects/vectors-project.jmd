@@ -1,0 +1,245 @@
+# Questions to be handed in on using Julia for parametric functions
+
+
+### Quick background
+
+Read about this material here: [Julia](http://nbviewer.ipython.org/url/mth229.github.io/233-projects/vectors.ipynb?create=1).
+
+For the impatient, these questions cover the use of `julia` for vectors and vector-valued functions.
+
+A vector is created in `julia` using square brackets, separating values by commas:
+
+```
+u = [1,2,3]
+v = [4,5,6]
+```
+
+The usual algebra of vectors is implemented by `julia`:
+
+```
+2u, u + v, u - 3v
+```
+
+For vectors, there is no multiplication, rather two operations: the dot product and the cross product (for 3D vectors). The functions `dot` and `cross` are used here:
+
+```
+dot(u,v), cross(u,v)
+```
+
+However, we can match the notation in books using the unicode infix operators types with `\cdot<tab>` and `\times<tab>`:
+
+```
+u ⋅ v, u × v
+```
+
+The norm of a vector can be found by `sqrt(u ⋅ u)`, but instead use the `norm` function:
+
+```
+norm(u)
+```
+
+A vector valued function just parameterizes the components of the vector by functions of $t$:
+
+```
+r(t) = [sin(t), cos(t), t]
+```
+
+Then a vector can be produced by fixing a value of $t$, e.g., `r(1)`.
+
+
+We use `PyPlot` to visualize vector-valued functions, as `Gadfly` will only handle the 2D case. The following is useful:
+
+```
+using PyPlot
+function PyPlot.plot(f::Function, a::Real, b::Real, args...; test_pt=0, kwargs...)
+	n = length(f(test_pt))
+	ts = linspace(a, b, 250)
+    out = [ [f(t)[i] for t in ts] for i in 1:n]
+	n == 1 && plot(ts, out[1], args...; kwargs...)
+    n == 2 && plot(out...,     args...; kwargs...)
+	n == 3 && plot3D(out...,   args...; kwargs...)
+end
+```
+
+And use it here:
+
+```
+plot(r, 0, 2pi)
+```
+
+Taking the derivative of a vector-valued function is done component wise. The following function allows the taking of the first and second derivatives using the prime notation (`r'(t)`):
+
+```
+Base.ctranspose(r::Function, h=1e-4) = t -> (r(t+h) - r(t-h)) / (2h)
+```
+
+For example, this finds the unit tangent vector to the curve traced by `r` at `t=pi/2`:
+
+```
+uvec(u) = u/norm(u)   # find the unit vector
+uvec(r'(pi/2))
+```
+
+
+## Questions
+
+* Let $u =\langle 1,2,3 \rangle$, $v=\langle 1,1,1 \rangle$, and $w = \langle 1, -4, 3 \rangle$. Use vector calculus with `julia` to find:
+
+The sum $u + v$:
+
+```
+```
+
+The value of $\| v \|$:
+
+```
+```
+
+A unit vector $\hat{u}$:
+
+```
+```
+
+The angle between the vectors $u$ and $v$:
+
+```
+```
+
+The volume of the parallelpiped formed by $u$, $v$, and $w$:
+
+```
+```
+
+Verify that the cross product is anti-commutative by showing $u \times v + v \times u = 0$:
+
+```
+```
+
+
+Verify that the cross product is not associative by computing both $(u \times v) \times w$ and $u \times (v \times w)$ and comparing the answers:
+
+```
+```
+
+* Let $p = \langle 3,4,5 \rangle$ and $v = \langle 1,2,1 \rangle$. Write a function, `r(t)`, that parameterizes the line in the direction of $v$ going through the point $p$.
+
+```
+```
+
+Find the distance between $r(0)$ and $r(3)$ using `julia`:
+
+```
+```
+
+* Let `r(t) = [sin(t), 2cos(t), 0]`.
+
+Make a plot of `r` over the interval $[0,2pi]$, what kind of shape is it?
+
+```
+```
+
+Let `er` be the unit vector of `r`. Write this as a function of `t`:
+
+```
+```
+
+
+Show that `r(t) × r'(t)` is a constant in `t` by taking 3 different values of `t` and comparing:
+
+```
+```
+
+
+Show that `r''(t)` and `r(t)` are parallel by showing the for a 3 different values of `t` the cross product of the two vectors is basically 0 (up to numeric round off).
+
+```
+```
+
+
+
+
+# Symbolic manipulations
+
+Using `SymPy` allows us to do some computations symbolically, as one would do with paper and pencil.
+
+Here we load the package and define symbolic value for $t$, assuming it is real:
+
+```
+using SymPy
+t = symbols("t", real=true)
+```
+
+If we have a vector-valued function, we can easily create a symbolic vector by evaluating at our symbolic `t`:
+
+```
+r(t) = [sin(t), cos(t), t]
+u = r(t)                    # a symbolic expression
+```
+
+The usual algebra works. As do symbolic derivatives and integrals.
+
+Here we find the arclength
+
+```
+integrate(norm(diff(u)), t, 0, 2PI)
+```
+
+
+Here we find the curvature
+
+```
+norm(diff(u,t) × diff(u, t, 2)) / norm(diff(u,t))^3 |> simplify
+```
+
+### CAS Questions
+
+* The Bernoulli spiral is parameterized by `r(t) = exp(t) * [cos(4t), sin(4t)]`. Plot this over $[-10, 3]$:
+
+```
+```
+
+
+Show the following for the Bernoulli spiral: the angle between the position vector $r(t)$ and the tangent vector $r'(t)$ is constant, that is it does not depend on $t$:
+
+```
+```
+
+
+* A spiraling curve is given by $r(t) = [t \cdot \cos(4t), t \cdot \sin(4t)]$.
+
+Make a plot over $[0, 3\pi]$:
+
+```
+```
+
+Compute $\| r'(t) \|$ symbolically and assign its _simplified_ output to `ds`.
+
+```
+```
+
+Compute the arclength over $[0,3\pi]$ via `integrate(ds, t, 0, 3PI)`
+
+```
+```
+
+
+* Let Viviani's curve be given by $r(t) = \langle 1 + \cos(t), \sin(t), 2\sin(t/2) \rangle$.
+
+Plot this over $[0, 2\pi]$:
+
+```
+```
+
+Compute the curvature and compare with
+
+$$
+\frac{\sqrt{13 + 3\cos(t)}}{(3 + \cos(t))^{3/2}}
+$$
+
+```
+```
+
+* Let $r(t) = [\sin(t), t, 0]$. Find the curvature for all $t$. Plot it. Where is it maximal? What part of the $\sin(t)$ curve would this correspond to?
+
+```
+```

@@ -61,13 +61,14 @@ perimeter 20 the one with maximum area. This is done quickly via:
 A(b, h) = h * b             # base times height is area
 ## From P = 2b + 2h -> h = (P -2b)/2
 h(b) = (20 - 2b)/2      # Relates perimeter, height, base
-A(b) = A(b, h(b))       # express Area in terms of b alone
+A(b) = A(b, h(b))       # substitution step: express Area in terms of b alone
 x = fzero(D(A), [0, 10])    # critical point of A(b) on its domain
+f(0), f(x), f(10)
 \end{verbatim}
-Here \texttt{x} is a critical point. Following Fermat, we would check
-the value of the function at \texttt{x} along with the endpoints, $0$
-and $10$. However, a simple graph also illustrates that any maximum
-occurs in between these endpoints (with the minimum occurring at both):
+Here \texttt{x} is a critical point. Following Fermat, we checked the
+value of the function at \texttt{x} along with the endpoints, $0$ and
+$10$. However, a simple graph also illustrates that any maximum occurs
+in between these endpoints (with the minimum occurring at both):
 
 
 
@@ -80,6 +81,14 @@ From this one variable can be deduced in terms of another leaving us a
 continuous function (\texttt{A}) with extrema of interest (in this case
 the maximum).
 
+Notice how \texttt{julia} makes this easy: the substitution step of math
+is done using \textbf{composition} of functions and leverages the fact
+that \texttt{julia}, using \emph{multiple dispatch}, can give the
+function \texttt{A} different meanings depending on the number (and
+type) of its arguments: with one argument, the area is a function of the
+base \texttt{b} with two arguments, the area is a function of the base
+and the height.
+
 To solve for the $x$-value corresponding to the extrema, we used
 \texttt{fzero} with bracketing, as it is guaranteed to converge and it
 is clear that the interval $[0,10]$ is a bracket for the derivative
@@ -90,7 +99,9 @@ initial guess, as \texttt{fzero(D(A), 5)}.
 \subsubsection{Questions}
 
 For the following questions (which were cribbed from various internet
-sources), find the most precise answer you can.
+sources), find the most precise answer you can, a graphical solution is
+not enough, use one of the zero-finding methods to get as accurate
+answer you can.
 
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
@@ -144,7 +155,7 @@ answer: 3
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
-  cheap paper cups
+  Cheap paper cups
 \end{itemize}
 
 A cone-shaped paper drinking cup is to hold 100 cubic centimeters of
@@ -165,7 +176,7 @@ cols: 60
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
-  inscription
+  Inscription
 \end{itemize}
 
 A trapezoid is inscribed in a semicircle of radius $r=2$ so that one
@@ -180,7 +191,7 @@ area of trapezoid is the height times the average of the two bases.
 \begin{answer}
 type: longtext
 reminder: Commands to find maximum area of inscribed trapezoid
-answer_text: \verb#r=2;A(t) = (2r+2r*cos(t))/2 * r*sin(t);fzero(D(A), 1) has 1.04; A=5.19 
+answer_text: \verb#r=2;A(t) = (2r+2r*cos(t))/2 * r*sin(t);fzero(D(A), 1) has 1.04; A=5.19# 
 rows: 6
 cols: 60
 \end{answer}
@@ -188,25 +199,42 @@ cols: 60
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
-  best size for a cheat sheet
+  Best size for a phone
 \end{itemize}
 
-a 3-by-5 card is 15 square inches. For all rectangular cards with 15 sq.
-inches what is the optimal size to maximize the printable area if there
-are 1/4-inch margins all around? Show your work.
+A cell phone manufacturer wishes to make a rectangular phone with total
+surface area of 12,000 $mm^2$ and maximal screen area. The screen is
+surrounded by bezels with sizes of 8$mm$ on the long sides and 32$mm$ on
+the short sides. (So the width of the screen would be the width of the
+phone minus 2 time 8mm, and the height of the screen similarly
+adjusted.)
+
+What are the dimensions (width and height) that allow the maximum screen
+area?
 
 \begin{answer}
 type: longtext
 reminder: maximize printable area with 1/4-inch margins
-answer_text: \verb+w(h)=15/h; A(w,h)=(w-1/4)*(h-1/4); A(h)=A(h,w(h)); fzero(D(A),5)->3.87298# 
+answer_text: \verb+w(h)=12000/h; A(w,h)=(w-2*8)*(h-2*32); A(h)=A(w(h),h); h = fzero(D(A),100)->219..; w(h)=54... + 
 rows: 6
 cols: 60
+\end{answer}
+
+The dimensions for the iPhone 6 plus have height about twice the width.
+Is that the case for your answer?
+
+\begin{answer}
+type: radio
+reminder: 
+values: 1 | 2 | 3 | 4
+labels: No the height to width ratio is closer to 1 to 1 | Yes, the height to width ratio is basically 2 to 1 | No, the height to width ratio is closer to 3 to 1 | No the height to width ratio is closer to 4 to 1
+answer: 4
 \end{answer}
 
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
-   will you be in the water?
+  Will you be in the water?
 \end{itemize}
 
 The Statue of Liberty stands 92 meters high, including the pedestal
@@ -225,7 +253,7 @@ cols: 60
 \begin{itemize}
 \itemsep1pt\parskip0pt\parsep0pt
 \item
-  getting closer
+  Getting closer
 \end{itemize}
 
 Let $f(x) = \tan(x)$. Find the point on the graph of $f(x)$ that is

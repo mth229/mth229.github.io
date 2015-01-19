@@ -43,11 +43,12 @@ with perimeter 20 the one with maximum area. This is done quickly via:
 A(b, h) = h * b		        # base times height is area
 ## From P = 2b + 2h -> h = (P -2b)/2
 h(b) = (20 - 2b)/2		# Relates perimeter, height, base
-A(b) = A(b, h(b))		# express Area in terms of b alone
+A(b) = A(b, h(b))		# substitution step: express Area in terms of b alone
 x = fzero(D(A), [0, 10])	# critical point of A(b) on its domain
+f(0), f(x), f(10)
 ```
 
-Here `x` is a critical point. Following Fermat, we would check the
+Here `x` is a critical point. Following Fermat, we  checked the
 value of the function at `x` along with the endpoints, $0$ and $10$.
 However, a simple graph also illustrates that any maximum occurs in
 between these endpoints (with the minimum occurring at both):
@@ -62,6 +63,14 @@ and a height) and a fixed relationship between them (the perimeter is
 us a continuous function (`A`) with extrema of interest (in this case
 the maximum).
 
+Notice how `julia` makes this easy: the substitution step of math is
+done using **composition** of functions and leverages the fact that
+`julia`, using _multiple dispatch_, can give the function `A`
+different meanings depending on the number (and type) of its
+arguments: with one argument, the area is a function of the base `b`
+with two arguments, the area is a function of the base and the height.
+
+
 To solve for the $x$-value corresponding to the extrema, we used
 `fzero` with bracketing, as it is guaranteed to converge and it is clear
 that the interval $[0,10]$ is a bracket for the derivative
@@ -73,7 +82,9 @@ maximum from the graph, say 5, and just called `fzero` with this initial guess, 
 ### Questions
 
 For the following questions (which were cribbed from various internet
-sources), find the most precise answer you can.
+sources), find the most precise answer you can, a graphical solution
+is not enough, use one of the zero-finding methods to get as accurate
+answer you can.
 
 * <em>Ye olde post office</em>
 
@@ -122,7 +133,7 @@ radioq(choices, ans, "Do proportions match?")
 
 
 
-* <em>cheap paper cups</em>
+* <em>Cheap paper cups</em>
 
 A cone-shaped paper drinking cup is to hold 100 cubic centimeters of
 water (about 4 ozs). Find the height and radius of the cup that will
@@ -140,7 +151,7 @@ longq("work to minimize paper used in conical drink cup",
 rows=6)
 ```
 
-* <em>inscription</em>
+* <em>Inscription</em>
 
 A trapezoid is inscribed in a semicircle of radius $r=2$ so that one
 side is along the diameter. Find the maximum possible area for the
@@ -158,26 +169,46 @@ two bases.
 
 ```julia
 longq("Commands to find maximum area of inscribed trapezoid",
-"\\verb#r=2;A(t) = (2r+2r*cos(t))/2 * r*sin(t);fzero(D(A), 1) has 1.04; A=5.19",
+"\\verb#r=2;A(t) = (2r+2r*cos(t))/2 * r*sin(t);fzero(D(A), 1) has 1.04; A=5.19#",
 rows=6)
 ```
 
-* <em>best size for a cheat sheet</em>
+* <em>Best size for a phone</em>
 
-a 3-by-5 card is 15 square inches. For all  rectangular cards with
-15 sq. inches what is the optimal size to maximize the printable area
-if there are 1/4-inch margins all around? Show your work.
+A cell phone manufacturer wishes to make a rectangular phone with
+total surface area of 12,000 $mm^2$ and maximal screen area. The
+screen is surrounded by bezels with sizes of 8$mm$ on the long sides
+and 32$mm$ on the short sides. (So the width of the screen would be
+the width of the phone minus 2 time 8mm, and the height of the screen
+similarly adjusted.)
+  
+What are the dimensions (width and
+height) that allow the maximum screen area? 
 
 ```
 ```
 
 ```julia
 longq("maximize printable area with 1/4-inch margins",
-"\\verb+w(h)=15/h; A(w,h)=(w-1/4)*(h-1/4); A(h)=A(h,w(h)); fzero(D(A),5)->3.87298#",
+"\\verb+w(h)=12000/h; A(w,h)=(w-2*8)*(h-2*32); A(h)=A(w(h),h); h = fzero(D(A),100)->219..; w(h)=54... +",
 rows=6)
 ```
 
-* <em> will you be in the water?</em>
+  The dimensions for the iPhone 6 plus have height about twice the
+  width. Is that the case for your answer?
+
+```julia
+choices = [
+"No the height to width ratio is closer to 1 to 1",
+"Yes, the height to width ratio is basically 2 to 1",
+"No, the height to width ratio is closer to 3 to 1",
+"No the height to width ratio is closer to 4 to 1",
+]
+ans = 4
+radioq(choices, ans)
+```
+
+* <em>Will you be in the water?</em>
 
 The Statue of Liberty stands 92 meters high, including the pedestal
 which is 46 meters high. How far from the base should you stand so
@@ -191,7 +222,7 @@ that your viewing angle, theta, is as large as possible?
 longq("Commands to maximize viewing angle","\\verb#Theta(x)=atan(92/x)-atan(46/x);fzero(D(Theta), 50)# is 65", rows=6)
 ```
 
-* <em>getting closer</em>
+* <em>Getting closer</em>
 
 
 Let $f(x) = \tan(x)$. Find the point on the graph of $f(x)$ that is closest to the point $(\pi/4, 0)$. Show your work.
