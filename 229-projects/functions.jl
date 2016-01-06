@@ -1,3 +1,4 @@
+module functions
 ## file for function variables
 
 ##
@@ -8,3 +9,8 @@ p1_x0,p1_y0 = vals[2], vals[3]
 
 ##
 p2_c = rand(2:10)
+
+
+
+
+end

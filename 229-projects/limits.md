@@ -75,16 +75,11 @@ ys = map(f, xs)     # alternative to [f(x) for x in xs]
 Wait, is the limit $1/2$ or $0$? At first $1/2$ seems like the answer, but the last numbers are $0$.
 
 
-Here we see a limitation of tables -- when numbers get too small, that
-fact that they are represented in floating point becomes important. In
-this case, for numbers too close to $\pi/2$ the value on the computer
-for `sin(x)` is just 1 and not a number near 1. Hence the denominator
-becomes $0$, and so then the expression. (Near $1$, the floating point
-values are about $10^{-16}$ apart, so when two numbers are within
-$10^{-16}$ of each other, they can be rounded to the same number.)  So
-watch out when seeing what the values of $f(x)$ get close to. Here it
-is clear that the limit is heading towards $0.5$ until we get too
-close.
+Here we see a limitation of tables --
+when numbers get too small, that fact that they are represented in floating point becomes important. In this case, for numbers too close to $pi/2$ the value on the computer for `sin(x)` is just 1 and not a number near 1. Hence the denominator becomes $0$, and so then the expression. (Near $1$, the floating point values are about $10^{-16}$ apart, so when two numbers are within $10^{-16}$ of each other, they can be rounded to the same number.)
+So watch out when seeing what the values of $f(x)$ get
+close to. Here it is clear that the limit is heading towards $0.5$
+until we get too close.
 
 For convenience, this function can make the above computations easier to do:
 
@@ -101,7 +96,7 @@ function lim(f::Function, c::Real; n::Int=6, dir="+")
 end
 ```
 
-It use follows the common pattern: `action(function, arguments...)`. E.g.,
+It use follows the common `action(function, arguments...)` pattern:
 
 ```
 f(x) = (1 - sin(x))/(pi/2 - x)^2

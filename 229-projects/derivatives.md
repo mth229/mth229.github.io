@@ -131,14 +131,14 @@ diff(x*sin(a*x), x)
 ### Questions
 
 * Calculate the slope of the secant line of $f(x) = 3x^2 + 5$ between
-  $({{p1_x0}},f({{p1_x0}}))$ and $({{p1_x1}}, f({{p2_x1}}))$.
+  $(2,f(2))$ and $(5, f())$.
 
 ```
 ```
 
 ```
 f(x) = 3x^2 + 5
-x0,x1 = {{p1_x0}}, {{p1_x1}}
+x0,x1 = 2, 5
 val = (f(x1) - f(x0))/(x1 - x0)
 numericq(val, 1e-3, "slope of secant line")
 ```
@@ -160,7 +160,7 @@ longq("Verify derivative using a table", "\\verb+[hs map(h->(sin(pi/3 + h)-sin(p
 ```
 
 
-* Let $f(x) = 1/x$ and $c={{p2_c}}$. Find the approximate derivative (forward) when
+* Let $f(x) = 1/x$ and $c=3$. Find the approximate derivative (forward) when
   `h=1e-6`.
 
 ```
@@ -168,13 +168,13 @@ longq("Verify derivative using a table", "\\verb+[hs map(h->(sin(pi/3 + h)-sin(p
 
 ```
 f(x) = 1/x
-c, h = {{p2_c}}, 1e-6
+c, h = 3, 1e-6
 val = (f(c + h) - f(c))/h
-numericq(val, 1e-4, "approx forward derivative \\verb+(1/x)'({{p2_c}})+")
+numericq(val, 1e-4, "approx forward derivative \\verb+(1/x)'(3)+")
 ```
 
 
-* Let $f(x) = x^x$ and $c={{p3_c}}$. Find the approximate derivative
+* Let $f(x) = x^x$ and $c=3$. Find the approximate derivative
   (forward) when `h=1e-8`.
 
 ```
@@ -481,14 +481,14 @@ Higher-order derivates can be approximated as well. For example, one
 can use `D(f,2)` *or*, if defined, `f''` to approximate the second
 derivative.
 
-* Find the second derivative of $f(x) = \sqrt{x*exp(x)}$ at $c={{p4_c}}$.
+* Find the second derivative of $f(x) = \sqrt{x*exp(x)}$ at $c=2$.
 
 ```
 ```
 
 ```
 f(x) = sqrt(x * exp(x))
-c = {{p4_c}}
+c = 2
 val = f''(c)
 numericq(val)
 ```

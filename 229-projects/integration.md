@@ -331,7 +331,7 @@ The graph of $f(x)$ over the interval $[e, e^2]$ makes clear that the
 triangle formed by the line connecting $(e, f(e))$ and $(e^2,
 f(e^2))$, the $x$ axis, and the line $x=f(e^2)$ will form a lower
 bound for the area under $f$. What is the error in this approximation?
-(Where error = answer $-$ approximation.)
+(error = answer $-$ approximation)
 
 ```
 ```
@@ -362,26 +362,26 @@ val, err = quadgk(x -> sqrt(1 + D(f)(x)^2), 0, pi)
 numericq(val)
 ```
 
-Repeat, when the function is $f(x) = x^x$ over $(0, {{p1_c}})$:
+Repeat, when the function is $f(x) = x^x$ over $(0, 2)$:
 
 ```
 ```
 
 ```
 f(x) = x^x
-b = {{p1_c}}
+b = 2
 val, err = quadgk(x -> sqrt(1 + D(f)(x)^2), 0, b)
 numericq(val)
 ```
 
-* Compute the area between the intersection points of the two curves $f(x) = x$ and $g(x) = x^{{p2_c}}$ by taking the difference between two definite integrals.
+* Compute the area between the intersection points of the two curves $f(x) = x$ and $g(x) = x^4$ by taking the difference between two definite integrals.
 
 ```
 ```
 
 ```
 f(x) =x
-n = {{p2_c}}
+n = 4
 g(x) = x^n
 a,b = 0, 1
 val = quadgk(f, a, b)[1] - quadgk(g, a, b)[1]

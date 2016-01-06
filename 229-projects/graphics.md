@@ -1,0 +1,327 @@
+# Questions to be handed in for project 3:
+
+Read about this here: [Graphing Functions with Julia](http://mth229.github.io/graphing.html).
+
+For the impatient, `julia` has several packages that allow for
+graphical presentations, but nothing "built-in."  We will use the
+`Plots` package, a front-end to several graphing packages. As a
+backend we have to choose one, and will use `Gadfly.  Assuming the
+packages haves been installed, we load them into a session as follows:
+
+
+``` 
+using Plots
+gadfly()      # specifying backend is optional if only one is avaiable or desired one is the default
+```
+
+This brings in a `plot` function that makes plotting functions as easy
+as specifying a function object and the $x$ limits to plot over:
+
+```
+plot(sin, 0, 2pi)		# plot(f, a, b)
+```
+
+
+
+Often most of the battle is *judiciously* choosing the values of $a$
+and $b$ so that the graph highlights a feature of interest. Such as a
+relative maximum or minimum, a zero, a vertical asymptote, a
+horizontal asymptote, a slant asymptote...
+
+
+The use of a function as an argument is not something done with a
+calculator, but is very useful when using `julia` for calculus as many
+actions operate on the function, not the values of the function.
+
+
+----
+
+A plot is nothing more than a connect-the-dot graph of $x$ and $y$
+values. It can be useful to know how to do the steps. The above could
+be done with:
+
+```
+a, b = 0, 2pi
+xs = linspace(a, b)  		# 50 points between a and b
+ys = map(sin, xs)	        # or ys = [sin(x) for x in xs] (see the notes)
+plot(xs, ys)	
+```
+
+The `xs` and `ys` are written as though they are "plural" because
+these variables contain 50 values each in a container (a vector in
+this case). The `map` command "maps" a function to each value in the
+container and returns a new container with the "mapped" values. In the
+example above, these are the values for the `sin` at each `x`.
+
+
+
+Containers (vectors in this case) are often constructed by combining like values
+within square brackets separated by commas: e.g., `[a,b]`. For plotting, we can combine
+functions using `[]` and all will plot:
+
+```
+plot([sin, cos], 0, 2pi)
+```
+
+
+----
+
+### Questions
+
+* Make a plot of $f(x) = \exp(x) - x^3$ over the interval
+   $[3,5]$. Estimate the value where the graph crosses the $x$ axis.
+
+The commands to produce the plot are:
+
+```
+```
+
+```
+longq("commands to plot \\( e^x - x^3 \\)")
+```
+
+The approximate zero is:
+
+```
+```
+
+```
+using Roots
+f(x) = exp(x) - x^3
+val = fzero(f, [3,5])
+numericq(val, .25, "approximate zero", val)
+```
+
+
+
+
+* For the same function $f(x) = \exp(x) - x^3$ make graphs over
+  different domains until you can find another zero. What is this other approximate zero?
+
+```
+```
+
+```
+val = fzero(f, [0, 3])
+numericq(val, .25, "second approximate zero", "1.8")
+```
+
+* Graph the function $f(x) = 2x^3 - 5x^2 + x$. By graphing different
+  domains, approximate the location of the three zeros to one decimal
+  point.
+
+The smallest root is:
+
+```
+```
+
+```
+f(x) =  2x^3 - 5x^2 + x
+rts = sort(roots(f))
+val = rts[1]
+numericq(val, .25, "smallest")
+```
+
+
+The middle root is:
+
+```
+```
+
+```
+val = rts[2]
+numericq(val, .25, middle)
+```
+
+
+The largest root is:
+
+```
+```
+
+```
+val = rts[3]
+numericq(val, .25, "largest")
+```
+
+
+* A cell phone plan has 700 minutes of talking for 20 dollars with
+  each additional minute over 700 minutes costing 10 cents per
+  minute. Write a function representing this rate for any positive time
+  $t$. Then graph the function between $0$ and $1000$.
+
+```
+```
+
+```
+longq("Commands to plot cell phone plan", "f(x) = x < 700 ? 20.0  : 20.0 + 0.10*(x-700); plot(f, 0, 1000)")
+```
+
+* The function $f(x) = (\sin(x)^2 - 2x + 1)^5$ is very flat between
+  $-1$ and $2$. By repeatedly graphing on smaller intervals, find an
+  interval of the type $[x, x + 0.01]$ which contains a zero. (E.g.,
+  $[0.68, 0.69]$.)
+
+```
+```
+
+```
+shortq("[0.71, 0.72]", "the zero is 0.714...")
+```
+
+
+* The function $f(x) = (2x - x^2) \cdot e^x$ increases on just one
+  interval. What is it? (Use interval notation $(a,b)$.)
+
+```
+```
+
+```
+shortq("(-1.4, 1.4)", "it is (-sqrt(2), sqrt(2))")
+```
+
+
+* Graph the rational function $f(x) = (x^2 + 1)/ (x - 1)$. Do you see
+  any asymptotes? If so, describe them.
+
+```
+```
+
+```
+longq("Describe asymptotes of \\(f(x) = (x^2 + 1)/ (x - 1) \\)", "One slant with slope 1, one vertical at x=1")
+```
+
+
+* Make a graph of the rational function $f(x) = (x^2 - 2x + 1)/(x^2 -
+  4)$. Use a suitable domain so that any horizontal asymptotes can be
+  seen. What commands did you use?
+
+```
+```
+
+```
+longq("Commands to plot \\( f(x) = (x^2 - 2x + 1)/(x^2 - 4) \\) showing aymptotes")
+```
+
+
+* Make a plot of $f(x) = \cos(x)$ and $g(x) = 1 - x^2/2$ over
+  $[-\pi/2, \pi/2]$. How many times to the graphs intersect? Can you
+  even tell? If not, why not?
+
+```
+```
+
+```
+longq("How many times to the graphs intersect? Can you even tell? If not, why not?", 
+	   "Can't distinguish the graph near 0.")
+```
+
+* Make a plot of `f(x) = max(0, 1-abs(x))` and `g(x) = 1 +
+  2*f(x-3)`. Describe the relationship of `g` and `f` in terms of the
+  values $1$, $2$ and $3$.
+
+```
+```
+
+```
+longq("Describe the relationship of g and f in terms of the values 1,2 and 3", 
+      "graph of g is shift up 1, scaled by 2, shifted right by 3 units")
+```		
+
+
+## NaN values. 
+
+The value `NaN` is a floating point value that arises during some
+indeterminate operations, such as `0/0`. The `plot` function
+will stop connecting the dots when it
+encounters an `NaN` value. This can be useful. The following uses it
+to graph a straight line _only_ when the cosine is positive.
+
+
+* Make a plot of `f(x) = sin(x)` and `g(x) = cos(x) > 0 ? 0.0 : NaN`
+over $[0, 2\pi]$. What is the relationship? (Notice, the graph of
+$g(x)$ shows only when $\cos(x)$ is positive.)
+
+```
+```
+
+```
+longq("What is the relationship between graph of sin and graph of cos when cosine is positive?", "increasing function, of course")
+```
+
+
+* The following function can be used to restrict the range of a
+mathematical function:
+
+```
+trim(f::Function; cutoff=10) = x -> abs(f(x)) > cutoff ? NaN : f(x)
+```
+
+Try plotting `trim(f)` when $f(x) = (x^2 - 2x + 1)/(x^2 - 4)$ over
+  $[-5, 5]$. What do you see as compared to the previous graph of
+  the rational function $f(x)$?
+
+```
+```
+
+```
+longq("What do you see with using \\verb+trim+?", "The vertical asymptotes do not distort the view")
+```
+
+## Creating sequences
+
+`Julia` has different ways to create sequences of numbers. One of them is `linspace`.
+The `linspace(a, b)` command creates (by default) $50$ evenly spaced
+values between `a` and `b`. This is a useful set of values to use when
+plotting using the lower-level commands.
+
+* write a simple command to produce 50 values between $0$ and $2\pi$
+
+```
+```
+
+```
+shortq("linspace(0, 2pi)", "write a simple command to produce  50 values between 0 and \\(2\\pi\\)")
+```
+
+
+* Write a simple command to produce 50 evenly-spaced values between $1/10$ and $10$.
+
+```
+```
+
+```
+shortq("linspace(1/10, 10)", "write a simple command to produce  50 values between 0 and 10")
+```
+
+
+
+## mapping a function
+
+`Julia` has different ways of applying a function to each value in a
+collection. Some functions, like `sin` are vectorized to naturally do
+so, others are not. The `map` function, called as `map(f, collection)`
+will work. There are also list comprehensions.
+
+
+* If `a = [1,2,3,4,5]` find `a^3` for each value. (Use the `map` function.)
+
+```
+```
+
+```
+longq("find \\verb+a^3+ for a=[1,2,3,4,5]", "Use  map")
+```
+
+
+* The command `xs = linspace(0, 10pi)` creates  many points between 0
+  and `10pi`. Map the function $f(x) = \cos^2(x^{1/2})$ to these
+  values. Write your commands here:
+
+
+```
+```
+
+```
+longq("Commands to map f(x) = cos^2(x^(1/2))")
+```

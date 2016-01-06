@@ -119,8 +119,8 @@ If the comma is left out, the results are combined "horizontally", which can be 
 ### Questions
 
 
-* Write a function that describes a line with slope ${{p1_m}}$ going through
-  the point $({{p1_x0}},{{p1_y0}})$. What is the value of $f(10)$?
+* Write a function that describes a line with slope $2$ going through
+  the point $(1,3)$. What is the value of $f(10)$?
 
 The function is:
 
@@ -128,7 +128,7 @@ The function is:
 ```
 
 ```
-shortq("f(x) = {{p1_y0}}+{{p1_m}}*(x-{{p1_x0}})", "function m={{p1_m}}, p = ({{p1_x0}},{{p1_y0}})", "f(x) = {{p1_y0}}+{{p1_m}}*(x-{{p1_x0}})")
+shortq("f(x) = 3+2*(x-1)", "function m=2, p = (1,3)", "f(x) = 3+2*(x-1)")
 ```
 
 
@@ -138,7 +138,7 @@ The value of $f(10)$ is:
 ```
 
 ```
-f(x) = {{p1_y0}} + {{p1_m}}*(x-{{p1_x0}})
+f(x) = 3 + 2*(x-1)
 val = f(10)
 numericq(val, 1e-4, "f(10)")
 ```
@@ -181,7 +181,7 @@ numericq(val, 1e-4, "Fahrenheit at -89.2C")
 * Write a function that computes
 
 $$~
-f(x) = {{p2_c}}x^2 - 3x  - 7 - \frac{1}{x}
+f(x) = 10x^2 - 3x  - 7 - \frac{1}{x}
 ~$$
 
 Use it to find the values of $f(1)$, and $f(3)$.
@@ -192,7 +192,7 @@ The function is defined by:
 ```
 
 ```
-shortq("f(x) = {{p2_c}}*x^2 - 3x  - 7 - 1/x", "\\( {{p2_c}}x^2 - 3x  - 7 - \\frac{1}{x} \\)")
+shortq("f(x) = 10*x^2 - 3x  - 7 - 1/x", "\\( 10x^2 - 3x  - 7 - \\frac{1}{x} \\)")
 ```
 
 The value $f(1)$ is
@@ -201,7 +201,7 @@ The value $f(1)$ is
 ```
 
 ```
-f(x) = {{p2_c}}*x^2 - 3x - 7 - 1/x
+f(x) = 10*x^2 - 3x - 7 - 1/x
 val = f(1)
 numericq(val, 1e-4)
 ```

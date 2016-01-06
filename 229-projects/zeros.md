@@ -102,16 +102,16 @@ This summary might help:
 
 ### Polynomial functions
 
-* Find a zero of the function $f(x) = {{p1_c}} - 0.65x$.
+* Find a zero of the function $f(x) = 216 - 0.65x$.
 
 ```
 ```
 
 ```julia
 using Roots
-f(x) = {{p1_c}} - 0.65x
+f(x) = 216 - 0.65x
 val = fzero(f, 0)
-numericq(val, 1e-3, "zero of f(x) = {{p1_c}} - 0.65x")
+numericq(val, 1e-3, "zero of f(x) = 216 - 0.65x")
 ```
 
 * The parabola $f(x) = -16x^2 + 200x$ has one zero at $x=0$. Graphically find the other one. What is the value
