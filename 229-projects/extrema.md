@@ -102,7 +102,7 @@ For the following questions (which were cribbed from various internet
 sources), find the most precise answer available, a graphical solution
 is not enough, the answers should  use one of the zero-finding methods.
 
-* <em>Ye olde post office</em>
+* *Ye olde post office*
 
 A box with a square base is taller than it is wide. In order to send
 the box through the U.S. mail, the height of the box and the perimeter
@@ -117,7 +117,7 @@ volume for such a box.
 longq("Maximum volume for box with 108 = h + 4w", rows=6)
 ```
 
-* <em>Inscription</em>
+* *Inscription*
 
 A trapezoid is inscribed in a semicircle of radius $r=2$ so that one
 side is along the diameter. Find the maximum possible area for the
@@ -139,7 +139,7 @@ longq("Commands to find maximum area of inscribed trapezoid",
 rows=6)
 ```
 
-* <em>Cheap paper cups</em>
+* *Cheap paper cups*
 
 A cone-shaped paper drinking cup is to hold 100 cubic centimeters of
 water (about 4 ozs). Find the height and radius of the cup that will
@@ -159,7 +159,7 @@ rows=6)
 
 
 
-* <em>How big is that can?</em>
+* *How big is that can?*
 
 A cylindrical can, **open on top**, is to hold 355 cubic centimeters of
 liquid. Find the height and radius that minimizes the amount of
@@ -190,7 +190,7 @@ radioq(choices, ans, "Do proportions match?")
 
 
 
-* <em>Getting closer</em>
+* *Getting closer*
 
 
 Let $f(x) = \tan(x)$. Find the point on the graph of $f(x)$ that is closest to the point $(\pi/4, 0)$. Show any work.
@@ -204,7 +204,7 @@ longq("Minimize distance to graph",
 ```
 
 
-* <em>Best size for a phone</em>
+* *Best size for a phone*
 
 A cell phone manufacturer wishes to make a rectangular phone with
 total surface area of 12,000 $mm^2$ and maximal screen area. The
@@ -239,7 +239,7 @@ ans = 4
 radioq(choices, ans)
 ```
 
-* <em>Will you be in the water?</em>
+* *Will you be in the water?*
 
 The Statue of Liberty stands 92 meters high, including the pedestal
 which is 46 meters high. How far from the base is it when

@@ -1,0 +1,388 @@
+# Questions to be handed in for project 6b:
+
+
+Read about this material here: [Symbolic math in Julia](http://mth229.github.io/symbolic.html).
+
+Begin by loading our package for plotting *and* a new package that allows symbolic math:
+
+```
+using Plots; gadfly
+using SymPy
+```
+
+
+----
+
+### Quick background <small>Read the notes for more detail</small>
+
+There are many computer algebra systems (CAS) that do symbolic math. Most students are familiar with Wolfram's [alpha](http://www.wolframalpha.com/) site, as many homework problems can be easily done there. That site  uses Wolfram's `Mathematica` program, though the interface relaxes greatly the syntax of that program. Other CASs include `Maple` and `Sage`. Both `Mathematica` and `Maple` are available for free to CUNY students and `Sage` is free to everyone, as it is open source.
+
+In addition to these, there is `SymPy`, an add-on to the popular
+`Python` programming language. Julia's `SymPy` package interfaces with
+`Python's` `SymPy` package in a fairly easy to use manner.
+
+
+The first thing one does is create some symbolic variables:
+
+```
+x, y, z, h = symbols("x, y, z, h")
+```
+
+(This can also be done with just `@vars x y z h`
+
+
+
+That command creates symbolic variables that (more or less) magically
+interact with `Julia` functions. So for example, we can create a
+symbolic expression as follows:
+
+```
+p = 16x^2 - 96x + 128
+```
+
+Note a subtle but *big* difference: we did not define a function, rather `p` is an expression. (A function would be `p(x) = ...`). Symbolic expressions print slightly differently than functions, so this can be a clue. Also note that we _could_ have defined a function, then evaluated it on the symbolic value of $x$:
+
+```
+q(x) = 16x^2 - 96x + 128	# a function
+q(2)				# used as any other function call
+q(x)				# evaluating with a symbolic value gives expression
+```
+
+
+
+What is so great about symbolic expressions? Well, they can be manipulated symbolically!
+
+
+
+For example to _factor_ the polynomial `p` we have the `factor` function:
+
+```
+factor(p)
+```
+
+Or if we used a function:
+
+```
+factor(q(x))
+```
+
+(`factor` applied to a symbolic expression tries to factor as a polynomial, say; whereas `factor` applied to an integer tries to find prime factors. The `factor` function is generic, so can have different implementations depending on the type of its argument.)
+
+To solve for `p=0` we have `solve`:
+
+```
+solve(p, x)			# or just solve(p) as x can be implied
+```
+
+The two answers are $2$ and $4$, as one could read from the
+factorization of `p`. The `solve` function tries to solve when the
+expression is equal to $0$. To solve something of the type $g(x) =
+h(x)$, use $g(x) - h(x) = 0$, as is done with `fzero`, our numeric
+solver.
+
+Symbolic expressions are not functions, but they can often be called like functions. In the simplest case -- with just one free symbol, the notation is similar:
+
+```
+ex = x^2 - 2x + 2
+ex(2)
+```
+
+For expressions with one or more variable, then an indication must be made as to which variable gets which value. There are a few ways to do this, but using `=>` might be the most direct:
+
+```
+ex = x^2 - y^2 - 1
+ex(x=>2, y=>3)
+```
+
+The use of `()` to substitute a value is only valid for version `0.4` or greater. This is just a convenient interface for `subs` to substitute a value into a expression. The syntax for that is: `subs(ex, (x,xvalue), (y, yvalue), ...)`. So, we could have done:
+
+```
+ex = x^2 - y^2 - 1
+subs(ex, (x,2), (y,3))
+```
+
+
+### Questions
+
+#### Working with algebraic expressions
+
+Algebra functions include `expand` to expand a polynomial expression, `simplify` to simplify algebraically an expression, `together` to combine expressions, and `factor` to factor expressions.
+
+
+* Factor the polynomial $p(x) = -2x^4 - x^3 + 3x^2$
+
+```
+```
+
+
+* Find the zeros and any vertical asymptotes of the rational function
+
+$$~
+f(x) = \frac{x^3 + 3x^2}{x^2 - x  - 6}
+~$$
+
+(Use `factor` to get the factors, then read these values off.)
+
+```
+```
+
+* Factor the polynomial $p(x) = 4x^4 + 2x^3 - 2x^2 -3x - 1$. How many roots are there? How many real roots are there? 
+
+```
+```
+
+* Solve the equation $x^4 - 8x^2 + 8 = 0$. How many real roots are there?
+
+```
+```
+
+* Simplify
+
+$$~
+\frac{\frac{1}{x+h} - \frac{1}{x}}{h}
+~$$
+
+From your simplified answer, what would be the value if $h=0$?
+
+```
+```
+
+
+#### Performing limits
+
+The `limit` function from `SymPy` implements [Gruntz's algorithm](http://docs.sympy.org/dev-py3k/_modules/sympy/series/gruntz.html) to find symbolic derivatives. It does not have the issues with floating point that a numeric approach does.
+
+
+The basic form is `limit(expr, x, c)`, where `x` is the symbolic variable and `c` is where the limit is being taken. Optionally one can include `dir="+"` or `dir="-"` to find limits from the right or left. For example, the right limit at $c=0$ of $x^x$ is given by:
+
+```
+limit(x^x, x, 0, dir="+")
+```
+
+
+* Symbolically find 
+
+$$~
+\lim_{x \rightarrow 0} \frac{3^x - 1}{x}
+~$$
+
+
+
+```
+```
+
+
+* Symbolically find 
+
+$$~
+\lim_{x \rightarrow 0+} (1 + 3x)^{1/x}
+~$$
+
+
+```
+```
+
+
+* Symbolically find 
+
+$$~
+\lim_{x \rightarrow 1} \frac{x^n - 1}{x^m - 1}
+~$$
+
+You can define $m$ and $n$ as symbols and your answer will include them:
+
+```
+m,n = symbols("m, n")
+```
+
+
+```
+```
+
+
+* Symbolically find 
+
+$$~
+\lim_{x \rightarrow \infty} (\frac{x}{x+1})^x
+~$$
+
+Limits at infinity just need `c=oo` (oh-oh, not zero-zero).
+
+
+```
+```
+
+
+* What is the value of this expression and does it make sense?
+
+```
+f(x) = sin(x)
+ex = (f(x + h) - f(x)) / h
+limit(ex, h, 0)
+```
+
+#### Questions: Finding derivatives
+
+`SymPy` provides the `diff` function for finding derivatives: `diff(ex, x)` will find the derivative in `x`, whereas `diff(ex, x, 2)` will find the second derivative. For example, here we see the chain rule in action:
+
+```
+f(x) = sin(exp(x))
+diff(f(x), x)
+```
+
+(Just to be clear, the `D` function from the `Roots` package was `D(f)` which creates a function. Here we use `f(x)` which creates a symbolic expression. It is an important distinction, `diff(f,x)` will not work, as desired.)
+
+
+* What is the derivative of $f(x) = \sin(x) / (\tan^{-1}(x) + \tan^2(x))$?
+
+```
+```
+
+* What is the derivative of 
+
+$$~
+f(x) = \frac{1}{\sqrt(2\pi)} e^{-x^2/2}?
+~$$
+
+```
+```
+
+* Find the second derivative of $f(x) = \tan^{-1}(x)$.
+
+```
+```
+
+* Find the 10th derivative of $f(x) = xe^{-x}$.
+
+```
+```
+
+* Does this limit give the first derivative? Check that it does or doesn't for $f(x) = \sin(x)$.
+
+$$~
+\lim_{h \rightarrow 0} \frac{f(x + h) - f(x-h)}{h}.
+~$$
+
+```
+```
+
+* Does this limit give the second derivative? Check that it does or doesn't for $f(x) = \sin(x)$.
+
+$$~
+\lim_{h \rightarrow 0} \frac{f(x + h) - 2f(x) + f(x-h)}{h^2}.
+~$$
+
+```
+```
+
+
+* Find the critical points of $f(x) = 3x^4−32x^3+114x^2−144x + 2$ by solving for when the derivative is $0$.
+
+```
+```
+
+* Find the inflection points of $f(x) = e^{-x^2}$
+
+```
+```
+
+* For the function $\sin(x)$ over the interval $[0, \pi/2]$ find a point $c$ such that the slope of the tangent line at $c$ is equal to the slope of the secant line from $0$ to $\pi/2$.
+
+```
+```
+
+
+### Graphing expressions
+
+The `plot` function is overloaded to also plot symbolic expressions of a single variable. The use is not so different than how it is used to plot a function:
+
+```
+plot([sin(x), cos(x)], 0, 2pi)
+```
+
+The difference is we plot the expressions `sin(x)` and `cos(x)` rather than *function objects* `sin` and `cos`.
+
+
+* Graphically solve for when $f(x) = e^x$ and $g(x) = 10 + 5x$ intersect for $x > 0$.
+
+```
+```
+
+
+* For the function $f(x) = e^x$. Over the interval $[0,3]$, plot both $f(x)$ and the expression 
+
+$$~
+f(0) + \frac{f'(0)}{1!} x + \frac{f''(0)}{2!}x^2.
+~$$ 
+
+Where $n!=n \cdot (n-1) \cdots 2 \cdot 1$, and can be evaluated with `factorial(2)`. Do the two mostly agree on this interval?
+
+(One tedious aspect of finding $f'(a)$ is that it is done in two steps like `replace(diff(f, x), x, a)` (find the derivative in `x`, the replace `x` with `a`). The following function can shorten the above so that `D(f,k)(a)` works on symbolic expression, as it did for functions with `D` from the `Roots` package.)
+
+```
+D(f, k=1) = a -> replace(diff(f(x), x, k), x, a)
+```
+
+```
+```
+
+
+#### Questions: Integration
+
+The `integrate` function can be used for integration -- when an antiderivative exists. Integration comes in two flavors
+
+* indefinite integrals (or basically antiderivatives)
+
+* definite integrals. 
+
+The two are related, as the definite integral $\int_a^b f(x) dx = F(b) - F(a)$ where $F(x)$ is *any* antiderivative (they all differ by atmost a constant).
+
+In `SymPy`, we simply pass in a symbolic expression and optionally limits of integration:
+
+```
+integrate(x*exp(-x))		# indefinite integral
+```
+
+or 
+
+```
+integrate(x*exp(-x), (x, 0, 10))	# definite
+```
+
+The limits of integration are lumped together as a tuple of the form
+`(symbol, a, b)`, this syntax allows for multiple integration.
+
+
+#### Questions
+
+* Find an antiderivative of  $\sin(x) \cdot \cos(2x)$.
+
+```
+```
+
+* Find the area under the curve of $\sin(x)$ bewteen $0$ and $\pi$.
+
+```
+```
+
+* If you use a symbolic variable for the limits of integration the answer can be expressed that way. Find
+
+$$~
+\int_0^t x \cdot \exp(-x) dx
+~$$
+
+Then differentiate it to confirm that the fundamental theorem of calculus holds.
+
+```
+```
+
+* The mean value theorem for integrals states that there exists a $c$ in $[a,b]$ for which 
+
+$$~
+f(c) = (b-a)^{-1} \int_a^b f(x) dx
+~$$
+
+For $f(x) = 10e^{-5t}$ find a $c$ in the interval $[0,1]$.
+
+```
+``` 

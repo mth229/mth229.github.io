@@ -76,7 +76,8 @@ fp(x) = D(sin)(x)		# define a function fp or use D(sin) directly
 fp(pi)			        # finds cos(pi). Also D(sin)(pi)
 ```
 
-The usual notation for a deriviative can be defined, though it isn't the default. If we use this command (ignoring the warning):
+The usual notation for a deriviative can be defined, though it isn't
+the default. If we use this command (ignoring the warning):
 
 ```
 Base.ctranspose(f::Function) = D(f)
@@ -86,7 +87,8 @@ then, we can differentiate using the "usual" notation:
 
 ```
 f(x) = sin(x)
-f'(pi)     # same as cos(pi)
+f'(pi)     # same as D(f)(pi)
+f''(pi)    # same as D(f,2)(pi)
 ```
 
 
@@ -112,12 +114,12 @@ It can also be called with a symbolic expression:
 x, a = symbols("x, a")
 ```
 
-```verbatic
+```verbatim
 @vars x a
 ```
 
 ```
-diff(x * sin(x)
+diff(x * sin(x))
 ```
 
 If there is another symbol, then a second argument is passed to specify which one is being having its derivative taken:
@@ -131,14 +133,14 @@ diff(x*sin(a*x), x)
 ### Questions
 
 * Calculate the slope of the secant line of $f(x) = 3x^2 + 5$ between
-  $(2,f(2))$ and $(5, f())$.
+  $(3,f(3))$ and $(5, f())$.
 
 ```
 ```
 
 ```
 f(x) = 3x^2 + 5
-x0,x1 = 2, 5
+x0,x1 = 3, 5
 val = (f(x1) - f(x0))/(x1 - x0)
 numericq(val, 1e-3, "slope of secant line")
 ```
@@ -160,7 +162,7 @@ longq("Verify derivative using a table", "\\verb+[hs map(h->(sin(pi/3 + h)-sin(p
 ```
 
 
-* Let $f(x) = 1/x$ and $c=3$. Find the approximate derivative (forward) when
+* Let $f(x) = 1/x$ and $c=4$. Find the approximate derivative (forward) when
   `h=1e-6`.
 
 ```
@@ -168,13 +170,13 @@ longq("Verify derivative using a table", "\\verb+[hs map(h->(sin(pi/3 + h)-sin(p
 
 ```
 f(x) = 1/x
-c, h = 3, 1e-6
+c, h = 4, 1e-6
 val = (f(c + h) - f(c))/h
-numericq(val, 1e-4, "approx forward derivative \\verb+(1/x)'(3)+")
+numericq(val, 1e-4, "approx forward derivative \\verb+(1/x)'(4)+")
 ```
 
 
-* Let $f(x) = x^x$ and $c=3$. Find the approximate derivative
+* Let $f(x) = x^x$ and $c=4$. Find the approximate derivative
   (forward) when `h=1e-8`.
 
 ```
@@ -245,7 +247,7 @@ numericq(val, 1e-4, "zero of f'(x)")
   at $x=\pi/6$ for various values of $h$. The true derivative is
   $\cos(\pi/6) = \sqrt{3}/2$.
 
-Make the following table. What size `h` has the closest approximation? 
+Make the following table. 
 
 ```
 f(x) = sin(x)
@@ -255,10 +257,12 @@ ys = [forward(f, c, h=h) for h in hs] - sqrt(3)/2
 [hs ys]
 ```
 
+What size `h` has the closest approximation?
+
 ```
 choices = ["1e-"*string(i) for i in 1:12]
 ans = 8
-radioq(choices, ans, "smallest error")
+radioq(choices, ans, "smallest error", keep_order=true)
 ```
 
 * The `D` operator is easy to use. Here is how we can plot both the
@@ -481,19 +485,19 @@ Higher-order derivates can be approximated as well. For example, one
 can use `D(f,2)` *or*, if defined, `f''` to approximate the second
 derivative.
 
-* Find the second derivative of $f(x) = \sqrt{x*exp(x)}$ at $c=2$.
+* Find the second derivative of $f(x) = \sqrt{x \cdot exp(x)}$ at $c=3$.
 
 ```
 ```
 
 ```
 f(x) = sqrt(x * exp(x))
-c = 2
+c = 3
 val = f''(c)
 numericq(val)
 ```
 
-* Find the zeros in $[0, 10]$ of the second derivative of the function $f(x) = \sin(2x) + 3sin(4x)$ using `fzeros`.
+* Find the zeros in $[0, 10]$ of the second derivative of the function $f(x) = \sin(2x) + 3\sin(4x)$ using `fzeros`.
 
 ```
 ```

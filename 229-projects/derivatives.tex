@@ -18,9 +18,11 @@ using Roots
 \rule{\textwidth}{1pt}
 \subsubsection{Quick background}\newline
 Read about this material here: \href{http://mth229.github.io/derivatives.html}{Approximate derivatives in julia}.\newline
-For the impatient, the slope of the tangent line to the graph of $f(x)$ at the point $(c,f(c))$ is given by the following limit:$~
+For the impatient, the slope of the tangent line to the graph of $f(x)$ at the point $(c,f(c))$ is given by the following limit:
+$$
 \lim_{h \rightarrow 0} \frac{f(c + h) - f(c)}{h}.
-~$\newline
+$$
+\newline
 The notation for this – when the limit exists – is $f'(c)$, the intuition is that this is the limit of the slope of a sequence of secant lines connecting the points $(c, f(c))$ and $(c+h, f(c+h))$. In general the derivative of a function $f(x)$ is the function $f'(x)$, which returns the slope of the tangent line for each $x$ where it is defined.\subsubsection{Approximate derivatives}\newline
 Approximating the slope of the tangent line can be done \href{XXX}{several ways}. The \textit{forward difference quotient} takes a small value of $h$ and uses the values $(f(x+h) - f(x))/h$ as an approximation.\newline
 For example to estimate the derivative of $x^x$ at $c=1$ with \texttt{h=1e-6} we could have\begin{verbatim}
@@ -59,10 +61,11 @@ ctranspose (generic function with 53 methods)\end{verbatim}
 \newline
 then, we can differentiate using the "usual" notation:\begin{verbatim}
 f(x) = sin(x)
-f'(pi)     # same as cos(pi)
+f'(pi)     # same as D(f)(pi)
+f''(pi)    # same as D(f,2)(pi)
 \end{verbatim}
 \begin{verbatim}
--1.0\end{verbatim}
+-1.2246467991473532e-16\end{verbatim}
 \subsubsection{Symbolic derivatives}\newline
 The \texttt{D} function gives accurate numeric values for first, second, and even higher-order derivatives. It does not however, return the expression one would get were these computed by hand. The \texttt{diff} function from \texttt{SymPy} will find symbolic derivatives, similar to what is achieved when differentiating "by hand."\newline
 The \texttt{diff} function can be called with a function:\begin{verbatim}
@@ -80,28 +83,24 @@ x, a = symbols("x, a")
 @vars x a
 \end{verbatim}
 \begin{verbatim}
-UndefVarError(:Sym)
+diff(x * sin(x))
 \end{verbatim}
-\begin{verbatim}
-diff(x * sin(x)
-\end{verbatim}
-\begin{verbatim}
-ErrorException("syntax: incomplete: premature end of input")
-\end{verbatim}
-\newline
+$$x \cos{\left (x \right )} + \sin{\left (x \right )}$$\newline
 If there is another symbol, then a second argument is passed to specify which one is being having its derivative taken:\begin{verbatim}
 diff(x*sin(a*x), x)
 \end{verbatim}
-$$a x \cos{\left (a x \right )} + \sin{\left (a x \right )}$$\subsubsection{Questions}\begin{itemize}\item Calculate the slope of the secant line of $f(x) = 3x^2 + 5$ between   $(2,f(2))$ and $(5, f())$.\end{itemize}
+$$a x \cos{\left (a x \right )} + \sin{\left (a x \right )}$$\subsubsection{Questions}\begin{itemize}\item Calculate the slope of the secant line of $f(x) = 3x^2 + 5$ between   $(3,f(3))$ and $(5, f())$.\end{itemize}
 \\begin{answer}
     type: numeric
     reminder: slope of secant line
-    answer: [20.999, 21.001]
-    answer_text: [20.999, 21.001] 
+    answer: [23.999, 24.001]
+    answer_text: [23.999, 24.001] 
 \\end{answer}
-\begin{itemize}\item Verify that the derivative of $f(x) = \sin(x)$ at $\pi/3$ is $1/2$   by finding the following limit using a table:\end{itemize}$~
+\begin{itemize}\item Verify that the derivative of $f(x) = \sin(x)$ at $\pi/3$ is $1/2$   by finding the following limit using a table:\end{itemize}
+$$
 \lim_{h \rightarrow 0} \frac{f(\pi/3 + h) - f(\pi/3)}{h}
-~$\newline
+$$
+\newline
 (Use \texttt{[hs ys]} to look at your generated data, as was done in the limits project.)
 \\begin{answer}
 type: longtext
@@ -110,19 +109,19 @@ answer_text: \verb+[hs map(h->(sin(pi/3 + h)-sin(pi/3))/h, hs)]+
 rows: 3
 cols: 60
 \\end{answer}
-\begin{itemize}\item Let $f(x) = 1/x$ and $c=3$. Find the approximate derivative (forward) when   \texttt{h=1e-6}.\end{itemize}
+\begin{itemize}\item Let $f(x) = 1/x$ and $c=4$. Find the approximate derivative (forward) when   \texttt{h=1e-6}.\end{itemize}
 \\begin{answer}
     type: numeric
-    reminder: approx forward derivative \verb+(1/x)'(3)+
-    answer: [-0.1112110740636967, -0.11101107406369669]
-    answer_text: [-0.111, -0.111] 
+    reminder: approx forward derivative \verb+(1/x)'(4)+
+    answer: [-0.06259998438234705, -0.06239998438234705]
+    answer_text: [-0.063, -0.062] 
 \\end{answer}
-\begin{itemize}\item Let $f(x) = x^x$ and $c=3$. Find the approximate derivative   (forward) when \texttt{h=1e-8}.\end{itemize}
+\begin{itemize}\item Let $f(x) = x^x$ and $c=4$. Find the approximate derivative   (forward) when \texttt{h=1e-8}.\end{itemize}
 \\begin{answer}
     type: numeric
-    reminder: approx forward derivative \verb+(x^x)'(3)+
-    answer: [56.66253108858052, 56.66253308858052]
-    answer_text: [56.663, 56.663] 
+    reminder: approx forward derivative \verb+(x^x)'(4)+
+    answer: [610.8913613847911, 610.8913633847911]
+    answer_text: [610.891, 610.891] 
 \\end{answer}
 \begin{itemize}\item Let $f(x) = (x + 2)/(1 + x^3)$. Plot both $f$ and its approximate   derivative on the interval $[0,5]$. Identify the zero of the   derivative. What is its value? What is the value of $f(x)$ at this   point?\end{itemize}\newline
 What commands produce the plot?
@@ -157,7 +156,7 @@ What is the value of $f$ at this point:
     answer_text: [-1.364, -1.364] 
 \\end{answer}
 \begin{itemize}\item Let $f(x) = \sin(x)$. Following the example on p124 of the Rogawski   book we look at a table of values of the forward difference equation   at $x=\pi/6$ for various values of $h$. The true derivative is   $\cos(\pi/6) = \sqrt{3}/2$.\end{itemize}\newline
-Make the following table. What size \texttt{h} has the closest approximation? \begin{verbatim}
+Make the following table. \begin{verbatim}
 f(x) = sin(x)
 c = pi/6
 hs = [(1/10)^i for i in 1:12]
@@ -178,13 +177,14 @@ ys = [forward(f, c, h=h) for h in hs] - sqrt(3)/2
  1.0e-10   1.80794e-7 
  1.0e-11  -1.48454e-6 
  1.0e-12   4.06657e-6 \end{verbatim}
-
+\newline
+What size \texttt{h} has the closest approximation?
 \\begin{answer}
 type: radio
 reminder: smallest error
-values: 1 | 2 | 5 | 4 | 8 | 7 | 6 | 11 | 10 | 9 | 12 | 3
-labels: 1e-1 | 1e-4 | 1e-11 | 1e-2 | 1e-12 | 1e-10 | 1e-9 | 1e-3 | 1e-6 | 1e-7 | 1e-5 | 1e-8
-answer: 12
+values: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+labels: 1e-1 | 1e-2 | 1e-3 | 1e-4 | 1e-5 | 1e-6 | 1e-7 | 1e-8 | 1e-9 | 1e-10 | 1e-11 | 1e-12
+answer: 8
 
 \\end{answer}
 \begin{itemize}\item The \texttt{D} operator is easy to use. Here is how we can plot both the   sine function and its derivative\end{itemize}\begin{verbatim}
@@ -228,17 +228,17 @@ answer: 2
 type: radio
 reminder: 
 values: 1 | 2 | 3 | 4
-labels: $x^x*(log(x) + 1)$ | $x*x^(x-1)$ | $x^x$ | $x^(x+1) / (x+1)$
-answer: 1
+labels: $x^x$ | $x^(x+1) / (x+1)$ | $x^x*(log(x) + 1)$ | $x*x^(x-1)$
+answer: 3
 
 \\end{answer}
 \begin{itemize}\item Using the \texttt{diff} function, find the derivative of the inverse tangent, $\tan^{-1}(x)$ (\texttt{atan}). What is the function?\end{itemize}
 \\begin{answer}
 type: radio
 reminder: 
-values: 3 | 1 | 2
-labels: $(-1)\tan^{-2}(x)$ | $(-1)\tan^{-2}(x) \cdot (\tan^2(x) + 1)$ | $1/(1+x^2)$
-answer: 3
+values: 2 | 3 | 1
+labels: $(-1)\tan^{-2}(x) \cdot (\tan^2(x) + 1)$ | $1/(1+x^2)$ | $(-1)\tan^{-2}(x)$
+answer: 2
 
 \\end{answer}
 \subsection{Some applications}\begin{itemize}\item Suppose the height of a ball falls according to the formula $h(t) =   300 - 16t^2$. Find the rate of change of height at the instant the   ball hits the ground.\end{itemize}
@@ -280,9 +280,9 @@ cols: 60
 \\begin{answer}
 type: radio
 reminder: Is bal' ever positive
-values: 3 | 1 | 2
-labels: Yes, after 3 | No, it never is | Yes, initially
-answer: 3
+values: 2 | 3 | 1
+labels: No, it never is | Yes, initially | Yes, after 3
+answer: 2
 
 \\end{answer}
 \subsubsection{Tangent lines}\newline
@@ -340,20 +340,20 @@ rows: 3
 cols: 60
 \\end{answer}
 \subsubsection{Higher-order derivatives}\newline
-Higher-order derivates can be approximated as well. For example, one can use \texttt{D(f,2)} \textit{or}, if defined, \texttt{f''} to approximate the second derivative.\begin{itemize}\item Find the second derivative of $f(x) = \sqrt{x*exp(x)}$ at $c=2$.\end{itemize}
+Higher-order derivates can be approximated as well. For example, one can use \texttt{D(f,2)} \textit{or}, if defined, \texttt{f''} to approximate the second derivative.\begin{itemize}\item Find the second derivative of $f(x) = \sqrt{x \cdot exp(x)}$ at $c=3$.\end{itemize}
 \\begin{answer}
     type: numeric
     reminder: 
-    answer: [1.6808510748196146, 1.6828510748196144]
-    answer_text: [1.681, 1.683] 
+    answer: [3.0177551230478667, 3.0197551230478665]
+    answer_text: [3.018, 3.02] 
 \\end{answer}
-\begin{itemize}\item Find the zeros in $[0, 10]$ of the second derivative of the function $f(x) = \sin(2x) + 3sin(4x)$ using \texttt{fzeros}.\end{itemize}
+\begin{itemize}\item Find the zeros in $[0, 10]$ of the second derivative of the function $f(x) = \sin(2x) + 3\sin(4x)$ using \texttt{fzeros}.\end{itemize}
 \\begin{answer}
 type: radio
 reminder: 
-values: 1 | 2 | 3
-labels: 13 numbers: 0.420534, 1.20943, ..., 9.00424, 9.84531 | 13 numbers: 0.0, 0.869122, ..., 8.55566, 9.42478 | 13 numbers: 0.0, 0.806238, ..., 8.61854, 9.42478
-answer: 3
+values: 3 | 1 | 2
+labels: 13 numbers: 0.420534, 1.20943, ..., 9.00424, 9.84531 | 13 numbers: 0.0, 0.806238, ..., 8.61854, 9.42478 | 13 numbers: 0.0, 0.869122, ..., 8.55566, 9.42478
+answer: 2
 
 \\end{answer}
 

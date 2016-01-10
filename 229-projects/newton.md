@@ -14,8 +14,8 @@ using Roots
 
 Read about this material here: [Newton's Method](http://mth229.github.io/newton.html).
 
-For the impatient, symbolic math -- as is done behind the scenes at
-the Wolfram alpha web site -- is pretty nice. For so many problems it
+For the impatient, symbolic math $-$ as is done behind the scenes at
+the Wolfram alpha web site $-$ is pretty nice. For so many problems it
 can easily do what is tedious work. However, for some questions, only
 numeric solutions are possible. For example, there is no general
 formula to solve a fifth order polynomial the way there is a
@@ -38,14 +38,15 @@ solve(x^5 - x - 1)
 
 We see that `SymPy` basically punts on this question.
 
-Numeric solutions are available. As this is a polynomial, we could use the `roots` function for `Roots`:
+Numeric solutions are available. As this is a polynomial, we could use
+the `roots` function for `Roots`:
 
 ```
 f(x) = x^5 - x - 1
 roots(f)
 ```
 
-We see 5 roots -- as expected from a fifth degree polynomial -- with
+We see 5 roots, as expected from a fifth degree polynomial, with
 one real root (the one with `0.0im`) that is approximately
 1.1673. Finding such a value usually requires some iterative
 root-finding algorithm (though not in the case above which uses linear
@@ -83,7 +84,7 @@ $$~
 x_{i+1} = x_i - f(x_i)/f'(x_i)
 ~$$
 
-Let's see this algorithm for `f(x) = x^3−2x−5`, a function that Newton
+Let's see this algorithm for $f(x) = x^3−2x−5$, a function that Newton
 himself considered. He was looking for a solution near $2$, so let's
 start there:
 
@@ -93,7 +94,7 @@ f(x) = x^3 - 2x -5
 fp(x) = 3x^2 - 2		# done by hand
 ```
 
-We don't need to track the index ($x_0$, $x_1$, ...) as when we write
+We don't need to track the index ($x_0$, $x_1$, ...), as when we write
 the following expression, the next value is just assigned to `x` using
 the *current* value of `x` when computed:
 
@@ -150,8 +151,14 @@ x = 2.0
 newt(newt(newt(newt(newt(x)))))
 ```
 
-That is kinda ugly. Here we use a programming construct, a *macro*, to
-repeat some _expression_ 5 times. (This macro basically replaces the
+That is kinda ugly. Is this form any better?
+
+```
+x |> newt |> newt |> newt |> newt |> newt
+```
+
+Here we use a programming construct, a *macro*, to
+repeat some *expression* 5 times. (This macro basically replaces the
 expression internally with 5 repeats of the expression.)
 
 ```
@@ -171,9 +178,6 @@ and to see that `x` has been updated we have:
 ```
 x, f(x)
 ```
-
-
-
 
  
 ### Questions
@@ -273,7 +277,7 @@ val = fzero(f, 1)
 numericq(val, 1e-3, "zero of cos(x) - x")
 ```
 
-### Using `D` for the derivative
+### Using D for the derivative
 
 If the function `f(x)` allows it, the `D` operator from the `Roots`
 package can simplify the Newton's method algorithm, as the derivative
@@ -319,7 +323,7 @@ numericq(vals[2], 1e-5, "larger zero")
 ```
 
 
-### Using `newton` and `fzero` from the `Roots` package
+### Using newton and fzero from the Roots package
 
 The `newton` function in the `Roots` package will compute newton's method. For example:
 
@@ -337,9 +341,9 @@ newton(f, fp, 3, verbose=true)
 ```
 
 
-However, the `fzero` function -- that we have seen before -- will use
+However, the `fzero` function $-$ that we have seen before $-$ will use
 a derivative-free algorithm, similar to Newton's method to find a
-zero. So, the above zero can also be found with:
+zero. So, the above zero can *also* be found with:
 
 ```
 fzero(sin, 3)
@@ -408,13 +412,13 @@ numericq(val, 1e-5, "zero of derivative of \\( 5/cos(x) + 7/sin(x) \\)")
 
 Newton's method can fail due to various cases:
 
-* the initial guess is not close to the zero
+`*` the initial guess is not close to the zero
 
-* the derivative, $|f'(x)|$ is too small
+`*` the derivative, $|f'(x)|$ is too small
 
-* the second derivative $|f''(x)|$ is too big, or possibly undefined
+`*` the second derivative $|f''(x)|$ is too big, or possibly undefined
 
-* Earlier  the roots of $f(x) = x^5 - x - 1$ were considered. Try
+`*` Earlier  the roots of $f(x) = x^5 - x - 1$ were considered. Try
   Newton's method with an initial guess of $x_0=0$ to find a real
   root. Why does this fail? (You can look graphically. Otherwise, you
   could look at the output of `newton` with this extra argument:
@@ -463,12 +467,12 @@ Not so for multiple roots.
 ```julia
 choices = ["about $k steps" for k in [5,10,15,20,25,30, 35, 40]]
 ans = 6
-radioq(choices, ans, "How many steps to get convergence of newton's method?")
+radioq(choices, ans, "How many steps to get convergence of newton's method?", keep_order=true)
 ```
 
 
-* Repeat the above with `f(x) = 8x*exp(-x^2) -2x - 3` -- there is no
-  extra power of $8$ here -- and again, starting with
+* Repeat the above with `f(x) = 8x*exp(-x^2) -2x - 3` $-$ there is no
+  extra power of $8$ here $-$ and again, starting with
   `x=-2.0`. Roughly how many iterations are needed now?
 
 ```
@@ -477,5 +481,5 @@ radioq(choices, ans, "How many steps to get convergence of newton's method?")
 ```julia
 choices = ["about $k steps" for k in [5,10,15,20,25,30, 35, 40]]
 ans = 1
-radioq(choices, ans, "How many steps to get convergence of newton's method?")
+radioq(choices, ans, "How many steps to get convergence of newton's method?", keep_order=true)
 ```

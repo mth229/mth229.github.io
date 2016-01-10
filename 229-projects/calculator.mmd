@@ -15,7 +15,8 @@ For the most part there is no surprise, once you learn the notations:
   pasting minus signs will often cause an error, as only something
   that looks like a minus sign is pasted in.)
 
-Using `IJulia`, one types the following into a cell and then presses the "run" button (or "shift-enter"):
+Using `IJulia`, one types the following into a cell and then presses
+the *run* button (or *shift-enter*):
 
 ```
 2 + 2
@@ -66,7 +67,7 @@ Names can be reassigned (though at times names for functions can not be reassign
 a,b,c = 1,2,3
 ```
 
-#### Julia -- like math -- has different number types
+#### Julia, like math, has different number types
 
 
 Unlike a calculator, but just like math, `julia` has different types of
@@ -253,7 +254,7 @@ numericq(val, 1e-3, "\\( \\frac{5}{\\cos(57^\\circ)}  + \\frac{8}{\\sin(57^\\cir
 
 
 * In mathematics a function is defined not only by a rule but also by
-  a _domain_ of possible values. Similarly with `julia`. What kind of
+  a *domain* of possible values. Similarly with `julia`. What kind of
   error does `julia` respond with if you try this command: `sqrt(-1)`?
 
 ```
@@ -285,12 +286,11 @@ shortq("(1 - 2) + ((3 * (4 ^ 5)) / 6)",
 
 * Which of these will also produce $1/(3\cdot4)$:
 
+`*` `1 / 3 * 4`
 
-* `1/3*4`
+`*` `1 / 3 / 4`
 
-* `1/3/4`
-
-* `1*3/4`
+`*` `1 * 3 / 4`?
 
 ```
 ```
@@ -519,7 +519,7 @@ booleanq(7e-10 > 8e-9, "Is 7e-10 greater 8e-9?")
 Julia has different storage type for integers (which are stored
 exactly, but have smaller bounds on their size); rational numbers
 (which are stored exactly in terms of a numerator and a denominator);
-real numbers (which are _approximated_ by floating point numbers); and
+real numbers (which are *approximated* by floating point numbers); and
 complex numbers (which may have either have integer or floating point
 values for the two components.) When `julia` parses a value, it will
 determine the type by how it is entered.
@@ -554,4 +554,3 @@ What command did you use:
 longq("Compute `2^(-1)`", "either `1/2`, `1/2^1`, `2.0^(-1)`, ..., but not `2^(-1)`")
 ```
 
-That's all folks ...

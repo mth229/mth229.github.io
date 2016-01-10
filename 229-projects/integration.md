@@ -1,6 +1,6 @@
 # Questions to be handed in on integration:
 
-To get started, we load the `Gadfly` backend for `Plots`, so that we can make plots; and load the `Roots` package for `D`; and the `SymPy` package:
+To get started, we load the `Gadfly` backend for `Plots`, so that we can make plots; load the `Roots` package for its `D` function; and the `SymPy` package:
 
 ```
 using Plots
@@ -11,7 +11,7 @@ using SymPy
 
 ### Quick background
 
-Read about this material here: [integration](http://mth229.github.io/integration.html).
+Read more about this material here: [integration](http://mth229.github.io/integration.html).
 
 
 
@@ -44,13 +44,13 @@ integrate(f, 0, 1)		# returns a "symbolic" number
 
 
 However, this only works *if* there is a known antiderivative $F(x)$
--- which is not always the case. If not, what to do?
+$-$ which is not always the case. If not, what to do?
 
 In this case, we can appeal to the definition of the definite
 integral. For continuous, non-negative $f(x)$, the definite integral
 is the area under the graph of $f$ over the interval $[a,b]$. For
 possibly negative functions, the indefinite integral is found by the
-_signed_ area under $f$.  This area can be directly *approximated*
+*signed* area under $f$.  This area can be directly *approximated*
 using Riemann sums, or some other approximation scheme.
 
 
@@ -67,7 +67,7 @@ sum(fxs * delta)		# a new function `sum` to add up values in a container
 ```
 
 That value isn't very close to $1/3$. But we only took $n=5$
-rectangles -- clearly there will be some error. Bigger $n$s mean
+rectangles $-$ clearly there will be some error. Bigger $n$s mean
 better approximations:
 
 ```
@@ -125,7 +125,7 @@ ans, err = quadgk(f, 0, 1)
 The `quadgk` function returns two values, an answer and an estimated maximum
 possible error.  The ans is the first number, clearly it is $1/3$, and
 the estimated maximum error is the second. In this case it is small
-($10^{-17}$) -- basically 0.
+($10^{-17}$) $-$ basically 0.
 
 ### Questions
 
@@ -331,7 +331,7 @@ The graph of $f(x)$ over the interval $[e, e^2]$ makes clear that the
 triangle formed by the line connecting $(e, f(e))$ and $(e^2,
 f(e^2))$, the $x$ axis, and the line $x=f(e^2)$ will form a lower
 bound for the area under $f$. What is the error in this approximation?
-(error = answer $-$ approximation)
+(Where error = answer $-$ approximation.)
 
 ```
 ```
@@ -362,26 +362,26 @@ val, err = quadgk(x -> sqrt(1 + D(f)(x)^2), 0, pi)
 numericq(val)
 ```
 
-Repeat, when the function is $f(x) = x^x$ over $(0, 2)$:
+Repeat, when the function is $f(x) = x^x$ over $(0, 3)$:
 
 ```
 ```
 
 ```
 f(x) = x^x
-b = 2
+b = 3
 val, err = quadgk(x -> sqrt(1 + D(f)(x)^2), 0, b)
 numericq(val)
 ```
 
-* Compute the area between the intersection points of the two curves $f(x) = x$ and $g(x) = x^4$ by taking the difference between two definite integrals.
+* Compute the area between the intersection points of the two curves $f(x) = x$ and $g(x) = x^3$ by taking the difference between two definite integrals.
 
 ```
 ```
 
 ```
 f(x) =x
-n = 4
+n = 3
 g(x) = x^n
 a,b = 0, 1
 val = quadgk(f, a, b)[1] - quadgk(g, a, b)[1]
@@ -390,12 +390,12 @@ numericq(val)
 
 ## Applications
 
-We discuss an application of the integral to finding the volumes --
+We discuss an application of the integral to finding the volumes $-$
 not just areas.
 
-A _solid of revolution_ is a figure with rotational symmetry around
+A *solid of revolution* is a figure with rotational symmetry around
 some axis, such as a soda can, a snow cone, a red solo cup, and other
-common figures. A formula for the volume of a figure with rotational
+common objects. A formula for the volume of an object with rotational
 symmetry can be written in terms of an integral based on a function,
 $r(h)$, which specifies the radius for various values of $h$.
 

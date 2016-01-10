@@ -56,7 +56,7 @@ action which is encapsulated in some function call like `roots`.)
 
 #### Bisection method
 
-For the general case -- non-polynomial functions -- the notes mention the bisection method for
+For the general case, non-polynomial functions,  the notes mention the bisection method for
 zero-finding. This is based on the *intermediate value theorem* which
 guarantees a zero for a continuous function $f(x)$ over any interval
 $[a,b]$ *when* $f(a)$ and $f(b)$ have *different* signs. Such an
@@ -66,7 +66,7 @@ The algorithm finds a zero by successive division of the
 interval. Either the midpoint is a zero, or one of the two sub
 intervals must be a bracket. The notes define a `bisection` method and
 a stripped down version is given below.  More conveniently the `Roots`
-package implements this in its `fzero` function -- when it is called
+package implements this in its `fzero` function when it is called
 through `fzero(f, [a,b])` (or `fzero(f, a, b)`). For example,
 
 ```
@@ -89,13 +89,17 @@ fzeros(f, [-5,5])
 
 This summary might help:
 
-* the call `roots(f)`  finds all roots of a polynomial function, even complex ones
+`*` the call `roots(f)` finds all roots of a polynomial function, even
+complex ones
 
-* the call `fzeros(f)` finds all *real* roots of polynomial function
+`*` the call `fzeros(f)` finds all *real* roots of polynomial function
 
-* the call `fzero(f, [a,b])` finds a root of a function between a **bracketing** interval, `[a,b]`, using the bisection method.
+`*` the call `fzero(f, [a,b])` finds a root of a function between a
+**bracketing** interval, `[a,b]`, using the bisection method.
 
-* the call `fzeros(f, [a,b])` function *attempts* to find all roots of a function in an interval `[a,b]`. This may miss values; answers should be checked graphically.
+`*` the call `fzeros(f, [a,b])` function *attempts* to find all roots
+of a function in an interval `[a,b]`. This may miss values; answers
+should be checked graphically.
 
 
 ## Questions to answer
@@ -225,14 +229,14 @@ longq("intersections of \\(f(x) = 2.5-2e^{-x}\\) and \\(g(x) = 1 + x^2\\)", "aro
 
 ```
 function bisection(f, bracket)
-  a,b = sort(bracket	 )
+  a,b = sort(bracket)
   @assert f(a) * f(b) < 0	# an error if [a,b] is not a bracket
-  mid = a + (b-a)/2
+  mid = a + (b - a) / 2
 
   while a < mid < b
     if f(mid) == 0.0 break end
     f(a) * f(mid) < 0 ? (b = mid) : (a = mid)  
-    mid = (a+b) / 2
+    mid = a + (b - a) / 2
   end
   mid
 end
@@ -244,7 +248,7 @@ is continuous, it must cross zero between $a$ and $b$. The algorithm
 simply bisects this interval by finding `mid`. It then selects either
 `[a,mid]` or `[mid,b]` to be the new interval where a zero is
 guaranteed. It **stops** if the interval is too small to
-subdivide -- an impossibility mathematically, but is the case with
+subdivide. This is an impossibility mathematically, but is the case with
 floating point numbers.
 
 The `bisection` function is used to find a zero, when $[a,b]$ brackets
@@ -427,9 +431,9 @@ radioq(choices, ans)
 ```
 
 ```
-choices = [L"0", "`NaN`", L"An error, as the function is never $0$"]
+choices = [L"0", "NaN", L"An error, as the function is never $0$"]
 ans = 1
-radioq(choices, ans)
+radioq(choices, ans,keep_order=true)
 ```
 
 * There can be numeric issues when roots of a polynomial are close to each other. For example, consider the polynomial parameterized by `delta`:
@@ -442,7 +446,7 @@ fzeros(f)
 
 The above easily finds three roots separated by `delta`. What happens
 if `delta` is smaller, say `delta = 0.0001`, so the three mathematical
-roots are even close together? Are all three roots still found by `fzeros`?
+roots are even closer together? Are all three roots still found by `fzeros`?
 
 ```
 ```

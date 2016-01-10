@@ -1,1637 +1,1547 @@
+
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="generator" content="pandoc">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title></title>
-  <style type="text/css">code{white-space: pre;}</style>
-  <!--[if lt IE 9]>
-    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
-  <style type="text/css">
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; }
-code > span.dt { color: #902000; }
-code > span.dv { color: #40a070; }
-code > span.bn { color: #40a070; }
-code > span.fl { color: #40a070; }
-code > span.ch { color: #4070a0; }
-code > span.st { color: #4070a0; }
-code > span.co { color: #60a0b0; font-style: italic; }
-code > span.ot { color: #007020; }
-code > span.al { color: #ff0000; font-weight: bold; }
-code > span.fu { color: #06287e; }
-code > span.er { color: #ff0000; font-weight: bold; }
-  </style>
-  <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
 
 <link
-  href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css"
+  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
   rel="stylesheet">
 
-<!-- cf. http://www.utf8icons.com/ 2b54-->
 <style>
 .julia {font-family: "Source Code Pro";
         color:#0033CC;
         }
-h4:before {
-content:"\2742\ ";
-}
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
 </style>
 
 <script src="http://code.jquery.com/jquery.js"></script>
-<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
 
 
 
 <script type="text/javascript"
   src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
 
-<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<script type="text/javascript">google.load("visualization", "1",{packages:["corechart"]});</script>
-
-<!-- <script type="text/javascript" src="https://rawgithub.com/dcjones/Gadfly.jl/master/src/gadfly.js"></script> -->
-<!-- <script type="text/javascript" -->
-<!-- src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.2.2/d3.v3.min.js"></script> -->
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) { 
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();                                    
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();  
+});
+</script>
 
 </head>
-<body>
-
-<div class="row">
-  <div class="span11">
-<h1 id="julia-as-a-calculator">Julia as a calculator</h1>
-<script type="text/javascript">
-function next_nav_tab() {$('.tabbable li').filter('.active').next('li').find('a[data-toggle="tab"]').tab('show');window.scrollTo(0,0);}
-</script>
-<div id="tabbable" class="tabbable tabs-left">
-<ul class="nav nav-tabs"></ul>
-<div class="tab-content">
-
-<div class="tab-pane active" id="_introduction_">
-
-<p>The programming language <code>Julia</code> (www.julialang.org) is a new language that builds on a long history of so-called dynamic scripting languages (DSLs). DSLs are widely used for exploratory work and are part of the toolbox of most all data scientists, a rapidly growing area of employment. The basic <code>Julia</code> language is reminiscent of is <code>MATLAB</code>, though it offers many improvements over that language. For these notes, the focus will be on its more transparent syntax, but in general a major selling point of <code>Julia</code> is that it is much faster that <code>MATLAB</code> at many tasks. (Well it should be, <code>MATLAB</code> was started back in the 70s.) Even better, <code>julia</code> is an open-source project which means it is free to download and install, unlike the commercial package <code>MATLAB</code>.</p>
-<p>These notes will use <code>Julia</code> to explore calculus concepts. Unlike some other programs used with calculus (e.g., Mathematica, Maple, and Sage) <code>Julia</code> is not a symbolic math language. Rather, we will use a numeric approach. This gives a different viewpoint on the calculus material supplementing that of the text book. Though there are a few idiosyncrasies we will see along the way, for the most part the <code>Julia</code> language will be both powerful and easy to learn.</p>
-<p>In this project we start with baby steps -- how to use <code>julia</code> to perform operations we can do on the calculator. The use of a calculator requires knowledge about several things we take for granted here:</p>
-<ul>
-<li><p>the use of the basic math operators</p></li>
-<li><p>an understanding of the order of operations, or knowing when parentheses are needed</p></li>
-<li><p>how to use the buttons that compute functions such as the sine function</p></li>
-<li><p>and how to use the memory feature to store intermediate computations.</p></li>
-</ul>
-<p>Parallells of each of these will be discussed in the following.</p>
-<div class="pagination">
-<ul><li>
-<button class="btn btn-default" onclick="next_nav_tab()">
-Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
-</li></ul>
 
 
-</div>
+<body data-spy="scroll" >
 
-</div>
-<div  class="tab-pane" id="_expressions_">
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
 
-<h2 id="expressions">Expressions</h2>
-<p><code>Julia</code> can replicate the basics of a calculator with the standard notations. The familiar binary operators are <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, and <code>^</code>. With a calculator you &quot;punch&quot; in numbers and operators and to get an answer push the <code>=</code> key. Using <code>Julia</code> is not much different: you type in an expression then send to <code>julia</code> to compute. The &quot;equals key&quot; on a calculator is replaced by the <em>enter</em> key on the keyboard (or <em>shift-enter</em> if using <code>IJulia</code>). Beyond that there isn't much difference.</p>
-<p>For example, to add two and two we simple execute:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia"><span class="fl">2</span> + <span class="fl">2</span></code></pre>
-<pre class="output"><code>4</code></pre>
-<p>Or to convert <span class="math">\(70\)</span> degrees to Celsius with the standard formula <span class="math">\(C=5/9(F-32)\)</span>:</p>
-<pre class="sourceCode julia julia"><code class="sourceCode julia">(<span class="fl">5</span>/<span class="fl">9</span>)*(<span class="fl">70</span> - <span class="fl">32</span>)</code></pre>
-<pre class="output"><code>21.11111111111111</code></pre>
-<p>Of to find a value of <span class="math">\(32 - 16x^2\)</span> when <span class="math">\(x=1.5\)</span>:</p>
-<pre class="sourceCode julia julia"><code class="sourceCode julia"><span class="fl">32</span> - <span class="fl">16</span>*(<span class="fl">1.5</span>)^<span class="fl">2</span></code></pre>
-<pre class="output"><code>-4.0</code></pre>
-<p>To find the value of <span class="math">\(\sqrt{15}\)</span> we can use power notation:</p>
-<pre class="sourceCode julia julia"><code class="sourceCode julia"><span class="fl">15</span>^(<span class="fl">1</span>/<span class="fl">2</span>)</code></pre>
-<pre class="output"><code>3.872983346207417</code></pre>
-<h3 id="practice">Practice</h3>
-<h4 id="question">Question</h4>
-<p>Compute <span class="math">\(22/7\)</span> in <code>julia</code>.</p>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
 
-<form name='WeaveQuestion' data-id='Cm7LTmGXmv' data-controltype='numeric'>
-<div class='control-group '>
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h1>Julia as a calculator</h1><h2>Introduction</h2><p>The programming language <code>Julia</code> (www.julialang.org) is a new language that builds on a long history of so-called dynamic scripting languages (DSLs).  DSLs are widely used for exploratory work and are part of the toolbox of most all data scientists, a rapidly growing area of employment. The basic <code>Julia</code> language is reminiscent of is <code>MATLAB</code>, though it offers many improvements over that language. For these notes, the focus will be on its more transparent syntax, but in general a major selling point of <code>Julia</code> is that it is much faster that <code>MATLAB</code> at many tasks.  (Well it should be, <code>MATLAB</code> was started back in the 70s.) Even better, <code>julia</code> is an open-source project which means it is free to download and install, unlike the commercial package <code>MATLAB</code>.</p><p>These notes will use <code>Julia</code> to explore calculus concepts. Unlike some other programs used with calculus (e.g., Mathematica, Maple, and Sage) <code>Julia</code> is not a symbolic math language. Rather, we will use a numeric approach. This gives a different viewpoint on the calculus material supplementing that of the text book. Though there are a few idiosyncrasies we will see along the way, for the most part the <code>Julia</code> language will be both powerful and easy to learn.</p><p>In this project we start with baby steps – how to use <code>julia</code> to perform operations we can do on the calculator. The use of a calculator requires knowledge about several things we take for granted here:</p><ul>
+<li>the use of the basic math operators</li>
+</ul><ul>
+<li>an understanding of the  order of operations, or knowing when parentheses are needed</li>
+</ul><ul>
+<li>how to use the buttons that compute functions such as the sine function</li>
+</ul><ul>
+<li>and how to use the memory feature to store intermediate computations.</li>
+</ul><p>Parallells of each of these will be discussed in the following.</p><h2>Expressions</h2><p><code>Julia</code> can replicate the basics of a calculator with the standard notations. The familiar binary operators are <code>&#43;</code>, <code>-</code>, <code>*</code>, <code>/</code>, and <code>^</code>.  With a calculator you "punch" in numbers and operators and to get an answer push the <code>&#61;</code> key. Using <code>Julia</code> is not much different: you type in an expression then send to <code>julia</code> to compute. The "equals key" on a calculator is replaced by the <em>enter</em> key on the keyboard (or <em>shift-enter</em> if using <code>IJulia</code>). Beyond that there isn't much difference.</p><p>For example, to add two and two we simple execute:</p><pre class="sourceCode julia">2 + 2</pre>
+<pre class="output">
+4</pre>
+
+<p>Or to convert $70$ degrees to Celsius with the standard formula $C=5/9(F-32)$:</p><pre class="sourceCode julia">(5/9)*(70 - 32)</pre>
+<pre class="output">
+21.11111111111111</pre>
+
+<p>Of to find a value of $32 - 16x^2$ when $x=1.5$:</p><pre class="sourceCode julia">32 - 16*(1.5)^2</pre>
+<pre class="output">
+-4.0</pre>
+
+<p>To find the value of $\sqrt{15}$ we can use  power notation:</p><pre class="sourceCode julia">15^(1/2)</pre>
+<pre class="output">
+3.872983346207417</pre>
+
+<h3>Practice</h3><h4>Question</h4><p>Compute $22/7$ in <code>julia</code>.</p><form name='WeaveQuestion' data-id='Ulu60zYw' data-controltype='numeric'>
+<div class='form-group '>
 <div class='controls'>
-<input id="Cm7LTmGXmv" type="number">
 
 
-<div id='Cm7LTmGXmv_message'></div>
+
+<div class="input-group">
+<input id="Ulu60zYw" type="number" class="form-control">
+
+</div>
+  
+<div id='Ulu60zYw_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#Cm7LTmGXmv').on('change', function() {
+$('#Ulu60zYw').on('change', function() {
   correct = Math.abs(this.value - 3.142857142857143) <= 1.0e-5;
 
   if(correct) {
-     $('#Cm7LTmGXmv_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#Ulu60zYw_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#Cm7LTmGXmv_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#Ulu60zYw_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
-
 </script>
-
-<h4 id="question-1">Question</h4>
-<p>Compute <span class="math">\(\sqrt{220}\)</span> in <code>julia</code>.</p>
-
-<form name='WeaveQuestion' data-id='w6wwKr8Z9T' data-controltype='numeric'>
-<div class='control-group '>
+<h4>Question</h4><p>Compute $\sqrt{220}$ in <code>julia</code>.</p><form name='WeaveQuestion' data-id='eSO3Gx9U' data-controltype='numeric'>
+<div class='form-group '>
 <div class='controls'>
-<input id="w6wwKr8Z9T" type="number">
 
 
-<div id='w6wwKr8Z9T_message'></div>
+
+<div class="input-group">
+<input id="eSO3Gx9U" type="number" class="form-control">
+
+</div>
+  
+<div id='eSO3Gx9U_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#w6wwKr8Z9T').on('change', function() {
+$('#eSO3Gx9U').on('change', function() {
   correct = Math.abs(this.value - 14.832396974191326) <= 1.0e-5;
 
   if(correct) {
-     $('#w6wwKr8Z9T_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#eSO3Gx9U_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#w6wwKr8Z9T_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#eSO3Gx9U_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
-
 </script>
-
-<h4 id="question-2">Question</h4>
-<p>Compute <span class="math">\(2^8\)</span> in <code>julia</code>.</p>
-
-<form name='WeaveQuestion' data-id='mxhEmy9APl' data-controltype='numeric'>
-<div class='control-group '>
+<h4>Question</h4><p>Compute $2^8$ in <code>julia</code>.</p><form name='WeaveQuestion' data-id='qEUhVOjA' data-controltype='numeric'>
+<div class='form-group '>
 <div class='controls'>
-<input id="mxhEmy9APl" type="number">
 
 
-<div id='mxhEmy9APl_message'></div>
+
+<div class="input-group">
+<input id="qEUhVOjA" type="number" class="form-control">
+
+</div>
+  
+<div id='qEUhVOjA_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#mxhEmy9APl').on('change', function() {
+$('#qEUhVOjA').on('change', function() {
   correct = Math.abs(this.value - 256) <= 1.0e-5;
 
   if(correct) {
-     $('#mxhEmy9APl_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#qEUhVOjA_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#mxhEmy9APl_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#qEUhVOjA_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
-
 </script>
-
-<div class="pagination">
-<ul><li>
-<button class="btn btn-default" onclick="next_nav_tab()">
-Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
-</li></ul>
-
-
-</div>
-
-</div>
-<div  class="tab-pane" id="_precedence_">
-
-<h2 id="precedence">Precedence</h2>
-<p>One drawback about using a calculator is the expression gets evaluated as it gets entered. For simple computations this is a convenience, but for more complicated ones it requires some thinking about the order of how an expression will be computed. In <code>Julia</code> you still need to be mindful of the order that operations are carried out, but as the entire expression is typed -- and can be edited -- before evaluation, you can more closely control what you want.</p>
-<p><em>Order of operations</em> refers to conventions used to decide which operation will happen first, when there is a choice of more than one. A simple example, is what is the value of <span class="math">\(3 \cdot 2 + 1\)</span>?</p>
-<p>There are two <em>binary</em> operations in this expressions: a multiplication and an addition. Which is done first and which second?</p>
-<p>In some instances the order used doesn't matter. A case of this would be <span class="math">\(3 + 2 + 1\)</span>. This is because addition is <em>associative</em>. (Well, not really on the computer, but that is another lesson.) In the case of <span class="math">\(3 \cdot 2 + 1\)</span> the order certainly matters.</p>
-<p>For <span class="math">\(3 \cdot 2 + 1\)</span> if we did the addition first, the expression would <span class="math">\(9 = 3\cdot 3\)</span>. If we did the multiplication first, the value would be <span class="math">\(7=6+1\)</span>. In this case, we all know that the correct answer is <span class="math">\(7\)</span>, as we perform multiplication before addition, or in more precise terms the <em>precedence</em> of multiplication is higher than that of addition.</p>
-<h3 id="basics-of-pemdas">Basics of PEMDAS</h3>
-<p>The standard order of the basic mathematical operations is remembered by many students through the mnemonic PEMDAS, which can be misleading, so we spell it out here:</p>
-<ul>
-<li>(<code>P</code>) First parentheses</li>
-<li>(<code>E</code>) then exponents (or powers)</li>
+<h2>Precedence</h2><p>One drawback about using a calculator is the expression gets evaluated as it gets entered. For simple computations this is a convenience, but for more complicated ones it requires some thinking about the order of how an expression will be computed. In <code>Julia</code> you still need to be mindful of the order that operations are carried out, but as the entire expression is typed – and can be edited – before evaluation, you can more closely control what you want.</p><p><em>Order of operations</em> refers to conventions used to decide which operation will happen first, when there is a choice of more than one. A simple example, is what is the value of $3 \cdot 2 + 1$?</p><p>There are two <em>binary</em> operations in this expressions: a multiplication and an addition. Which is done first and which second?</p><p>In some instances the order used doesn't matter. A case of this would be $3 + 2 + 1$. This is because addition is <em>associative</em>. (Well, not really on the computer, but that is another lesson.) In the case of $3 \cdot 2 + 1$ the order certainly matters.</p><p>For $3 \cdot 2 + 1$ if we did the addition first, the expression would $9 = 3\cdot 3$. If we did the multiplication first, the value would be $7=6+1$. In this case, we all know that the correct answer is $7$, as we perform multiplication before addition, or in more precise terms the <em>precedence</em> of multiplication is higher than that of addition.</p><h3>Basics of PEMDAS</h3><p>The standard order of the basic mathematical operations is remembered by many students through the mnemonic PEMDAS, which can be misleading, so we spell it out here:</p><ul>
+<li>(<code>P</code>) First parentheses </li>
+<li>(<code>E</code>) then exponents (or powers) </li>
 <li>(<code>MD</code>) then multiplication or division</li>
 <li>(<code>AS</code>) then addition or subtraction.</li>
-</ul>
-<p>This has the precedence of multiplication (<code>MD</code>) higher than that of subtraction (<code>AS</code>), as just mentioned.</p>
-<p>Applying this, if we have the mathematical expression</p>
-<p><span class="math">\[
+</ul><p>This has the precedence of multiplication (<code>MD</code>) higher than that of subtraction (<code>AS</code>), as just mentioned.</p><p>Applying this, if we have the mathematical expression</p>$$~
 \frac{12 - 10}{2}
-\]</span></p>
-<p>We know that the subtraction needs to be done before the division, as this is how we interpret this form of division. How to make this happen? The precedence of parentheses is used to force the subtraction before the division, as in <code>(12-10)/2</code>. Without parentheses you get a different answer:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">(<span class="fl">12</span> - <span class="fl">10</span>)/<span class="fl">2</span>,  <span class="fl">12</span> - <span class="fl">10</span>/<span class="fl">2</span></code></pre>
-<pre class="output"><code>(1.0,7.0)</code></pre>
+~$$<p>We know that the subtraction needs to be done before the division, as this is how we interpret this form of division. How to make this happen? The precedence of parentheses is used to force the subtraction before the division, as in <code>&#40;12-10&#41;/2</code>. Without parentheses you get a different answer:</p><pre class="sourceCode julia">(12 - 10)/2,  12 - 10/2</pre>
+<pre class="output">
+(1.0,7.0)</pre>
 
-<div class="alert alert-info">
-<strong></strong>
-<p>Using a comma to separate expressions will cause both to print out -- not just the last one evaluated. This trick is also a useful trick within an <code>IJulia</code> notebook.</p>
-</div>
-
+<div class="alert alert-success" role="alert"><div class="markdown"><p>Using a comma to separate expressions will cause both to print out – not just the last one evaluated. This trick is also a useful trick within an <code>IJulia</code> notebook.</p>
+</div></div>
 <blockquote>
 <p>Parentheses are used to force lower precedence operations to happen before higher precedence ones.</p>
-</blockquote>
-<h3 id="same-precedence----what-to-do">Same precedence -- what to do</h3>
-<p>There is a little more to the story, as we need to understand what happens when we have more then one operation with the same level. For instance, what is <span class="math">\(2 - 3- 4\)</span>? Is it <span class="math">\((2 - 3) - 4\)</span> or <span class="math">\(2 - (3 - 4)\)</span>.</p>
-<p>Unlike addition, subtraction is <em>not associative</em> so this really matters. The subtraction operator is <a href="http://en.wikipedia.org/wiki/Operator_associativity">left associative</a> meaning the evaluation of <span class="math">\(2 - 3 - 4\)</span> is done by <span class="math">\((2-3) - 4\)</span>. The operations are performed in a left-to-right manner. Most -- but not all operations -- are left associative, some are right associative and performed in a right-to-left manner.</p>
+</blockquote><h3>Same precedence – what to do</h3><p>There is a little more to the story, as we need to understand what happens when we have more then one operation with the same level. For instance, what is $2 - 3- 4$? Is it $(2 - 3) - 4$ or $2 - (3 - 4)$. </p><p>Unlike addition, subtraction is *not associative8 so this really matters.  The subtraction operator is <a href="http://en.wikipedia.org/wiki/Operator_associativity">left associative</a> meaning the evaluation of $2 - 3 - 4$ is done by $(2-3) - 4$. The operations are performed in a left-to-right manner. Most – but not all operations – are left associative, some are right associative and performed in a right-to-left manner.</p><div class="alert alert-success" role="alert"><div class="markdown"><p><strong>right to left</strong> It is the order of which operation is done first,   not reading from right to left, as one might read Arabic.</p>
+</div></div>
+<p>To see that <code>julia</code> has left associative subtraction, we can just check. </p><pre class="sourceCode julia">2 - 3 - 4, (2 - 3) - 4, 2 - (3 - 4)</pre>
+<pre class="output">
+(-5,-5,3)</pre>
 
-<div class="alert alert-info">
-<strong></strong>
-<p><strong>right to left</strong> It is the order of which operation is done first, not reading from right to left, as one might read Arabic.</p>
-</div>
+<p>Not all operations are processed left-to-right. The power operation, <code>^</code>, is <em>right associative</em>, as this matches the mathematical usage. For example:</p><pre class="sourceCode julia">4^3^2, (4^3)^2, 4^(3^2)</pre>
+<pre class="output">
+(262144,4096,262144)</pre>
 
-<p>To see that <code>julia</code> has left associative subtraction, we can just check.</p>
-<pre class="sourceCode julia"><code class="sourceCode julia"><span class="fl">2</span> - <span class="fl">3</span> - <span class="fl">4</span>, (<span class="fl">2</span> - <span class="fl">3</span>) - <span class="fl">4</span>, <span class="fl">2</span> - (<span class="fl">3</span> - <span class="fl">4</span>)</code></pre>
-<pre class="output"><code>(-5,-5,3)</code></pre>
-<p>Not all operations are processed left-to-right. The power operation, <code>^</code>, is <em>right associative</em>, as this matches the mathematical usage. For example:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia"><span class="fl">4</span>^<span class="fl">3</span>^<span class="fl">2</span>, (<span class="fl">4</span>^<span class="fl">3</span>)^<span class="fl">2</span>, <span class="fl">4</span>^(<span class="fl">3</span>^<span class="fl">2</span>)</code></pre>
-<pre class="output"><code>(262144,4096,262144)</code></pre>
-<p>What about the case where we have different operations with the same precedence? What happens then? A simple example would be <span class="math">\(2 + 3 - 4\)</span>? Is this done in a left to right manner as in:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">(<span class="fl">2</span> + <span class="fl">3</span>) - <span class="fl">4</span></code></pre>
-<pre class="output"><code>1</code></pre>
-<p>Or a right-to-left manner, as in:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia"><span class="fl">2</span> + (<span class="fl">3</span> - <span class="fl">4</span>)</code></pre>
-<pre class="output"><code>1</code></pre>
-<p>And the answer is <em>left-to-right</em>:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia"><span class="fl">2</span> + <span class="fl">3</span> - <span class="fl">4</span></code></pre>
-<pre class="output"><code>1</code></pre>
-<h3 id="practice-1">Practice</h3>
-<h4 id="question-3">Question</h4>
-<p>Wich of the following is a valid <code>julia</code> expression for</p>
-<p><span class="math">\[
+<p>What about the case where we have different operations with the same precedence? What happens then? A simple example would be $2 + 3 - 4$? Is this done in a left to right manner as in:</p><pre class="sourceCode julia">(2 + 3) - 4</pre>
+<pre class="output">
+1</pre>
+
+<p>Or a right-to-left manner, as in:</p><pre class="sourceCode julia">2 + (3 - 4)</pre>
+<pre class="output">
+1</pre>
+
+<p>And the answer is <em>left-to-right</em>:</p><pre class="sourceCode julia">2 + 3 - 4</pre>
+<pre class="output">
+1</pre>
+
+<h3>Practice</h3><h4>Question</h4><p>Wich of the following is a valid <code>julia</code> expression for </p>$$~
 \frac{3 - 2}{4 - 1}
-\]</span></p>
-<p>that uses the least number of parentheses?</p>
-
-<form name='WeaveQuestion' data-id='X1P17KC22z' data-controltype='radio'>
-<div class='control-group '>
-<div class='controls'>
-
-
-<label class='radio'>
-  <input type='radio' name='radio_X1P17KC22z' value='1'>
-  <code>(3 - 2)/ 4 - 1</code>
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_X1P17KC22z' value='2'>
-  <code>3 - 2 / (4 - 1)</code>
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_X1P17KC22z' value='3'>
-  <code>(3 - 2) / (4 - 1)</code>
-</label>
-
-
-
-<div id='X1P17KC22z_message'></div>
+~$$<p>that uses the least number of parentheses?</p><form name="WeaveQuestion" data-id="PKKZ9i3o" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_PKKZ9i3o" value="1"><div class="markdown"><p><code>&#40;3 - 2&#41;/ 4 - 1</code></p>
 </div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_PKKZ9i3o" value="2"><div class="markdown"><p><code>3 - 2 / &#40;4 - 1&#41;</code></p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_PKKZ9i3o" value="3"><div class="markdown"><p><code>&#40;3 - 2&#41; / &#40;4 - 1&#41;</code></p>
+</div>
+    </label>
+    </div>
+    
+
+
+<div id="PKKZ9i3o_message"></div>
 </div>
 </form>
-<script text='text/javascript'>
-$('input:radio[name="radio_X1P17KC22z"]').on('change', function() {
+<script text="text/javascript">
+$("input:radio[name='radio_PKKZ9i3o']").on("change", function() {
   correct = this.value == 3;
 
   if(correct) {
-     $('#X1P17KC22z_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $("#PKKZ9i3o_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $('#X1P17KC22z_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $("#PKKZ9i3o_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-
-<h4 id="question-4">Question</h4>
-<p>Wich of the following is a valid <code>julia</code> expression for</p>
-<p><span class="math">\[
+<h4>Question</h4><p>Wich of the following is a valid <code>julia</code> expression for </p>$$~
 \frac{3\cdot2}{4}
-\]</span></p>
-<p>that uses the least number of parentheses?</p>
-
-<form name='WeaveQuestion' data-id='NjTzg4mUef' data-controltype='radio'>
-<div class='control-group '>
-<div class='controls'>
-
-
-<label class='radio'>
-  <input type='radio' name='radio_NjTzg4mUef' value='1'>
-  <code>3 * 2 / 4</code>
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_NjTzg4mUef' value='2'>
-  <code>(3 * 2) / 4</code>
-</label>
-
-
-
-<div id='NjTzg4mUef_message'></div>
+~$$<p>that uses the least number of parentheses?</p><form name="WeaveQuestion" data-id="ow1y2wQ6" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_ow1y2wQ6" value="1"><div class="markdown"><p><code>&#40;3 * 2&#41; / 4</code></p>
 </div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_ow1y2wQ6" value="2"><div class="markdown"><p><code>3 * 2 / 4</code></p>
+</div>
+    </label>
+    </div>
+    
+
+
+<div id="ow1y2wQ6_message"></div>
 </div>
 </form>
-<script text='text/javascript'>
-$('input:radio[name="radio_NjTzg4mUef"]').on('change', function() {
+<script text="text/javascript">
+$("input:radio[name='radio_ow1y2wQ6']").on("change", function() {
+  correct = this.value == 2;
+
+  if(correct) {
+     $("#ow1y2wQ6_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+  } else {
+     $("#ow1y2wQ6_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+  }
+});
+
+</script>
+<h4>Question</h4><p>Wich of the following is a valid <code>julia</code> expression for </p>$$~
+2^{4 - 2}
+~$$<p>that uses the least number of parentheses?</p><form name="WeaveQuestion" data-id="HBpTDc7c" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_HBpTDc7c" value="1"><div class="markdown"><p><code>2 ^ &#40;4 - 2&#41;</code></p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_HBpTDc7c" value="2"><div class="markdown"><p><code>2 ^ 4 - 2</code></p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_HBpTDc7c" value="3"><div class="markdown"><p><code>&#40;2 ^ 4&#41; - 2</code></p>
+</div>
+    </label>
+    </div>
+    
+
+
+<div id="HBpTDc7c_message"></div>
+</div>
+</form>
+<script text="text/javascript">
+$("input:radio[name='radio_HBpTDc7c']").on("change", function() {
   correct = this.value == 1;
 
   if(correct) {
-     $('#NjTzg4mUef_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $("#HBpTDc7c_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $('#NjTzg4mUef_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $("#HBpTDc7c_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-
-<h4 id="question-5">Question</h4>
-<p>Wich of the following is a valid <code>julia</code> expression for</p>
-<p><span class="math">\[
-2^{4 - 2}
-\]</span></p>
-<p>that uses the least number of parentheses?</p>
-
-<form name='WeaveQuestion' data-id='rcfI9sBjd1' data-controltype='radio'>
-<div class='control-group '>
-<div class='controls'>
-
-
-<label class='radio'>
-  <input type='radio' name='radio_rcfI9sBjd1' value='1'>
-  <code>2 ^ 4 - 2</code>
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_rcfI9sBjd1' value='2'>
-  <code>(2 ^ 4) - 2</code>
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_rcfI9sBjd1' value='3'>
-  <code>2 ^ (4 - 2)</code>
-</label>
-
-
-
-<div id='rcfI9sBjd1_message'></div>
+<h4>Question</h4><p>One of these three expressions will produce a different answer, select that one:</p><form name="WeaveQuestion" data-id="SfRfrCtv" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_SfRfrCtv" value="1"><div class="markdown"><p><code>&#40;2 - 3&#41; - 4</code></p>
 </div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_SfRfrCtv" value="2"><div class="markdown"><p><code>2 - 3 - 4</code></p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_SfRfrCtv" value="3"><div class="markdown"><p><code>2 - &#40;3 - 4&#41;</code></p>
+</div>
+    </label>
+    </div>
+    
+
+
+<div id="SfRfrCtv_message"></div>
 </div>
 </form>
-<script text='text/javascript'>
-$('input:radio[name="radio_rcfI9sBjd1"]').on('change', function() {
+<script text="text/javascript">
+$("input:radio[name='radio_SfRfrCtv']").on("change", function() {
   correct = this.value == 3;
 
   if(correct) {
-     $('#rcfI9sBjd1_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $("#SfRfrCtv_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $('#rcfI9sBjd1_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $("#SfRfrCtv_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-
-<h4 id="question-6">Question</h4>
-<p>One of these three expressions will produce a different answer, select that one:</p>
-
-<form name='WeaveQuestion' data-id='9KV1jjSRDE' data-controltype='radio'>
-<div class='control-group '>
-<div class='controls'>
-
-
-<label class='radio'>
-  <input type='radio' name='radio_9KV1jjSRDE' value='1'>
-  <code>2 - 3 - 4</code>
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_9KV1jjSRDE' value='2'>
-  <code>(2 - 3) - 4</code>
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_9KV1jjSRDE' value='3'>
-  <code>2 - (3 - 4)</code>
-</label>
-
-
-
-<div id='9KV1jjSRDE_message'></div>
+<h4>Question</h4><p>One of these three expressions will produce a different answer, select that one:</p><form name="WeaveQuestion" data-id="Q4ionw9p" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_Q4ionw9p" value="1"><div class="markdown"><p><code>2 - &#40;3 * 4&#41;</code></p>
 </div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_Q4ionw9p" value="2"><div class="markdown"><p><code>&#40;2 - 3&#41; * 4</code></p>
 </div>
-</form>
-<script text='text/javascript'>
-$('input:radio[name="radio_9KV1jjSRDE"]').on('change', function() {
-  correct = this.value == 3;
-
-  if(correct) {
-     $('#9KV1jjSRDE_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
-  } else {
-     $('#9KV1jjSRDE_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
-  }
-});
-
-</script>
-
-<h4 id="question-7">Question</h4>
-<p>One of these three expressions will produce a different answer, select that one:</p>
-
-<form name='WeaveQuestion' data-id='BHJk0J7d2j' data-controltype='radio'>
-<div class='control-group '>
-<div class='controls'>
-
-
-<label class='radio'>
-  <input type='radio' name='radio_BHJk0J7d2j' value='1'>
-  <code>2 - 3 * 4</code>
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_BHJk0J7d2j' value='2'>
-  <code>(2 - 3) * 4</code>
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_BHJk0J7d2j' value='3'>
-  <code>2 - (3 * 4)</code>
-</label>
-
-
-
-<div id='BHJk0J7d2j_message'></div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_Q4ionw9p" value="3"><div class="markdown"><p><code>2 - 3 * 4</code></p>
 </div>
+    </label>
+    </div>
+    
+
+
+<div id="Q4ionw9p_message"></div>
 </div>
 </form>
-<script text='text/javascript'>
-$('input:radio[name="radio_BHJk0J7d2j"]').on('change', function() {
+<script text="text/javascript">
+$("input:radio[name='radio_Q4ionw9p']").on("change", function() {
   correct = this.value == 2;
 
   if(correct) {
-     $('#BHJk0J7d2j_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $("#Q4ionw9p_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $('#BHJk0J7d2j_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $("#Q4ionw9p_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-
-<h4 id="question-unary-operator-the-minus-sign">Question <small>Unary operator: the minus sign</small></h4>
-<p>One of these three expressions will produce a different answer, select that one:</p>
-
-<form name='WeaveQuestion' data-id='8wo76lNmsN' data-controltype='radio'>
-<div class='control-group '>
-<div class='controls'>
-
-
-<label class='radio'>
-  <input type='radio' name='radio_8wo76lNmsN' value='1'>
-  <code>-1^2</code>
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_8wo76lNmsN' value='2'>
-  <code>(-1)^2</code>
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_8wo76lNmsN' value='3'>
-  <code>-(1^2)</code>
-</label>
-
-
-
-<div id='8wo76lNmsN_message'></div>
+<h4>Question <small>Unary operator: the minus sign</small></h4><p>One of these three expressions will produce a different answer, select that one:</p><form name="WeaveQuestion" data-id="wOssq6ib" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_wOssq6ib" value="1"><div class="markdown"><p><code>-&#40;1^2&#41;</code></p>
 </div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_wOssq6ib" value="2"><div class="markdown"><p><code>&#40;-1&#41;^2</code></p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_wOssq6ib" value="3"><div class="markdown"><p><code>-1^2</code></p>
+</div>
+    </label>
+    </div>
+    
+
+
+<div id="wOssq6ib_message"></div>
 </div>
 </form>
-<script text='text/javascript'>
-$('input:radio[name="radio_8wo76lNmsN"]').on('change', function() {
+<script text="text/javascript">
+$("input:radio[name='radio_wOssq6ib']").on("change", function() {
   correct = this.value == 2;
 
   if(correct) {
-     $('#8wo76lNmsN_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $("#wOssq6ib_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $('#8wo76lNmsN_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $("#wOssq6ib_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-
-<h4 id="question-8">Question</h4>
-<p>Compute the value of</p>
-<p><span class="math">\[
+<h4>Question</h4><p>Compute the value of </p>$$~
 \frac{9 - 5 \cdot (3-4)}{6 - 2}.
-\]</span></p>
-
-<form name='WeaveQuestion' data-id='T6yCui2yGr' data-controltype='numeric'>
-<div class='control-group '>
+~$$<form name='WeaveQuestion' data-id='dBUfmopc' data-controltype='numeric'>
+<div class='form-group '>
 <div class='controls'>
-<input id="T6yCui2yGr" type="number">
 
 
-<div id='T6yCui2yGr_message'></div>
+
+<div class="input-group">
+<input id="dBUfmopc" type="number" class="form-control">
+
+</div>
+  
+<div id='dBUfmopc_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#T6yCui2yGr').on('change', function() {
+$('#dBUfmopc').on('change', function() {
   correct = Math.abs(this.value - 3.5) <= 0.001;
 
   if(correct) {
-     $('#T6yCui2yGr_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#dBUfmopc_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#T6yCui2yGr_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#dBUfmopc_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
-
 </script>
-
-<h4 id="question-9">Question</h4>
-<p>Compute the following using <code>julia</code>:</p>
-<p><span class="math">\[
+<h4>Question</h4><p>Compute the following using <code>julia</code>:</p>$$~
 \frac{(.25 - .2)^2}{(1/4)^2 + (1/3)^2}
-\]</span></p>
-
-<form name='WeaveQuestion' data-id='kHJKvjlBCp' data-controltype='numeric'>
-<div class='control-group '>
+~$$<form name='WeaveQuestion' data-id='W4bfCCs4' data-controltype='numeric'>
+<div class='form-group '>
 <div class='controls'>
-<input id="kHJKvjlBCp" type="number">
 
 
-<div id='kHJKvjlBCp_message'></div>
+
+<div class="input-group">
+<input id="W4bfCCs4" type="number" class="form-control">
+
+</div>
+  
+<div id='W4bfCCs4_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#kHJKvjlBCp').on('change', function() {
-  correct = Math.abs(this.value - 0.014399999999999993) <= 1.4901161193847656e-8;
+$('#W4bfCCs4').on('change', function() {
+  correct = Math.abs(this.value - 0.014399999999999993) <= 0.001;
 
   if(correct) {
-     $('#kHJKvjlBCp_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#W4bfCCs4_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#kHJKvjlBCp_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#W4bfCCs4_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
-
 </script>
-
-<h4 id="question-10">Question</h4>
-<p>Compute the decimal representation of the following using <code>julia</code>:</p>
-<p><span class="math">\[
+<h4>Question</h4><p>Compute the decimal representation of the following using <code>julia</code>:</p>$$~
 1 + \frac{1}{2} + \frac{1}{2^2} + \frac{1}{2^3} + \frac{1}{2^4}
-\]</span></p>
-
-<form name='WeaveQuestion' data-id='kbJBCZ2mSV' data-controltype='numeric'>
-<div class='control-group '>
+~$$<form name='WeaveQuestion' data-id='cFFQGNkQ' data-controltype='numeric'>
+<div class='form-group '>
 <div class='controls'>
-<input id="kbJBCZ2mSV" type="number">
 
 
-<div id='kbJBCZ2mSV_message'></div>
+
+<div class="input-group">
+<input id="cFFQGNkQ" type="number" class="form-control">
+
+</div>
+  
+<div id='cFFQGNkQ_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#kbJBCZ2mSV').on('change', function() {
-  correct = Math.abs(this.value - 1.9375) <= 1.4901161193847656e-8;
+$('#cFFQGNkQ').on('change', function() {
+  correct = Math.abs(this.value - 1.9375) <= 0.001;
 
   if(correct) {
-     $('#kbJBCZ2mSV_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#cFFQGNkQ_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#kbJBCZ2mSV_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#cFFQGNkQ_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
-
 </script>
-
-<h4 id="question-11">Question</h4>
-<p>Compute the following using <code>julia</code>:</p>
-<p><span class="math">\[
+<h4>Question</h4><p>Compute the following using <code>julia</code>:</p>$$~
 \frac{3 - 2^2}{4 - 2\cdot3}
-\]</span></p>
-
-<form name='WeaveQuestion' data-id='xaZMFzJWlo' data-controltype='numeric'>
-<div class='control-group '>
+~$$<form name='WeaveQuestion' data-id='XV0xs1Gp' data-controltype='numeric'>
+<div class='form-group '>
 <div class='controls'>
-<input id="xaZMFzJWlo" type="number">
 
 
-<div id='xaZMFzJWlo_message'></div>
+
+<div class="input-group">
+<input id="XV0xs1Gp" type="number" class="form-control">
+
+</div>
+  
+<div id='XV0xs1Gp_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#xaZMFzJWlo').on('change', function() {
-  correct = Math.abs(this.value - 0.5) <= 1.4901161193847656e-8;
+$('#XV0xs1Gp').on('change', function() {
+  correct = Math.abs(this.value - 0.5) <= 0.001;
 
   if(correct) {
-     $('#xaZMFzJWlo_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#XV0xs1Gp_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#xaZMFzJWlo_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#XV0xs1Gp_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
-
 </script>
-
-<h4 id="question-12">Question</h4>
-<p>Compute the following using <code>julia</code>:</p>
-<p><span class="math">\[
+<h4>Question</h4><p>Compute the following using <code>julia</code>:</p>$$~
 (1/2) \cdot 32 \cdot 3^2 + 100 \cdot 3 - 20
-\]</span></p>
-
-<form name='WeaveQuestion' data-id='377jE9eAl9' data-controltype='numeric'>
-<div class='control-group '>
+~$$<form name='WeaveQuestion' data-id='qtcPOgKn' data-controltype='numeric'>
+<div class='form-group '>
 <div class='controls'>
-<input id="377jE9eAl9" type="number">
 
 
-<div id='377jE9eAl9_message'></div>
+
+<div class="input-group">
+<input id="qtcPOgKn" type="number" class="form-control">
+
+</div>
+  
+<div id='qtcPOgKn_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#377jE9eAl9').on('change', function() {
-  correct = Math.abs(this.value - 424.0) <= 1.4901161193847656e-8;
+$('#qtcPOgKn').on('change', function() {
+  correct = Math.abs(this.value - 424.0) <= 0.001;
 
   if(correct) {
-     $('#377jE9eAl9_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#qtcPOgKn_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#377jE9eAl9_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#qtcPOgKn_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
-
 </script>
+<h2>Using functions</h2><p>Most all calculators used are not limited to these basic arithmetic operations. So-called scientific calculators provide buttons for many of the common mathematical functions, such as exponential, logs, and trigonometric functions. <code>Julia</code> provides these too, of course. </p><p>There are special functions to perform common powers. For example, the square-root function is used as:</p><pre class="sourceCode julia">sqrt(15)</pre>
+<pre class="output">
+3.872983346207417</pre>
 
-<div class="pagination">
-<ul><li>
-<button class="btn btn-default" onclick="next_nav_tab()">
-Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
-</li></ul>
+<p>This shows how to evaluate a function – using its name and parentheses, as in <code>function_name&#40;arguments&#41;</code>. Parentheses are also used to group expressions, as would be done to do this using the power notation:</p><pre class="sourceCode julia">15^(1/2)</pre>
+<pre class="output">
+3.872983346207417</pre>
 
+<p>Additionally, parentheses are also used to make "tuples", a concept we don't pursue here but that is important for programming with <code>julia</code>. The point here is the context of how parentheses are used is important, though for the most part the usage is the same as their dual use in your calculus text.</p><p>Like <code>sqrt</code>, there is also a cube-root function:</p><pre class="sourceCode julia">cbrt(27)</pre>
+<pre class="output">
+3.0</pre>
 
-</div>
+<p>The <code>cbrt</code> and <code>sqrt</code> functions are not exactly the same as using <code>^</code>, as they differ when the inputs are not in their domain: For cube roots, we can see that there is a difference with negative bases:</p><pre class="sourceCode julia">cbrt(-8)			## correct</pre>
+<pre class="output">
+-2.0</pre>
 
-</div>
-<div  class="tab-pane" id="_using_functions_">
+<pre class="sourceCode julia">(-8)^(1/3)		        ## need first parentheses, why?</pre>
+<pre class="output">
+DomainError()
+</pre>
 
-<h2 id="using-functions">Using functions</h2>
-<p>Most all calculators used are not limited to these basic arithmetic operations. So-called scientific calculators provide buttons for many of the common mathematical functions, such as exponential, logs, and trigonometric functions. <code>Julia</code> provides these too, of course.</p>
-<p>There are special functions to perform common powers. For example, the square-root function is used as:</p>
-<pre class="sourceCode julia julia"><code class="sourceCode julia">sqrt(<span class="fl">15</span>)</code></pre>
-<pre class="output"><code>3.872983346207417</code></pre>
-<p>This shows how to evaluate a function -- using its name and parentheses, as in <code>function_name(arguments)</code>. Parentheses are also used to group expressions, as would be done to do this using the power notation:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia"><span class="fl">15</span>^(<span class="fl">1</span>/<span class="fl">2</span>)</code></pre>
-<pre class="output"><code>3.872983346207417</code></pre>
-<p>Additionally, parentheses are also used to make &quot;tuples&quot;, a concept we don't pursue here but that is important for programming with <code>julia</code>. The point here is the context of how parentheses are used is important, though for the most part the usage is the same as their dual use in your calculus text.</p>
-<p>Like <code>sqrt</code>, there is also a cube-root function:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">cbrt(<span class="fl">27</span>)</code></pre>
-<pre class="output"><code>3.0</code></pre>
-<p>The <code>cbrt</code> and <code>sqrt</code> functions are not exactly the same as using <code>^</code>, as they differ when the inputs are not in their domain: For cube roots, we can see that there is a difference with negative bases:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">cbrt(-<span class="fl">8</span>)            <span class="co">## correct</span></code></pre>
-<pre class="output"><code>-2.0</code></pre>
-<pre class="sourceCode julia"><code class="sourceCode julia">(-<span class="fl">8</span>)^(<span class="fl">1</span>/<span class="fl">3</span>)              <span class="co">## need first parentheses, why?</span></code></pre>
-<pre class="output"><code>DomainError()</code></pre>
-<p>(The latter is an error as the power function has an output type that depends on the power being real, not a specific value of a real. For 1/2 the above would clearly be an error, so then for 1/3 <code>julia</code> makes this an error.)</p>
-<h3 id="trigonometric-functions">trigonometric functions</h3>
-<p>The basic trigonometric functions in <code>julia</code> work with radians:</p>
-<pre class="sourceCode julia julia"><code class="sourceCode julia">sin(pi/<span class="fl">4</span>)
-cos(pi/<span class="fl">3</span>)</code></pre>
-<pre class="output"><code>0.5000000000000001</code></pre>
-<p>But students think in degrees. What to do? Well, you can always convert via the ratio <span class="math">\(\pi/180\)</span>:</p>
-<pre class="sourceCode julia julia"><code class="sourceCode julia">sin(<span class="fl">45</span> * pi/<span class="fl">180</span>)
-cos(<span class="fl">60</span> * pi/<span class="fl">180</span>)</code></pre>
-<pre class="output"><code>0.5000000000000001</code></pre>
-<p>However, <code>julia</code> provides the student-friendly functions <code>sind</code>, <code>cosd</code>, and <code>tand</code> to work directly with degrees:</p>
-<pre class="sourceCode julia julia"><code class="sourceCode julia">sind(<span class="fl">45</span>)
-cosd(<span class="fl">45</span>)</code></pre>
-<pre class="output"><code>0.7071067811865476</code></pre>
-<p>Be careful, an expression like <span class="math">\(\cos^2(\pi/4)\)</span> is a shorthand for squaring the output of the cosine of <span class="math">\(\pi/4\)</span>, hence is expressed with</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">cos(pi/<span class="fl">4</span>)^<span class="fl">2</span>         <span class="co"># not cos^2(pi/4) !!!</span></code></pre>
-<pre class="output"><code>0.5000000000000001</code></pre>
-<h3 id="inverse-trigonometric-function">Inverse trigonometric function</h3>
-<p>The math notation <span class="math">\(\sin^{-1}(x)\)</span> is also a source of confusion. This is <strong>not</strong> a power, rather it indicates an <em>inverse</em> function, in this case the arcsine. The arcsine function is written <code>asin</code> in <code>julia</code>.</p>
-<p>For certain values, the arcsine and sine function are inverses:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">asin(sin(<span class="fl">0.1</span>))      </code></pre>
-<pre class="output"><code>0.1</code></pre>
-<p>However, this isn't true for all values of <span class="math">\(x\)</span>, as <span class="math">\(\sin(x)\)</span> is not monotonic everywhere. In particular, the above won't work for <span class="math">\(x\)</span> values outside <span class="math">\((-\pi/2, \pi/2)\)</span>:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">asin(sin(<span class="fl">100</span>))</code></pre>
-<pre class="output"><code>-0.5309649148733837</code></pre>
-<p>Other inverse trigonometric functions are <code>acos</code>, <code>atan</code> and for completeness <code>asec</code>, <code>acsc</code>, and <code>acot</code> are available for use.</p>
-<h3 id="exponential-and-logs">Exponential and logs</h3>
-<p>The values <span class="math">\(e^x\)</span> can be computed with the built-in constant <code>e</code>:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">e^<span class="fl">2</span></code></pre>
-<pre class="output"><code>7.38905609893065</code></pre>
-<p>Or through the function <code>exp(x)</code>:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">exp(<span class="fl">2</span>)</code></pre>
-<pre class="output"><code>7.38905609893065</code></pre>
-<p>As, <code>e</code> can be redefined, it is best to use the latter style, though it takes a bit more typing.</p>
-<p>The logarithm function, <code>log</code> does log base <span class="math">\(e\)</span>:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">log(exp(<span class="fl">2</span>))</code></pre>
-<pre class="output"><code>2.0</code></pre>
-<p>To do base 10, there is a <code>log10</code> function:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">log10(e^<span class="fl">2</span>)</code></pre>
-<pre class="output"><code>0.8685889638065036</code></pre>
-<p>There is also a <code>log2</code> function for base 2. However, there are many more possible choices for a base. Rather than create functions for each possible one of interest the <code>log</code> function has an alternative form taking <em>two argument</em>. The first is interpreted as the base, the second the <span class="math">\(x\)</span> value. So the above, is also done through:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">log(<span class="fl">10</span>, exp(<span class="fl">2</span>))</code></pre>
-<pre class="output"><code>0.8685889638065035</code></pre>
-<h3 id="some-useful-functions">some useful functions</h3>
-<p>There are some other useful functions For example, <code>abs</code> for the absolute value, <code>round</code> for rounding, <code>floor</code> for rounding down and <code>ceil</code> for rounding up. Here are some examples</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">round(<span class="fl">3.14</span>)</code></pre>
-<pre class="output"><code>3.0</code></pre>
-<pre class="sourceCode julia"><code class="sourceCode julia">floor(<span class="fl">3.14</span>)</code></pre>
-<pre class="output"><code>3.0</code></pre>
-<pre class="sourceCode julia"><code class="sourceCode julia">ceil(<span class="fl">3.14</span>)</code></pre>
-<pre class="output"><code>4.0</code></pre>
-<p>The observant eye will notice the answers above are not integers. (We discuss how to tell later.) What to do if you want an integer? These functions have versions <code>iround</code>, <code>ifloor</code>, and <code>iceil</code> to return integer values. (Why this is needed is due to the fact that <code>julia</code> code can run faster when the &quot;type&quot; of a value doesn't change during the calling of a function. So for these functions there are good reasons for the default to keep the same output type as the input value, e.g. floating point to floating point.)</p>
-<h3 id="practice-2">Practice</h3>
-<h4 id="question-13">Question</h4>
-<p>What is the value of <span class="math">\(\sin(\pi/10)\)</span>?</p>
+<p>(The latter is an error as the power function has an output type that depends on the power being real, not a specific value of a real. For 1/2 the above would clearly be an error, so then for 1/3 <code>julia</code> makes this an error.)</p><h3>trigonometric functions</h3><p>The basic trigonometric functions in <code>julia</code> work with radians:</p><pre class="sourceCode julia">sin(pi/4)
+cos(pi/3)</pre>
+<pre class="output">
+0.5000000000000001</pre>
 
-<form name='WeaveQuestion' data-id='K90k1hn9Sv' data-controltype='numeric'>
-<div class='control-group '>
+<p>But students think in degrees. What to do? Well, you can always convert via the ratio $\pi/180$:</p><pre class="sourceCode julia">sin(45 * pi/180)
+cos(60 * pi/180)</pre>
+<pre class="output">
+0.5000000000000001</pre>
+
+<p>However, <code>julia</code> provides the student-friendly functions <code>sind</code>, <code>cosd</code>, and <code>tand</code> to work directly with degrees:</p><pre class="sourceCode julia">sind(45)
+cosd(45)</pre>
+<pre class="output">
+0.7071067811865476</pre>
+
+<p>Be careful, an expression like $\cos^2(\pi/4)$ is a shorthand for squaring the output of the cosine of $\pi/4$, hence is expressed with</p><pre class="sourceCode julia">cos(pi/4)^2			# not cos^2(pi/4) !!!</pre>
+<pre class="output">
+0.5000000000000001</pre>
+
+<h3>Inverse trigonometric function</h3><p>The math notation $\sin^{-1}(x)$ is also a source of confusion. This is <strong>not</strong> a power, rather it indicates an <em>inverse</em> function, in this case the arcsine. The arcsine function is written <code>asin</code> in <code>julia</code>.</p><p>For certain values, the arcsine and sine function are inverses:</p><pre class="sourceCode julia">asin(sin(0.1))		</pre>
+<pre class="output">
+0.1</pre>
+
+<p>However, this isn't true for all values of $x$, as $\sin(x)$ is not monotonic everywhere. In particular, the above won't work for $x$ values outside $(-\pi/2, \pi/2)$:</p><pre class="sourceCode julia">asin(sin(100))</pre>
+<pre class="output">
+-0.5309649148733837</pre>
+
+<p>Other inverse trigonometric functions are <code>acos</code>, <code>atan</code> and for completeness <code>asec</code>, <code>acsc</code>, and <code>acot</code> are available for use.</p><h3>Exponential and logs</h3><p>The values $e^x$ can be computed with the built-in constant <code>e</code>:</p><pre class="sourceCode julia">e^2</pre>
+<pre class="output">
+7.38905609893065</pre>
+
+<p>Or through the function <code>exp&#40;x&#41;</code>:</p><pre class="sourceCode julia">exp(2)</pre>
+<pre class="output">
+7.38905609893065</pre>
+
+<p>As, <code>e</code> can be redefined, it is best to use the latter style, though it takes a bit more typing.</p><p>The logarithm function, <code>log</code> does log base $e$:</p><pre class="sourceCode julia">log(exp(2))</pre>
+<pre class="output">
+2.0</pre>
+
+<p>To do base 10, there is a <code>log10</code> function:</p><pre class="sourceCode julia">log10(e^2)</pre>
+<pre class="output">
+0.8685889638065036</pre>
+
+<p>There is also a <code>log2</code> function for base 2. However, there are many more possible choices for a base. Rather than create functions for each possible one of interest the <code>log</code> function has an alternative form taking <em>two argument</em>. The first is interpreted as the base, the second the $x$ value. So the above, is also done through:</p><pre class="sourceCode julia">log(10, exp(2))</pre>
+<pre class="output">
+0.8685889638065035</pre>
+
+<h3>Some useful functions</h3><p>There are some other useful functions For example, <code>abs</code> for the absolute value, <code>round</code> for rounding, <code>floor</code> for rounding down and <code>ceil</code> for rounding up. Here are some examples</p><pre class="sourceCode julia">round(3.14)</pre>
+<pre class="output">
+3.0</pre>
+
+<pre class="sourceCode julia">floor(3.14)</pre>
+<pre class="output">
+3.0</pre>
+
+<pre class="sourceCode julia">ceil(3.14)</pre>
+<pre class="output">
+4.0</pre>
+
+<p>The observant eye will notice the answers above are not integers. (We discuss how to tell later.)  What to do if you want an integer? These functions have versions <code>iround</code>, <code>ifloor</code>, and <code>iceil</code> to return integer values.  (Why this is needed is due to the fact that <code>julia</code> code can run faster when the "type" of a value doesn't change during the calling of a function. So for these functions there are good reasons for the default to keep the same output type as the input value, e.g. floating point to floating point.)</p><h3>Practice</h3><h4>Question</h4><p>What is the value of $\sin(\pi/10)$?</p><form name='WeaveQuestion' data-id='E8FY9ELn' data-controltype='numeric'>
+<div class='form-group '>
 <div class='controls'>
-<input id="K90k1hn9Sv" type="number">
 
 
-<div id='K90k1hn9Sv_message'></div>
+
+<div class="input-group">
+<input id="E8FY9ELn" type="number" class="form-control">
+
+</div>
+  
+<div id='E8FY9ELn_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#K90k1hn9Sv').on('change', function() {
-  correct = Math.abs(this.value - 0.3090169943749474) <= 1.4901161193847656e-8;
+$('#E8FY9ELn').on('change', function() {
+  correct = Math.abs(this.value - 0.3090169943749474) <= 0.001;
 
   if(correct) {
-     $('#K90k1hn9Sv_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#E8FY9ELn_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#K90k1hn9Sv_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#E8FY9ELn_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
-
 </script>
-
-<h4 id="question-14">Question</h4>
-<p>What is the value of <span class="math">\(\sin(52^\circ)\)</span>?</p>
-
-<form name='WeaveQuestion' data-id='B1dsUR30xJ' data-controltype='numeric'>
-<div class='control-group '>
+<h4>Question</h4><p>What is the value of $\sin(52^\circ)$?</p><form name='WeaveQuestion' data-id='jRfsNxSf' data-controltype='numeric'>
+<div class='form-group '>
 <div class='controls'>
-<input id="B1dsUR30xJ" type="number">
 
 
-<div id='B1dsUR30xJ_message'></div>
+
+<div class="input-group">
+<input id="jRfsNxSf" type="number" class="form-control">
+
+</div>
+  
+<div id='jRfsNxSf_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#B1dsUR30xJ').on('change', function() {
-  correct = Math.abs(this.value - 0.7880107536067219) <= 1.4901161193847656e-8;
+$('#jRfsNxSf').on('change', function() {
+  correct = Math.abs(this.value - 0.788010753606722) <= 0.001;
 
   if(correct) {
-     $('#B1dsUR30xJ_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#jRfsNxSf_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#B1dsUR30xJ_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#jRfsNxSf_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
-
 </script>
-
-<h4 id="question-15">Question</h4>
-<p>Is <span class="math">\(\sin^{-1}(\sin(3\pi/2))\)</span> equal to <span class="math">\(3\pi/2\)</span>?</p>
-
-<form name='WeaveQuestion' data-id='kRRAUbb834' data-controltype='radio'>
-<div class='control-group '>
-<div class='controls'>
-
-
-<label class='radio inline'>
-  <input type='radio' name='radio_kRRAUbb834' value='1'>
-  true
-</label>
-
-<label class='radio inline'>
-  <input type='radio' name='radio_kRRAUbb834' value='2'>
-  false
-</label>
-
-
-
-<div id='kRRAUbb834_message'></div>
+<h4>Question</h4><p>Is $\sin^{-1}(\sin(3\pi/2))$ equal to $3\pi/2$?</p><form name="WeaveQuestion" data-id="c0cbx9Yn" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio inline"> 
+    <label>
+      <input type="radio" name="radio_c0cbx9Yn" value="1"><div class="markdown"><p>yes</p>
 </div>
+    </label>
+    </div>
+    
+    <div   class="radio inline"> 
+    <label>
+      <input type="radio" name="radio_c0cbx9Yn" value="2"><div class="markdown"><p>no</p>
+</div>
+    </label>
+    </div>
+    
+
+
+<div id="c0cbx9Yn_message"></div>
 </div>
 </form>
-<script text='text/javascript'>
-$('input:radio[name="radio_kRRAUbb834"]').on('change', function() {
+<script text="text/javascript">
+$("input:radio[name='radio_c0cbx9Yn']").on("change", function() {
   correct = this.value == 2;
 
   if(correct) {
-     $('#kRRAUbb834_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $("#c0cbx9Yn_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $('#kRRAUbb834_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $("#c0cbx9Yn_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-
-<h4 id="question-16">Question</h4>
-<p>What is the value of <code>round(3.5000)</code></p>
-
-<form name='WeaveQuestion' data-id='UfaNQeUFHg' data-controltype='numeric'>
-<div class='control-group '>
+<h4>Question</h4><p>What is the value of <code>round&#40;3.5000&#41;</code></p><form name='WeaveQuestion' data-id='VT4voMBw' data-controltype='numeric'>
+<div class='form-group '>
 <div class='controls'>
-<input id="UfaNQeUFHg" type="number">
 
 
-<div id='UfaNQeUFHg_message'></div>
+
+<div class="input-group">
+<input id="VT4voMBw" type="number" class="form-control">
+
+</div>
+  
+<div id='VT4voMBw_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#UfaNQeUFHg').on('change', function() {
-  correct = Math.abs(this.value - 4.0) <= 1.4901161193847656e-8;
+$('#VT4voMBw').on('change', function() {
+  correct = Math.abs(this.value - 4.0) <= 0.001;
 
   if(correct) {
-     $('#UfaNQeUFHg_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#VT4voMBw_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#UfaNQeUFHg_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#VT4voMBw_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
-
 </script>
-
-<h4 id="question-17">Question</h4>
-<p>What is the value of <code>sqrt(32 - 12)</code></p>
-
-<form name='WeaveQuestion' data-id='aAQWb80YWQ' data-controltype='numeric'>
-<div class='control-group '>
+<h4>Question</h4><p>What is the value of <code>sqrt&#40;32 - 12&#41;</code></p><form name='WeaveQuestion' data-id='khsDoMJh' data-controltype='numeric'>
+<div class='form-group '>
 <div class='controls'>
-<input id="aAQWb80YWQ" type="number">
 
 
-<div id='aAQWb80YWQ_message'></div>
+
+<div class="input-group">
+<input id="khsDoMJh" type="number" class="form-control">
+
+</div>
+  
+<div id='khsDoMJh_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#aAQWb80YWQ').on('change', function() {
-  correct = Math.abs(this.value - 4.47213595499958) <= 1.4901161193847656e-8;
+$('#khsDoMJh').on('change', function() {
+  correct = Math.abs(this.value - 4.47213595499958) <= 0.001;
 
   if(correct) {
-     $('#aAQWb80YWQ_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#khsDoMJh_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#aAQWb80YWQ_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#khsDoMJh_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
-
 </script>
-
-<h4 id="question-18">Question</h4>
-<p>Which is greater <span class="math">\(e^\pi\)</span> or <span class="math">\(\pi^e\)</span>?</p>
-
-<form name='WeaveQuestion' data-id='6Qcg5czUoM' data-controltype='radio'>
-<div class='control-group '>
-<div class='controls'>
-
-
-<label class='radio'>
-  <input type='radio' name='radio_6Qcg5czUoM' value='1'>
-  <code>e^pi</code>
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_6Qcg5czUoM' value='2'>
-  <code>pi^e</code>
-</label>
-
-
-
-<div id='6Qcg5czUoM_message'></div>
+<h4>Question</h4><p>Which is greater $e^\pi$ or $\pi^e$?</p><form name="WeaveQuestion" data-id="HywzYiWV" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_HywzYiWV" value="1"><div class="markdown"><p><code>pi^e</code></p>
 </div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_HywzYiWV" value="2"><div class="markdown"><p><code>e^pi</code></p>
+</div>
+    </label>
+    </div>
+    
+
+
+<div id="HywzYiWV_message"></div>
 </div>
 </form>
-<script text='text/javascript'>
-$('input:radio[name="radio_6Qcg5czUoM"]').on('change', function() {
-  correct = this.value == 1;
+<script text="text/javascript">
+$("input:radio[name='radio_HywzYiWV']").on("change", function() {
+  correct = this.value == 2;
 
   if(correct) {
-     $('#6Qcg5czUoM_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $("#HywzYiWV_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $('#6Qcg5czUoM_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $("#HywzYiWV_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-
-<h4 id="question-19">Question</h4>
-<p>What is the value of <span class="math">\(\pi - (x - \sin(x)/\cos(x))\)</span> when <span class="math">\(x=3\)</span>?</p>
-
-<form name='WeaveQuestion' data-id='B3r4m1qA3X' data-controltype='numeric'>
-<div class='control-group '>
+<h4>Question</h4><p>What is the value of $\pi - (x - \sin(x)/\cos(x))$ when $x=3$?</p><form name='WeaveQuestion' data-id='9cbTWDyB' data-controltype='numeric'>
+<div class='form-group '>
 <div class='controls'>
-<input id="B3r4m1qA3X" type="number">
 
 
-<div id='B3r4m1qA3X_message'></div>
+
+<div class="input-group">
+<input id="9cbTWDyB" type="number" class="form-control">
+
+</div>
+  
+<div id='9cbTWDyB_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#B3r4m1qA3X').on('change', function() {
-  correct = Math.abs(this.value - -0.0009538894844847157) <= 1.4901161193847656e-8;
+$('#9cbTWDyB').on('change', function() {
+  correct = Math.abs(this.value - -0.0009538894844847157) <= 0.001;
 
   if(correct) {
-     $('#B3r4m1qA3X_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#9cbTWDyB_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#B3r4m1qA3X_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#9cbTWDyB_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
-
 </script>
-
-<h4 id="question-20">Question</h4>
-<p>Search the page <a href="http://docs.julialang.org/en/latest/stdlib/base/#mathematical-functions">mathematical functions</a> for a function which finds the factorial of <code>n</code>. The proper <code>julia</code> command to find <span class="math">\(10!\)</span> would be:</p>
-
-<form name='WeaveQuestion' data-id='YXZ7FiJrzb' data-controltype='radio'>
-<div class='control-group '>
-<div class='controls'>
-
-
-<label class='radio'>
-  <input type='radio' name='radio_YXZ7FiJrzb' value='1'>
-  <code>fact(10)</code>
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_YXZ7FiJrzb' value='2'>
-  <code>10!</code>
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_YXZ7FiJrzb' value='3'>
-  <code>factorial(10)</code>
-</label>
-
-
-
-<div id='YXZ7FiJrzb_message'></div>
+<h4>Question</h4><p>Search the page <a href="http://docs.julialang.org/en/latest/stdlib/base/#mathematical-functions">mathematical functions</a> for a function which finds the factorial of <code>n</code>. The proper <code>julia</code> command to find $10!$ would be:</p><form name="WeaveQuestion" data-id="r6bUbqg1" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_r6bUbqg1" value="1"><div class="markdown"><p><code>10&#33;</code></p>
 </div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_r6bUbqg1" value="2"><div class="markdown"><p><code>fact&#40;10&#41;</code></p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_r6bUbqg1" value="3"><div class="markdown"><p><code>factorial&#40;10&#41;</code></p>
+</div>
+    </label>
+    </div>
+    
+
+
+<div id="r6bUbqg1_message"></div>
 </div>
 </form>
-<script text='text/javascript'>
-$('input:radio[name="radio_YXZ7FiJrzb"]').on('change', function() {
+<script text="text/javascript">
+$("input:radio[name='radio_r6bUbqg1']").on("change", function() {
   correct = this.value == 3;
 
   if(correct) {
-     $('#YXZ7FiJrzb_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $("#r6bUbqg1_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $('#YXZ7FiJrzb_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $("#r6bUbqg1_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
+<h2>Variables</h2><p>With a calculator, one can store values into a <em>memory</em> for later usage. This useful feature with calculators is greatly enhanced with computer languages, where one can bind, or assign, a variable to a value. For example the command <code>x&#61;2</code> will bind <code>x</code> to  the value $2$:</p><pre class="sourceCode julia">x = 2</pre>
+<pre class="output">
+2</pre>
 
-<div class="pagination">
-<ul><li>
-<button class="btn btn-default" onclick="next_nav_tab()">
-Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
-</li></ul>
+<p>So, when we evaluate</p><pre class="sourceCode julia">x^2</pre>
+<pre class="output">
+4</pre>
 
+<p>The value assigned to <code>x</code> is looked up and used to return $4$.</p><p>The word "dynamic" to describe the <code>Julia</code> language refers to the fact that variables can be reassigned and retyped. For example:</p><pre class="sourceCode julia">x = sqrt(2) ## a Float64 now</pre>
+<pre class="output">
+1.4142135623730951</pre>
 
-</div>
+<p>In <code>julia</code> one can have single letter names, or much longer ones, such as</p><pre class="sourceCode julia">some_ridiculously_long_name = 3</pre>
+<pre class="output">
+3</pre>
 
-</div>
-<div  class="tab-pane" id="_variables_">
+<pre class="sourceCode julia">some_ridiculously_long_name^2</pre>
+<pre class="output">
+9</pre>
 
-<h2 id="variables">Variables</h2>
-<p>With a calculator, one can store values into a <em>memory</em> for later usage. This useful feature with calculators is greatly enhanced with computer languages, where one can bind, or assign, a variable to a value. For example the command <code>x=2</code> will bind <code>x</code> to the value <span class="math">\(2\)</span>:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">x = <span class="fl">2</span></code></pre>
-<pre class="output"><code>2</code></pre>
-<p>So, when we evaluate</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">x^<span class="fl">2</span></code></pre>
-<pre class="output"><code>4</code></pre>
-<p>The value assigned to <code>x</code> is looked up and used to return <span class="math">\(4\)</span>.</p>
-<p>The word &quot;dynamic&quot; to describe the <code>Julia</code> language refers to the fact that variables can be reassigned and retyped. For example:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">x = sqrt(<span class="fl">2</span>) <span class="co">## a Float64 now</span></code></pre>
-<pre class="output"><code>1.4142135623730951</code></pre>
-<p>In <code>julia</code> one can have single letter names, or much longer ones, such as</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">some_ridiculously_long_name = <span class="fl">3</span></code></pre>
-<pre class="output"><code>3</code></pre>
-<pre class="sourceCode julia"><code class="sourceCode julia">some_ridiculously_long_name^<span class="fl">2</span></code></pre>
-<pre class="output"><code>9</code></pre>
-<p>The basic tradeoff being: longer names are usually more expressive and easier to remember, whereas short names are simpler to type. To get a list of the currently bound names, the <code>whos</code> function may be called. Not all names are syntactically valid, for example names can't begin with a number or include spaces.</p>
+<p>The basic tradeoff being: longer names are usually more expressive and easier to remember, whereas short names are simpler to type. To get a list of the currently bound names, the <code>whos</code> function may be called. Not all names are syntactically valid, for example names can't begin with a number or include spaces.</p><div class="alert alert-success" role="alert"><div class="markdown"><p>In fact, only <em>most</em> objects bound to a name can be arbitrarily redefined. When we discuss functions, we will see that redefining functions can be an issue and new names will need to be used. As such, it often works to stick to come convention for naming: numbers use values like <code>i</code>, <code>j</code>, <code>x</code>, <code>y</code>; function like <code>f</code>, <code>g</code>, h`, etc.</p>
+</div></div>
+<p>To work with computer languages, it is important to appreciate that the equals sign in the variable assignment is unlike that of mathematics, where often it is used to indicate an equation which may be solved for a value. With the following computer command the right hand expression is evaluated and that value is assigned to the variable. So,</p><pre class="sourceCode julia">x = 2 + 3</pre>
+<pre class="output">
+5</pre>
 
-<div class="alert alert-info">
-<strong></strong>
-<p>In fact, only <em>most</em> objects bound to a name can be arbitrarily redefined. When we discuss functions, we will see that redefining functions can be an issue and new names will need to be used. As such, it often works to stick to come convention for naming: numbers use values like <code>i</code>, <code>j</code>, <code>x</code>, <code>y</code>; function like <code>f</code>, <code>g</code>, h`, etc.</p>
-</div>
+<p>does not assign the expression <code>2 &#43; 3</code> to <code>x</code>, but rather the evaluation of that expression, which yields 5. (This also shows that the precedence of the assignment operator is <em>lower</em> than addition, as addition is performed first in the absence of parentheses.)</p><h3>Multiple assignments</h3><p>At the prompt, a simple expression is entered and, when the <em>return</em> key is pressed, evaluated.  At times we may want to work with multiple subexpressions. A particular case might be setting different parameters:</p><pre class="sourceCode julia">a=0
+b=1</pre>
+<pre class="output">
+1</pre>
 
-<p>To work with computer languages, it is important to appreciate that the equals sign in the variable assignment is unlike that of mathematics, where often it is used to indicate an equation which may be solved for a value. With the following computer command the right hand expression is evaluated and that value is assigned to the variable. So,</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">x = <span class="fl">2</span> + <span class="fl">3</span></code></pre>
-<pre class="output"><code>5</code></pre>
-<p>does not assign the expression <code>2 + 3</code> to <code>x</code>, but rather the evaluation of that expression, which yields 5. (This also shows that the precedence of the assignment operator is <em>lower</em> than addition, as addition is performed first in the absence of parentheses.)</p>
-<h3 id="multiple-assignments">Multiple assignments</h3>
-<p>At the prompt, a simple expression is entered and, when the <em>return</em> key is pressed, evaluated. At times we may want to work with multiple subexpressions. A particular case might be setting different parameters:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">a=<span class="fl">0</span>
-b=<span class="fl">1</span></code></pre>
-<pre class="output"><code>1</code></pre>
-<p>Multiple expressions can be more tersely written by separating each expression using a semicolon:</p>
-<pre class="sourceCode julia julia"><code class="sourceCode julia">a=<span class="fl">0</span>; b=<span class="fl">1</span>;</code></pre>
-<pre class="output"><code>1</code></pre>
-<p>Note that <code>julia</code> makes this task even easier, as one can do multiple assignments via &quot;tuple destructuring:&quot;</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">a, b  = <span class="fl">0</span>, <span class="fl">1</span>        <span class="co">## printed output is a &quot;tuple&quot;</span>
-a + b</code></pre>
-<pre class="output"><code>1</code></pre>
-<h3 id="practice-3">Practice</h3>
-<h4 id="question-21">Question</h4>
-<p>Let <span class="math">\(a=10\)</span>, <span class="math">\(b=2.3\)</span>, and <span class="math">\(c=8\)</span>. Find the value of <span class="math">\((a-b)/(a-c)\)</span>.</p>
+<p>Multiple expressions can be more tersely written by separating each expression using a semicolon:</p><pre class="sourceCode julia">a=0; b=1;</pre>
+<pre class="output">
+1</pre>
 
-<form name='WeaveQuestion' data-id='8A62CubAWB' data-controltype='numeric'>
-<div class='control-group '>
+<p>Note that <code>julia</code> makes this task even easier, as one can do multiple assignments via "tuple destructuring:"</p><pre class="sourceCode julia">a, b  = 0, 1		## printed output is a "tuple"
+a + b</pre>
+<pre class="output">
+1</pre>
+
+<h3>Practice</h3><h4>Question</h4><p>Let $a=10$, $b=2.3$, and $c=8$. Find the value of $(a-b)/(a-c)$.</p><form name='WeaveQuestion' data-id='jv1GYPoG' data-controltype='numeric'>
+<div class='form-group '>
 <div class='controls'>
-<input id="8A62CubAWB" type="number">
 
 
-<div id='8A62CubAWB_message'></div>
+
+<div class="input-group">
+<input id="jv1GYPoG" type="number" class="form-control">
+
+</div>
+  
+<div id='jv1GYPoG_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#8A62CubAWB').on('change', function() {
-  correct = Math.abs(this.value - 3.85) <= 1.4901161193847656e-8;
+$('#jv1GYPoG').on('change', function() {
+  correct = Math.abs(this.value - 3.85) <= 0.001;
 
   if(correct) {
-     $('#8A62CubAWB_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#jv1GYPoG_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#8A62CubAWB_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#jv1GYPoG_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
-
 </script>
-
-<h4 id="question-22">Question</h4>
-<p>What is the answer to this computation?</p>
-<pre class="sourceCode julia" execute="false"><code class="sourceCode julia">a = <span class="fl">3.2</span>; b=<span class="fl">2.3</span>
-a^b - b^a</code></pre>
-
-<form name='WeaveQuestion' data-id='OnRZm89iry' data-controltype='numeric'>
-<div class='control-group '>
+<h4>Question</h4><p>What is the answer to this computation?</p><pre class="sourceCode julia">a = 3.2; b=2.3
+a^b - b^a</pre>
+<form name='WeaveQuestion' data-id='ApFh9bsb' data-controltype='numeric'>
+<div class='form-group '>
 <div class='controls'>
-<input id="OnRZm89iry" type="number">
 
 
-<div id='OnRZm89iry_message'></div>
+
+<div class="input-group">
+<input id="ApFh9bsb" type="number" class="form-control">
+
+</div>
+  
+<div id='ApFh9bsb_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#OnRZm89iry').on('change', function() {
-  correct = Math.abs(this.value - 0.14354012963861962) <= 1.4901161193847656e-8;
+$('#ApFh9bsb').on('change', function() {
+  correct = Math.abs(this.value - 0.14354012963861962) <= 0.001;
 
   if(correct) {
-     $('#OnRZm89iry_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#ApFh9bsb_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#OnRZm89iry_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#ApFh9bsb_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
-
 </script>
-
-<h4 id="question-23">Question</h4>
-<p>For longer computations, it can be convenient to do them in parts, as this makes it easier to check for mistakes. (You likely do this with your calculator.)</p>
-<p>For example, to compute</p>
-<p><span class="math">\[
+<h4>Question</h4><p>For longer computations, it can be convenient to do them in parts, as this makes it easier to check for mistakes. (You likely do this with your calculator.)</p><p>For example, to compute</p>$$~
 \frac{p - q}{\sqrt{p(1-p)}}
-\]</span></p>
-<p>for <span class="math">\(p=0.25\)</span> and <span class="math">\(q=0.2\)</span> we might do:</p>
-<pre class="sourceCode julia" execute="false"><code class="sourceCode julia">p, q = <span class="fl">0.25</span>, <span class="fl">0.2</span>
+~$$<p>for $p=0.25$ and $q=0.2$ we might do:</p><pre class="sourceCode julia">p, q = 0.25, 0.2
 top = p - q
-bottom = sqrt(p*(<span class="fl">1</span>-p))
-ans = top/bottom</code></pre>
-<p>What is the result of the above?</p>
-
-<form name='WeaveQuestion' data-id='V2LfJJaFM9' data-controltype='numeric'>
-<div class='control-group '>
+bottom = sqrt(p*(1-p))
+ans = top/bottom</pre>
+<p>What is the result of the above?</p><form name='WeaveQuestion' data-id='yC0ndSab' data-controltype='numeric'>
+<div class='form-group '>
 <div class='controls'>
-<input id="V2LfJJaFM9" type="number">
 
 
-<div id='V2LfJJaFM9_message'></div>
+
+<div class="input-group">
+<input id="yC0ndSab" type="number" class="form-control">
+
+</div>
+  
+<div id='yC0ndSab_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#V2LfJJaFM9').on('change', function() {
-  correct = Math.abs(this.value - 0.11547005383792514) <= 1.4901161193847656e-8;
+$('#yC0ndSab').on('change', function() {
+  correct = Math.abs(this.value - 0.11547005383792514) <= 0.001;
 
   if(correct) {
-     $('#V2LfJJaFM9_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#yC0ndSab_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#V2LfJJaFM9_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#yC0ndSab_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
-
 </script>
+<h2>Numbers</h2><p>In mathematics, there a many different types of numbers. Familiar ones are integers, rational numbers, and the real numbers. In addition, complex numbers are needed to fully discuss polynomial functions. This is not the case with calculators.</p><p>Most calculators treat all numbers as floating point numbers – an approximation to the real numbers.  Not so with <code>julia</code>.  <code>Julia</code> has types for many different numbers: <code>Integer</code>, <code>Real</code>, <code>Rational</code>, <code>Complex</code>, and specializations depending on the number of bits that are used, e.g., <code>Int64</code> and <code>Float64</code>. For the most part there is no need to think about the details, as values are promoted to a common type when used together. However, there are times where one needs to be aware of the distinctions.</p><h3>Integers and floating point numbers</h3><p>In the real number system of mathematics, there are the familiar real numbers and integers. The integers are viewed as a subset of the real numbers.</p><p>Julia provides types <code>Integer</code> and <code>Real</code> to represent these values. (Actually, the <code>Integer</code> type represents more than one actual storage type, either <code>Int32</code> or <code>Int64</code>.) These are separate types. The type of an object is returned by <code>typeof&#40;&#41;</code>.</p><p>For example, the integer $1$ is simply created by the value <code>1</code>:</p><pre class="sourceCode julia">1</pre>
+<pre class="output">
+1</pre>
 
-<div class="pagination">
-<ul><li>
-<button class="btn btn-default" onclick="next_nav_tab()">
-Next&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></button>
-</li></ul>
+<p>The floating point value $1$ is specified by using a decimal point:</p><pre class="sourceCode julia">1.0</pre>
+<pre class="output">
+1.0</pre>
 
+<p>The two values are printed differently – integers never have a decimal point, floating point values always have a decimal point. This emphasizes the fact that the two values <code>1</code> and <code>1.0</code> are not the same – they are stored differently, they print differently, and can give different answers. In most cases – but not all – uses they can be used interchangeably.</p><p>For example, we can add the two:</p><pre class="sourceCode julia">1 + 1.0</pre>
+<pre class="output">
+2.0</pre>
 
-</div>
+<p>This gives back the floating point value <code>2.0</code>. First the integer and floating point value are promoted to a common type (floating point in this case) and then added. </p><p>Powers are different. This value will be an error <code>10^&#40;-2&#41;</code>, but <code>10.0^&#40;-2&#41;</code> will not. </p><blockquote>
+<p>In base <code>julia</code>, if possible,  functions are <a href="http://docs.julialang.org/en/latest/manual/faq/#why-does-julia-give-a-domainerror-for-perfectly-sensible-operations">type stable</a>. This means, the type of the output depends  on the type of the input – not the value. In this case, integer powers and bases are expected to return integer answers, which $10^{-2}$ is not.</p>
+</blockquote><p>When a computer is used to represent numeric values there are limitations: a computer only assigns a finite number of bits for a value. This works great in most cases, but since there are infinitely many numbers, not all possible numbers can be represented on the computer.</p><blockquote>
+<p>The first limitation is numbers can not be arbitrarily large. </p>
+</blockquote><p>Take for instance a 64-bit integer.  A bit is just a place in computer memory to hold a $0$ or a $1$. Basically one bit is used to record the sign of the number and the remaining 63 to represent the numbers. This leaves the following range for such integers $-2^{63}$ to $2^{63} - 1$.</p><p><code>Julia</code> is said to not provide training wheels. This means it doesn't put in checks for integer overflow, as these can slow things down. To see what happens, let just peek:</p><pre class="sourceCode julia">2^62				## about 4.6 * 10^18
+2^63				## negative!!!</pre>
+<pre class="output">
+-9223372036854775808</pre>
 
-</div>
-<div  class="tab-pane" id="_numbers_">
+<p>So if working with really large values, one must be mindful of the difference – or your bike might crash!</p><p><span class="label label-info">Gotchas</span></p><p>Look at the output of </p><pre class="sourceCode julia">2^3^4</pre>
+<pre class="output">
+0</pre>
 
-<h2 id="numbers">Numbers</h2>
-<p>In mathematics, there a many different types of numbers. Familiar ones are integers, rational numbers, and the real numbers. In addition, complex numbers are needed to fully discuss polynomial functions. This is not the case with calculators.</p>
-<p>Most calculators treat all numbers as floating point numbers -- an approximation to the real numbers. Not so with <code>julia</code>. <code>Julia</code> has types for many different numbers: <code>Integer</code>, <code>Real</code>, <code>Rational</code>, <code>Complex</code>, and specializations depending on the number of bits that are used, e.g., <code>Int64</code> and <code>Float64</code>. For the most part there is no need to think about the details, as values are promoted to a common type when used together. However, there are times where one needs to be aware of the distinctions.</p>
-<h3 id="integers-and-floating-point-numbers">Integers and floating point numbers</h3>
-<p>In the real number system of mathematics, there are the familiar real numbers and integers. The integers are viewed as a subset of the real numbers.</p>
-<p>Julia provides types <code>Integer</code> and <code>Real</code> to represent these values. (Actually, the <code>Integer</code> type represents more than one actual storage type, either <code>Int32</code> or <code>Int64</code>.) These are separate types. The type of an object is returned by <code>typeof()</code>.</p>
-<p>For example, the integer <span class="math">\(1\)</span> is simply created by the value <code>1</code>:</p>
-<p>The floating point value <span class="math">\(1\)</span> is specified by using a decimal point:</p>
-<p>The two values are printed differently -- integers never have a decimal point, floating point values always have a decimal point. This emphasizes the fact that the two values <code>1</code> and <code>1.0</code> are not the same -- they are stored differently, they print differently, and can give different answers. In most cases -- but not all -- uses they can be used interchangeably.</p>
-<p>For example, we can add the two:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia"><span class="fl">1</span> + <span class="fl">1.0</span></code></pre>
-<pre class="output"><code>2.0</code></pre>
-<p>This gives back the floating point value <code>2.0</code>. First the integer and floating point value are promoted to a common type (floating point in this case) and then added.</p>
-<p>Powers are different. This value will be an error <code>10^(-2)</code>, but <code>10.0^(-2)</code> will not.</p>
-<blockquote>
-<p>In base <code>julia</code>, if possible, functions are <a href="http://docs.julialang.org/en/latest/manual/faq/#why-does-julia-give-a-domainerror-for-perfectly-sensible-operations">type stable</a>. This means, the type of the output depends on the type of the input -- not the value. In this case, integer powers and bases are expected to return integer answers, which <span class="math">\(10^{-2}\)</span> is not.</p>
-</blockquote>
-<p>When a computer is used to represent numeric values there are limitations: a computer only assigns a finite number of bits for a value. This works great in most cases, but since there are infinitely many numbers, not all possible numbers can be represented on the computer.</p>
-<blockquote>
-<p>The first limitation is numbers can not be arbitrarily large.</p>
-</blockquote>
-<p>Take for instance a 64-bit integer. A bit is just a place in computer memory to hold a <span class="math">\(0\)</span> or a <span class="math">\(1\)</span>. Basically one bit is used to record the sign of the number and the remaining 63 to represent the numbers. This leaves the following range for such integers <span class="math">\(-2^{63}\)</span> to <span class="math">\(2^{63} - 1\)</span>.</p>
-<p><code>Julia</code> is said to not provide training wheels. This means it doesn't put in checks for integer overflow, as these can slow things down. To see what happens, let just peek:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia"><span class="fl">2</span>^<span class="fl">62</span>                <span class="co">## about 4.6 * 10^18</span>
-<span class="fl">2</span>^<span class="fl">63</span>                <span class="co">## negative!!!</span></code></pre>
-<pre class="output"><code>-9223372036854775808</code></pre>
-<p>So if working with really large values, one must be mindful of the difference -- or your bike might crash!</p>
-<p><span class="label label-info">Gotchas</span></p>
-<p>Look at the output of</p>
-<pre class="sourceCode julia julia"><code class="sourceCode julia"><span class="fl">2</span>^<span class="fl">3</span>^<span class="fl">4</span></code></pre>
-<pre class="output"><code>0</code></pre>
-<p>Why is it 0? The value of <span class="math">\(3^4=81\)</span> is bigger than 63, so <span class="math">\(2^{81}\)</span> will overflow.</p>
-<p>The following works though:</p>
-<pre class="sourceCode julia julia"><code class="sourceCode julia"><span class="fl">2.0</span> ^ <span class="fl">3</span> ^ <span class="fl">4</span></code></pre>
-<pre class="output"><code>2.4178516392292583e24</code></pre>
-<p>This is because the value <code>2.0</code> will use floating point arithmetic which has a much wider range of values. (The <code>julia</code> documentation sends you to this interesting blog post <a href="http://www.johndcook.com/blog/2009/04/06/anatomy-of-a-floating-point-number/">johndcook</a>, which indicates the largest floating point value is <span class="math">\(2^{1023}(2 - 2^{-52})\)</span> which is roughly <code>1.8e308</code>.</p>
-<blockquote>
+<p>Why is it 0? The value of $3^4=81$ is bigger than 63, so $2^{81}$ will overflow.</p><p>The following works though:</p><pre class="sourceCode julia">2.0 ^ 3 ^ 4</pre>
+<pre class="output">
+2.4178516392292583e24</pre>
+
+<p>This is because the value <code>2.0</code> will use floating point arithmetic which has a much wider range of values. (The <code>julia</code> documentation sends you to this interesting blog post <a href="http://www.johndcook.com/blog/2009/04/06/anatomy-of-a-floating-point-number/">johndcook</a>, which indicates the largest floating point value is $2^{1023}(2 - 2^{-52})$ which is roughly <code>1.8e308</code>.</p><blockquote>
 <p>Scientific notation is used to represent many numbers</p>
-</blockquote>
-<p>A number in <code>julia</code> may be represented in scientific notation. The basic canonical form is <span class="math">\(a*10^b\)</span>, with <span class="math">\(-10 &lt; a &lt; 10\)</span> and <span class="math">\(b\)</span> is an integer. This is written in <code>julia</code> as <code>aeb</code> where <code>e</code> is used to separate the value from the exponent. The value <code>1.8e308</code> means <span class="math">\(1.8 \cdot 10^{308}\)</span>. Scientific notation makes it very easy to focus on the gross size of a number, as the exponent is set off.</p>
-<blockquote>
+</blockquote><p>A number in <code>julia</code> may be represented in scientific notation. The basic canonical form is $a\cdot 10^b$, with $-10 < a < 10$ and $b$ is an integer. This is written in <code>julia</code> as <code>aeb</code> where <code>e</code> is used to separate the value from the exponent. The value <code>1.8e308</code> means $1.8 \cdot 10^{308}$. Scientific notation makes it very easy to focus on the gross size of a number, as the exponent is set off.</p><blockquote>
 <p>The second limitation is numbers are often only an approximation.</p>
-</blockquote>
-<p>This means expressions which are mathematically true, need not be true once approximated on the computer. For example, <span class="math">\(\sqrt{2}\)</span> is an irrational number, that is, its decimal representation does not repeat the way a rational number does. Hence it is impossible to store on the computer an exact representation, at some level there is a truncation or round off. This will show up when you try something like:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia"><span class="fl">2</span> - sqrt(<span class="fl">2</span>) * sqrt(<span class="fl">2</span>)</code></pre>
-<pre class="output"><code>-4.440892098500626e-16</code></pre>
-<p>That difference of basically <span class="math">\(10^{-16}\)</span> is roughly the machine tolerance when representing a number. (One way to imagine this is mathematically, we have two ways to write the number <span class="math">\(1\)</span>:</p>
-<p><span class="math">\[
+</blockquote><p>This means expressions which are mathematically true, need not be true once approximated on the computer. For example,  $\sqrt{2}$ is an irrational number, that is, its decimal representation does not repeat the way a rational number does. Hence it is impossible to store on the computer an exact representation, at some level there is a truncation or round off. This will show up when you try something like:</p><pre class="sourceCode julia">2 - sqrt(2) * sqrt(2)</pre>
+<pre class="output">
+-4.440892098500626e-16</pre>
+
+<p>That difference of basically $10^{-16}$ is roughly the machine tolerance when representing a number. (One way to imagine this is mathematically, we have two ways to write the number $1$:</p>$$~
 0.\bar{9} = 0.9999... = 1
-\]</span></p>
-<p>but on the computer, you can't have the &quot;...&quot; in a decimal expansion -- it must truncate -- so instead values round to something like <span class="math">\(0.9999999999999999\)</span> or <span class="math">\(1\)</span>, with nothing in between.</p>
-<p><span class="label label-info">Comparing values</span></p>
-<p>A typical expression in computer languages is to use <code>==</code> to compare the values on the left- and right-hand sides. This is not assignment, rather a question. For example:</p>
-<pre class="sourceCode julia julia"><code class="sourceCode julia"><span class="fl">2</span> == <span class="fl">2</span>
-<span class="fl">2</span> == <span class="fl">3</span>
-sqrt(<span class="fl">2</span>) * sqrt(<span class="fl">2</span>) == <span class="fl">2</span>      <span class="co">## surprising?</span></code></pre>
-<pre class="output"><code>false</code></pre>
-<p>The last one would be surprising were you not paying attention to the last paragraph. Comparisons with <code>==</code> work well for integers and strings, but not with floating point numbers. (For these the <code>isapprox</code> function can be used.)</p>
-<p>Comparisons do a promotion prior to comparing, so even though these numbers are of different types, the <code>==</code> operation treats them as equal:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia"><span class="fl">1</span> == <span class="fl">1.0</span></code></pre>
-<pre class="output"><code>true</code></pre>
-<p>The <code>===</code> operator has an even more precise notion of equality:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia"><span class="fl">1</span> === <span class="fl">1.0</span></code></pre>
-<pre class="output"><code>false</code></pre>
-<h3 id="scientific-notation">Scientific notation</h3>
-<p>As mentioned, one can write <code>3e8</code> for <span class="math">\(3 \cdot 10^8\)</span>, but in fact to <code>julia</code> the two values <code>3e8</code> and <code>3*10^8</code> are not quite the same, as one is stored in floating point, and one as an integer. One can use <code>3.0 * 10.0^8</code> to get a floating point equivalent to <code>3e8</code>.</p>
-<blockquote>
+~$$<p>but on the computer, you can't have the "..." in a decimal expansion – it must truncate – so instead values round to something like $0.9999999999999999$ or $1$, with nothing in between.</p><p><span class="label label-info">Comparing values</span></p><p>A typical expression in computer languages is to use <code>&#61;&#61;</code> to compare the values on the left- and right-hand sides. This is not assignment, rather a question. For example:</p><pre class="sourceCode julia">2 == 2
+2 == 3
+sqrt(2) * sqrt(2) == 2		## surprising?</pre>
+<pre class="output">
+false</pre>
+
+<p>The last one would be surprising were you not paying attention to the last paragraph. Comparisons with <code>&#61;&#61;</code> work well for integers and strings, but not with floating point numbers. (For these the <code>isapprox</code> function can be used.)</p><p>Comparisons do a promotion prior to comparing, so even though these numbers are of different types, the <code>&#61;&#61;</code> operation treats them as equal:</p><pre class="sourceCode julia">1 == 1.0</pre>
+<pre class="output">
+true</pre>
+
+<p>The <code>&#61;&#61;&#61;</code> operator has an even more precise notion of equality:</p><pre class="sourceCode julia">1 === 1.0</pre>
+<pre class="output">
+false</pre>
+
+<h3>Scientific notation</h3><p>As mentioned, one can write <code>3e8</code> for  $3 \cdot 10^8$, but in fact to <code>julia</code> the two values <code>3e8</code> and <code>3*10^8</code> are not quite the same, as one is stored in floating point, and one as an integer. One can use <code>3.0 * 10.0^8</code> to get a floating point equivalent to <code>3e8</code>.</p><blockquote>
 <p>Floating point includes the special values: <code>NaN</code>, <code>Inf</code>. (Not so with integers.)</p>
-</blockquote>
-<p>Floating point contains two special values: <code>NaN</code> and <code>Inf</code> to represent &quot;not a number&quot; and &quot;infinity.&quot; These arise in some natural cases:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia"><span class="fl">1</span>/<span class="fl">0</span>             <span class="co">## infinity. Also -1/0.</span></code></pre>
-<pre class="output"><code>Inf</code></pre>
-<pre class="sourceCode julia"><code class="sourceCode julia"><span class="fl">0</span>/<span class="fl">0</span>             <span class="co">## indeterminate</span></code></pre>
-<pre class="output"><code>NaN</code></pre>
-<p>These values can come up in unexpected circumstances. For example division by <span class="math">\(0\)</span> can occur due to round off errors:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">x = <span class="fl">1e-17</span>
-x^<span class="fl">2</span>/(<span class="fl">1</span>-cos(x))          <span class="co">## should be about 2</span></code></pre>
-<pre class="output"><code>Inf</code></pre>
-<h3 id="rational-numbers">Rational numbers</h3>
-<p>In addition to special classes for integer and floating point values, <code>Julia</code> has a special class for rational numbers, or ratios of integers. To distinguish between regular division and rational numbers, <code>julia</code> has the <code>//</code> symbol to define rational numbers:</p>
-<pre class="sourceCode julia julia"><code class="sourceCode julia"><span class="fl">1</span>//<span class="fl">2</span></code></pre>
-<pre class="output"><code>1//2</code></pre>
-<pre class="sourceCode julia julia"><code class="sourceCode julia">typeof(<span class="fl">1</span>//<span class="fl">2</span>)</code></pre>
-<pre class="output"><code>Rational{Int64} (constructor with 1 method)</code></pre>
-<p>As you know, a rational number <span class="math">\(m/n\)</span> can be reduced to lowest terms by factoring out common factors. <code>Julia</code> does this to store its rational numbers:</p>
-<pre class="sourceCode julia julia"><code class="sourceCode julia"><span class="fl">2</span>//<span class="fl">4</span></code></pre>
-<pre class="output"><code>1//2</code></pre>
-<p>Rational numbers are used typically to avoid round off error when using floating point values. This is easy to do, as <code>julia</code> will convert them when needed:</p>
-<pre class="sourceCode julia julia"><code class="sourceCode julia"><span class="fl">1</span>//<span class="fl">2</span> - <span class="fl">5</span>//<span class="fl">2</span>                         <span class="co">## still a rational</span>
-<span class="fl">1</span>//<span class="fl">2</span> - sqrt(<span class="fl">5</span>)/<span class="fl">2</span>                    <span class="co">## now a floating point</span></code></pre>
-<pre class="output"><code>-0.6180339887498949</code></pre>
-<p>However, we can't do the following, as the numerator would be non-integer when trying to make the rational number:</p>
-<pre class="sourceCode julia julia"><code class="sourceCode julia">(<span class="fl">1</span> - sqrt(<span class="fl">5</span>)) // <span class="fl">2</span></code></pre>
-<pre class="output"><code>MethodError(//,(-1.2360679774997898,2))</code></pre>
-<h3 id="complex-numbers">Complex numbers</h3>
-<p>Complex numbers are an extension of the real numbers when the values <span class="math">\(i = \sqrt{-1}\)</span> is added. Complex numbers have two terms: a real and imaginary part. They are typically written as <span class="math">\(a + bi\)</span>, though the polar form <span class="math">\(r\cdot e^{i\theta}\)</span> is also used. The complex numbers have the usual arithmetic operations defined for them.</p>
-<p>In <code>Julia</code> a complex number may be constructed by the <code>Complex</code> function:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">z = <span class="dt">Complex</span>(<span class="fl">1</span>,<span class="fl">2</span>)</code></pre>
-<pre class="output"><code>1 + 2im</code></pre>
-<p>We see that <code>julia</code> uses <code>im</code> (and not <code>i</code>) for the <span class="math">\(i\)</span>. It can be more direct to just use this value in constructing complex numbers:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">z = <span class="fl">1</span> + <span class="fl">2im</span></code></pre>
-<pre class="output"><code>1 + 2im</code></pre>
-<p>Here we see that the usual operations can be done:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">z^<span class="fl">2</span>, <span class="fl">1</span>/z, conj(z)</code></pre>
-<pre class="output"><code>(-3 + 4im,0.2 - 0.4im,1 - 2im)</code></pre>
-<p>The value of <span class="math">\(i\)</span> comes from taking the square root of <span class="math">\(-1\)</span>. This is almost true in <code>julia</code>, but not quite. As the <code>sqrt</code> function will return a real value for any real input, directly trying <code>sqrt(-1.0)</code> will give a <code>DomainError</code>, as in <span class="math">\(-1.0\)</span> is not in the domain of the function. However, the <code>sqrt</code> function will return complex numbers for complex inputs. So we have:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">sqrt(-<span class="fl">1.0</span> + <span class="fl">0im</span>)</code></pre>
-<pre class="output"><code>0.0 + 1.0im</code></pre>
-<p>Complex numbers have a big role to play in higher level mathematics. In calculus, they primarily occur as roots of polynomial equation.</p>
-<h3 id="practice-4">Practice</h3>
-<h4 id="question-24">question</h4>
-<p>Compute the value of <span class="math">\(2^{1023}(2 -2^{-52})\)</span> using <code>2.0</code> -- not the integer <code>2</code>:</p>
+</blockquote><p>Floating point contains two special values: <code>NaN</code> and <code>Inf</code> to represent "not a number" and "infinity." These arise in some natural cases:</p><pre class="sourceCode julia">1/0				## infinity. Also -1/0.</pre>
+<pre class="output">
+Inf</pre>
 
-<form name='WeaveQuestion' data-id='dKwo4dNBiT' data-controltype='radio'>
-<div class='control-group '>
-<div class='controls'>
+<pre class="sourceCode julia">0/0				## indeterminate</pre>
+<pre class="output">
+NaN</pre>
 
+<p>These values can come up in unexpected circumstances. For example division by $0$ can occur due to round off errors:</p><pre class="sourceCode julia">x = 1e-17
+x^2/(1-cos(x))			## should be about 2</pre>
+<pre class="output">
+Inf</pre>
 
-<label class='radio'>
-  <input type='radio' name='radio_dKwo4dNBiT' value='1'>
-  <code>-Inf</code>
-</label>
+<h3>Rational numbers</h3><p>In addition to special classes for integer and floating point values, <code>Julia</code> has a special class for rational numbers, or ratios of integers. To distinguish between regular division and rational numbers, <code>julia</code> has the <code>//</code> symbol to define rational numbers:</p><pre class="sourceCode julia">1//2</pre>
+<pre class="output">
+1//2</pre>
 
-<label class='radio'>
-  <input type='radio' name='radio_dKwo4dNBiT' value='2'>
-  Domain Error
-</label>
+<pre class="sourceCode julia">typeof(1//2)</pre>
+<pre class="output">
+Rational{Int64}</pre>
 
-<label class='radio'>
-  <input type='radio' name='radio_dKwo4dNBiT' value='3'>
-  <code>1.7976931348623157e308</code>
-</label>
+<p>As you know, a rational number $m/n$ can be reduced to lowest terms by factoring out common factors. <code>Julia</code> does this to store its rational numbers:</p><pre class="sourceCode julia">2//4</pre>
+<pre class="output">
+1//2</pre>
 
+<p>Rational numbers are used typically to avoid round off error when using floating point values. This is easy to do, as <code>julia</code> will convert them when needed:</p><pre class="sourceCode julia">1//2 - 5//2                         ## still a rational
+1//2 - sqrt(5)/2                    ## now a floating point</pre>
+<pre class="output">
+-0.6180339887498949</pre>
 
+<p>However, we can't do the following, as the numerator would be non-integer when trying to make the rational number:</p><pre class="sourceCode julia">(1 - sqrt(5)) // 2</pre>
+<pre class="output">
+MethodError(//,(-1.2360679774997898,2))
+</pre>
 
-<span class='help-inline'><i id='dKwo4dNBiT_hint' class='icon-gift'></i></span>
-<script>$('#dKwo4dNBiT_hint').tooltip({title:'You must use 2.0 -- not 2 to do this.', html:true, placement:'right'});</script>
+<h3>Complex numbers</h3><p>Complex numbers are an extension of the real numbers when the values $i = \sqrt{-1}$ is added. Complex numbers have two terms: a real and imaginary part. They are typically written as $a + bi$, though the polar form $r\cdot e^{i\theta}$ is also used. The complex numbers have the usual arithmetic operations defined for them.  </p><p>In <code>Julia</code> a complex number may be constructed by the <code>Complex</code> function:</p><pre class="sourceCode julia">z = Complex(1,2)</pre>
+<pre class="output">
+1 + 2im</pre>
 
-<div id='dKwo4dNBiT_message'></div>
+<p>We see that <code>julia</code> uses <code>im</code> (and not <code>i</code>) for the $i$. It can be more direct to just use this value in constructing complex numbers:</p><pre class="sourceCode julia">z = 1 + 2im</pre>
+<pre class="output">
+1 + 2im</pre>
+
+<p>Here we see that the usual operations can be done:</p><pre class="sourceCode julia">z^2, 1/z, conj(z)</pre>
+<pre class="output">
+(-3 + 4im,0.2 - 0.4im,1 - 2im)</pre>
+
+<p>The value of $i$ comes from taking the square root of $-1$. This is almost true in <code>julia</code>, but not quite. As the <code>sqrt</code> function will return a real value for any real input, directly trying <code>sqrt&#40;-1.0&#41;</code> will give a <code>DomainError</code>, as in $-1.0$ is not in the domain of the function. However, the <code>sqrt</code> function will return complex numbers for complex inputs. So we have:</p><pre class="sourceCode julia">sqrt(-1.0 + 0im)</pre>
+<pre class="output">
+0.0 + 1.0im</pre>
+
+<p>Complex numbers have a big role to play in higher level mathematics. In calculus, they primarily occur as roots of polynomial equation.</p><h3>Practice</h3><h4>question</h4><p>Compute the value of $2^{1023}(2 -2^{-52})$ using <code>2.0</code> – not the integer <code>2</code>:</p><form name="WeaveQuestion" data-id="04LSJ5Dp" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio inline"> 
+    <label>
+      <input type="radio" name="radio_04LSJ5Dp" value="1"><div class="markdown"><p><code>-Inf</code></p>
 </div>
+    </label>
+    </div>
+    
+    <div   class="radio inline"> 
+    <label>
+      <input type="radio" name="radio_04LSJ5Dp" value="2"><div class="markdown"><p><code>1.7976931348623157e308</code></p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio inline"> 
+    <label>
+      <input type="radio" name="radio_04LSJ5Dp" value="3"><div class="markdown"><p>Domain Error</p>
+</div>
+    </label>
+    </div>
+    
+
+
+<span class="help-inline"><span id="04LSJ5Dp_hint" class="glyphicon glyphicon-gift"></span></span>
+<script>$("#04LSJ5Dp_hint").tooltip({title:"<div class="markdown"><p>You must use 2.0 – not 2 to do this.</p>
+</div>", html:true, placement:"right"});</script>
+
+<div id="04LSJ5Dp_message"></div>
 </div>
 </form>
-<script text='text/javascript'>
-$('input:radio[name="radio_dKwo4dNBiT"]').on('change', function() {
+<script text="text/javascript">
+$("input:radio[name='radio_04LSJ5Dp']").on("change", function() {
+  correct = this.value == 2;
+
+  if(correct) {
+     $("#04LSJ5Dp_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+  } else {
+     $("#04LSJ5Dp_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+  }
+});
+
+</script>
+<h4>question</h4><p>The result of <code>sqrt&#40;16&#41;</code> is</p><form name="WeaveQuestion" data-id="iyxLWl5y" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_iyxLWl5y" value="1"><div class="markdown"><p>An integer</p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_iyxLWl5y" value="2"><div class="markdown"><p>A floating point number</p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_iyxLWl5y" value="3"><div class="markdown"><p>A rational number (fraction)</p>
+</div>
+    </label>
+    </div>
+    
+
+
+<div id="iyxLWl5y_message"></div>
+</div>
+</form>
+<script text="text/javascript">
+$("input:radio[name='radio_iyxLWl5y']").on("change", function() {
+  correct = this.value == 2;
+
+  if(correct) {
+     $("#iyxLWl5y_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+  } else {
+     $("#iyxLWl5y_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+  }
+});
+
+</script>
+<h4>question</h4><p>The result of 16^2` is</p><form name="WeaveQuestion" data-id="myUIjWhI" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_myUIjWhI" value="1"><div class="markdown"><p>An integer</p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_myUIjWhI" value="2"><div class="markdown"><p>A rational number (fraction)</p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_myUIjWhI" value="3"><div class="markdown"><p>A floating point number</p>
+</div>
+    </label>
+    </div>
+    
+
+
+<div id="myUIjWhI_message"></div>
+</div>
+</form>
+<script text="text/javascript">
+$("input:radio[name='radio_myUIjWhI']").on("change", function() {
+  correct = this.value == 1;
+
+  if(correct) {
+     $("#myUIjWhI_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+  } else {
+     $("#myUIjWhI_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+  }
+});
+
+</script>
+<h4>question</h4><p>The result of <code>1/2</code> is</p><form name="WeaveQuestion" data-id="Uz5KQ9A4" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_Uz5KQ9A4" value="1"><div class="markdown"><p>A rational number (fraction)</p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_Uz5KQ9A4" value="2"><div class="markdown"><p>A floating point number</p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_Uz5KQ9A4" value="3"><div class="markdown"><p>An integer</p>
+</div>
+    </label>
+    </div>
+    
+
+
+<div id="Uz5KQ9A4_message"></div>
+</div>
+</form>
+<script text="text/javascript">
+$("input:radio[name='radio_Uz5KQ9A4']").on("change", function() {
+  correct = this.value == 2;
+
+  if(correct) {
+     $("#Uz5KQ9A4_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+  } else {
+     $("#Uz5KQ9A4_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+  }
+});
+
+</script>
+<h4>question</h4><p>The result of <code>2/1</code> is</p><form name="WeaveQuestion" data-id="r0jXMDI5" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_r0jXMDI5" value="1"><div class="markdown"><p>A floating point number</p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_r0jXMDI5" value="2"><div class="markdown"><p>An integer</p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_r0jXMDI5" value="3"><div class="markdown"><p>A rational number (fraction)</p>
+</div>
+    </label>
+    </div>
+    
+
+
+<div id="r0jXMDI5_message"></div>
+</div>
+</form>
+<script text="text/javascript">
+$("input:radio[name='radio_r0jXMDI5']").on("change", function() {
+  correct = this.value == 1;
+
+  if(correct) {
+     $("#r0jXMDI5_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+  } else {
+     $("#r0jXMDI5_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+  }
+});
+
+</script>
+<h4>question</h4><p>Which number is <code>1.23e4</code>?</p><form name="WeaveQuestion" data-id="lVDNXOPK" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_lVDNXOPK" value="1"><div class="markdown"><p>1234</p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_lVDNXOPK" value="2"><div class="markdown"><p>12340</p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_lVDNXOPK" value="3"><div class="markdown"><p>12300</p>
+</div>
+    </label>
+    </div>
+    
+
+
+<div id="lVDNXOPK_message"></div>
+</div>
+</form>
+<script text="text/javascript">
+$("input:radio[name='radio_lVDNXOPK']").on("change", function() {
   correct = this.value == 3;
 
   if(correct) {
-     $('#dKwo4dNBiT_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $("#lVDNXOPK_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $('#dKwo4dNBiT_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $("#lVDNXOPK_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-
-<h4 id="question-25">question</h4>
-<p>The result of <code>sqrt(16)</code> is</p>
-
-<form name='WeaveQuestion' data-id='17JHQh5mEn' data-controltype='radio'>
-<div class='control-group '>
-<div class='controls'>
-
-
-<label class='radio'>
-  <input type='radio' name='radio_17JHQh5mEn' value='1'>
-  An integer
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_17JHQh5mEn' value='2'>
-  A floating point number
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_17JHQh5mEn' value='3'>
-  A rational number (fraction)
-</label>
-
-
-
-<div id='17JHQh5mEn_message'></div>
+<h4>question</h4><p>Which number is <code>-43e-2</code>?</p><form name="WeaveQuestion" data-id="Cv4rvXfr" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_Cv4rvXfr" value="1"><div class="markdown"><p>-0.43</p>
 </div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_Cv4rvXfr" value="2"><div class="markdown"><p>-4.30</p>
 </div>
-</form>
-<script text='text/javascript'>
-$('input:radio[name="radio_17JHQh5mEn"]').on('change', function() {
-  correct = this.value == 2;
-
-  if(correct) {
-     $('#17JHQh5mEn_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
-  } else {
-     $('#17JHQh5mEn_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
-  }
-});
-
-</script>
-
-<h4 id="question-26">question</h4>
-<p>The result of 16^2` is</p>
-
-<form name='WeaveQuestion' data-id='8hiTyz4zpp' data-controltype='radio'>
-<div class='control-group '>
-<div class='controls'>
-
-
-<label class='radio'>
-  <input type='radio' name='radio_8hiTyz4zpp' value='1'>
-  An integer
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_8hiTyz4zpp' value='2'>
-  A floating point number
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_8hiTyz4zpp' value='3'>
-  A rational number (fraction)
-</label>
-
-
-
-<div id='8hiTyz4zpp_message'></div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_Cv4rvXfr" value="3"><div class="markdown"><p>-43.0</p>
 </div>
+    </label>
+    </div>
+    
+
+
+<div id="Cv4rvXfr_message"></div>
 </div>
 </form>
-<script text='text/javascript'>
-$('input:radio[name="radio_8hiTyz4zpp"]').on('change', function() {
+<script text="text/javascript">
+$("input:radio[name='radio_Cv4rvXfr']").on("change", function() {
   correct = this.value == 1;
 
   if(correct) {
-     $('#8hiTyz4zpp_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $("#Cv4rvXfr_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $('#8hiTyz4zpp_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $("#Cv4rvXfr_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
+<h4>question</h4><p>What is the answer to the following:</p><pre class="sourceCode julia">ans = round(3.4999999999999999);</pre>
+<pre class="output">
+4.0</pre>
 
-<h4 id="question-27">question</h4>
-<p>The result of <code>1/2</code> is</p>
-
-<form name='WeaveQuestion' data-id='Ae207uCMzi' data-controltype='radio'>
-<div class='control-group '>
+<form name='WeaveQuestion' data-id='WxL4M9q6' data-controltype='numeric'>
+<div class='form-group '>
 <div class='controls'>
 
 
-<label class='radio'>
-  <input type='radio' name='radio_Ae207uCMzi' value='1'>
-  An integer
-</label>
 
-<label class='radio'>
-  <input type='radio' name='radio_Ae207uCMzi' value='2'>
-  A floating point number
-</label>
+<div class="input-group">
+<input id="WxL4M9q6" type="number" class="form-control">
 
-<label class='radio'>
-  <input type='radio' name='radio_Ae207uCMzi' value='3'>
-  A rational number (fraction)
-</label>
-
-
-
-<div id='Ae207uCMzi_message'></div>
+</div>
+  
+<div id='WxL4M9q6_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('input:radio[name="radio_Ae207uCMzi"]').on('change', function() {
-  correct = this.value == 2;
+$('#WxL4M9q6').on('change', function() {
+  correct = Math.abs(this.value - 4.0) <= 0.001;
 
   if(correct) {
-     $('#Ae207uCMzi_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $('#WxL4M9q6_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#Ae207uCMzi_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $('#WxL4M9q6_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
-
 </script>
-
-<h4 id="question-28">question</h4>
-<p>The result of <code>2/1</code> is</p>
-
-<form name='WeaveQuestion' data-id='Ra5k4u5W7g' data-controltype='radio'>
-<div class='control-group '>
-<div class='controls'>
-
-
-<label class='radio'>
-  <input type='radio' name='radio_Ra5k4u5W7g' value='1'>
-  An integer
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_Ra5k4u5W7g' value='2'>
-  A floating point number
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_Ra5k4u5W7g' value='3'>
-  A rational number (fraction)
-</label>
-
-
-
-<div id='Ra5k4u5W7g_message'></div>
+<h4>question</h4><p>If you need more bits, <code>julia</code> provides the <code>BigInt</code> and <code>BigFloat</code> classes which give $256$ bits of precision. Using this allows one to compute $2^3^4$ precisely as an integer:</p><pre class="sourceCode julia">x = BigInt(2)
+ans = x^3^4</pre>
+<p>What is the answer?</p><form name="WeaveQuestion" data-id="3ejilATd" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_3ejilATd" value="1"><div class="markdown"><p><code>2417851639229258349412352</code></p>
 </div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_3ejilATd" value="2"><div class="markdown"><p><code>2.4178516392292583e24</code></p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio"> 
+    <label>
+      <input type="radio" name="radio_3ejilATd" value="3"><div class="markdown"><p><code>0</code></p>
+</div>
+    </label>
+    </div>
+    
+
+
+<div id="3ejilATd_message"></div>
 </div>
 </form>
-<script text='text/javascript'>
-$('input:radio[name="radio_Ra5k4u5W7g"]').on('change', function() {
-  correct = this.value == 2;
-
-  if(correct) {
-     $('#Ra5k4u5W7g_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
-  } else {
-     $('#Ra5k4u5W7g_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
-  }
-});
-
-</script>
-
-<h4 id="question-29">question</h4>
-<p>Which number is <code>1.23e4</code>?</p>
-
-<form name='WeaveQuestion' data-id='gceDeEaz5m' data-controltype='radio'>
-<div class='control-group '>
-<div class='controls'>
-
-
-<label class='radio'>
-  <input type='radio' name='radio_gceDeEaz5m' value='1'>
-  1234
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_gceDeEaz5m' value='2'>
-  12340
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_gceDeEaz5m' value='3'>
-  12300
-</label>
-
-
-
-<div id='gceDeEaz5m_message'></div>
-</div>
-</div>
-</form>
-<script text='text/javascript'>
-$('input:radio[name="radio_gceDeEaz5m"]').on('change', function() {
-  correct = this.value == 3;
-
-  if(correct) {
-     $('#gceDeEaz5m_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
-  } else {
-     $('#gceDeEaz5m_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
-  }
-});
-
-</script>
-
-<h4 id="question-30">question</h4>
-<p>Which number is <code>-43e-2</code>?</p>
-
-<form name='WeaveQuestion' data-id='iuuhRjzqSI' data-controltype='radio'>
-<div class='control-group '>
-<div class='controls'>
-
-
-<label class='radio'>
-  <input type='radio' name='radio_iuuhRjzqSI' value='1'>
-  -0.43
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_iuuhRjzqSI' value='2'>
-  -4.30
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_iuuhRjzqSI' value='3'>
-  -43.0
-</label>
-
-
-
-<div id='iuuhRjzqSI_message'></div>
-</div>
-</div>
-</form>
-<script text='text/javascript'>
-$('input:radio[name="radio_iuuhRjzqSI"]').on('change', function() {
+<script text="text/javascript">
+$("input:radio[name='radio_3ejilATd']").on("change", function() {
   correct = this.value == 1;
 
   if(correct) {
-     $('#iuuhRjzqSI_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
+     $("#3ejilATd_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $('#iuuhRjzqSI_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
+     $("#3ejilATd_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
 
-<h4 id="question-31">question</h4>
-<p>What is the answer to the following:</p>
-<pre class="sourceCode julia"><code class="sourceCode julia">ans = round(<span class="fl">3.4999999999999999</span>);</code></pre>
-<pre class="output"><code>4.0</code></pre>
-
-<form name='WeaveQuestion' data-id='u9XLKw1sbC' data-controltype='numeric'>
-<div class='control-group '>
-<div class='controls'>
-<input id="u9XLKw1sbC" type="number">
-
-
-<span class='help-inline'><i id='u9XLKw1sbC_hint' class='icon-gift'></i></span>
-<script>$('#u9XLKw1sbC_hint').tooltip({title:'This value is indistinguishable from 3.5', html:true, placement:'right'});</script>
-
-<div id='u9XLKw1sbC_message'></div>
-</div>
-</div>
-</form>
-<script text='text/javascript'>
-$('#u9XLKw1sbC').on('change', function() {
-  correct = Math.abs(this.value - 4.0) <= 1.4901161193847656e-8;
-
-  if(correct) {
-     $('#u9XLKw1sbC_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
-  } else {
-     $('#u9XLKw1sbC_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
-  }
-});
-
-</script>
-
-<h4 id="question-32">question</h4>
-<p>If you need more bits, <code>julia</code> provides the <code>BigInt</code> and <code>BigFloat</code> classes which give <span class="math">\(256\)</span> bits of precision. Using this allows one to compute <span class="math">\(2^3^4\)</span> precisely as an integer:</p>
-<pre class="sourceCode julia" execute="false"><code class="sourceCode julia">x = BigInt(<span class="fl">2</span>)
-ans = x^<span class="fl">3</span>^<span class="fl">4</span></code></pre>
-<p>What is the answer?</p>
-
-<form name='WeaveQuestion' data-id='RRPpxJCahK' data-controltype='radio'>
-<div class='control-group '>
-<div class='controls'>
-
-
-<label class='radio'>
-  <input type='radio' name='radio_RRPpxJCahK' value='1'>
-  <code>2417851639229258349412352</code>
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_RRPpxJCahK' value='2'>
-  <code>2.4178516392292583e24</code>
-</label>
-
-<label class='radio'>
-  <input type='radio' name='radio_RRPpxJCahK' value='3'>
-  <code>0</code>
-</label>
-
-
-
-<div id='RRPpxJCahK_message'></div>
-</div>
-</div>
-</form>
-<script text='text/javascript'>
-$('input:radio[name="radio_RRPpxJCahK"]').on('change', function() {
-  correct = this.value == 1;
-
-  if(correct) {
-     $('#RRPpxJCahK_message').html('<div class="alert alert-success"><i class="icon-thumbs-up"></i>&nbsp;Correct</div>');
-  } else {
-     $('#RRPpxJCahK_message').html('<div class="alert alert-error"><i class="icon-thumbs-down"></i>&nbsp;Incorrect</alert>');
-  }
-});
-
-</script>
-
-</div>
-</div>
-</div>
-<script>$(document).ready(function(){$("#tabbable > ul").html('<li class="active"><a href="#_introduction_" data-toggle="tab"> Introduction </a></li><li ><a href="#_expressions_" data-toggle="tab"> Expressions </a></li><li ><a href="#_precedence_" data-toggle="tab"> Precedence </a></li><li ><a href="#_using_functions_" data-toggle="tab"> Using functions </a></li><li ><a href="#_variables_" data-toggle="tab"> Variables </a></li><li ><a href="#_numbers_" data-toggle="tab"> Numbers </a></li>');});</script>
   </div>
-</div>
+</div>  
+
 </body>
 </html>

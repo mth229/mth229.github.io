@@ -1,0 +1,326 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+
+
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) { 
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();                                    
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();  
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h1>Questions to be handed in for project Techniques of Integration</h1><p>Begin by loading our package for plotting our package that allows symbolic math:</p><pre class="sourceCode julia">using Plots; gadfly()
+using SymPy</pre>
+<p>This project covers some of the techniques of integration utilizing the symbolic algebra capabilities provide by the <code>SymPy</code> package. </p><p>The basic techniques of integration involve </p><ul>
+<li>substitution (reverse chain rule)</li>
+<li>integration by parts (reversed product rule)</li>
+<li>partial fractions (for rational functions)</li>
+</ul><p>The <code>SymPy</code> function <code>integrate</code> is a implementation of the <a href="http://en.wikipedia.org/wiki/Risch_algorithm">Risch Algorithm</a>.  This algorithm can decide if a function comprised of elementary functions has an antiderivative expressed in elementary function.  For example, neither $\sin(x^2)$ or $e^{x^2}$ has such a "nice" antiderivative, whereas $\sin(x)^2$ and $xe^{-x^2}$ do. Risch's algorithm exploits <a href="http://asmeurersympy.wordpress.com/2010/08/">Liouville's Theorem</a> which gives a representation for any potential antiderivative of $f(x)$ using <em>elementary functions</em> such as polynomials, logarithms, exponentials and trigonometric functions.</p><h3>Questions</h3><h4>When <code>integrate</code> works</h4><ul>
+<li>use <code>integrate</code> to find an antiderivative for </li>
+</ul>$$~
+\int \cos(x) \log(\sin(x)) dx.
+~$$<p>Judging from the answer does it appear to use parts, substitution, both, or something else.</p><div class="well well-sm">
+</div>
+
+<ul>
+<li>use <code>integrate</code> to find an antiderivative for </li>
+</ul>$$~
+\int (\log(x))^2 dx.
+~$$<p>Judging from the answer does it appear to use parts, substitution, both, or something else.</p><div class="well well-sm">
+</div>
+
+<ul>
+<li>use <code>integrate</code> to find an antiderivative for </li>
+</ul>$$~
+\int \sin(x) \cdot e^x dx.
+~$$<p>Judging from the answer does it appear to use parts, substitution, both, or something else.</p><div class="well well-sm">
+</div>
+
+<ul>
+<li>The <code>integrate</code> function might fail on</li>
+</ul>$$~
+\int x \sec^2(x) dx.
+~$$<p>But, replacing $\sec(x)$ with $1/\cos(x)$ may work. Does it?</p><div class="well well-sm">
+</div>
+
+<h3>It doesn't always work ...</h3><p>The <code>integrate</code> function works for many functions, but for some one can help by performing substitutions by hand first.</p><p>Here is an example from <a href="http://faculty.uml.edu/jpropp/142/Integration.pdf">here</a> where performing the substitution by hand is needed to give a boost. Find</p>$$~
+\int (1 + \log(x)) \cdot \sqrt{1 + (x\cdot\log(x))^2} dx.
+~$$<pre class="sourceCode julia">x, dx = symbols("x, dx")
+f(x) = sqrt(x^2 + 1)
+u = x*log(x)
+ex = f(u) * diff(u,x)</pre>
+<div class="well well-sm">
+$$\sqrt{x^{2} \log^{2}{\left (x \right )} + 1} \left(\log{\left (x \right )} + 1\right)$$</div>
+
+<p>This is written to look like a substitution problem. Will <code>SymPy</code> be able to see that?</p><pre class="sourceCode julia">integrate(ex, x)</pre>
+<div class="well well-sm">
+$$\int \sqrt{x^{2} \log^{2}{\left (x \right )} + 1} \left(\log{\left (x \right )} + 1\right)\, dx$$</div>
+
+<p>Sympy can't do this integral, and so returns the expression. We can help.</p><p>Let's introduce a variable <code>dx</code> into our expression, and then we have:</p><pre class="sourceCode julia">ex =  f(u) * diff(u,x) * dx</pre>
+<div class="well well-sm">
+$$dx \sqrt{x^{2} \log^{2}{\left (x \right )} + 1} \left(\log{\left (x \right )} + 1\right)$$</div>
+
+<p>Then we can have this substitution $u = x\log(x)$  Then $du = (x \cdot \log(x))' dx$.</p><p>We replace each $x \log(x)$ with a <code>u</code>, and replace $dx$ with $dy/(x \cdot \log(x))'$. The <code>subs</code> function can do so:</p><pre class="sourceCode julia">u, du = symbols("u, du")
+## replace x*log(x) with u and diff(x*log(x),x) * dx with du
+ex1 = subs(ex, (x*log(x), u), (dx, du/diff(x*log(x),x)))</pre>
+<div class="well well-sm">
+$$du \sqrt{u^{2} + 1}$$</div>
+
+<p>This latter function can be integrated (after stripping off the differential we added for familiarity):</p><pre class="sourceCode julia">ex = integrate(ex1 / du)</pre>
+<div class="well well-sm">
+$$\frac{u}{2} \sqrt{u^{2} + 1} + \frac{1}{2} \operatorname{asinh}{\left (u \right )}$$</div>
+
+<p>If needed we can resubstitute in $x \log(x)$ for $u$ to get an answer.</p><pre class="sourceCode julia">subs(ex, (u, x*log(x)))</pre>
+<div class="well well-sm">
+$$\frac{x}{2} \sqrt{x^{2} \log^{2}{\left (x \right )} + 1} \log{\left (x \right )} + \frac{1}{2} \operatorname{asinh}{\left (x \log{\left (x \right )} \right )}$$</div>
+
+<p>For future use, we codify the above steps in a function:</p><pre class="sourceCode julia">function usub(ex, let_u_equal)
+    u, du, dx = symbols("u, du, dx")
+    ex1 = ex * dx
+    ex2 = subs(ex1, (dx, du/diff(let_u_equal, x)))
+    ex3 = subs(ex2, (let_u_equal, u))
+    ex3 / du
+end</pre>
+<pre class="output">
+usub (generic function with 1 method)</pre>
+
+<p>This can be used as follow:</p><pre class="sourceCode julia">ex = log(x)/x
+usub(ex, log(x))</pre>
+<div class="well well-sm">
+$$u$$</div>
+
+<p>While we are here, we also give this quick function for integration by parts. Just pick "u" and let <code>SymPy</code> do the ret:</p><pre class="sourceCode julia">function udv_parts(ex, let_u_equal)
+    u, dv = let_u_equal, ex/let_u_equal
+    du = diff(u, x)
+    v = integrate(dv)
+    [u*v, v*du]			# return two pieces. One for FTC, one to integrate
+end
+
+ex = x*sin(x)
+uv, vdu = udv_parts(ex, sin(x))</pre>
+<div class="well well-sm">
+\begin{bmatrix}\frac{x^{2}}{2} \sin{\left (x \right )}\\\frac{x^{2}}{2} \cos{\left (x \right )}\end{bmatrix}</div>
+
+<h3>Questions</h3><h4>The absolute value</h4><ul>
+<li>Does <code>integrate</code> know how to integrate $|x|$?</li>
+</ul><div class="well well-sm">
+</div>
+
+<ul>
+<li>Assert to <code>SymPy</code> that $x > 0$ by defining it via:</li>
+</ul><pre class="sourceCode julia">x = symbols("x", positive=true)</pre>
+<div class="well well-sm">
+$$x$$</div>
+
+<p>Does <code>integrate</code> now know how to integrate $|x|$?</p><div class="well well-sm">
+</div>
+
+<ul>
+<li>What is a simple antiderivative for $\int |x| dx$?</li>
+</ul><div class="well well-sm">
+</div>
+
+<h4>Helping <code>integrate</code> out</h4><ul>
+<li>Does <code>integrate</code>  find an antiderivative for </li>
+</ul>$$~
+\int \log(\log(x)) / x dx?
+~$$<p>If not, help it out.</p><div class="well well-sm">
+</div>
+
+<ul>
+<li>The following integral exists, but is not found by <code>integrate</code>:</li>
+</ul>$$~
+\int \frac{(-\log(x)^2 + 1)^{1/2}}{x} dx
+~$$<p>Make a $u$-substitution to help <code>integrate</code> out with finding an answer:</p><div class="well well-sm">
+</div>
+
+<ul>
+<li>The following integral exists, but is not found by <code>integrate</code>:</li>
+</ul>$$~
+\int \frac{1}{x \sqrt{1 - \log(x)^2}}dx.
+~$$<p>Make a $u$-substitution to help <code>integrate</code> out with finding an answer:</p><div class="well well-sm">
+</div>
+
+<ul>
+<li>What do you get if you try a "u"-"dv" integration by parts for $\int   e^x \sin(x) dx$?  Does it seem to help find the integral?</li>
+</ul><div class="well well-sm">
+</div>
+
+<ul>
+<li>The <a href="http://en.wikipedia.org/wiki/Integration_by_parts#LIATE_rule">LIATE rule</a> is a rule of thumb for identifying what $u$ should be in integrating by parts. Apply it to </li>
+</ul>$$~
+\int x^2 e^x dx.
+~$$<p>What is $u$? What is the "$v \cdot du$" term? Does it seem "easier" than what you started with? Why?</p><div class="well well-sm">
+</div>
+
+<h3>Integration of rational functions:</h3><p>Some background reading on the implementation is <a href="http://asmeurersympy.wordpress.com/2010/06/11/integration-of-rational-functions/">here</a></p><p>A <em>rational function</em> is a ratio of polynomial functions. Using polynomial long division and dividing out common factors, up to removable singularities, one can uniquely write a rational function in terms of three other polynomials:</p>$$~
+a(x)/b(x) =  s(x) + r(x)/q(x)
+~$$<p>where the degree of $r(x)$ is less than the degree of $q(x)$ and there are no common roots to $r(x)$ and $q(x)$. It is easy to integrate $s(x)$. What about the $r(x)/q(x)$?</p><p>We know from the <em>fundamental theorem of algebra</em> that we can factor $q(x) = p_1(x)^n_1 \cdots p_k(x)^{n_k}$, where $p_i$ is a linear or quadratic factor. Further, the <a href="http://en.wikipedia.org/wiki/Partial_fraction_decomposition">partial fraction decomposition</a> ensures then that the ratio can be written as:</p>$$~
+\frac{r(x)}{q(x)} = \sum_i^k \frac{a_{i1}(x)}{p_i(x)} + \frac{a_{i2}(x)}{p_i(x)^2} + ... + \frac{a_{in_i}(x)}{p_i(x)^{n_i}}
+~$$<p>with the $a_{ij}(x)$ being polynomials of degree less than or equal the $p_i(x)$, so in this case either a constant or linear polynomial.</p><p>So, if the polynomials of the form $(ax+b)/(cx^2 + dx + e)^j$ can be integrated, by the linearity of integration all rational functions can be integrated. Let's investigate this question.</p><h3>Questions</h3><ul>
+<li>The <code>apart</code> function separates rational functions into pieces. Use   <code>apart</code> to find the partial fraction decomposition of</li>
+</ul>$$~
+f(x) = \frac{1}{x(x+1)}
+~$$<div class="well well-sm">
+</div>
+
+<ul>
+<li> Use <code>apart</code> to find the partial fraction decomposition of </li>
+</ul>$$~
+f(x) = \frac{1}{x(x+1)^5}
+~$$<div class="well well-sm">
+</div>
+
+<ul>
+<li> Use <code>apart</code> to find the partial fraction decomposition of </li>
+</ul>$$~
+f(x) = \frac{1}{x(x^2+1)}
+~$$<div class="well well-sm">
+</div>
+
+<ul>
+<li> Use <code>apart</code> to find the partial fraction decomposition of </li>
+</ul>$$~
+f(x) = \frac{1}{x(x^2+1)^3}
+~$$<div class="well well-sm">
+</div>
+
+<ul>
+<li> Use <code>apart</code> to find the partial fraction decomposition of </li>
+</ul>$$~
+f(x) = \frac{1}{(x^2+2)^2 (x^2+3)^3}
+~$$<div class="well well-sm">
+</div>
+
+<ul>
+<li>Let $m$ be a positive integer. For which values of $m$ will </li>
+</ul>$$~
+\int \frac{1}{x^m} dx
+~$$<p>will have a rational function for an answer? What is the answer when it isn't a rational function?</p><div class="well well-sm">
+</div>
+
+<ul>
+<li>What is the integral of a term like:</li>
+</ul>$$~
+\int \frac{1}{x^2 + 1} dx
+~$$<div class="well well-sm">
+</div>
+
+<ul>
+<li>What is the integral of a term like</li>
+</ul>$$~
+\int \frac{x}{x^2 + 1} dx
+~$$<div class="well well-sm">
+</div>
+
+<ul>
+<li>For non-negative, integer values of $m$, do these integrals appear   to always be rational functions? (Just try some different values   starting with $m=1$.)</li>
+</ul>$$~
+\int \frac{1}{(x^2+1)^m} dx
+~$$<div class="well well-sm">
+</div>
+
+<ul>
+<li>For non-negative, integer values of $m$, do these integrals appear   to always be rational functions?</li>
+</ul>$$~
+\int \frac{x}{(x^2+1)^m} dx
+~$$<p>Verify this is the case for any $m$ by integrating the above symbolically. (You might also try to do the substitution manually.)</p><div class="well well-sm">
+</div>
+
+
+  </div>
+</div>  
+
+</body>
+</html>

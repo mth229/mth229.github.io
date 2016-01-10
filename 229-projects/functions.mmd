@@ -17,9 +17,10 @@ passing a value to it with parentheses.
 
 That covers most of the uses within this project.
 
+
 ----
 
-But there is more...
+But there is more to functions...
 
 #### Julia functions can have more than one variable
 
@@ -38,7 +39,7 @@ rectarea(b) = rectarea(b,b)	# area of square using area of rectangle
 Which function is used depends on the arguments that are passed when calling the function. Hence, `log(x)` will find log base $e$ of $x$ whereas `log(10,x)` can be used to find log base 10.
 
 
-#### Multiline functions are defined with the `function` keyword
+#### Multiline functions are defined with the function keyword
 
 ```
 function multiline_function(x)
@@ -71,7 +72,7 @@ Using functions this way will form a *very* common pattern.
 
 
 
-#### Functions can be *anonymous*.
+#### Functions can be anonymous.
 
 These are defined via the pattern: "`args -> body`". Look for the arrow `->`:
 
@@ -79,42 +80,8 @@ These are defined via the pattern: "`args -> body`". Look for the arrow `->`:
 plot(x -> sin(x)*cos(2x), 0, 2pi)
 ```
 
-#### Functions can be *returned* by other functions (see the "arrow"):
-
-```
-secant_line(f, a, b) = x -> f(a) + (f(b) - f(a))/(b-a)*(x-a)
-```
-
 ----
 
-### Controlling what gets returned by `IJulia`
-
-When `IJulia` evaluates a cell, it will only display the last command
-executed (without explicitly printing).  One useful trick to output more than one value at a time is
-to place them into a container. Grouping values within parentheses will produce a "tuple":
-
-```
-(1, 2, "a")
-```
-
-Tuples will be implicitly constructed if the parentheses are left off. So separating values by commas can be used to have multiple values printed in a cell.
-
-
-If the values are all of the same type, the preferred container would
-be made with `[]`, as in:
-
-```
-[1, 2]
-```
-
-If the comma is left out, the results are combined "horizontally", which can be a space saver in some cases:
-
-```
-[1 2 3 4 5]
-```
-
-
-----
 
 ### Questions
 
@@ -331,14 +298,11 @@ numericq(val, 1e-4, "value at t=$t")
 
 Some functions are defined in terms of cases. For example, a cell phone plan might depend on the data used through:
 
-$$~
-f(d) = \begin{cases}
-40.00 & d \leq 1.0\\
-40.00 + 10.0 \cdot (d - 1) & \text{ otherwise}
-\end{cases}
-~$$
+> The amount is 40 dollars for the first 1 Gb  of data, and 10 dollars more for each *additional* Gb of data.
 
-How to define such conditions on the computer?
+This function has two cases to consider: one if the data is less than 1 Gb and the other when it is more.
+
+How to write this in `julia`?
 
 
 The ternary operator `predicate ? expression1 : expression2` has three
@@ -390,16 +354,7 @@ shortq("f(x) = x < 10 ? x : 10", "Function which is x for x < 10 and 10 otherwis
 shortq("Sin(x) = -pi/2 < x < pi/2 ? sin(x) : NaN", "restrict sin(x) to -pi/2 to pi/2")
 ```
 
-* Define a function 
-
-$$~
-signal(x) =
-\begin{cases}
-0 & \text{ if } x\leq 0,\\
-\sin^2(\pi /2 x) & \text{ if } 0<x<1, \text{ and }\\
-1 & \text{ if } x\geq 1
-\end{cases}
-~$$
+* Define a function `signal(x)` where when $x \leq 0$ the function is $0$, when $x > 1$ the function is $1$, and otherwise is $\sin(\pi/2 \cdot x)^2$.
 
 Compare the difference between `signal(0.999)` and `signal(1.001)`.
 
@@ -538,7 +493,13 @@ numericq(val, 1e-4, "$ex")
 
 ## Returning a function
 
-Familiar mathematical functions take a real number and return a real number. However, the concept of a function is more general. With `julia` it is useful to write functions that take functions as arguments, and return a derived function as an output. For the return value an _anonymous function_ is typically used. These are specified as `arg -> rule`, where the arg is a variable, like `x`, and the rule can depend on the value of `x`. 
+Familiar mathematical functions take a real number and return a real
+number. However, the concept of a function is more general. With
+`julia` it is useful to write functions that take functions as
+arguments, and return a derived function as an output. For the return
+value an *anonymous function* is typically used. These are specified
+as `arg -> rule`, where the arg is a variable, like `x`, and the rule
+can depend on the value of `x`.
 
 * Describe what the following function does to the argument $f$, when
   $f$ is a function. (There isn't anything to do but recognize that
@@ -553,4 +514,32 @@ n(f::Function) = x -> -f(x)
 
 ```
 longq("Describe \\verb+n(f::Function) = x -> -f(x)+", "The defines g(x) = -f(x)")
+```
+
+
+* This function takes a function and two points and returns a new function that evaluates the secant line:
+
+```
+function secant(f, a, b)
+  m = (f(b) - f(a)) / (b - a)
+  x -> f(a) + m * (x - a)
+end
+```
+
+Let $f(x) = \sin(x)$. Let $a=\pi/6$ and $b=\pi/3$. Show that the secant line at $\pi/4$ is less than the function value at $\pi/4$ by computing both:
+
+```
+```
+
+The function at $\pi/4$ is:
+
+```
+f(x) = sin(x)
+numericq(f(pi/4))
+```
+
+The secant line's value at $\pi/4$ is:
+
+```
+numericq(secant(f, pi/6, pi/3)(pi/4))
 ```

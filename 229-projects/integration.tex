@@ -10,17 +10,19 @@ ul li {list-style-image: url(http://www.math.csi.cuny.edu/static/images/julia.pn
 \end{html}
 \begin{document}
 \section{Questions to be handed in on integration:}\newline
-To get started, we load the \texttt{Gadfly} backend for \texttt{Plots}, so that we can make plots; and load the \texttt{Roots} package for \texttt{D}; and the \texttt{SymPy} package:\begin{verbatim}
+To get started, we load the \texttt{Gadfly} backend for \texttt{Plots}, so that we can make plots; load the \texttt{Roots} package for its \texttt{D} function; and the \texttt{SymPy} package:\begin{verbatim}
 using Plots
 gadfly()
 using Roots			# for D and fzero
 using SymPy
 \end{verbatim}
 \subsubsection{Quick background}\newline
-Read about this material here: \href{http://mth229.github.io/integration.html}{integration}.\newline
-For the impatient, in many cases, the task of evaluating a definite integral is made easy by the fundamental theorem of calculus which says that for a continuous function $f$ the following holds for any antiderivate, $F$, of $f$:$~
+Read more about this material here: \href{http://mth229.github.io/integration.html}{integration}.\newline
+For the impatient, in many cases, the task of evaluating a definite integral is made easy by the fundamental theorem of calculus which says that for a continuous function $f$ the following holds for any antiderivate, $F$, of $f$:
+$$
 \int_a^b f(x) dx = F(b) - F(a).
-~$\newline
+$$
+\newline
 That is the definite integral is found by evaluating a related function at the endpoints, $a$ and $b$.\newline
 The \texttt{SymPy} package can compute many antiderivatives using a version of the \href{http://en.wikipedia.org/wiki/Risch\_algorithm}{Risch algorithm} that works for \href{http://en.wikipedia.org/wiki/Elementary\_function}{elementary functions}. \texttt{SymPy}'s \texttt{integrate} function can be used to find an indefinite integral:\begin{verbatim}
 f(x) = x^2
@@ -31,8 +33,8 @@ Or a definite integral:\begin{verbatim}
 integrate(f, 0, 1)		# returns a "symbolic" number
 \end{verbatim}
 $$\frac{1}{3}$$\newline
-However, this only works \textit{if} there is a known antiderivative $F(x)$ – which is not always the case. If not, what to do?\newline
-In this case, we can appeal to the definition of the definite integral. For continuous, non-negative $f(x)$, the definite integral is the area under the graph of $f$ over the interval $[a,b]$. For possibly negative functions, the indefinite integral is found by the _signed_ area under $f$.  This area can be directly \textit{approximated} using Riemann sums, or some other approximation scheme.\newline
+However, this only works \textit{if} there is a known antiderivative $F(x)$ $-$ which is not always the case. If not, what to do?\newline
+In this case, we can appeal to the definition of the definite integral. For continuous, non-negative $f(x)$, the definite integral is the area under the graph of $f$ over the interval $[a,b]$. For possibly negative functions, the indefinite integral is found by the \textit{signed} area under $f$.  This area can be directly \textit{approximated} using Riemann sums, or some other approximation scheme.\newline
 The Riemann approximation can help. The following pattern will compute a Riemann sum using right-hand endpoints:\begin{verbatim}
 f(x) = x^2
 a, b, n = 0, 1, 5		# 5 partitions of [0,1] requested
@@ -44,7 +46,7 @@ sum(fxs * delta)		# a new function `sum` to add up values in a container
 \begin{verbatim}
 0.44000000000000006\end{verbatim}
 \newline
-That value isn't very close to $1/3$. But we only took $n=5$ rectangles – clearly there will be some error. Bigger $n$s mean better approximations:\begin{verbatim}
+That value isn't very close to $1/3$. But we only took $n=5$ rectangles $-$ clearly there will be some error. Bigger $n$s mean better approximations:\begin{verbatim}
 f(x) = x^2
 a, b, n = 0, 1, 50_000		# 50,000 partitions of [0,1] requested
 delta = (b - a)/n		
@@ -89,7 +91,7 @@ ans, err = quadgk(f, 0, 1)
 \begin{verbatim}
 (0.3333333333333333,5.551115123125783e-17)\end{verbatim}
 \newline
-The \texttt{quadgk} function returns two values, an answer and an estimated maximum possible error.  The ans is the first number, clearly it is $1/3$, and the estimated maximum error is the second. In this case it is small ($10^{-17}$) – basically 0.\subsubsection{Questions}\begin{itemize}\item Let $g(x) = x^4 + 10x^2 - 60x + 71$. Find the integral $\int_0^1   g(x) dx$ by hand by finding an antiderivative and then using the fundamental theorem of calculus.\end{itemize}
+The \texttt{quadgk} function returns two values, an answer and an estimated maximum possible error.  The ans is the first number, clearly it is $1/3$, and the estimated maximum error is the second. In this case it is small ($10^{-17}$) $-$ basically 0.\subsubsection{Questions}\begin{itemize}\item Let $g(x) = x^4 + 10x^2 - 60x + 71$. Find the integral $\int_0^1   g(x) dx$ by hand by finding an antiderivative and then using the fundamental theorem of calculus.\end{itemize}
 \\begin{answer}
 type: longtext
 reminder: Commands to do FTC
@@ -97,9 +99,11 @@ answer_text: \verb# G(x) = x^5/5 + 10x^3/3 -60x^2/2+71x; G(1)-G(0)=44.53# (or \v
 rows: 3
 cols: 60
 \\end{answer}
-\begin{itemize}\item For $f(x) = x/\sqrt{g(x)}$ (for $g(x)$ from the last problem) estimate the following using 1000 Riemann sums:\end{itemize}$~
+\begin{itemize}\item For $f(x) = x/\sqrt{g(x)}$ (for $g(x)$ from the last problem) estimate the following using 1000 Riemann sums:\end{itemize}
+$$
 \int_0^1 f(x) dx
-~$
+$$
+
 \\begin{answer}
     type: numeric
     reminder: riemann sum, n=1000
@@ -117,8 +121,8 @@ cols: 60
 \\begin{answer}
 type: radio
 reminder: Where do they differ?
-values: 4 | 2 | 5 | 1 | 3 | 6
-labels: They differ at the fifth place after the decimal point | They differ at the second place after the decimal point | They differ at the first place after the decimal point | They differ at the third place after the decimal point | They differ at the fourth place after the decimal point | They differ at the sixth place after the decimal point
+values: 3 | 6 | 4 | 1 | 2 | 5
+labels: They differ at the fourth place after the decimal point | They differ at the fifth place after the decimal point | They differ at the first place after the decimal point | They differ at the third place after the decimal point | They differ at the sixth place after the decimal point | They differ at the second place after the decimal point
 answer: 4
 
 \\end{answer}
@@ -134,26 +138,26 @@ The left Riemann sum uses left-hand endpoints, not right-hand ones. \begin{itemi
 \\begin{answer}
 type: radio
 reminder: Approximate difference for 10,000 steps
-values: 4 | 3 | 2 | 1
-labels: 1/1000 | 1/100000 | 1/100 | 1/10000
-answer: 4
+values: 1 | 2 | 3 | 4
+labels: 1/100 | 1/10000 | 1/1000 | 1/100000
+answer: 2
 
 \\end{answer}
 \subsubsection{Trapezoid, Simpson's}\begin{itemize}\item The answer to $\int_0^1 e^x dx$ is simply $e^1 - e^0$ =   $e-1$. Compare the error (in absolute value) of the trapezoid method when $n=10,000$.\end{itemize}
 \\begin{answer}
 type: radio
 reminder: Size of error
-values: 3 | 1 | 4 | 6 | 5 | 2 | 7
-labels: The error is about 1e-11 | The error is about 1e-9 | The error is about 1e-7 | The error is about 1e-6 | The error is about 1e-10 | The error is about 1e-8 | The error is about 1e-12
-answer: 2
+values: 4 | 1 | 5 | 3 | 2 | 6 | 7
+labels: The error is about 1e-10 | The error is about 1e-8 | The error is about 1e-6 | The error is about 1e-7 | The error is about 1e-9 | The error is about 1e-12 | The error is about 1e-11
+answer: 5
 
 \\end{answer}
 \begin{itemize}\item The answer to $\int_0^1 e^x dx$ is simply $e^1 - e^0$ =   $e-1$. Compare the error of the Simpson's method when $n=10,000$.\end{itemize}
 \\begin{answer}
 type: radio
 reminder: Size of error, simpsons
-values: 4 | 1 | 3 | 2 | 5 | 6 | 7
-labels: The error is about 1e-11 | The error is about 1e-13 | The error is about 1e-15 | The error is about 1e-10 | The error is about 1e-14 | The error is about 1e-12 | The error is about 1e-16
+values: 1 | 6 | 4 | 5 | 3 | 7 | 2
+labels: The error is about 1e-10 | The error is about 1e-13 | The error is about 1e-11 | The error is about 1e-15 | The error is about 1e-16 | The error is about 1e-14 | The error is about 1e-12
 answer: 2
 
 \\end{answer}
@@ -171,9 +175,9 @@ The error is about
 \\begin{answer}
 type: radio
 reminder: Size of error, quadgk
-values: 2 | 3 | 1 | 4 | 5 | 6 | 7
-labels: The error is about 1e-8 | The error is about 1e-6 | The error is about 1e-7 | The error is about 1e-9 | The error is about 1e-12 | The error is about 1e-11 | The error is about 1e-10
-answer: 1
+values: 7 | 5 | 3 | 4 | 6 | 1 | 2
+labels: The error is about 1e-10 | The error is about 1e-6 | The error is about 1e-9 | The error is about 1e-8 | The error is about 1e-12 | The error is about 1e-7 | The error is about 1e-11
+answer: 4
 
 \\end{answer}
 \begin{itemize}\item Use \texttt{quadgk} to find the integral of $e^{-|x|}$ over $[-1,1]$.\end{itemize}
@@ -198,16 +202,18 @@ answer: 1
     answer_text: [2.063, 2.063] 
 \\end{answer}
 \newline
-The graph of $f(x)$ over the interval $[e, e^2]$ makes clear that the triangle formed by the line connecting $(e, f(e))$ and $(e^2, f(e^2))$, the $x$ axis, and the line $x=f(e^2)$ will form a lower bound for the area under $f$. What is the error in this approximation? (error = answer $-$ approximation)
+The graph of $f(x)$ over the interval $[e, e^2]$ makes clear that the triangle formed by the line connecting $(e, f(e))$ and $(e^2, f(e^2))$, the $x$ axis, and the line $x=f(e^2)$ will form a lower bound for the area under $f$. What is the error in this approximation? (Where error = answer $-$ approximation.)
 \\begin{answer}
     type: numeric
     reminder: area under f
     answer: [0.4437198540224312, 0.44391985402243117]
     answer_text: [0.444, 0.444] 
 \\end{answer}
-\begin{itemize}\item A formula to compute the length of a the graph of the function $f(x)$ from $a$ to $b$ is given by the formula:\end{itemize}$~
+\begin{itemize}\item A formula to compute the length of a the graph of the function $f(x)$ from $a$ to $b$ is given by the formula:\end{itemize}
+$$
 \int_a^b \sqrt{1 + f'(x)^2} dx
-~$\newline
+$$
+\newline
 Use this formula when $f(x) = \sin(x)$ and the interval is $[0,\pi]$. What is the answer?
 \\begin{answer}
     type: numeric
@@ -216,23 +222,23 @@ Use this formula when $f(x) = \sin(x)$ and the interval is $[0,\pi]$. What is th
     answer_text: [3.819, 3.821] 
 \\end{answer}
 \newline
-Repeat, when the function is $f(x) = x^x$ over $(0, 2)$:
+Repeat, when the function is $f(x) = x^x$ over $(0, 3)$:
 \\begin{answer}
     type: numeric
     reminder: 
-    answer: [4.452551383749958, 4.454551383749958]
-    answer_text: [4.453, 4.455] 
+    answer: [27.483739678027934, 27.485739678027937]
+    answer_text: [27.484, 27.486] 
 \\end{answer}
-\begin{itemize}\item Compute the area between the intersection points of the two curves $f(x) = x$ and $g(x) = x^4$ by taking the difference between two definite integrals.\end{itemize}
+\begin{itemize}\item Compute the area between the intersection points of the two curves $f(x) = x$ and $g(x) = x^3$ by taking the difference between two definite integrals.\end{itemize}
 \\begin{answer}
     type: numeric
     reminder: 
-    answer: [0.299, 0.301]
-    answer_text: [0.299, 0.301] 
+    answer: [0.24900000000000005, 0.25100000000000006]
+    answer_text: [0.249, 0.251] 
 \\end{answer}
 \subsection{Applications}\newline
-We discuss an application of the integral to finding the volumes – not just areas.\newline
-A _solid of revolution_ is a figure with rotational symmetry around some axis, such as a soda can, a snow cone, a red solo cup, and other common figures. A formula for the volume of a figure with rotational symmetry can be written in terms of an integral based on a function, $r(h)$, which specifies the radius for various values of $h$.\begin{quotation}\newline
+We discuss an application of the integral to finding the volumes $-$ not just areas.\newline
+A \textit{solid of revolution} is a figure with rotational symmetry around some axis, such as a soda can, a snow cone, a red solo cup, and other common objects. A formula for the volume of an object with rotational symmetry can be written in terms of an integral based on a function, $r(h)$, which specifies the radius for various values of $h$.\begin{quotation}\newline
 If the radius as a function of height is given by $r(h)$, the the volume is $\int_a^b \pi r(h)^2 dh$.\end{quotation}\newline
 So for example, a baseball has a overall diameter of $2\cdot 37$mm, but if we place the center at the origin, its rotational radious is given by $r(h) = (37^2 - h^2)^{1/2}$ for $-37 \leq h \leq 37$. The volume in mm$^3$ is given by:\begin{verbatim}
 r(h) = (37^2 - h^2)^(1/2)

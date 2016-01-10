@@ -20,11 +20,11 @@ function, $f(x)$, and its first and second derivatives, $f'(x)$ and
 $f''(x)$. The basic relationship can be summarized (though the devil
 is in the details) by:
 
-1) if the first derivative is _positive_ on $(a,b)$ then the function
-  is _increasing_ on $(a,b)$.
+`*` if the first derivative is *positive* on $(a,b)$ then the function
+  is *increasing* on $(a,b)$.
 
-2) If the second derivative is _positive_ on $(a,b)$ then the function
-  is _concave up_ on $(a,b)$.
+`*` If the second derivative is *positive* on $(a,b)$ then the function
+  is *concave up* on $(a,b)$.
 
 (The devil here is that the converse statements are not quite always true.)
 
@@ -47,30 +47,37 @@ function plotif(f, g, a, b)
 end
 ```
 
-This allows a graphical exploration of the above facts. For example, this graph shows where the sine function in *increasing* over $[0, 2pi]$:
 
-```
-f(x) = sin(x)
-plotif(f, f', 0, 2pi)		# shows sin(x) and when its derivative is 0
+```nocode
+function plotif(f, g, a, b)
+  plot([f, x -> g(x) > 1/10 ? f(x) : NaN], a, b, linewidth=5)
+end
 ```
 
-<br/>
+
+This allows a graphical exploration of the above facts. For example, using it like this: `plotif(f,f', a, b)` will show a different color when $f(x)$ is *increasing* whereas `plotif(f,f,a,b)` will show a different color when $f(x)$ is *positive*.
+
+----
 
 As a reminder
 
-* a _critical_ point of $f$ is a value in the domain of $f(x)$ for
+`*` a *critical* point of $f$ is a value in the domain of $f(x)$ for
 which the derivative is $0$ or undefined. These are often but **not
 always** where $f(x)$ has a local maximum or minimum. 
 
-* An _inflection point_ of $f$ is a value in the domain of $f(x)$
-where the concavity of $f$ changes. (These are _often_ but **not
+`*` An *inflection point* of $f$ is a value in the domain of $f(x)$
+where the concavity of $f$ changes. (These are *often* but **not
 always** where $f''(x)=0$.)
 
 
 
-We can graphically identify these points or find them numerically by finding zeroes of the appropriate function.
-To find zeros we have the function call `fzero(f, a)` to find a zero iteratively starting at $x=aS$ or `fzeros(f, [a,b])` to nievely search for
-any zeros in the interval $[a,b]$.  (Recall, `fzeros` may miss some values, so a graph should always be made to double check)
+
+We can graphically identify these points or find them numerically by
+finding zeroes of the appropriate function.  To find zeros we have the
+function call `fzero(f, a)` to find a zero iteratively starting at
+$x=a$ or `fzeros(f, [a,b])` to naively search for any zeros in the
+interval $[a,b]$.  (Recall, `fzeros` may miss some values, so a graph
+should always be made to double check)
 
 For example:
 
@@ -82,17 +89,36 @@ fzero(f, 1.5)
 Or to get all values in an interval:
 
 ```
-fzeros(f, [0, 2pi])
+zs = fzeros(f, [0, 2pi])
 ```
 
-The answer from `fzeros` is a vector of values, which may require some extra work.
+The answer from `fzeros` is a vector of values. You can get individual
+ones different way or work with them all at once. For example, here is the derivative's value at each point:
+
+```
+map(f', zs)
+```
+
+
+In addition, there are two main derivative tests:
+
+`*` The **first derivative test**:  This states that for a differentiable function
+$f(x)$ with a critical point at $c$ then if $f'(x)$ changes sign
+from $+$ to $-$ at $c$ then $f(c)$ is a local maximum and if it
+changes sign from $-$ to $+$ then $f(c)$ is a local minimum.
+
+`*` The **second derivative test**: This states that if $c$ is a critical point of
+$f(x)$ and $f''(c) > 0$ then $f(c)$ is a local minimum and if
+$f''(c) < 0$ then $f(c)$ is a local maximum.
+
+
 
 ### Questions
 
 #### Graphical explorations
 
 
-* The `airy` function is a *built$-in function that is important for
+* The `airy` function is a *built-in* function that is important for
   some applications. It is likely to be unfamiliar. Make a graph using
   `plotif` to investigate when the `airy` function is positive on the
   interval $(-5,5)$. Your answer should use interval
@@ -108,7 +134,7 @@ longq("Commands to plot airy to see when it is positive", "(-5,-4.08) and (-2.33
 ```
 
 * Make a graph using `plotif` to investigate when the function $f(x) =
-  x^x$ is _increasing_ on the interval $(0,2)$. Your answer should use
+  x^x$ is *increasing* on the interval $(0,2)$. Your answer should use
   interval notation. 
 
 ```
@@ -125,7 +151,7 @@ $$~
 f(x) = \frac{x}{x^2+9}
 ~$$
 
-is _concave up_ on the interval $(-10,10)$. Your answer should use interval notation. 
+is *concave up* on the interval $(-10,10)$. Your answer should use interval notation. 
 
 ```
 ```
@@ -135,8 +161,10 @@ longq("When on (-10, 10) is \\( x/(x^2 + 9) \\) concave up?",
      L"(-5.196, 0), (5.196, \infty)")
 ```
 
-* Make a graph using `plotif` to identify any _critical points_ of
-  $f(x) = x \ln(x)$ on the interval $(0,4)$. Points where the function changes from increasing to decreasing will be critical points (though there may be others).
+* Make a graph using `plotif` to identify any *critical points* of
+  $f(x) = x \ln(x)$ on the interval $(0,4)$. Points where the function
+  changes from increasing to decreasing will be critical points
+  (though there may be others).
 
 ```
 ```
@@ -146,8 +174,10 @@ longq("Critical point of \\( x \\log(x) \\) on (0,4)",
       "0.367879 is only one")
 ```
 
-* Make a graph using `plotif` to identify any _inflection points_ of
-  $f(x) = \sin(x) - x$ over the interval $(-5,5)$. Points where the function changes concavity are inflection points (though there may be others).
+* Make a graph using `plotif` to identify any *inflection points* of
+  $f(x) = \sin(x) - x$ over the interval $(-5,5)$. Points where the
+  function changes concavity are inflection points (though there may
+  be others).
 
 ```
 ```
@@ -157,10 +187,12 @@ longq("inflection points of sin(x) - x in (-5,5)", "-pi, 0, pi")
 ```
 
 
-* For any polynomial $p(x)$, between any two consecutive zeros there must be a
-  critical point, perhaps more than one.
+* For any polynomial $p(x)$, between any two consecutive zeros there
+  must be a critical point, perhaps more than one.
 
-  For $p(x) =x^4 + x^3 - 7x^2 - x + 6$, there are zeros $-3$, $-1$, $1$ and $2$. Find the critical points using `plotif`. Which critical point(s) are between $-1$ and $1$?
+  For $p(x) =x^4 + x^3 - 7x^2 - x + 6$, there are zeros $-3$, $-1$,
+  $1$ and $2$. Find the critical points using `plotif`. Which critical
+  point(s) are between $-1$ and $1$?
 
 
 
@@ -175,7 +207,7 @@ radioq(choices, ans)
 
 #### Finding more precise numeric values
 
-* Use `fzero` to numerically identify all _critical points_ to the
+* Use `fzero` or `fzeros` to numerically identify all *critical points* to the
 function $f(x) = 2x^3 - 6x^2 - 2x + 4$. (There are no more than $2$.)
 
 ```
@@ -188,7 +220,7 @@ function $f(x) = 2x^3 - 6x^2 - 2x + 4$. (There are no more than $2$.)
 longq("critical points of \\( f(x) = 2x^3 - 6x^2 - 2x + 4 \\)", "\\verb+fzeros(D(f), -10,10)+ gives -0.15455, 2.1547")
 ```
 
-* Use `fzero` to numerically identify all _inflection points_ for the
+* Use `fzero` of `fzeros` to numerically identify all *inflection points* for the
   function $f(x) = \ln(x^2 + 2x + 5)$.
 
 ```
@@ -203,7 +235,9 @@ ans = 3
 radioq(choices, ans, "all inflection points")
 ```
 
-* Numerically identify all _critical points_ to the rational function $f(x)$ defined below. Graphing is useful to identify where the possible values are.
+* Numerically identify all *critical points* to the rational function
+  $f(x)$ defined below. Graphing is useful to identify where the
+  possible values are.
 
 $$~
 f(x) = \frac{(x-3)\cdot (x-1)\cdot (x+1)\cdot (x+3)}{(x-2)\cdot (x+2)}.
@@ -247,22 +281,13 @@ radioq(choices, ans, "When is f(x) increasing?")
 
 
 ```
-choices = [L"(-\infty, \infty) -- it is always concave up",
+choices = [L"$(-\infty, \infty)$ -- it is always concave up",
 	L"(1.5, \infty)",
 	"(1.0, 2.0)",
 	L"(-\infty, 1.0) and (2.0, \infty)"]
 ans = 4
 radioq(choices, ans, "When is f(x) concave up?")
 ```
-
-### The derivative tests
-
-#### The first derivative test
-
-This states that for a differentiable function
-$f(x)$ with a critical point at $c$ then if $f'(x)$ changes sign
-from $+$ to $-$ at $c$ then $f(c)$ is a local maximum and if it
-changes sign from $-$ to $+$ then $f(c)$ is a local minimum.
 
 * For the function $f(x)$ suppose you know $f'(x)=x^3 - 5x^2 + 8x -
 4$. Find *all* the critical points. Use the first derivative test to
@@ -276,11 +301,6 @@ longq("Find critical points of f(x), when \\( f'(x)=x^3 - 5x^2 + 8x -4 \\). Clas
 "1,2 are cps, changes sign - to + at 1, so a min; does not change sign at 2, not an extrema")
 ```
 
-#### The second derivative test
-
-This states that if $c$ is a critical point of
-$f(x)$ and $f''(c) > 0$ then $f(c)$ is a local minimum and if
-$f''(c) < 0$ then $f(c)$ is a local maximum.
 
 * Suppose $f'(x) = (x^2 - 2) \cdot e^{-x}$. First find the critical
 points of $f(x)$, then use the second derivative test to classify
@@ -403,6 +423,9 @@ radioq(choices, ans, "inflection points")
 On what interval(s) is the function $f(x)$ positive?
 
 ```
+```
+
+```
 choices = [
 L"$(-5, -4.08795)$ and $(-2.33811,0)$",
 L"$(-5, -4.8201)$ and $(-3.2482, -1.01879)$",
@@ -416,6 +439,9 @@ radioq(choices, ans, keep_order=true)
 On what interval(s) is the function $f(x)$ increasing?
 
 ```
+```
+
+```
 choices = [
 L"$(-5, -4.08795)$ and $(-2.33811,0)$",
 L"$(-5, -4.8201)$ and $(-3.2482, -1.01879)$",
@@ -427,6 +453,9 @@ radioq(choices, ans, keep_order=true)
 ```
 
 On what interval(s) is the function $f(x)$ concave up?
+
+```
+```
 
 ```
 choices = [
@@ -523,7 +552,7 @@ f((c+d)/2) <= (f(c) + f(d))/2
 
 For any function, [Wikipedia](https://en.wikipedia.org/wiki/Convex_function) gives a different definition which basically says $f(x)$ is concave up on $(a,b)$ if for
 **any** pair of points, $c$ and $d$ with $a < c < d < b$ the has the
-secant line connecting $(c,f(c))$ and $(d,f(d))$ lies _above_ the
+secant line connecting $(c,f(c))$ and $(d,f(d))$ lies *above* the
 graph of $f(x)$ over $(c,d)$.
 
 This can be investigated graphically. This function is helpful for making a secant line:

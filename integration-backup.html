@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+
+
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) { 
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();                                    
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();  
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h2>This seemed a bit hard??</h2><h4>Question</h4><p>Rewriting: Substitution</p><p>According to Strang (http://ocw.mit.edu/resources/res-18-001-calculus-online-textbook-spring-2005/textbook/MITRES_18_001_strang_5558.pdf) integration routines on calculators did some tricks to make difficult integrals easier. He gives the example of integrating $f(x) = 1/\sqrt{x}$ over the interval $[0,1]$, with known answer 2. This is an improper integral as $f(x)$ diverges as $x$ goes to 0. In practice, we can avoid this issue by using the right Riemann sums, as this integral does exist.</p><p>Okay, what is the trick? One can use a technique called _substitution_ to see that if we let $h(u) = 3u^2 - 2u^3$ that</p>$$~
+\int_0^1 f(x) dx = \int_0^1 f(h(u)) h'(u) du
+~$$<p>Let $g(u) = f(h(u))h'(u) = 6u(1-u)/\sqrt{3u^2 - 2u^3}$. Then the above is $\int_0^1 g(u) du$. This trick has two purposes:</p><ul>
+<li>if you cancel a common $u$ on top and bottom, the integral of $g$ is a proper integral</li>
+<li>It also mixes up the regularity of points used to integrate which in the case of periodic functions can lead to <em>aliasing</em>.</li>
+</ul><p>The right Riemann sum of $f(x)$ at $n=100,000$ is not even accurate at the scale of <code>1e-3</code>:</p><pre class="sourceCode julia">f(x) = 1/sqrt(x)
+abs( 2 - riemann(f, 0, 1, 100000, right_riemann) ) < 2e-3</pre>
+<pre class="output">
+UndefVarError(:riemann)
+</pre>
+
+<pre class="sourceCode julia">n = ifloor(1000 + 4000*rand(1))[1];</pre>
+<pre class="output">
+4333</pre>
+
+<p>Is the integral of $g$ over $[0,1]$ accurate to within <code>1e-3</code> by $n=$ <code>n</code>{.julia}?</p><form name="WeaveQuestion" data-id="T5dhJL9M" data-controltype="radio">
+<div class="form-group ">
+    
+    <div   class="radio inline"> 
+    <label>
+      <input type="radio" name="radio_T5dhJL9M" value="1"><div class="markdown"><p>true</p>
+</div>
+    </label>
+    </div>
+    
+    <div   class="radio inline"> 
+    <label>
+      <input type="radio" name="radio_T5dhJL9M" value="2"><div class="markdown"><p>false</p>
+</div>
+    </label>
+    </div>
+    
+
+
+<div id="T5dhJL9M_message"></div>
+</div>
+</form>
+<script text="text/javascript">
+$("input:radio[name='radio_T5dhJL9M']").on("change", function() {
+  correct = this.value == 2;
+
+  if(correct) {
+     $("#T5dhJL9M_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+  } else {
+     $("#T5dhJL9M_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+  }
+});
+
+</script>
+
+  </div>
+</div>  
+
+</body>
+</html>
