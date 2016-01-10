@@ -768,7 +768,7 @@ In fact, only *most* objects bound to a name can be arbitrarily
 redefined. When we discuss functions, we will see that redefining
 functions can be an issue and new names will need to be used. As such,
 it often works to stick to come convention for naming: numbers use
-values like `i`, `j`, `x`, `y`; function like `f`, `g`, h`, etc.
+values like `i`, `j`, `x`, `y`; functions like `f`, `g`, `h`, etc.
 
 """)
 ```
@@ -1315,13 +1315,13 @@ radioq(choices, ans)
 
 What is the answer to the following:
 
-```
-ans = round(3.4999999999999999);
+```verbatim
+val = round(3.4999999999999999);
 ```
 
 
 ```
-numericq(ans; hint="This value is indistinguishable from 3.5")
+numericq(val; hint="This value is indistinguishable from 3.5")
 ```
 
 #### question
