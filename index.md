@@ -114,15 +114,15 @@ An assignment for this material:
 [view](http://nbviewer.ipython.org/url/mth229.github.io/229-projects/newton.ipynb?create=1)
 
 
-* [First and second derivatives](http://mth229.github.io/first-second-derivatives.html)
+* [First and second derivatives](http://mth229.github.io/first_second_derivatives.html)
 
 A look at the relationship between a function and its first and second
 derivatives.
 
 <br/>
 An assignment for this material: 
-[ipynb](http://mth229.github.io/229-projects/first-second-derivatives.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/229-projects/first-second-derivatives.ipynb?create=1)
+[ipynb](http://mth229.github.io/229-projects/first_second_derivatives.ipynb) 
+[view](http://nbviewer.ipython.org/url/mth229.github.io/229-projects/first_second_derivatives.ipynb?create=1)
 
 * [Extrema](http://mth229.github.io/extrema.html)
 

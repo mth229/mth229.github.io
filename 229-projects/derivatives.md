@@ -133,14 +133,14 @@ diff(x*sin(a*x), x)
 ### Questions
 
 * Calculate the slope of the secant line of $f(x) = 3x^2 + 5$ between
-  $(3,f(3))$ and $(5, f())$.
+  $(3,f(3))$ and $(4, f(4))$.
 
 ```
 ```
 
 ```
 f(x) = 3x^2 + 5
-x0,x1 = 3, 5
+x0,x1 = 3, 4
 val = (f(x1) - f(x0))/(x1 - x0)
 numericq(val, 1e-3, "slope of secant line")
 ```
@@ -162,7 +162,7 @@ longq("Verify derivative using a table", "\\verb+[hs map(h->(sin(pi/3 + h)-sin(p
 ```
 
 
-* Let $f(x) = 1/x$ and $c=4$. Find the approximate derivative (forward) when
+* Let $f(x) = 1/x$ and $c=2$. Find the approximate derivative (forward) when
   `h=1e-6`.
 
 ```
@@ -170,13 +170,13 @@ longq("Verify derivative using a table", "\\verb+[hs map(h->(sin(pi/3 + h)-sin(p
 
 ```
 f(x) = 1/x
-c, h = 4, 1e-6
+c, h = 2, 1e-6
 val = (f(c + h) - f(c))/h
-numericq(val, 1e-4, "approx forward derivative \\verb+(1/x)'(4)+")
+numericq(val, 1e-4, "approx forward derivative \\verb+(1/x)'(2)+")
 ```
 
 
-* Let $f(x) = x^x$ and $c=4$. Find the approximate derivative
+* Let $f(x) = x^x$ and $c=3$. Find the approximate derivative
   (forward) when `h=1e-8`.
 
 ```
