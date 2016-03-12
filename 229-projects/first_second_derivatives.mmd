@@ -1,4 +1,4 @@
-# Questions to be handed in for project 7:
+# Questions to be handed in First and Second Derivatives
 
 
 To get started, we load the `Gadfly` backend for `Plots` so that we can make plots, and the `Roots` package for its `D` and `fzero` functionality:
@@ -228,9 +228,9 @@ longq("critical points of \\( f(x) = 2x^3 - 6x^2 - 2x + 4 \\)", "\\verb+fzeros(D
 
 ```
 choices = ["There are none",
-	"There is one at x=-1.0",
-	"There is one at x=1.0 and one at x=-3.0",
-	"There is one at each of x=-4.4641, -1.0, and 2.4641"]
+	L"There is one at $x=-1.0$",
+	L"There is one at $x=1.0$ and one at $x=-3.0$",
+	L"There is one at each of $x=-4.4641, -1.0$, and $2.4641$"]
 ans = 3
 radioq(choices, ans, "all inflection points")
 ```
@@ -249,8 +249,8 @@ f(x) = \frac{(x-3)\cdot (x-1)\cdot (x+1)\cdot (x+3)}{(x-2)\cdot (x+2)}.
 ```
 choices = [L"-2.44949, 2.44949",
 L"0",
-L"-3,-1,1,3",
-L"-2,2"
+L"-3, -1, 1, 3",
+L"-2, 2"
 ]
 ans = 2
 radioq(choices, ans)
@@ -266,8 +266,8 @@ radioq(choices, ans)
 
 ```
 choices = ["It is always increasing",
-	L"(-\infty, 1.42265) and (2.57735, \infty)",
-	L"(1.0, 2.0) and (3.0, \infty)",
+	L"(-\infty, 1.42265) \text{ and } (2.57735, \infty)",
+	L"(1.0, 2.0) \text{ and } (3.0, \infty)",
 	L"(2.0, \infty)"]       
 ans = 3
 radioq(choices, ans, "When is f(x) increasing?")
@@ -284,7 +284,7 @@ radioq(choices, ans, "When is f(x) increasing?")
 choices = [L"$(-\infty, \infty)$ -- it is always concave up",
 	L"(1.5, \infty)",
 	"(1.0, 2.0)",
-	L"(-\infty, 1.0) and (2.0, \infty)"]
+	L"(-\infty, 1.0) \text{ and } (2.0, \infty)"]
 ans = 4
 radioq(choices, ans, "When is f(x) concave up?")
 ```
@@ -336,9 +336,9 @@ longq("Classify critical points with second derivative test", "\\verb+[D(fp)(x) 
 
 ```
 choices = [L"(-1.29, 1.61) and (6.69, \infty)",
-	L"(-\infty, 0) and (4.67, \infty)",
+	L"(-\infty, 0) \text{ and } (4.67, \infty)",
 	L"(-\infty, 0)",
-	L"(-\infty, 00) and (6.69, \infty)"]
+	L"(-\infty, 0) \text{ and } (6.69, \infty)"]
 ans = 1
 radioq(choices, ans, "when is f increasing")
 ```
@@ -350,10 +350,10 @@ What did you use to find your last answer?
 
 ```
 choices = [
-"f'(x) > 0 on these subintervals",
-"f''(x) > 0 on these subintervals",
-"f'(x) < 0 on these subintervals",
-"f''(x) < 0 on these subintervals"
+L"$f'(x) > 0$ on these subintervals",
+L"$f''(x) > 0$ on these subintervals",
+L"$f'(x) < 0$ on these subintervals",
+L"$f''(x) < 0$ on these subintervals"
 ]
 ans = 1
 radioq(choices, ans, "how?")
@@ -365,7 +365,7 @@ What are the $x$-coordinates of the relative minima of $f(x)$?
 ```
 
 ```
-choices = ["4.56", "-1.29 and 6.69", "4.56 and 0", "-1.29 and 1.61"]
+choices = [L"4.56", L"-1.29 \text{ and } 6.69", L"4.56 \text{ and } 0", L"-1.29 \text{ and  }1.61"]
 ans = 2
 radioq(choices, ans, "where are minima?")
 ```
@@ -377,7 +377,7 @@ On what subintervals is $f(x)$ concave up?
 
 ```
 choices = [
-L"(-\infty, 0) and (4.67, \infty)",
+L"(-\infty, 0) \text{ and } (4.67, \infty)",
 L"(1.167, \infty)",
 L"(-\infty, 1.167)",
 "It is always concave down"
@@ -393,10 +393,10 @@ What did you use to decide?
 
 ```
 choices = [
-"f'(x) > 0 on these subintervals",
-"f''(x) > 0 on these subintervals",
-"f'(x) < 0 on these subintervals",
-"f''(x) < 0 on these subintervals"
+L"$f'(x) > 0$ on these subintervals",
+L"$f''(x) > 0$ on these subintervals",
+L"$f'(x) < 0$ on these subintervals",
+L"$f''(x) < 0$ on these subintervals"
 ]
 ans = 2
 radioq(choices, ans, "Where is f(x) concave up?")
@@ -408,7 +408,7 @@ Find the $x$ coordinates of the inflection points of $f(x)$.
 ```
 
 ```
-choices = ["4.56", "4.67", "0 and 4.67", "Not listed"]
+choices = [L"4.56", L"4.67", L"0 \text{ and } 4.67", "Not listed"]
 ans = 3
 radioq(choices, ans, "inflection points")
 ```
