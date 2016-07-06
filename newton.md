@@ -29,11 +29,14 @@ Newton's method, and more usefully we will see that `fzero` can be
 used for root finding with an algorithm that is a bit more robust than
 Newton's method.
 
-To begin, we load that package and the `Plots` package for plotting.
+To begin, we load `MTH229` which loads both `Plots` and `Roots`:
 
 ```
-using Roots
-using Plots; gadfly()
+using MTH229
+```
+
+```nocode, noout
+plotly()
 ```
 
 
@@ -82,10 +85,10 @@ done in assignment within `julia`, so  the above simply
 becomes:
 
 ```verbatim
-x = x - f(x)/fp(x)
+x = x - f(x)/f'(x)
 ```
 
-Where `f(x)` is the function and `fp(x)` its derivative. This line
+Where `f(x)` is the function and `f'(x)` its derivative. (In this case found by automatic differentiation.) This line
 starts with a previously defined value of `x` and updates it
 accordingly.
 
@@ -182,27 +185,22 @@ the tolerance.
 
 ### Repeating steps
 
-The above approach -- basically repeating steps -- can be tedious. The
-following *macro* makes it easy to repeat an expression 5 times at
-once:
+The above approach -- basically repeating steps -- can be tedious.
+There will be a function to do this for you (`newton`). One can use copy and paste to do much of this though:
 
-
-```
-macro take5(body) quote [$(esc(body)) for _ in 1:5] end end 
-```
-
-Macros are used a bit differently than functions: they are called as `@take5` and (usually) without parentheses. To perform Newton's method using this macro, we have:
 
 ```
 f(x) = x^3 - 2x - 5
-fp(x) = 3x^2 - 2
 x = 2
-@take5 x = x - f(x)/fp(x)
+x = x - f(x)/f'(x)
+x = x - f(x)/f'(x)
+x = x - f(x)/f'(x)
+x = x - f(x)/f'(x)
+x = x - f(x)/f'(x)
+
+(x, f(x))
 ```
 
-In the above, we see that to 5 decimal places the algorithm doesn't
-change after third step (though the estimate does improve itself
-beyond the fifth decimal point on more steps. 
 
 
 
@@ -255,7 +253,7 @@ numericq(val, 1e-4)
 #### Question
 
 The function $f(x) = \sin(x)$ has derivative $f'(x) = \cos(x)$. Use
-Newton's method to solve $f(x) = 0$ starting at $3$. Use `@take5` to repeat 5 times.
+Newton's method to solve $f(x) = 0$ starting at $3$. Repeat 5 times.
 What value do you get for `x`?
 
 ```
@@ -285,8 +283,7 @@ numericq(val, 1e-14)
 
 ## Implementing a Newton's method function
 
-The `@take5` macro makes doing interactive work easier. The macro
-simply repeats the expression 5 times. For iterative algorithms it is
+For iterative algorithms it is
 better to repeat the expression until something happens -- not a fixed
 number of times.  In this case, we need a criteria to decide if the
 algorithm has converged. We shall use the following:
@@ -340,7 +337,7 @@ fp(x) = 3x^2 - 5
 xstar, ctr = nm(f, fp, 0)	# takes 6 steps
 ```
 
-(Of course, we could have just called `roots(f)` in this case, if the `Roots` package is loaded.)
+However, the `Roots` package implements the `newton` function. So we shall use that. To see the number of steps, the argument `verbose=true` may be given.
 
 ----
 
@@ -351,9 +348,8 @@ are three of them. Let's find one near $x=2$:
 
 ```
 f(x) = exp(x) - x^4
-fp(x) = exp(x) - 4x^3
 x = 2
-xstar, steps = nm(f, fp, 2)
+newton(f, 2)  # newton will use automatic differentiation for the derivative
 ```
 
 It took 8 steps and we are this close:
@@ -407,20 +403,22 @@ Starting at $\pi/8$, solve for the root returned by Newton's method
 k1=4
 f(x)  = sin(x) - cos(k1*x);
 fp(x) = cos(x) + k1*sin(k1*x);
-val, ctr = nm(f, fp, pi/(2k1));
+val = newton(f, fp, pi/(2k1));
 numericq(val)
 ```
 
 
 ## Numeric derivatives
 
-In order to use Newton's method we need to evaluate by hand
- $f'(x)$. Though not so hard with the examples we have used so far, it
- may prove to be tedious, or even hard to compute the derivative. (In
- higher order-generalizations, it can be difficult.)
+In order to use Newton's method we need to evaluate $f'(x)$. We have
+used automatic differentiation above through `f'(x)`. Automatic
+differentiation returns a numerically accurate value for the
+derivative.
+
 
 However, Newton's method is actually fairly robust to using other
-related values to the derivative. That is the method will converge, though perhaps not as fast as with the derivative. 
+related values to the derivative. That is the method will converge,
+though perhaps not as fast as with the derivative.
 
 ### The secant method
 
@@ -447,17 +445,19 @@ x2, x1 = x2 - f(x2)/fp(x1, x2), x2 # update step
 ```
 
 
-Using `@take5` we can repeat:
+We can repeat via copy and paste:
 
 ```
-@take5 x2, x1 = x2 - f(x2)/fp(x1, x2), x2
-```
+x2, x1 = x2 - f(x2)/fp(x1, x2), x2
+x2, x1 = x2 - f(x2)/fp(x1, x2), x2
+x2, x1 = x2 - f(x2)/fp(x1, x2), x2
+x2, x1 = x2 - f(x2)/fp(x1, x2), x2
+x2, x1 = x2 - f(x2)/fp(x1, x2), x2
 
-The last step shows the algorithm has basically converged, as the values agree to $10^{-14}$. We have
-
-```
 x2, f(x2)
 ```
+
+The last line shows the algorithm has basically converged, as the values agree to $10^{-14}$. We have
 
 ### Using forward differences
 
@@ -486,40 +486,6 @@ close to a root gets quite small. This improves the convergence rate to be on pa
 $$~
 x - \frac{f(x)^2}{f(x+ f(x)) - f(x)}.
 ~$$
-
-
-
-### Using automatic differentiation
-
-In a previous project we discussed automatic differentiation. As these
-values are basically exact, the automatic derivative can replace
-$f'(x)$ and the method will be just as quick to converge.
-
-
-To see how this is done, we load in the automatic derivative operator `D` from the `Roots` package
-
-```
-using Roots
-```
-
-The Newton's method can be used quite simply. For example, let $f(x) =
-\exp(x) - x^4$ and set $x_0 = -1$. We can find a root with the
-following command:
-
-```
-f(x) = exp(x) - x^4
-xstar, ctr = nm(f, D(f), -1)
-```
-
-```
-alert("""
-
-In fact, the `Roots` package provides the function `newton` which will
-use `D` to compute the derivative if one is not specified, so the
-above could be `newton(f, -1)`.
-
-""")
-```
 
 
 
@@ -662,7 +628,7 @@ value does it converge to?
 
 ```
 f(x) = 4x^4 -5x^3 + 4x^2 -20x - 6
-val, ctr = nm(f, D(f), 0);
+val = newton(f, 0);
 numericq(val, 1e-10)
 ```
 
@@ -686,7 +652,7 @@ Eyeing this, we pick an initial point, $1$, for Newton's method to the
 right of the minimum, which appears to be around $x=0.35$.
 
 ```
-xstar, ctr = nm(f, D(f), 1);
+xstar = newton(f, 1);
 ```
 
 What is the value of `xstar`?
@@ -783,11 +749,11 @@ deliberately a poor choice:
 ```
 f(x) = sin(x) - x/4
 fp(x) = cos(x) - 1/4
-nm(f, fp, 2pi)
+newton(f, fp, 2pi, verbose=true)
 ```
 
-Though `julia` makes this happen fast, note that the counter got past 20
-before converging and the answer is no where near the guess. This
+Though `julia` makes this happen fast, it will take more than  20
+steps before converging and the answer is no where near the guess. This
 trace might show why
 
 
@@ -835,9 +801,10 @@ as we desire for negative numbers, as follows:
 
 ```
 f(x) = cbrt(x)
-fp(x) = sign(x) * (1/3) * cbrt(x)/x
-xstar, ctr = nm(f, fp, 2)
+xstar = newton(f, 2)
 ```
+
+Still an issue. Why? 
 
 #### Question
 
@@ -856,7 +823,7 @@ ImageFile("figures/newton/newton-cubic.png")
 ```
 choices = ["`|f'(x)|` gets too small",
 	     "`|f''(x)|` gets too big at 0",
-	     "Initial guess is to far from a zero."
+	     "Initial guess is too far from a zero."
 	    ];
 ans = 2;
 radioq(choices, ans)
@@ -899,6 +866,22 @@ choices = ["`|f'(x)|` gets too small",
 ans = 1;
 radioq(choices, ans)
 ```
+
+#### Question
+
+The function `f(x) = atan(x)` is a strictly increasing function with one zero, $0$. Yet it can pose problems with Newton's method. For which values of $x$ does Newton's method converge:
+
+```
+choices = [
+L"For each of $1$, $2$ and $\pi$",
+L"For $1$ and $2$ but not $\pi$",
+L"For $1$ but not $2$ or $\pi$",
+L"For none of  $1$, $2$ and $\pi$"
+]
+ans = 3
+radioq(choices, ans, keep_order=true)
+```
+
 
 
 ### Cycles

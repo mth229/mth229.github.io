@@ -9,7 +9,7 @@ ones (`Winston`, `Gadfly`, `Gaston`, `PyPlot`, plotly, ...), and perhaps more wi
 generated before a dominant one is arrived at. As such, we don't try
 to teach the details of any one of them. 
 
-Rather, we use the `Plots` package which provides a unified interface to many backend plotting pacakges.
+Rather, we use the `Plots` package which provides a unified interface to many backend plotting pacakges. This package is loaded when the `MTH229` package is.
 
 ```
 note("""Packages are described a bit more [here](http://mth229.github.io/index.html/#_packages_).""")
@@ -17,12 +17,13 @@ note("""Packages are described a bit more [here](http://mth229.github.io/index.h
 
 For the impatient, this is all that is needed to know to get up and running.
 
-First you must load the package (which can take some time) and specify
-a backend (`gadfly()`) when more than one is avaiable:
 
 ```
-using Plots
-gadfly()
+using MTH229  # to load Plots
+```
+
+```nocode, noout
+plotly()
 ```
 
 
@@ -35,7 +36,18 @@ plot(f, -3, 3) 			# plot f over [-3,3]
 ```
 
 
-Graphing two or more functions is done by combining them together into a container of functions using `[]`:
+Graphs can be layered by using the `plot!` function (with an exclamation point indicating a current graph is begin modified):
+
+```
+f(x) = cos(x)
+g(x) = 1 - x^2/2
+plot(f, -pi/2, pi/2)
+plot!(g)
+```
+
+
+
+Graphing two or more functions can also be done by combining tge together into a container of functions using `[]`:
 
 
 ```
@@ -66,8 +78,9 @@ plot(sin, 0, 2pi)
 
 
 
-That creates the graphic. Within `IJulia` it will
-be automatically displayed as an `SVG` file that allows you to zoom
+That creates the graphic. The `Plots` package is an interface to several plotting "backends."
+Within `IJulia` and using `plotly()` the graph will
+be automatically displayed as an `SVG` graphic that allows you to zoom
 and pan with the mouse.
 
 
@@ -94,7 +107,26 @@ f(x) = x^2 - 2x + 2
 plot(f, -3, 3) 
 ```
 
+### Adding layers using "plot!"
 
+A graph can have layers added to it using `plot!` or other such functions. For example, adding the function `zero` will emphasize the `x` axis:
+
+```
+f(x) = x^2 - 2x + 2
+plot(f, -3, 3)
+plot!(zero)     # x axis
+```
+
+The automatic legend can be supressed by passing `legend=false` to the initial `plot` command.
+
+Adding points can be done with the `scatter!` command. We put the `x` and `y` values into containers defined by `[]`. For example, the polynomial $x^2 - 3x +2$ has roots at $2$ and $1$, we emphasize this through:
+
+```
+f(x) = x^2 - 3x + 2
+rts = [1, 2]
+plot(f, 0, 3)
+scatter!(rts, [0, 0])
+```
 
 
 ### Inf, NaN values
@@ -1003,12 +1035,24 @@ Though this is easy to do, it is also rather tedious, as putting in
 the "dots" is, for some reason, not that intuitive, so
 mistakes are often made. (It can surprisingly, also be slower to perform.)
 
+
 We do use this style to generate simple values, for example here we
 step through some powers of $1/10$ without much fuss:
 
 ```
 (1/10).^(1:5)
 ```
+
+### the "dot" call in Julia since v"0.5.0"
+
+Since version 0.5.0 of `Julia`, one can preface a function call's parentheses with a single dot to get "broadcasting" behaviour. This is like `map`, but a bit more general. To illustrate, we have:
+
+```
+f(x) = -16x^2 + 32x
+xs = [1,2,3]
+f.(xs)
+```
+
 
 
 ### Example
@@ -1081,7 +1125,7 @@ booleanq(true)
 
 #### Questions
 
-Let $f(x) = x^2 - 2x$. Which command will produce a $y$ values for plotting $f$ over $[0, 2]$?
+Let $f(x) = x^2 - 2x$. Which command will produce the $y$ values for plotting $f$ over $[0, 2]$?
 
 
 ```
@@ -1123,7 +1167,7 @@ val = sum(p);
 numericq(val, 1e-16)
 ```
 
-(It is easier to write `map(isprime, 1:10)` in this case.)
+(It is easier to write `map(isprime, 1:10)` in this case, which leads to `filter(isprime, 1:10)`.)
 
 
 
@@ -1198,10 +1242,14 @@ plot!(zero, -2, 2)   # zero is a function returning 0, useful for programming in
 example("Operators, aka. derived functions")
 ```
 
-Often we wish to plot a function derived from another function. For example, this is used to add a secant line to a graph. The following function will create a function which represents the secant line of $f(x)$ between two points, $a$ and $b$:
+Often we wish to plot a function derived from another function. For
+example, this is used to add a secant line to a graph. The following
+function (which is in the `MTH229` package) will create a function
+which represents the secant line of $f(x)$ between two points, $a$ and
+$b$:
 
-```
-function secline(f, a, b)
+```verbatim
+function secant(f, a, b)
 	 m =  (f(b) - f(a)) / (b-a)	# slope of secant line
 	 x -> f(a) + m * (x - a)	
 end
@@ -1221,19 +1269,9 @@ Using this function makes it simple to add a secant line to a graph.
 f(x) = sin(x)
 a, b = 0, pi/2
 plot(f, a, b)
-plot!(secline(f, a, b), a, b)
+plot!(secant(f, a, b))
 ```
 
-```
-alert("""
-
-The last command might look complicated, as "a" and "b" are specified
-twice, but this is because we are *composing* two operations at once:
-one to create a secant line function and one to make a plot. Both need
-a specification of an "a" and "b".
-
-""")
-```
 
 
 ### Practice
@@ -1243,7 +1281,7 @@ a specification of an "a" and "b".
 Define $f(x)$ to be a triangular function as follows:
 
 ```
-f(x) = abs(x) > 1 ? 0.0 : 1.0 - abs(x)
+f(x) = max(0, 1.0 - abs(x))
 ```
 
 In many applications, the following transformation is employed:
@@ -1300,10 +1338,10 @@ the following below seems correct?
 
 ```
 choices = [
-	"f < g < h",
-	"g < f < h",
-	"h < f < g",
-	"h < g < f"
+	L"f < g < h",
+	L"g < f < h",
+	L"h < f < g",
+	L"h < g < f"
 	   ];
 ans = 3;
 radioq(choices, ans)

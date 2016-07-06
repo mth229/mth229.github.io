@@ -23,6 +23,14 @@ The notes mostly follow topics of a standard first-semester
 calculus course after some background material is presented for
 learning `julia` within a mathematical framework.
 
+The notes assume that the [MTH229](https://github.com/mth229/MTH229.jl) add-on package is installed. This can be done through the command:
+
+```verbatim
+Pkg.clone("https://github.com/mth229/MTH229.jl")
+```
+
+----
+
 
 * [Calculator](http://mth229.github.io/calculator.html)
 
@@ -261,9 +269,9 @@ For example, the notes use:
 * `plot([f,g], a, b)` to plot both `f` and `g` over the interval `[a,b]`
 * `roots(f)` to find the roots of a polynomial function, `f` (from `Polynomials`)
 * `fzeros(f)` to find the real roots of a polynomial function `f` (from `Roots`)
-* `fzero(f, [a,b])` to find a root inside the bracketing interval `[a,b]` (from `Roots`)
+* `fzero(f, a, b)` to find a root inside the bracketing interval `[a,b]` (from `Roots`)
 * `limit(f, c)` to find the limit of `f` at `c` (from `SymPy`)
-* `D(f)` to return a function that computes the derivative of `f` (from the `Roots` package)
+* `f'` or `D(f)` to return a function that computes the derivative of `f` (from the `Roots` package)
 * `fzero(f, a)` or `[fzero(f, x) for x in [x1,x2, ...]]` to find root(s) of `f` starting at `a` or each of the x's
 * `quadgk(f, a, b)` to find the numeric integral of `f` over `(a,b)` (from base `julia`)
 * `integrate(f)` to find the symbolic integral of `f` (from the `SymPy` package)
@@ -339,6 +347,14 @@ A simple command is then typed into the computer followed by the *enter* key. Th
 
 If you get `4`, you are able to use `julia`.
 
+### Installing MTH229
+
+One command that the notes assume you have typed is the one to install the add-on `MTH229` package. If you haven't done so, try this:
+
+```verbatim
+Pkg.clone("https://github.com/mth229/MTH229.jl")
+```
+
 ### IJulia <small>An enhanced interface for using julia interactively</small>
 
 The command line is not the most comfortable learning experience for
@@ -357,29 +373,14 @@ The above graphic is from the main web page for `julia`
 (julialang.com) and shows the `IJulia` notebook with some graphics
 provided by the `Gadfly` package.
 
-Using `IJulia` will require a few additional installation steps:
+Using `IJulia` will require one more additional installation step:
 
-* download `anaconda` (https://store.continuum.io/cshop/anaconda/). It
-  is big, but free. Install it, then within a terminal (or Windows'
-  command propmpt) enter these commands:
-
-```verbatim
-conda update conda
-conda update ipython
 ```
-
-* Start `julia` then enter these commands to install the packages we use:
-
-```verbatim
-Pkg.update()
 Pkg.add("IJulia")
-Pkg.add("Gadfly")
-Pkg.add("Roots")
 ```
 
 
 ```
-
 alert(""" The above commands form the basics of
 `julia`'s package system. Like most computer languages, `julia` can be
 extended by user-contributed packages. The complete list of available
@@ -400,24 +401,20 @@ Afterwards those commands are successful, the following command will
 start the notebook interface:
 
 ```verbatim
-run(`ipython notebook --profile=julia`)
+using IJulia
+notebook()
 ```
 
-After all the installation, you can start the `IJulia` interface by simply starting `julia`, then issuing the above command *or* you can run just the command `ipython notebook --profile=julia` from the command line.
 
-For now, you can use `Julia` online through [juliabox.org](juliabox).
+For now, you can use `Julia` online through [juliabox.com](juliabox).
 
 ## Extending Julia with packages
 
 `Julia` can be extended through external packages. Although a
-relatively young language, there are already over 300 add-on packages
+relatively young language, there are already over 600 add-on packages
 readily available for Julia through its package manager.
 
-For example, there are numerous packages that provide means to draw
-graphs. To list a few: `Gadfly`, `Winston`, `PyPlot`, `Gaston`,
-`ASCIIPlots`, `Plotly`, `GoogleCharts`, ... The first few are the main
-ones. In these notes we use `Plots`, an interface to many of the above.
-
+For example, the `MTH229` package installs the `Plots` package for making plots, the `Roots` package for finding zeros of functions and the `SymPy` package for symbolic math within `Julia`.
 
 ### Installing an add-on pacakge
 
@@ -456,10 +453,11 @@ So, to make a plot using `Plots`, the sequence might go like:
 
 ```
 using Plots
-gadfly()                    # use Gadfly backend
+plotly()
 f(x) = x^2 - 2x
 plot(f, -2, 1)			
 ```
 
+(The command `using MTH229` will load the `Plots` package for you.)
 
 The [manual](http://julia.readthedocs.org/en/latest/manual/packages/) has some more information.

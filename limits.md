@@ -112,8 +112,14 @@ to have a limit. The basic idea is to simply make a graph around $c$
 and look to see if $f(x)$ gets close to some value as $x$ gets close
 to $c$:
 
+```nocode, noout
+using MTH229
+plotly()
 ```
-using Plots; gadfly()
+
+
+```
+using MTH229
 f(x) = sin(x)/x
 c, delta = 0, pi/2
 plot(f, c - delta, c + delta)
@@ -326,7 +332,10 @@ can be made with:
 ```
 f(x) = x == 0 ? NaN : x * sin(1/x)
 c, delta = 0, 1/4
-plot([f, abs, x -> -abs(x)], c - delta, c + delta)
+plot(f, c - delta, c + delta)
+g(x) = abs(x); h(x) = - abs(x)
+plot!(g)
+plot!(h)
 ```
 
 This graph clearly oscillates near $0$. To the graph of $f$, we added
@@ -467,9 +476,10 @@ L = \lim_{h \rightarrow 0} \frac{(1 + h)^2 - 1^2}{h}
 Guess the relationship between `epsilon` and `delta`
 
 ```
-choices = [L"$\epsilon/\delta$ is constant",
-L"$epsilon/delta^2$ is constant", 
-L"$epsilon/delta^3$ is constant"]
+choices = [
+L" $\epsilon/\delta$ is constant",
+L" $\epsilon/\delta^2$ is constant", 
+L" $\epsilon/\delta^3$ is constant"]
 ans = 1
 radioq(choices, ans, keep_order=true)
 ```
@@ -1181,14 +1191,13 @@ radioq(choices, ans)
 
 The `SymPy` package for `Julia` provides a means to for `Julia` users
 to interact with the `SymPy` add-on for the `Python` programming
-language. That package provides symbolic math features. One such
-feature is the ability to perform symbolically the limit of $f(x)$ as
-$x$ approaches $c$.
+language. This package is loaded by the `MTH229` package. The SymPy package
+provides symbolic math features. One such feature is the ability to
+perform symbolically the limit of $f(x)$ as $x$ approaches $c$.
 
 The `limit` function accesses these features. Its basic use is straightforward, just pass a function and a value of `c`:
 
 ```
-using SymPy			# must be installed
 f(x) = sin(x)/x
 c = 0
 limit(f, c)

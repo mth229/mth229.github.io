@@ -21,10 +21,10 @@ if some assumptions are met:
 
 ### Extreme value theorem (Bolzano)
 
-A real-valued continuous function $f$ on a closed interval $[a,b]$
-will obtain its maximum (minimum) value. That is there exists at least
-one value $c$ in $[a,b]$ for which $f( c) \geq f(x)$ ($f( c) \leq
-f(x)$) for any $x$ in $[a,b]$.
+> A real-valued continuous function $f$ on a closed interval $[a,b]$
+> will obtain its maximum (minimum) value. That is there exists at
+> least one value $c$ in $[a,b]$ for which $f( c) \geq f(x)$ ($f( c)
+> \leq f(x)$) for any $x$ in $[a,b]$.
 
 
 ### Theorem of Fermat
@@ -32,8 +32,8 @@ f(x)$) for any $x$ in $[a,b]$.
 The above complements a theorem of [Fermat](http://en.wikipedia.org/wiki/Fermat%27s_theorem_(stationary_points) )
 which can be expressed as:
 
-Further, the extrema (maxima or minima) can only occur at a _critical
-point_ of $f$ or at the endpoints, $a$ and $b$.
+> Further, the extrema (maxima or minima) can only occur at a
+> *critical point* of $f$ or at the endpoints, $a$ and $b$.
 
 ----
 
@@ -95,8 +95,11 @@ interval). Rather than solve analytically by taking a derivative, we
 simply graph to find the value:
 
 ```noout
-using Plots
-gadfly()
+using MTH229
+```
+
+```nocode, noout
+plotly()
 ```
 
 ```
@@ -230,8 +233,7 @@ $0$ of a function, we plot the derivative using our approximate
 derivative.
 
 ```
-using Roots			## provides D
-plot(D(A), 5.5, 5.7) 
+plot(A', 5.5, 5.7)     # uses A' notation defined in MTH229
 ```
 
 We confirm that the critical point is around $5.6$.
@@ -252,7 +254,7 @@ Our initial guess will be taken from the graph we made, or
 $x=5.6$. Here is how we use `fzero`:
 
 ```
-x = fzero(D(A), 5.6)
+x = fzero(A', 5.6)
 ```
 
 The value `x` is the critical point, and in this case gives
@@ -282,7 +284,7 @@ made?
 
 ```
 Area(y) = (20-2y)*y;
-val = fzero(D(Area),  10) |> Area;
+val = fzero(Area',  10) |> Area;
 numericq(val, 1e-3)
 ```
 
@@ -374,7 +376,7 @@ plot(l, delta, pi/2 - delta)
 The minimum occurs between 0.5 and 1.0 radins, we will use a bracketing method:
 
 ```
-x = fzero(D(l), [0.5, 1.0])
+x = fzero(l', [0.5, 1.0])
 ```
 
 So the minimum of the function $l$ is 
@@ -390,7 +392,7 @@ That is, any ladder less than this length can get around the hallway.
 #### Question
 
 Rather than use a bracketing method to solve for the root of
-$l'(t)=0$, we might have tried using `fzero(D(l), 0.8)`. Do so. What
+$l'(t)=0$, we might have tried using `fzero(l', 0.8)`. Do so. What
 do you find?
 
 
@@ -427,7 +429,7 @@ function A(t)
 	 adj = 10 * cos(t)
 	 2 * opp * adj/2 + opp * 10
 end
-t = fzero(D(A), pi/4, order=16);	## Has issues with order=8 algorithm, tol > 1e-14 is needed
+t = fzero(A', pi/4, order=16);	## Has issues with order=8 algorithm, tol > 1e-14 is needed
 val = t * 180/pi;
 numericq(val, 1e-3)
 ```
@@ -446,7 +448,7 @@ What is the value of theta in degrees?
 
 ```
 theta(x) = atan(30/x) - atan(10/x)
-val = fzero(D(theta), 20); ## careful where one starts
+val = fzero(theta', 20); ## careful where one starts
 val = theta(val) * 180/pi
 numericq(val, 1e-1)
 ```
@@ -506,7 +508,7 @@ It appears to be around 8.3. We now use `fzero` to refine our
 guess at the critical point using a bracketing algorithm:
 
 ```
-x = fzero(D(T), [7, 9])
+x = fzero(T', [7, 9])
 ```
 
 Okay, got it. Around 8.23. So is  our minimum time
@@ -531,7 +533,7 @@ Then $L(t)$ is continuous and has single peak, so the maximum occurs
 at the lone critical point. It turns out that this problem is bit sensitive to an initial condition, so we bracket
 
 ```
-x = fzero(D(L),  [0.1, 0.5])
+x = fzero(L',  [0.1, 0.5])
 ```
 
 Now if $L(t) = \exp(-3t) \cdot \exp(-2t) \cdot \exp(-4t), \quad 0 \leq t \leq 10$, explain why the same approach won't work:
@@ -576,13 +578,13 @@ Clearly the action is nearer to 1 than 100. We try graphing the
 derivative near that area:
 
 ```
-plot(D(f), 0, 5) 
+plot(f', 0, 5) 
 ```
 
 This shows the value near $0.7$. We use `fzero` starting there:
 
 ```
-x = fzero(D(f), 0.7)
+x = fzero(f', 0.7)
 ```
 
 The convergence is quick. The maximum is at 
@@ -656,7 +658,7 @@ The minimum looks to be around 4cm. We can use `fzero` to zero
 in on the answer:
 
 ```
-r0 = fzero(D(SA), 4)
+r0 = fzero(SA', 4)
 ```
 
 Okay, $3.837...$ is our computation for $r$. To get $h$, we use:
@@ -680,7 +682,7 @@ Minimize the function $f(x) = 2x + 3/x$ over $(0, \infty)$.
 
 ```
 f(x) = 2x + 3/x;
-val = fzero(D(f), 1);
+val = fzero(f', 1);
 numericq(val, 1e-3)
 ```
 
@@ -692,7 +694,7 @@ Of all rectangles of area 4, find the one with largest perimeter. What is the pe
 ```
 # 4 = xy
 P(x) = 2x + 2*(4/x);
-val = fzero(D(P), 1);
+val = fzero(P', 1);
 numericq(P(val), 1e-3)		## a square!
 ```
 

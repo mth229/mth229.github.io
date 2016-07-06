@@ -26,9 +26,13 @@ $$~
 
 This is great as long as some antiderivative is known. There will be several different techniques for finding antiderivatives. The `integrate` function in the `SymPy` package can do many of them:
 
+```nocode, noout
+using MTH229
+plotly()
 ```
-using Plots; gadfly()
-using SymPy
+
+```
+using MTH229  # loads Plots and SymPy
 f(x) = x^3 - cos(x) + x*log(x)
 integrate(f)
 ```
@@ -247,7 +251,9 @@ Different possibilities are:
 * making the cap a quadratic polynomial that goes through the left and right endpoints and the midpoint (`method="simpsons"`)
 
 
-```
+This function is defined in `MTH229`:
+
+```verbatim
 function riemann(f::Function, a::Real, b::Real, n::Int; method="right")
   if method == "right"
      meth(f,l,r) = f(r) * (r-l)
@@ -927,12 +933,11 @@ ImageFile("figures/integration/arclength.gif")
 Rather than focus on a derivation, we do some examples illustrating that to compute the arclength of the graph of a function is relatively straightforward  using numeric integration. For example, our answer for $f(x) = x^2$ is given by
 
 ```
-Base.ctranspose(f::Function) = D(f)     # so we can use f' in place of D(f)
 f(x) = x^2
-quadgk(x -> sqrt(1 + f'(x)^2), 0, 1)
+quadgk(x -> sqrt(1 + f'(x)^2), 0, 1)      # using f' notation defined in MTH229
 ```
 
-(We use an *anonymous function* for the integrand which involved the derivative being found by `D` from the `Roots` package. If the graph is described by `f`, then this expression be the same for all these problems.)
+(We use an *anonymous function* for the integrand which involved the derivative being found through `f'`. If the graph is described by `f`, then this expression be the same for all these problems.)
 
 ----
 

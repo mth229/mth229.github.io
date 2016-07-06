@@ -9,18 +9,21 @@ how to graph functions with `julia`.
 
 For basic things creating a new function and plotting it is as familiar as this:
 
+```nocode,noout
+using Plots
+plotly()
 ```
-using Plots; gadfly()			# for the plot function
+
+```
+using Plots			# for the plot function
 f(x) = sin(3x^2 - 2x^3)
 plot(f, 0, pi)
 ```
 
 Really, you'd be hard pressed to make this any shorter or more
 familiar.  Of course, not everything is this easy so there are still
-things to learn (in particular, trying this at home won't actually
-draw the plot unless you've loaded one of the graphing packages like
-`Winston` or `Gadfly`), but keep in mind that 90% of
-what we want to do in these projects is really this straightforward.
+things to learn, but keep in mind that 90% of what we want to do in
+these projects is really this straightforward.
 
 Mathematically, a function can be viewed in many different ways. An
 abstract means is to think of a function as a mapping, assigning to
@@ -434,10 +437,6 @@ radioq([
 
 
 
-### Practice
-
-#### Question
-
 Define the function $f(x) = -16x^2 + 100$.
 
 Is $f(4)$ positive?
@@ -713,7 +712,7 @@ heavyside(x) = x > 0 ? 1.0 : (x == 0.0 ? 0.0 : -1.0)
 
 
 
-### Practice
+### Practice 
 
 
 
