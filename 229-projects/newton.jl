@@ -1,7 +1,0 @@
-module newton
-
-
-
-
-
-end

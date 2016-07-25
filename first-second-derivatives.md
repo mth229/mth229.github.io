@@ -58,27 +58,30 @@ derivative on *I*.
 ## Graphically Identifying positive, increasing, concave up, critical points, ...
 
 
-We begin by loading in two packages, one to make a graphic and one to perform differentiation:
+We load `MTH229` to provide access to graphing and the `'` notation:
 
 ```
-using Plots; gadfly()
-using Roots			# provides D and fzero
-Base.ctranspose(f::Function) = D(f)  # allows f'(x) notation
+using MTH229
+```
+
+```nocode, noout
+plotly()
 ```
 
 
 Recall the plotting convention with `NaN` values -- they aren't
-plotted. This makes it easy for us to highlight when a function is
-positive. We make a simple function which plots the function $f(x)$
-twice, the second time doing so only *if* $g(x) > 0$. 
+plotted. This is utilized in the `plotif` function from the `MTH229`
+package, that makes it easy for us to highlight when a function is
+positive. This function plots the function $f(x)$
+twice, the second time doing so only *if* $g(x) > 0$.
 
-```
+```verbatime
 function plotif(f, g, a, b)
   plot([f, x -> g(x) > 0.0 ? f(x) : NaN], a, b, linewidth=5)
 end
 ```
 
-Then we can plot when a function is positive by using `f` for `g`. For example, when $f(x) = x^3 - 2x - 1/2$ we make the plot
+We can plot when a function is positive by using `f` for `g`. For example, when $f(x) = x^3 - 2x - 1/2$ we make the plot
 
 ```
 f(x) = x^3 - 2x - 1/2
@@ -93,7 +96,7 @@ windows.
 
 
 We can do the same with the derivative, then our graph will show when
-the function is increasing
+the function is increasing:
 
 ```
 plotif(f, f', -2, 2)
@@ -104,14 +107,14 @@ $(-2, -0.8)$ and $(0.8, 2)$.
 
 
 
-And of course, concave up:
+And of course, using when the second derivative is positive shows where `f` is concave up:
 
 
 ```
 plotif(f,  f'', -2, 2)
 ```
 
-with the function being concave up on $(0, 2)$.
+We can see the function is concave up on $(0, 2)$.
 
 
 
@@ -202,7 +205,7 @@ to $f(x)$ and not effect its derivative.
 
 Now suppose we have a different $f(x)$. In this case all we know is
 the second derivative is $f''(x) = x^2 - 2x$. What can we say about
-$f(x)$ on the interval (-1,3)$?
+$f(x)$ on the interval $(-1,3)$$?
 
 A plot to see where the second derivative is positive will show that this
 $f''(x)$ is positive on $(-1, 0)$ and $(2,3)$:
@@ -268,7 +271,10 @@ radioq(choices, ans)
 ## Classifying critical points
 
 The first- and second-derivative tests are a means to classify if a
-critical point is also a local extrema. A local extrema will correspond to a critical point -- but not vice versa. There are two theorems that ensure a critical point will be a local extrema:
+critical point is also a local extrema. A local extrema will always
+correspond to a critical point -- but not necessarily vice
+versa. There are two theorems that ensure a critical point will be a
+local extrema:
 
 
 

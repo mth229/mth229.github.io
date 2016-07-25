@@ -1,5 +1,0 @@
-## extrema...
-module extrema
-
-
-end

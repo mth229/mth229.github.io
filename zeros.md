@@ -34,13 +34,15 @@ Here we discuss a few different elementary means to do find zeros with
 `julia`, leaving some others for a later time. 
 
 
-We will use the add-on package `Roots`, which provides implementations of a few root-finding algorithms:
+We will use the add-on package `Roots`, which provides implementations of a few root-finding algorithms. This is loaded with the `MTH229` package:
 
 ```
-using Roots			# must be installed first
+using MTH229    # loads the Roots package
 ```
 
-
+```nocode, noout
+plotly()
+```
 
 
 ## Zeros of a polynomial
@@ -88,9 +90,14 @@ function quadratic(a, b, c)
 end
 ```
 
-(This is an example where the function is not *type-stable* as it
+
+```
+alert("""
+This is an example where the function is not *type-stable* as it
 returns either real-valued answers or complex-valued answers depending
-on the *values* of the input variables.)
+on the *values* of the input variables.
+""")
+```
 
 To find the roots of $x^2 + x - 1$ we could simply use:
 
@@ -106,7 +113,7 @@ For example, the *Fundamental theorem of algebra* states that every
 real-valued polynomial of degree $n$ will have $n$ roots, where we count complex
 roots and multiplicities.
 
-How to find them is left to numeric methods though. In `julia` there
+How to find them is left to numeric methods though. In `Julia` there
 is an add-on package that will do this work for us. The actual code is
 in the function `roots` from the `Polynomials` package, but we employ
 the easier interface for polynomial functions provided by the `Roots` package.
@@ -322,7 +329,6 @@ For the model without wind resistance, we can graph the function
 easily enough. Let's guess the distance is no more than 500 feet:
 
 ```
-using Plots; gadfly()
 plot(j, 0, 500)
 ```
 
@@ -401,8 +407,8 @@ example("Finding a zero")
 ```
 
 
-Sometimes, the equation $f(x)=0$ is actually presented at $h(x)=
-g(x)$. This form can be rewritten as $f(x) = h(x) -g(x) = 0$, or if
+Sometimes, the equation $f(x)=0$ is actually presented as $h(x)=
+g(x)$. This form can be rewritten as $f(x) = h(x) - g(x) = 0$, or if
 working graphically we can just look for crossing points of the graphs
 of $g(x)$ and $h(x)$. Here we shall do that.
 
@@ -414,7 +420,7 @@ We wish to compare two trash collection plans
 There are some cases where plan 1 is cheaper and some where plan 2 is. Categorize them.
 
 
-Both plans are *linear model* and may be written in *slope-intercept* form:
+Both plans are *linear models* and may be expressed in *slope-intercept* form:
 
 ```
 plan1(x) = 47.49 + 0.77x
@@ -430,7 +436,7 @@ plot([plan1, plan2], 10, 20)
 
 We can see the intersection point is around 14 and that if a family
 generates between 0-14 bags of trash per month that plan 2 would be
-cheaper.
+cheaper, otherwise they should opt for plan 1.
 
 ### Practice
 
@@ -471,7 +477,7 @@ negative. The first one is between $-3$ and $-1$. Find it graphically.
 
 
 ```
-val = fzero(airy, [-3, -1]);
+val = fzero(airy, -3, -1);
 numericq(val, 1e-1)
 ```
 
@@ -580,35 +586,56 @@ known. As each step halves the interval length, it must eventually
 converge to an answer.
 
 
-Let's take a step for the function $f(x) = x^2 - 2$ over the
-interval $[1,2]$. Clearly this interval is a bracketing interval, as
-$f(1) = -1$ and $f(2) = 2$. (As well, we can see the answer is around
-$1.414$, the square root of $2$.)
+
+
+Graphically, we could do this. For example, Let's consider $f(x) = x^2 - 2$ with the bracketing interval $[1,2]$. We first plot:
+
+```
+f(x) = x^2 - 2
+a,b = 1, 2
+plot(f, a, b)
+```
+
+We can see that $c = (a + b)/2 = 3/2$ will have $f(c) > 0$, so the new bracket is $[a,c]$:
+
+```
+a, b = a, (a + b)/2
+plot(f, a, b)
+```
+
+Now the midpoint is negative, so we modify `a`:
+
+```
+a, b = (a + b)/2, b
+plot(f, a, b)
+```
+
+And again, this has a midpoint in the negative territory so again we modify `a`:
+
+```
+a, b = (a + b)/2, b
+plot(f, a, b)
+```
+
+And now, as the midpoint is in positive territory we would modify $b$ ...
+
+
+This gets tedious to do graphically. But it can be easily programmed. The main step might look something like this:
 
 ```
 f(x) = x^2 - 2
 a, b = 1, 2
-M = (a + b) /2
-if f(a) * f(M) < 0
-  a, b = a, M
+
+c = (a + b) /2
+if f(a) * f(c) < 0
+  a, b = a, c
 else
-  a, b = M, b
+  a, b = c, b
 end
 a,b
 ```
 
-Here $M=1.5$ and the new interval is $[1.0, 1.5]$. Repeating we should get $[1.25, 1.5]$:
-
-```
-M = (a + b) /2
-if f(a) * f(M) < 0
-  a, b = a, M
-else
-  a, b = M, b
-end
-a,b
-```
-
+Here $c=1.5$ and the new interval is $[1.0, 1.5]$, as we had graphically. We just need to repeat the above.
 
 It seems as though we could be here all day. Indeed, if doing this by
 hand it might take up quite a bit of time. We should automate this.
@@ -620,43 +647,43 @@ paradox](http://en.wikipedia.org/wiki/Zenos_paradoxes). On a computer
 we don't have such a luxury. In fact, for floating point numbers we
 couldn't keep taking halves -- even if we wanted -- as ultimately we should expect
 tp get `a` and `b` being floating point values that are next to each
-other -- and hence there is no midpoint.
+other -- and hence there is no midpoint. (Well, there are some cases that suggest a more careful numeric approach to the above.)
 
 So even though this doesn't make mathematical sense we can try stopping when
 the following condition is no longer true:
 
 ```
-a < M < b
+a < c < b
 ```
 
 A `while` loop is used to repeat the central step until the above is
 `false`. Our code looks like this:
 
-```
-function bisection (f::Function, bracket=Vector)
-    a, b = bracket		# bracket is [a,b]
-    if f(a) * f(b) > 0
+```verbatim
+function bisection (f::Function, a, b)
+
+	if f(a) * f(b) > 0
       stop("[a,b] is not a bracket")
     end
 
-    M = a + (b-a) / 2
+    c = a + (b-a) / 2
     
-    while a < M < b
-        if f(M) == 0.0
+    while a < c < b
+        if f(c) == 0.0
 	  break
         end
         ## update step
-	if f(a) * f(M) < 0 
-	   a, b = a, M
+	if f(a) * f(c) < 0 
+	   a, b = a, c
 	else
-	   a, b = M, b
+	   a, b = c, b
 	end
     end
-    M
+    c
 end
 ```
 
-To use this, copy and paste the above function definition into a `julia` session.
+Such a function is already defined in the `MTH229` package.
 
 
 Okay, let's look at the function $f(x) = -16x^2 + 32x$. We know that 0
@@ -664,11 +691,11 @@ and $2$ are roots. Let's see if our algorithm finds them:
 
 ```
 f(x) = -16x^2 + 32x
-bisection(f, [-1, 1]) ## should find 0
+bisection(f, -1, 1) ## should find 0
 ```
 
 ```
-bisection(f, [1, 3])  ## should find 2
+bisection(f, 1, 3)  ## should find 2
 ```
 
 Okay, it seems to work. Lets try it on a less trivial problem. We know
@@ -677,7 +704,7 @@ too tired to remember where, we can simply ask:
 
 ```
 f(x) = cos(x) - sin(x)
-x = bisection(f, [0, pi/2])
+x = bisection(f, 0, pi/2)
 ```
 
 Is `x` really a zero?
@@ -745,13 +772,13 @@ plot(f, 8, 9)
 So we find the values of the zero in the bracketed region $[8,9]$:
 
 ```
-bisection(f, [8, 9])
+bisection(f, 8, 9)
 ```
 
 The root within $[0, 3]$ is found with:
 
 ```
-bisection(f, [0, 3])
+bisection(f, 0, 3)
 ```
 
 ### The Roots package and fzero
@@ -767,13 +794,13 @@ For example, to find a root of $f(x) = 2x \cdot \exp(-20) - 2 \cdot
 ```
 using Roots
 f(x) = 2x*exp(-20) - 2*exp(-20x) + 1
-fzero(f, [0, 1])
+fzero(f, 0, 1)
 ```
 
 
 The `fzero` function is actually an interface to different
-root-finding algorithms. When called as above (the second argument
-being a vector), it uses a bracketing approach as discussed here.
+root-finding algorithms. When called as above -- with two intial
+starting points -- it uses a bracketing approach as discussed here.
 
 ### Problems
 
@@ -800,7 +827,7 @@ $f(x) = e^x - x^4$. Find its value numerically:
 
 ```
 f(x) = exp(x) - x^2
-val = fzero(f, [-10, 0]);
+val = fzero(f, -10, 0);
 numericq(val, 1e-3)
 ```
 
@@ -817,7 +844,7 @@ zeros on the positive $x$ axis. You are asked to find the largest
 ```
 b = 10
 f(x) =  x^2 - b * x * log(x)
-val = fzero(f, [10, 500])
+val = fzero(f, 10, 500)
 numericq(val, 1e-3)
 ```
 #### Question
@@ -827,7 +854,7 @@ The `airy` function has infinitely many negative roots, as the function oscillat
 
 
 ```
-val = fzero(airy, [-5, -4]);
+val = fzero(airy, -5, -4);
 numericq(val, 1e-8)
 ```
 
@@ -904,21 +931,21 @@ radioq(choices, ans)
 
 So, `fzero` finds one value within a bracket. But this suggests a means to find all (most?) of the zeros within an interval -- split the interval up into many pieces; identify those that bracket a zero; use `fzero` on those intervals.
 
-This is basically implemented in the `fzeros(f, [a,b])` function. (Here `f` need not be a polynomial function, but we do need to specify an interval to search over, unlike the case when `f` is a polynomial function discussed above.)
+This is basically implemented in the `fzeros(f, a, b)` function. (Here `f` need not be a polynomial function, but we do need to specify an interval to search over, unlike the case when `f` is a polynomial function discussed above.)
 
 
 So, to find the zeros of $e^x - x^4$ over $[-10, 10]$ we have:
 
 ```
 f(x) = exp(x) - x^4
-fzeros(f, [-10, 10])
+fzeros(f, -10, 10)
 ```
 
 The above description will only work for zeros which cross the $x$ axis, but `fzeros` tries a bit more. So, it will find the zero of $f(x) = x^2 \cdot e^x$:
 
 ```
 f(x) = x^2 * exp(x)
-fzeros(f, [-1,1])
+fzeros(f, -1, 1)
 ```
 
 That being said, `fzeros` can miss zeros, so a graph is always suggested to verify the zeros are exhausted.

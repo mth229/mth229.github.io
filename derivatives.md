@@ -1,8 +1,8 @@
 # Approximate derivatives in julia
 
-```noout
-using Plots
-gadfly()
+```nocode, noout
+using MTH229
+plotly()
 ```
 
 ## Introduction
@@ -41,12 +41,13 @@ As mentioned, intuitively, the tangent line is the best straight-line
 approximation to a function near the point $(c, f( c))$ and would have
 slope given by the derivative.
 
-This graph shows $f(x) = 2 - x^2$ and various secant lines when $c=-0.75$:
+This graph shows $f(x) = 2 - x^2$ and various secant lines when $c=-0.75$ (see also `derivative_viz(f, c)` in the `MTH229` package):
 
 ```
+using MTH229 
 f(x) = 2 - x^2
 c = -0.75
-sec_line(h) = x -> f(c) + (f(c + h) - f(c))/h * (x - c)
+sec_line(h) = secant(f, c, c+h)                # secant in MTH229 package
 plot([f, sec_line(1), sec_line(.75), sec_line(.5), sec_line(.25)], -1, 1)
 ```
 
@@ -657,13 +658,15 @@ finite differences by using a different approach. Whereas finite
 differences have a long history, automatic differentiation only dates
 back to the 60s.
 
-The `Roots` package provides an operator `D` that (essentially)
-implements this. It is used like our previously defined `Df` and `Dc`
-functions, only it need not be redefined each `julia` session -- just
-the `Roots` package need be loaded. 
+The `ForwardDiff` package implements automatic differentiation.
+The `Roots` package provides an interface `D`, used like `D(f)`. The `MTH229` package overloads the idea of `'` -- at the expense of a warning on startup -- that uses automatic differentiation when the notation `f'` is encountered.
 
+That means, we can find derivatives, as familiarly as:
 
-
+```
+f(x) = x^x
+f'(1)
+```
 
 
 Unlike, finite differences automatic differentiation does not have
@@ -721,86 +724,45 @@ For functions we need to use the chain rule:
 * $f((x, dx)) = (f(x), d(f(x))) = (f(x), f'(x) dx )$
 
 
-### The `D` operator
-
-The `Roots` package provides the `D` operator that implements automatic differentiation using the underlying `ForwardDiff` package. Here we see it used:
-
-```
-using Roots			# where the D function is found
-f(x) = sin(x)
-fp(x) = D(f)(x)			# create a function that is the derivative of f
-fp(pi)				# basically cos(pi)
-```
-
-The advantage over `Df` and `Dc` is greater accuracy, and as mentioned
-it is built in to a package. (Though the `Calculus` package has
-forward difference built-in to it, so this last point not too
-compelling.) The disadvantage? It will only work for *most*
-functions. That is, functions composed of our basic elementary
-operations, such as powers; trigonometric; exponential; and
-logarithmic functions.
+### Examples
 
 
-
-
-Here we see that plotting a function and its derivative is straightforward:
+Using `'`, we see that plotting a function and its derivative is straightforward:
 
 ```
 f(x) = exp(-x)*sin(x)
-plot([f, D(f)], 0, 2pi)
+plot(f, 0, 2pi)
+plot!(f')
 ```
 
-The `D` operator allows for a second argument to specify the number of
-derivatives, as in `D(f, 2)` to find the second derivative. 
+Second derivatives are also available:
+
 ```
 f(x) = x^2 - 2x
-plot([f, D(f), D2(f)], -2, 2)
+plot(f, -2, 2)
+plot!(f')
+plot!(f'')
 ```
-
-```
-alert("""
-Be warned, higher order derivatives of degree 8 or more require extra attention.
-""")
-```
-
-```
-note("Simplifying the notation by overriding a definition")
-```
-
-We can simplify the notation involved with using `D` if we define the following:
-
-```
-Base.ctranspose(f::Function) = D(f)
-```
-
-At the cost of a warning (as we are overriding some other defintion) we can now use the "prime" notatin for derivatives:
-
-```
-f'(10), f''(10)
-```
-
-
-
 
 
 
 Here is an example where we plot the tangent line and the
-function. We first define a tangent line operator that returns a
-function representing the tangent line at a point `c`:
+function. The `MTH229` package provides this function to compute a tangent line function:
 
-```
+```verbatim
 tangent(f, c) = x -> f(c) + f'(c)*(x-c)
 ```
 
-Then this is employed as follows:
+This is employed as follows:
 
 ```
 f(x) = x^x
 c = 1
-plot([f, tangent(f, c)], 1/2, 2)
+plot(f, 1/2, 2)
+plot!(tangent(f, c))
 ```
 
-<hr/>
+----
 
 ```
 
@@ -839,7 +801,7 @@ We can do all this relatively quickly with `D` and the `fzero` function from the
 First, we define $A(t)$:
 
 ```
-A(t) = 6.687(0.931)^t
+A(t) = 6.687 * (0.931)^t
 ```
 
 The first question is answered by the slope of the secant line connecting $(0,A(0))$ and $(30, A(30))$:
