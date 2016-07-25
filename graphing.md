@@ -114,7 +114,7 @@ A graph can have layers added to it using `plot!` or other such functions. For e
 ```
 f(x) = x^2 - 2x + 2
 plot(f, -3, 3)
-plot!(zero, 03, 3)     # x axis
+plot!(zero, -3, 3)     # x axis
 ```
 
 The automatic legend can be supressed by passing `legend=false` to the initial `plot` command.
