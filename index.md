@@ -9,8 +9,8 @@ note(""" For a more thorough introduction, visit [Calculus with Julia](http://ca
 
 
 This is a collection of notes for exploring calculus concepts
-with the `Julia` programming language. Such an approach is used in MTH
-229 at the College of Staten Island.
+with the `Julia` programming language, as is done with MTH229 at the College of Staten Island.
+
 
 These  notes are broken into different sections, where most all sections
 have some self-grading questions at the end that allow you to test
@@ -29,6 +29,11 @@ The notes assume that the [MTH229](https://github.com/mth229/MTH229.jl) add-on p
 Pkg.clone("https://github.com/mth229/MTH229.jl")
 ```
 
+(If using `IJulia`, this command should be run in a Julia "Console".)
+
+The projects, or "ipynb" files, can be installed into `juliabox.com` by following the instructions [here](https://github.com/mth229/229-projects). Otherwise, they can be downloaded by clicking, and uploaded through `juliabox`'s "Files" tab.
+
+
 ----
 
 
@@ -38,8 +43,8 @@ Basics of types, order of operations, assignment and variables.
 
 <br/>
 An assignment for this material: 
-[ipynb](http://mth229.github.io/229-projects/calculator.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/229-projects/calculator.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/calculator.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/calculator.ipynb?create=1)
 
 * [Functions](http://mth229.github.io/functions.html)
 
@@ -48,8 +53,8 @@ ternary operator, multiple arguments, and return values (tuples).
 
 <br/>
 An assignment for this material: 
-[ipynb](http://mth229.github.io/229-projects/functions.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/229-projects/functions.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/functions.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/functions.ipynb?create=1)
 
 
 * [Graphing](http://mth229.github.io/graphing.html)
@@ -64,8 +69,8 @@ array is given. This will be useful later on with limits, ...
 
 <br/>
 An assignment for this material: 
-[ipynb](http://mth229.github.io/229-projects/graphics.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/229-projects/graphics.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/graphics.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/graphics.ipynb?create=1)
 
 
 * [Zeros](http://mth229.github.io/zeros.html)
@@ -78,8 +83,8 @@ The add-on `Roots` package provides some convenient functionality.
 
 <br/>
 An assignment for this material: 
-[ipynb](http://mth229.github.io/229-projects/zeros.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/229-projects/zeros.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/zeros.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/zeros.ipynb?create=1)
 
 * [Limits](http://mth229.github.io/limits.html)
 
@@ -89,8 +94,8 @@ Discussion on floating point representation and potential issues (subtracting li
 
 <br/>
 An assignment for this material: 
-[ipynb](http://mth229.github.io/229-projects/limits.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/229-projects/limits.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/limits.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/limits.ipynb?create=1)
 
 * [Derivatives](http://mth229.github.io/derivatives.html)
 
@@ -103,8 +108,8 @@ package.
 
 <br/>
 An assignment for this material: 
-[ipynb](http://mth229.github.io/229-projects/derivatives.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/229-projects/derivatives.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/derivatives.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/derivatives.ipynb?create=1)
 
 * [Newton's method](http://mth229.github.io/newton.html)
 
@@ -118,8 +123,8 @@ The `fzero` function of the `Roots` package is discussed.
 
 <br/>
 An assignment for this material: 
-[ipynb](http://mth229.github.io/229-projects/newton.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/229-projects/newton.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/newton.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/newton.ipynb?create=1)
 
 
 * [First and second derivatives](http://mth229.github.io/first-second-derivatives.html)
@@ -129,8 +134,8 @@ derivatives.
 
 <br/>
 An assignment for this material: 
-[ipynb](http://mth229.github.io/229-projects/first-second-derivatives.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/229-projects/first-second-derivatives.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/first-second-derivatives.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/first-second-derivatives.ipynb?create=1)
 
 * [Extrema](http://mth229.github.io/extrema.html)
 
@@ -138,8 +143,8 @@ A project on minimization and maximization. Some standard applied problems are p
 
 <br/>
 An assignment for this material: 
-[ipynb](http://mth229.github.io/229-projects/extrema.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/229-projects/extrema.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/extrema.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/extrema.ipynb?create=1)
 
 * [Integration](http://mth229.github.io/integration.html)
 
@@ -149,9 +154,8 @@ of solids of revolution.
 
 <br/>
 An assignment for this material: 
-[ipynb](http://mth229.github.io/229-projects/integration.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/229-projects/integration.ipynb?create=1)
-
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/integration.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/integration.ipynb?create=1)
 
 
 ### Calculus II material

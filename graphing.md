@@ -42,7 +42,7 @@ Graphs can be layered by using the `plot!` function (with an exclamation point i
 f(x) = cos(x)
 g(x) = 1 - x^2/2
 plot(f, -pi/2, pi/2)
-plot!(g)
+plot!(g, -pi/2, pi/2)   # try without the a and b, it may work.
 ```
 
 
@@ -114,7 +114,7 @@ A graph can have layers added to it using `plot!` or other such functions. For e
 ```
 f(x) = x^2 - 2x + 2
 plot(f, -3, 3)
-plot!(zero)     # x axis
+plot!(zero, 03, 3)     # x axis
 ```
 
 The automatic legend can be supressed by passing `legend=false` to the initial `plot` command.
@@ -1269,7 +1269,7 @@ Using this function makes it simple to add a secant line to a graph.
 f(x) = sin(x)
 a, b = 0, pi/2
 plot(f, a, b)
-plot!(secant(f, a, b))
+plot!(secant(f, a, b), a, b)
 ```
 
 
