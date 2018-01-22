@@ -34,7 +34,7 @@ pre {display: block;}
 
 <!-- not TeX-AMS-MML_HTMLorMML-->
 <script type="text/javascript"
-  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG">  
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
 </script>
 <script>
 MathJax.Hub.Config({
@@ -108,19 +108,21 @@ $( document ).ready(function() {
 <p>The package itself requires a version of <code>Python</code> that works with <code>julia</code>'s <code>PyCall</code> package <em>and</em> a version of sympy installed for <code>Python</code>.</p><h2>About</h2><p>The <code>SymPy</code> program extends <code>julia</code> by providing a type for <em>symbolic expressions</em>. Such an expression is encapsulated by a symbolic variable <code>x</code> instantiated through:</p><pre class="sourceCode julia">using SymPy
 x = Sym("x")</pre>
 <div class="well well-sm">
-$$x$$</div>
+x</div>
 
 <p>The "x" on the right-hand side is a character argument to the <code>Sym</code> constructor which returns a symbolic object stored as <code>x</code>:</p><pre class="sourceCode julia">x |> typeof</pre>
 <pre class="output">
 SymPy.Sym</pre>
 
-<p>That was painless. The type is <code>Sym</code>.</p><p>The <code>&#64;vars</code> macro can simplify variable creation:</p><pre class="sourceCode julia">@vars a b c</pre>
+<p>That was painless. The type is <code>Sym</code>.</p><p>The <code>@vars</code> macro can simplify variable creation:</p><pre class="sourceCode julia">@vars a b c</pre>
 <p>The <code>symbols</code> function can place assumptions on the created variables and create more than one at a time:</p><pre class="sourceCode julia">h, y = symbols("h, y", real=true)</pre>
 <pre class="output">
-(h,y)</pre>
+(h, y)</pre>
 
-<div class="alert alert-success" role="alert"><div class="markdown"><p>We use the pipeline operator <code>|&gt;</code> to compose functions in this project, as it makes the expressions a bit easier to read. That above would be simply <code>typeof&#40;x&#41;</code> so there is no advantage in clarity, but there is elsewhere.</p>
-</div></div>
+<div class="alert alert-success" role="alert">
+<div class="markdown"><p>We use the pipeline operator <code>|&gt;</code> to compose functions in this project, as it makes the expressions a bit easier to read. That above would be simply <code>typeof&#40;x&#41;</code> so there is no advantage in clarity, but there is elsewhere.</p>
+</div> 
+</div>
 <p>Most of the typical math functions have been overloaded to work with these symbolic expressions: the functions accept a symbolic expression and return a newly computed one. For example, the expression <code>x^2 -2x &#43;2</code> when evaluated becomes a new symbolic expression:</p><pre class="sourceCode julia">x^2 - 2x + 2 |> typeof</pre>
 <pre class="output">
 SymPy.Sym</pre>
@@ -128,56 +130,61 @@ SymPy.Sym</pre>
 <p>Similarly, when working with mathematical functions a symbolic expression is returned:</p><pre class="sourceCode julia">f(x) = exp(-x^2/2)             ## a julia function
 f(x)                           ## takes a symbolic object and returns a new one</pre>
 <div class="well well-sm">
-$$e^{- \frac{x^{2}}{2}}$$</div>
+exp(-x^2/2)</div>
 
 <p>This shows that the function object <code>f</code> will map a symbolic object to another symbolic object.</p><p>In <code>SymPy</code>, the <code>subs</code> function allows you to evaluate a symbolic expression for a given value. For example,</p><pre class="sourceCode julia">subs(f(x), x, 1)		## set x equal to 1</pre>
 <div class="well well-sm">
-$$e^{- \frac{1}{2}}$$</div>
+exp(-1/2)</div>
 
 <p>Since <code>julia</code>'s version <code>0.4</code>, we can use parentheses:</p><pre class="sourceCode julia">ex = exp(-x^2/2)  # a symbolic expression, not a function
 ex(1)</pre>
 <div class="well well-sm">
-$$e^{- \frac{1}{2}}$$</div>
+exp(-1/2)</div>
 
 <p>This works well when there is just one variable involved. Otherwise, the <code>&#61;&gt;</code> notation is useful to indicate which value is being substituted for, as with:</p><pre class="sourceCode julia">ex(x=>1)</pre>
 <div class="well well-sm">
-$$e^{- \frac{1}{2}}$$</div>
+exp(-1/2)</div>
 
 <p>The output of <code>subs</code> is still a symbolic object.  The <code>N</code> function will convert the value to a <code>julia</code>n one:</p><pre class="sourceCode julia">N(ex(1))</pre>
-<pre class="output">
-0.6065306597126334</pre>
+<div class="well well-sm">
+0.6065306597126334</div>
 
 <p>For the most part, one can work with symbolic expressions without pulling them back into <code>julia</code> expressions until needed.</p><h2>Equations</h2><p><code>SymPy</code> can do much of the basic tasks learned during algebra: simplification, factoring and solving equations. Just a few new commands are needed.</p><h3>Basic algebra</h3><p><code>SymPy</code> does some automatic simplification of expressions. For example, terms are combined</p><pre class="sourceCode julia">(x+1) + (x+2) + (x+3)</pre>
 <div class="well well-sm">
-$$3 x + 6$$</div>
+3*x + 6</div>
 
 <p>However, not everything is as simplified as possible. The <code>simplify</code> function can be called to (sometimes) go further:</p><pre class="sourceCode julia">sin(x)^2 + cos(x)^2		# not simplified</pre>
 <div class="well well-sm">
-$$\sin^{2}{\left (x \right )} + \cos^{2}{\left (x \right )}$$</div>
+sin(x)^2 + cos(x)^2</div>
 
 <pre class="sourceCode julia">simplify(sin(x)^2 + cos(x)^2)	# 1</pre>
 <div class="well well-sm">
-$$1$$</div>
+1</div>
 
 <p>One can <code>factor</code> polynomials:</p><pre class="sourceCode julia">factor(x^2 + 2x + 1)</pre>
 <div class="well well-sm">
-$$\left(x + 1\right)^{2}$$</div>
+(x + 1)^2</div>
 
 <p><code>SymPy</code> will leave terms in factored form. To multiply them out, can be requested through the function <code>expand</code>:</p><pre class="sourceCode julia">expand( (x+1)*(x+2)*(x+3) )</pre>
 <div class="well well-sm">
-$$x^{3} + 6 x^{2} + 11 x + 6$$</div>
+x^3 + 6*x^2 + 11*x + 6</div>
 
 <h3>Solving equations</h3><p>With <code>SymPy</code> there are <em>several</em> ways to solve an equation. Here we mention <code>factor</code>, <code>polyroots</code>, <code>real_roots</code>, <code>solve</code>, <em>and</em> <code>nsolve</code>.</p><p>First for <em>polynomial</em> (or rational) functions, we can factor:</p><pre class="sourceCode julia">p = expand((x-1)*(x-2)*(x-3)*(x^2 + x + 1))</pre>
 <div class="well well-sm">
-$$x^{5} - 5 x^{4} + 6 x^{3} - x^{2} + 5 x - 6$$</div>
+x^5 - 5*x^4 + 6*x^3 - x^2 + 5*x - 6</div>
 
 <pre class="sourceCode julia">factor(p)</pre>
 <div class="well well-sm">
-$$\left(x - 3\right) \left(x - 2\right) \left(x - 1\right) \left(x^{2} + x + 1\right)$$</div>
+(x - 3)*(x - 2)*(x - 1)*(x^2 + x + 1)</div>
 
 <p>From this we can see clearly the linear terms correspond to roots. The <code>polyroots</code> function returns a dictionary of roots and their multiplicities.</p><pre class="sourceCode julia">polyroots(p)</pre>
-<div class="well well-sm">
-\begin{equation*}\begin{cases}1 & \text{=>} &1\\- \frac{1}{2} - \frac{\sqrt{3} i}{2} & \text{=>} &1\\3 & \text{=>} &1\\- \frac{1}{2} + \frac{\sqrt{3} i}{2} & \text{=>} &1\\2 & \text{=>} &1\\\end{cases}\end{equation*}</div>
+<pre class="output">
+Dict{Any,Any} with 5 entries:
+  1 => 1
+  -1/2 - sqrt(3)*I/2 => 1
+  3 => 1
+  -1/2 + sqrt(3)*I/2 => 1
+  2 => 1</pre>
 
 <p>If the multiplicities are not of interest, we can get just the keys via:</p><pre class="sourceCode julia">Sym[k for (k,v) in polyroots(p)]</pre>
 <div class="well well-sm">
@@ -186,11 +193,13 @@ $$\left(x - 3\right) \left(x - 2\right) \left(x - 1\right) \left(x^{2} + x + 1\r
 <p>In this case there are two complex roots as well, that <code>factor</code> leaves alone.  Factoring reduces over the rational numbers – not the real numbers (the domain can be adjusted). For example, this quadratic will not be factored, even though the answers are real:</p><pre class="sourceCode julia">q = x^2 - 8x + 8
 factor(q)</pre>
 <div class="well well-sm">
-$$x^{2} - 8 x + 8$$</div>
+x^2 - 8*x + 8</div>
 
 <p>However, <code>polyroots</code> will work</p><pre class="sourceCode julia">polyroots(q)</pre>
-<div class="well well-sm">
-\begin{equation*}\begin{cases}- 2 \sqrt{2} + 4 & \text{=>} &1\\2 \sqrt{2} + 4 & \text{=>} &1\\\end{cases}\end{equation*}</div>
+<pre class="output">
+Dict{Any,Any} with 2 entries:
+  -2*sqrt(2) + 4 => 1
+  2*sqrt(2) + 4 => 1</pre>
 
 <p>The basic theorem is that for each linear factor over the complex numbers there corresponds a root and vice versa after accounting for multiplicity.</p><p>The <code>real_roots</code> function tries to return the real roots (omitting the non-real roots). Here we see that it fails for some polynomials when <code>polyroots</code> does not:</p><pre class="sourceCode julia">q = x^4 - 8x^2 + 8
 real_roots(q)			# should find 4</pre>
@@ -215,16 +224,12 @@ map(N, as)			# all are real</pre>
 \begin{bmatrix}- 2 \operatorname{LambertW}{\left (- \frac{\sqrt{2}}{4} \right )}\\- 2 \operatorname{LambertW}{\left (- \frac{\sqrt{2}}{4},-1 \right )}\end{bmatrix}</div>
 
 <p>This finds only one of two answers. The second can be found with <code>nsolve</code>, which is a numeric algorithm to find a zero starting with an initial guess (which often comes from making a simple plot):</p><pre class="sourceCode julia">nsolve(exp(x) - 2x^2, x, 3)	# 2.617...</pre>
-<pre class="output">
-2.617866613066812769178978059143202817320274359410482919210508161040370325331988</pre>
+<div class="well well-sm">
+2.617866613066812769178978059143202817320274359410482919210508161040370325332</div>
 
 <p>Trigonometric functions have infinitely many solutions, with the <code>sin</code> function <code>SymPy</code> solves only within the range $[-90, 90]$ degrees (the range of the <code>asin</code> function).</p><pre class="sourceCode julia">solve(sin(x)^2 - (1/2)^2) * 180 / pi</pre>
-<pre class="output">
-4-element Array{Any,1}:
- -94.2477796076938/pi
-  94.2477796076938/pi
-  471.238898038469/pi
-  659.734457253857/pi</pre>
+<div class="well well-sm">
+\begin{bmatrix}- \frac{94.2477796076938}{\pi}\\\frac{94.2477796076938}{\pi}\\\frac{471.238898038469}{\pi}\\\frac{659.734457253857}{\pi}\end{bmatrix}</div>
 
 <p>To solve an expression in another variable, we specify it through the second argument:</p><pre class="sourceCode julia">out = solve(x^2 + y^2 - 1, y)</pre>
 <div class="well well-sm">
@@ -232,14 +237,7 @@ map(N, as)			# all are real</pre>
 
 <p>This returns a vector of two symbolic answers, as the expression being solved is a quadratic.  We can then evaluate these two values at a point, say $x=1/2$, as before:</p><pre class="sourceCode julia">out |> replace(x, 1/2) |> N</pre>
 <pre class="output">
-MethodError(replace,(
-⎡    __________⎤
-⎢   ╱    2     ⎥
-⎢-╲╱  - x  + 1 ⎥
-⎢              ⎥
-⎢   __________ ⎥
-⎢  ╱    2      ⎥
-⎣╲╱  - x  + 1  ⎦,x,0.5))
+MethodError(replace, (SymPy.Sym[-sqrt(-x^2 + 1), sqrt(-x^2 + 1)], x, 0.5), 0x000000000000620b)
 </pre>
 
 <p>You can even do systems of equations. For this you specify the system and the variables to solve for using a vector:</p><pre class="sourceCode julia">x, y = Sym("x", "y")
@@ -249,398 +247,405 @@ solve([eq1, eq2], [x,y])</pre>
 <div class="well well-sm">
 \begin{equation*}\begin{cases}x & \text{=>} &0\\y & \text{=>} &1\\\end{cases}\end{equation*}</div>
 
-<h3>Practice</h3><h4>Question</h4><p>What is the coefficient of $x^3$ in $(x-1)(x-2)(x-3)(x-4)(x-5)$?</p><form name='WeaveQuestion' data-id='snWj7nS8' data-controltype='numeric'>
+<h3>Practice</h3><h4>Question</h4><p>What is the coefficient of $x^3$ in $(x-1)(x-2)(x-3)(x-4)(x-5)$?</p><form name='WeaveQuestion' data-id='8uYNNhdv' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="snWj7nS8" type="number" class="form-control">
+<input id="8uYNNhdv" type="number" class="form-control">
 
 </div>
   
-<div id='snWj7nS8_message'></div>
+<div id='8uYNNhdv_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#snWj7nS8').on('change', function() {
-  correct = Math.abs(this.value - 85) <= 0;
+$('#8uYNNhdv').on('change', function() {
+  correct = Math.abs(this.value - -225) <= 0;
 
   if(correct) {
-     $('#snWj7nS8_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#8uYNNhdv_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#snWj7nS8_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#8uYNNhdv_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h3>Question <small>Horner's method</small></h3><p>Expand $(((1x + 2)x + 3)x + 4)$. What do you get?</p><form name="WeaveQuestion" data-id="ZOKxMDEH" data-controltype="radio">
+<h3>Question <small>Horner's method</small></h3><p>Expand $(((1x + 2)x + 3)x + 4)$. What do you get?</p><form name="WeaveQuestion" data-id="KE5SgMNt" data-controltype="radio">
 <div class="form-group ">
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_ZOKxMDEH" value="1"><div class="markdown"><p>4x^3 + 3x^2 + 2x + 1</p>
+      <input type="radio" name="radio_KE5SgMNt" value="1"><div class="markdown"><p>4x^3 + 3x^2 + 2x + 1</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_ZOKxMDEH" value="2"><div class="markdown"><p>1x^3 + 2x^2 + 3x + 4</p>
+      <input type="radio" name="radio_KE5SgMNt" value="2"><div class="markdown"><p>(1+2+3+4)x</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_ZOKxMDEH" value="3"><div class="markdown"><p>(1+2+3+4)x</p>
+      <input type="radio" name="radio_KE5SgMNt" value="3"><div class="markdown"><p>1x^3 + 2x^2 + 3x + 4</p>
 </div>
     </label>
     </div>
     
 
 
-<div id="ZOKxMDEH_message"></div>
+<div id="KE5SgMNt_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_ZOKxMDEH']").on("change", function() {
-  correct = this.value == 2;
+$("input:radio[name='radio_KE5SgMNt']").on("change", function() {
+  correct = this.value == 3;
 
   if(correct) {
-     $("#ZOKxMDEH_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#KE5SgMNt_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#ZOKxMDEH_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#KE5SgMNt_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<p>(Horner's method is an alternate way of evaluating $a_n x^n + a_{n-1}x^{n-1} + \cdots a_1 x + a_0$ expressed in terms of the coefficients, which are 1,2,3,4 in the example.)</p><h4>Question</h4><p>Find the largest root of $x^3 - 6x^2 + 11x - 6$.</p><form name='WeaveQuestion' data-id='2PDDpf4O' data-controltype='numeric'>
+<p>(Horner's method is an alternate way of evaluating $a_n x^n + a_{n-1}x^{n-1} + \cdots a_1 x + a_0$ expressed in terms of the coefficients, which are 1,2,3,4 in the example.)</p><h4>Question</h4><p>Find the largest root of $x^3 - 6x^2 + 11x - 6$.</p><form name='WeaveQuestion' data-id='yeQjMYA2' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="2PDDpf4O" type="number" class="form-control">
+<input id="yeQjMYA2" type="number" class="form-control">
 
 </div>
   
-<div id='2PDDpf4O_message'></div>
+<div id='yeQjMYA2_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#2PDDpf4O').on('change', function() {
+$('#yeQjMYA2').on('change', function() {
   correct = Math.abs(this.value - 3) <= 0.01;
 
   if(correct) {
-     $('#2PDDpf4O_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#yeQjMYA2_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#2PDDpf4O_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#yeQjMYA2_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><div class="well well-sm">
-  <figure>
-    <img src="data:image/gif;base64, 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"/>
-    <figcaption><div class="markdown"></div></figcaption>
-  </figure>
+<h4>Question</h4>
+<div class="well well-sm">
+<figure>
+<img src="data:image/gif;base64,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"/>
+<figcaption><div class="markdown"></div></figcaption>
+</figure>
 </div>
 
 
-<p>Solve for $x$ using <code>solve&#40;x^2 - &#40;3^2 &#43; 4^2&#41;&#41;</code> not the picture. What do you get</p><form name="WeaveQuestion" data-id="cUip7eD9" data-controltype="radio">
+<p>Solve for $x$ using <code>solve&#40;x^2 - &#40;3^2 &#43; 4^2&#41;&#41;</code> not the picture. What do you get</p><form name="WeaveQuestion" data-id="UN8E0QhW" data-controltype="radio">
 <div class="form-group ">
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_cUip7eD9" value="1"><div class="markdown"><p>The value 5</p>
+      <input type="radio" name="radio_UN8E0QhW" value="1"><div class="markdown"><p>two answers -5 and 5</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_cUip7eD9" value="2"><div class="markdown"><p>two answers -5 and 5</p>
+      <input type="radio" name="radio_UN8E0QhW" value="2"><div class="markdown"><p>The value 5</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_cUip7eD9" value="3"><div class="markdown"><p>Same as the picture</p>
+      <input type="radio" name="radio_UN8E0QhW" value="3"><div class="markdown"><p>Same as the picture</p>
 </div>
     </label>
     </div>
     
 
 
-<div id="cUip7eD9_message"></div>
+<div id="UN8E0QhW_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_cUip7eD9']").on("change", function() {
-  correct = this.value == 2;
+$("input:radio[name='radio_UN8E0QhW']").on("change", function() {
+  correct = this.value == 1;
 
   if(correct) {
-     $("#cUip7eD9_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#UN8E0QhW_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#cUip7eD9_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#UN8E0QhW_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question</h4><p>The Soviet historian I. Y. Depman claimed that in 1486, Spanish mathematician Valmes was burned at the stake for claiming to have solved the <a href="https://en.wikipedia.org/wiki/Quartic_function">quartic equation</a>. Here we don't face such consequences. </p><p>Find the largest root of $x^4 - 10x^3 + 32x^2 - 38x + 15$.</p><form name='WeaveQuestion' data-id='QhK1kkto' data-controltype='numeric'>
+<h4>Question</h4><p>The Soviet historian I. Y. Depman claimed that in 1486, Spanish mathematician Valmes was burned at the stake for claiming to have solved the <a href="https://en.wikipedia.org/wiki/Quartic_function">quartic equation</a>. Here we don't face such consequences. </p><p>Find the largest root of $x^4 - 10x^3 + 32x^2 - 38x + 15$.</p><form name='WeaveQuestion' data-id='eTTz6siG' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="QhK1kkto" type="number" class="form-control">
+<input id="eTTz6siG" type="number" class="form-control">
 
 </div>
   
-<div id='QhK1kkto_message'></div>
+<div id='eTTz6siG_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#QhK1kkto').on('change', function() {
+$('#eTTz6siG').on('change', function() {
   correct = Math.abs(this.value - 5) <= 0;
 
   if(correct) {
-     $('#QhK1kkto_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#eTTz6siG_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#QhK1kkto_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#eTTz6siG_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Solve $e^x = x^4$ using <code>julia</code>. (You will need to convert to numeric with <code>N</code>.)</p><form name='WeaveQuestion' data-id='3NZrALmR' data-controltype='numeric'>
+<h4>Question</h4><p>Solve $e^x = x^4$ using <code>julia</code>. (You will need to convert to numeric with <code>N</code>.)</p><form name='WeaveQuestion' data-id='6GCIKS8j' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="3NZrALmR" type="number" class="form-control">
+<input id="6GCIKS8j" type="number" class="form-control">
 
 </div>
   
-<div id='3NZrALmR_message'></div>
+<div id='6GCIKS8j_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#3NZrALmR').on('change', function() {
+$('#6GCIKS8j').on('change', function() {
   correct = Math.abs(this.value - 1.4296118247255556) <= 0.01;
 
   if(correct) {
-     $('#3NZrALmR_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#6GCIKS8j_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#3NZrALmR_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#6GCIKS8j_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h2>Graphing expressions</h2><p>Plotting a symbolic expression is done by coercing the expression into a function. For simple plots, this happens behind the scenes:</p><pre class="sourceCode julia">using Plots; gadfly()
 ex = x^2 - 2x + 4
 plot(ex, -1, 3)          # plot of a symbolic expression</pre>
-<pre class="output">
-KeyError(:xguide)
-</pre>
-
+    <div id="5d5c144e-165e-4352-a917-b0143206019d" style="width:600px;height:400px;"></div>
+    <script>
+    PLOT = document.getElementById('5d5c144e-165e-4352-a917-b0143206019d');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[6.922254932726204,6.845272835221426,6.169605272941245,5.559169127672647,5.223702322387911,4.911793902060808,4.666458800375875,4.437964380238242,3.999584282949738,3.6658566231980934,3.514775108269963,3.3831067953122433,3.2548318422836635,3.152616190879167,3.035261168995959,3.000097429807212,3.033892009766678,3.1438071371899143,3.2372516830078997,3.353966276527538,3.486620935158149,3.6403420664616095,4.027465591526814,4.423962538406141,4.697732903845207,4.995559069976096,5.297459551183071,5.6206170717921715,6.18264790881421,6.799238178456291,6.898973000678312],"type":"scatter","name":"y1","yaxis":"y","x":[-0.9804683619604238,-0.9609367239208474,-0.7803385276236781,-0.5997403313265086,-0.49120834305200656,-0.3826763547775045,-0.2909139399572208,-0.19915152513693707,0.0002078801322057279,0.18399961813851265,0.282521701882236,0.3810437856259594,0.49519128149004427,0.6093387773541291,0.8122204244440858,0.99012934616088,1.1840978266212778,1.3792191150112483,1.4870848827544327,1.5949506504976172,1.6975822067384956,1.800213762979374,2.013639774045402,2.1932990146673808,2.3029707993064186,2.4126425839454564,2.515737296230145,2.618832008514834,2.783997732289537,2.9491634560642397,2.9745817280321196]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-0.5,0.0,0.5,1.0,1.5,2.0,2.5],"visible":true,"ticks":"inside","range":[-0.9804683619604238,2.9745817280321196],"domain":[0.05100612423447069,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-0.5","0.0","0.5","1.0","1.5","2.0","2.5"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[3.5,4.0,4.5,5.0,5.5,6.0,6.5],"visible":true,"ticks":"inside","range":[3.000097429807212,6.922254932726204],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["3.5","4.0","4.5","5.0","5.5","6.0","6.5"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    </script>
 <p>This is similar to how functions can be used as well. The following is similar, but different:</p><pre class="sourceCode julia">f(x) = x^2 - 2x + 4
 plot(f, -1, 3)           # plot of a function object</pre>
-<pre class="output">
-KeyError(:xguide)
-</pre>
-
+    <div id="b1f20429-3bef-425f-88e1-39f77302e1a8" style="width:600px;height:400px;"></div>
+    <script>
+    PLOT = document.getElementById('b1f20429-3bef-425f-88e1-39f77302e1a8');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[6.922254932726204,6.845272835221426,6.169605272941245,5.559169127672647,5.223702322387911,4.911793902060808,4.666458800375875,4.437964380238242,3.999584282949738,3.6658566231980934,3.514775108269963,3.3831067953122433,3.2548318422836635,3.152616190879167,3.035261168995959,3.000097429807212,3.033892009766678,3.1438071371899143,3.2372516830078997,3.353966276527538,3.486620935158149,3.6403420664616095,4.027465591526814,4.423962538406141,4.697732903845207,4.995559069976096,5.297459551183071,5.6206170717921715,6.18264790881421,6.799238178456291,6.898973000678312],"type":"scatter","name":"y1","yaxis":"y","x":[-0.9804683619604238,-0.9609367239208474,-0.7803385276236781,-0.5997403313265086,-0.49120834305200656,-0.3826763547775045,-0.2909139399572208,-0.19915152513693707,0.0002078801322057279,0.18399961813851265,0.282521701882236,0.3810437856259594,0.49519128149004427,0.6093387773541291,0.8122204244440858,0.99012934616088,1.1840978266212778,1.3792191150112483,1.4870848827544327,1.5949506504976172,1.6975822067384956,1.800213762979374,2.013639774045402,2.1932990146673808,2.3029707993064186,2.4126425839454564,2.515737296230145,2.618832008514834,2.783997732289537,2.9491634560642397,2.9745817280321196]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-0.5,0.0,0.5,1.0,1.5,2.0,2.5],"visible":true,"ticks":"inside","range":[-0.9804683619604238,2.9745817280321196],"domain":[0.05100612423447069,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-0.5","0.0","0.5","1.0","1.5","2.0","2.5"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[3.5,4.0,4.5,5.0,5.5,6.0,6.5],"visible":true,"ticks":"inside","range":[3.000097429807212,6.922254932726204],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["3.5","4.0","4.5","5.0","5.5","6.0","6.5"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    </script>
 <p>Graphing more than one expression at a time is, of course, possible. For example, to graph a function and its tangent line at a point we can do this.</p><pre class="sourceCode julia">f(x) = sqrt(x);
 c = 2;
 fp = diff(f(x));		# diff finds derivative, fp an expression (not function)
 m = fp(x=>c)	        # at c=2
 plot([f(x), f(c) + m * (x - c)], 1, 3)</pre>
 <pre class="output">
-KeyError(:xguide)
+MethodError(NaNMath.min, (sqrt(x), Inf), 0x000000000000620f)
 </pre>
 
-<h3>Practice</h3><h4>Question</h4><p>Plot the expression <code>x^4 - 3x^3 &#43; 3x^2 - 3x &#43;2</code> over $[-1, 3]$. How many real roots are there?</p><form name='WeaveQuestion' data-id='qEMnjbOr' data-controltype='numeric'>
+<h3>Practice</h3><h4>Question</h4><p>Plot the expression <code>x^4 - 3x^3 &#43; 3x^2 - 3x &#43;2</code> over $[-1, 3]$. How many real roots are there?</p><form name='WeaveQuestion' data-id='0owBIIUZ' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="qEMnjbOr" type="number" class="form-control">
+<input id="0owBIIUZ" type="number" class="form-control">
 
 </div>
   
-<div id='qEMnjbOr_message'></div>
+<div id='0owBIIUZ_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#qEMnjbOr').on('change', function() {
+$('#0owBIIUZ').on('change', function() {
   correct = Math.abs(this.value - 2) <= 0;
 
   if(correct) {
-     $('#qEMnjbOr_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#0owBIIUZ_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#qEMnjbOr_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#0owBIIUZ_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h2>Limits</h2><p>The <code>Limit</code> function can find the limit of an expression. Let's see how well it does. The basic question</p>$$~
 \lim_{x \rightarrow c} f(x) = L
-~$$<p>has three inputs: A function the limit is being taken of, a dummy variable $x$, and a value where the limit is taken, $c$. The output is the limit, when it exists. The <code>limit</code> function is similar. Here we find an old classic:</p><pre class="sourceCode julia">limit(sin(x)/x, x, 0)</pre>
+~$$
+<p>has three inputs: A function the limit is being taken of, a dummy variable $x$, and a value where the limit is taken, $c$. The output is the limit, when it exists. The <code>limit</code> function is similar. Here we find an old classic:</p><pre class="sourceCode julia">limit(sin(x)/x, x, 0)</pre>
 <div class="well well-sm">
-$$1$$</div>
+1</div>
 
 <p>We can do other similar questions:</p><pre class="sourceCode julia">limit((1-cos(x))/x^2, x, 0)</pre>
 <div class="well well-sm">
-$$\frac{1}{2}$$</div>
+1/2</div>
 
 <p>The second argument is needed, as the expression may have more than one variable:</p><pre class="sourceCode julia">lambda = symbols("lambda")
 limit((1 - lambda *x)^(1/x), x, 0)</pre>
 <div class="well well-sm">
-$$e^{- \lambda}$$</div>
+exp(-lambda)</div>
 
 <p>Limits can be taken at infinity as well. We can specify infinity using <code>oo</code>:</p><pre class="sourceCode julia">limit(sin(x)/x, x, oo)</pre>
 <div class="well well-sm">
-$$0$$</div>
+0</div>
 
 <p>We can even compute derivatives using limits. Here we do so symbolically:</p><pre class="sourceCode julia">h = Sym("h")
 f(x) = x^10
 limit( (f(x+h) - f(x))/h, h, 0)</pre>
 <div class="well well-sm">
-$$10 x^{9}$$</div>
+10*x^9</div>
 
 <p>We can see that some of the more complicated formulas for derivatives give the same answer. Here we see the central difference gives the same answer:</p><pre class="sourceCode julia">central_difference(f, x, h) = ( f(x+h) - f(x-h) ) / (2h)
 a = limit(central_difference(f, x, h), h, 0)</pre>
 <div class="well well-sm">
-$$10 x^{9}$$</div>
+10*x^9</div>
 
 <p>Even this more complicated expression works as expected:</p><pre class="sourceCode julia">central_4th_difference(f, x, h) = (-f(x + 2h) + 8f(x+h) - 8f(x-h) + f(x-2h))/(12h)
 limit(central_4th_difference(f, x, h), h, 0)</pre>
 <div class="well well-sm">
-$$10 x^{9}$$</div>
+10*x^9</div>
 
 <p>This limit matches the chain rule:</p><pre class="sourceCode julia">g(x) = sin(x)
 limit( (f(g(x+h)) - f(g(x)))/h, h, 0) |> replace(x, 1)</pre>
 <div class="well well-sm">
-$$10 \sin^{9}{\left (1 \right )} \cos{\left (1 \right )}$$</div>
+10*sin(1)^9*cos(1)</div>
 
 <h3>Practice</h3><h4>Question</h4><p>Find </p>$$~
 \lim_{x \rightarrow 4} \frac{(3 - \sqrt(x + 5))}{(x-4)}
-~$$<form name='WeaveQuestion' data-id='8yMDc5Ey' data-controltype='numeric'>
+~$$
+<form name='WeaveQuestion' data-id='YQv28p7x' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="8yMDc5Ey" type="number" class="form-control">
+<input id="YQv28p7x" type="number" class="form-control">
 
 </div>
   
-<div id='8yMDc5Ey_message'></div>
+<div id='YQv28p7x_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#8yMDc5Ey').on('change', function() {
+$('#YQv28p7x').on('change', function() {
   correct = Math.abs(this.value - -0.16666666666666666) <= 0.001;
 
   if(correct) {
-     $('#8yMDc5Ey_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#YQv28p7x_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#8yMDc5Ey_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#YQv28p7x_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h4>Question</h4><p>Compute</p>$$~
 \lim_{x \rightarrow 1} \frac{x^{1/4} - 1}{x^{1/3} - 1}.
-~$$<form name='WeaveQuestion' data-id='XLD5ZDPB' data-controltype='numeric'>
+~$$
+<form name='WeaveQuestion' data-id='P4EPkJ5E' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="XLD5ZDPB" type="number" class="form-control">
+<input id="P4EPkJ5E" type="number" class="form-control">
 
 </div>
   
-<div id='XLD5ZDPB_message'></div>
+<div id='P4EPkJ5E_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#XLD5ZDPB').on('change', function() {
+$('#P4EPkJ5E').on('change', function() {
   correct = Math.abs(this.value - 0.75) <= 0.001;
 
   if(correct) {
-     $('#XLD5ZDPB_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#P4EPkJ5E_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#XLD5ZDPB_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#P4EPkJ5E_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h4>Question</h4><p>At <a href="http://mathoverflow.net/questions/51685/how-did-bernoulli-prove-lh&#37;C3&#37;B4pitals-rule">math overflow</a> we learn that L'Hopital was motivated by the following limit:</p>$$~
 \lim_{x \rightarrow a} \frac{(2a^3x-x^4)^(1/2) - a (a^2x)^(1/3)}{a - (ax^3)^(1/4)}
-~$$<p>What did he find (with the help of Bernoulli)?</p><p>You need to inform <code>SymPy</code> that $a > 0$. The following is a good start (though it is complicated enough the output is mis-formatted):</p><pre class="sourceCode julia">x = Sym("x")
+~$$
+<p>What did he find (with the help of Bernoulli)?</p><p>You need to inform <code>SymPy</code> that $a > 0$. The following is a good start (though it is complicated enough the output is mis-formatted):</p><pre class="sourceCode julia">x = Sym("x")
 a = symbols("a", positive=true)
 top = (2a^3*x-x^4)^(1//2) - a *(a^2*x)^(1//3) # rationals are converted exactly to SymPy
 bottom =  a - (a*x^3)^(1//4)
 ex = top/bottom</pre>
 <div class="well well-sm">
-$$\frac{- a^{\frac{5}{3}} \root{3}{x} + \sqrt{2 a^{3} x - x^{4}}}{- \root{4}{a} \root{4}{x^{3}} + a}$$</div>
+(-a^(5/3)*x^(1/3) + sqrt(2*a^3*x - x^4))/(-a^(1/4)*(x^3)^(1/4) + a)</div>
 
-<p>Now find the limit.</p><form name="WeaveQuestion" data-id="qPfQPt0o" data-controltype="radio">
+<p>Now find the limit.</p><form name="WeaveQuestion" data-id="BgnCw1ZT" data-controltype="radio">
 <div class="form-group ">
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_qPfQPt0o" value="1"><div class="markdown">$0$
+      <input type="radio" name="radio_BgnCw1ZT" value="1"><div class="markdown">$16a/9$
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_qPfQPt0o" value="2"><div class="markdown">$16a/9$
+      <input type="radio" name="radio_BgnCw1ZT" value="2"><div class="markdown">$9\sqrt{a}$
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_qPfQPt0o" value="3"><div class="markdown">$9\sqrt{a}$
+      <input type="radio" name="radio_BgnCw1ZT" value="3"><div class="markdown"><p>Does not exist</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_qPfQPt0o" value="4"><div class="markdown"><p>Does not exist</p>
+      <input type="radio" name="radio_BgnCw1ZT" value="4"><div class="markdown">$0$
 </div>
     </label>
     </div>
     
 
 
-<div id="qPfQPt0o_message"></div>
+<div id="BgnCw1ZT_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_qPfQPt0o']").on("change", function() {
-  correct = this.value == 2;
+$("input:radio[name='radio_BgnCw1ZT']").on("change", function() {
+  correct = this.value == 1;
 
   if(correct) {
-     $("#qPfQPt0o_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#BgnCw1ZT_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#qPfQPt0o_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#BgnCw1ZT_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -652,93 +657,95 @@ f (generic function with 1 method)</pre>
 
 <p>Compute the following:</p>$$~
 \lim_{h->0} \frac{f(x+h) - 2f(x) + f(x-h)}{h^2}
-~$$<p>Based on your answer, what do you think the above expression finds for any <code>f</code>?</p><form name="WeaveQuestion" data-id="CKVxEAbp" data-controltype="radio">
+~$$
+<p>Based on your answer, what do you think the above expression finds for any <code>f</code>?</p><form name="WeaveQuestion" data-id="kCi13IZc" data-controltype="radio">
 <div class="form-group ">
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_CKVxEAbp" value="1"><div class="markdown"><p><code>f&#39;&#40;x&#41;</code></p>
+      <input type="radio" name="radio_kCi13IZc" value="1"><div class="markdown"><p><code>f&#39;&#40;x&#41;</code></p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_CKVxEAbp" value="2"><div class="markdown"><p><code>f&#39;&#39;&#40;x&#41;</code></p>
+      <input type="radio" name="radio_kCi13IZc" value="2"><div class="markdown"><p><code>f&#39;&#39;&#40;x&#41;</code></p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_CKVxEAbp" value="3"><div class="markdown"><p><code>f&#39;&#39;&#39;&#40;x&#41;</code></p>
+      <input type="radio" name="radio_kCi13IZc" value="3"><div class="markdown"><p><code>f&#39;&#39;&#39;&#40;x&#41;</code></p>
 </div>
     </label>
     </div>
     
 
 
-<div id="CKVxEAbp_message"></div>
+<div id="kCi13IZc_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_CKVxEAbp']").on("change", function() {
+$("input:radio[name='radio_kCi13IZc']").on("change", function() {
   correct = this.value == 2;
 
   if(correct) {
-     $("#CKVxEAbp_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#kCi13IZc_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#CKVxEAbp_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#kCi13IZc_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
 <h4>Question</h4><p>Define a symbolic quantity <code>a</code>. Compute the limit</p>$$~
 \lim_{x \rightarrow 0} \frac{\cos(ax) - 1}{\cos(x) - 1}
-~$$<p>What is the answer?</p><form name="WeaveQuestion" data-id="TEr4fP4H" data-controltype="radio">
+~$$
+<p>What is the answer?</p><form name="WeaveQuestion" data-id="mS52XRiD" data-controltype="radio">
 <div class="form-group ">
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_TEr4fP4H" value="1"><div class="markdown"><p>1</p>
+      <input type="radio" name="radio_mS52XRiD" value="1"><div class="markdown"><p>1</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_TEr4fP4H" value="2"><div class="markdown"><p>a</p>
+      <input type="radio" name="radio_mS52XRiD" value="2"><div class="markdown"><p>a</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_TEr4fP4H" value="3"><div class="markdown"><p>a^2</p>
+      <input type="radio" name="radio_mS52XRiD" value="3"><div class="markdown"><p>a^2</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_TEr4fP4H" value="4"><div class="markdown"><p>No limit exists</p>
+      <input type="radio" name="radio_mS52XRiD" value="4"><div class="markdown"><p>No limit exists</p>
 </div>
     </label>
     </div>
     
 
 
-<div id="TEr4fP4H_message"></div>
+<div id="mS52XRiD_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_TEr4fP4H']").on("change", function() {
+$("input:radio[name='radio_mS52XRiD']").on("change", function() {
   correct = this.value == 3;
 
   if(correct) {
-     $("#TEr4fP4H_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#mS52XRiD_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#TEr4fP4H_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#mS52XRiD_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -751,7 +758,7 @@ f (generic function with 1 method)</pre>
 fxs = map(f, xs);
 [xs fxs]</pre>
 <pre class="output">
-9x2 Array{Float64,2}:
+9×2 Array{Float64,2}:
  0.01     0.000191087
  0.001    5.60275e-5 
  0.0001   1.24647e-5 
@@ -762,50 +769,50 @@ fxs = map(f, xs);
  1.0e-9   8.52992e-9 
  1.0e-10  2.17687e-9 </pre>
 
-<p>It looks like the limit is $0$. What does <code>limit</code> compute for the <em>real</em> answer?</p><form name="WeaveQuestion" data-id="REQJucWH" data-controltype="radio">
+<p>It looks like the limit is $0$. What does <code>limit</code> compute for the <em>real</em> answer?</p><form name="WeaveQuestion" data-id="ACap6v6t" data-controltype="radio">
 <div class="form-group ">
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_REQJucWH" value="1"><div class="markdown"><p><code>0</code></p>
+      <input type="radio" name="radio_ACap6v6t" value="1"><div class="markdown"><p><code>Inf</code></p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_REQJucWH" value="2"><div class="markdown"><p><code>e &#61; 2.7182818284590455</code></p>
+      <input type="radio" name="radio_ACap6v6t" value="2"><div class="markdown"><p><code>e &#61; 2.7182818284590455</code></p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_REQJucWH" value="3"><div class="markdown"><p><code>Inf</code></p>
+      <input type="radio" name="radio_ACap6v6t" value="3"><div class="markdown"><p><code>1</code></p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_REQJucWH" value="4"><div class="markdown"><p><code>1</code></p>
+      <input type="radio" name="radio_ACap6v6t" value="4"><div class="markdown"><p><code>0</code></p>
 </div>
     </label>
     </div>
     
 
 
-<div id="REQJucWH_message"></div>
+<div id="ACap6v6t_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_REQJucWH']").on("change", function() {
-  correct = this.value == 3;
+$("input:radio[name='radio_ACap6v6t']").on("change", function() {
+  correct = this.value == 1;
 
   if(correct) {
-     $("#REQJucWH_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#ACap6v6t_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#REQJucWH_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#ACap6v6t_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -814,163 +821,165 @@ $("input:radio[name='radio_REQJucWH']").on("change", function() {
 <pre class="output">
 f (generic function with 1 method)</pre>
 
-<p>This function has a limit at $\infty$. It can't be found numerically though (well, not easily). You can verify this by trying to evaluate the function at $10$, let alone for really large values. However, it can be computed symbolically. What is the answer?</p><form name='WeaveQuestion' data-id='hFkBS7dq' data-controltype='numeric'>
+<p>This function has a limit at $\infty$. It can't be found numerically though (well, not easily). You can verify this by trying to evaluate the function at $10$, let alone for really large values. However, it can be computed symbolically. What is the answer?</p><form name='WeaveQuestion' data-id='UEvzeMZq' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="hFkBS7dq" type="number" class="form-control">
+<input id="UEvzeMZq" type="number" class="form-control">
 
 </div>
   
-<div id='hFkBS7dq_message'></div>
+<div id='UEvzeMZq_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#hFkBS7dq').on('change', function() {
+$('#UEvzeMZq').on('change', function() {
   correct = Math.abs(this.value - 0) <= 1.0e-8;
 
   if(correct) {
-     $('#hFkBS7dq_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#UEvzeMZq_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#hFkBS7dq_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#UEvzeMZq_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <p>(Again, this is from Gruntz.)</p><h2>Derivatives</h2><p>We just saw we can take derivatives with a limit, though just as with pen and paper, it is better to use the rules of derivatives.  These rules are implemented by the <code>diff</code> operator, which takes a symbolic expression, a variable to differentiate in (the default is <code>x</code>) and an optional integer for the number of derivatives and returns a symbolic derivative.</p><p>For example</p><pre class="sourceCode julia">f(x) = exp(exp(x))
 diff(f(x))		       ## not f, but the symbolic expression f(x)</pre>
 <div class="well well-sm">
-$$e^{x} e^{e^{x}}$$</div>
+exp(x)*exp(exp(x))</div>
 
 <pre class="sourceCode julia">diff(f(x), x)                  ## optional x is necessary if other symbols involved</pre>
 <div class="well well-sm">
-$$e^{x} e^{e^{x}}$$</div>
+exp(x)*exp(exp(x))</div>
 
 <pre class="sourceCode julia">diff(f(x), x, 2)               ## Finds f''(x), not f'(2).</pre>
 <div class="well well-sm">
-$$\left(e^{x} + 1\right) e^{x} e^{e^{x}}$$</div>
+(exp(x) + 1)*exp(x)*exp(exp(x))</div>
 
 <p>Here we find and plot the derivative of $x^x$ avoiding the asymptote at $x=0$.</p><pre class="sourceCode julia">f(x) = x^x
 plot(diff(f(x)), 1/10, 2)</pre>
-<pre class="output">
-KeyError(:xguide)
-</pre>
-
+    <div id="106077b4-8d52-4043-9caa-1fb1398c7936" style="width:600px;height:400px;"></div>
+    <script>
+    PLOT = document.getElementById('106077b4-8d52-4043-9caa-1fb1398c7936');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-0.9927512690814337,-0.9530226909663353,-0.9153039333176854,-0.8794272051430108,-0.613540564707753,-0.42504594951147995,-0.28133125806037507,-0.1658262447109112,-0.05119719345534388,0.04616501057415453,0.11961614731869574,0.18764731932733236,0.3250335444263125,0.4476840390956539,0.5829923339125594,0.7532360589821288,0.9238344657110802,1.093828450730358,1.306862875792399,1.5574032535170006,1.8871190233637982,2.2646899863661365,2.490485552927229,2.7395823368872696,2.9693259314873597,3.219311237265108,3.5548581846267657,3.927557641675184,4.315811141009099,4.745087208885262,5.121697298654907,5.530315533164967,5.973872381676866,6.455577986215799,6.533317407622909,6.612056506737441,6.69180898077738],"type":"scatter","name":"y1","yaxis":"y","x":[0.10463876403439937,0.10927752806879873,0.11391629210319809,0.11855505613759745,0.16144712775817516,0.2043391993787529,0.24723127099933062,0.29012334261990835,0.34167603705029687,0.3932287314806854,0.4368158785203201,0.4804030255599549,0.5750987430627976,0.6623998186157936,0.7559957981723308,0.8644359192432113,0.9608047016109407,1.045311439426418,1.137446467645107,1.230129079630343,1.332601558986368,1.4301015374152026,1.4807902150433843,1.531478892671566,1.574147962319286,1.6168170319670059,1.668911129670549,1.721005227374092,1.769975215709319,1.8189452040445462,1.8581720634410381,1.89739892283753,1.936625782234022,1.975852641630514,1.9818894812228853,1.9879263208152569,1.9939631604076284]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.25,0.5,0.75,1.0,1.25,1.5,1.75],"visible":true,"ticks":"inside","range":[0.10463876403439937,1.9939631604076284],"domain":[0.02137649460484106,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0.25","0.50","0.75","1.00","1.25","1.50","1.75"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.0,1.0,2.0,3.0,4.0,5.0,6.0],"visible":true,"ticks":"inside","range":[-0.9927512690814337,6.69180898077738],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0","1","2","3","4","5","6"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    </script>
 <p>Here we plot $f(x)$ and it's tangent line at $c=1$:</p><pre class="sourceCode julia">f(x) = x^x; c = 1
 m = diff(f(x)) |> replace(x, c);
 fs = [f(x), f(c) + m*(x-c)]
 plot(fs, .5, 1.5)</pre>
 <pre class="output">
-KeyError(:xguide)
+ErrorException("No user recipe defined for Float64")
 </pre>
 
 <h3>Extrema</h3><p>We can combine <code>solve</code> with <code>diff</code> to find extrema of a differentiable function over a closed interval, by locating the critical points where $f'(x) = 0$.</p><p>For example, consider the problem enclosing the maximum amount of area with 3 sides of a rectangle where the length of the 3 sides is fixed.</p><p>For this, we have</p>$$~
 L = 2x + y, \quad A = xy, \quad\text{or}\quad A(x) = x \cdot (L-2x)
-~$$<p>We can solve this with $L$ as a symbolic value, by looking at critical points of $A$ or when $A'(x) = 0$:</p><pre class="sourceCode julia">L = Sym("L")
+~$$
+<p>We can solve this with $L$ as a symbolic value, by looking at critical points of $A$ or when $A'(x) = 0$:</p><pre class="sourceCode julia">L = Sym("L")
 A = x*y
 A = A(y => L - 2x)
 out = solve(diff(A, x), x)[1]	## solve returns an array, we need its first component
 subs(L - 2x, x, out)		</pre>
 <div class="well well-sm">
-$$\frac{L}{2}$$</div>
+L/2</div>
 
 <p>This shows that  $y = L/2$. So solve for $x$ we have</p><pre class="sourceCode julia">solve(L/2 - (L - 2x), x)</pre>
 <div class="well well-sm">
 \begin{bmatrix}\frac{L}{4}\end{bmatrix}</div>
 
-<h3>Practice</h3><p>Find the derivative of $\tan^{-1}(x)$. What do you get?</p><form name="WeaveQuestion" data-id="CUbkFqLn" data-controltype="radio">
+<h3>Practice</h3><p>Find the derivative of $\tan^{-1}(x)$. What do you get?</p><form name="WeaveQuestion" data-id="hLWP4Orr" data-controltype="radio">
 <div class="form-group ">
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_CUbkFqLn" value="1"><div class="markdown"><p>1/(x^2 + 1)</p>
+      <input type="radio" name="radio_hLWP4Orr" value="1"><div class="markdown"><p>1/(x^2 + 1)</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_CUbkFqLn" value="2"><div class="markdown"><p>1/x</p>
+      <input type="radio" name="radio_hLWP4Orr" value="2"><div class="markdown"><p>1/x</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_CUbkFqLn" value="3"><div class="markdown"><p>1/sqrt(-x^2 + 1)</p>
+      <input type="radio" name="radio_hLWP4Orr" value="3"><div class="markdown"><p>1/sqrt(-x^2 + 1)</p>
 </div>
     </label>
     </div>
     
 
 
-<div id="CUbkFqLn_message"></div>
+<div id="hLWP4Orr_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_CUbkFqLn']").on("change", function() {
+$("input:radio[name='radio_hLWP4Orr']").on("change", function() {
   correct = this.value == 1;
 
   if(correct) {
-     $("#CUbkFqLn_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#hLWP4Orr_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#CUbkFqLn_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#hLWP4Orr_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Questions</h4><p>Let $f(x) = \exp(-\cos(x))$. Evaluate $f'(3)$. (You'll need to <code>subs</code>titute 3 for <code>x</code> and convert to floating point.)</p><form name='WeaveQuestion' data-id='I95csw5x' data-controltype='numeric'>
+<h4>Questions</h4><p>Let $f(x) = \exp(-\cos(x))$. Evaluate $f'(3)$. (You'll need to <code>subs</code>titute 3 for <code>x</code> and convert to floating point.)</p><form name='WeaveQuestion' data-id='VKO1YEXn' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="I95csw5x" type="number" class="form-control">
+<input id="VKO1YEXn" type="number" class="form-control">
 
 </div>
   
-<div id='I95csw5x_message'></div>
+<div id='VKO1YEXn_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#I95csw5x').on('change', function() {
+$('#VKO1YEXn').on('change', function() {
   correct = Math.abs(this.value - 0.37978418074577663) <= 0.001;
 
   if(correct) {
-     $('#I95csw5x_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#VKO1YEXn_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#I95csw5x_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#VKO1YEXn_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Questions</h4><p>Find the single critical point of $f(x) = 1/x^2 + x^3$. (Solve, will return many answers but only one real one. You can also try <code>nsolve&#40;diff&#40;f&#40;x&#41;&#41;, 1&#41;</code>.)</p><form name='WeaveQuestion' data-id='FAMNAeB6' data-controltype='numeric'>
+<h4>Questions</h4><p>Find the single critical point of $f(x) = 1/x^2 + x^3$. (Solve, will return many answers but only one real one. You can also try <code>nsolve&#40;diff&#40;f&#40;x&#41;&#41;, 1&#41;</code>.)</p><form name='WeaveQuestion' data-id='vGGpn5y7' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="FAMNAeB6" type="number" class="form-control">
+<input id="vGGpn5y7" type="number" class="form-control">
 
 </div>
   
-<div id='FAMNAeB6_message'></div>
+<div id='vGGpn5y7_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#FAMNAeB6').on('change', function() {
+$('#vGGpn5y7').on('change', function() {
   correct = Math.abs(this.value - 0.9221079114817278) <= 0.01;
 
   if(correct) {
-     $('#FAMNAeB6_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#vGGpn5y7_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#FAMNAeB6_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#vGGpn5y7_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -980,57 +989,58 @@ solve(f(c) + diff(f(c)) * (x - c), x)</pre>
 <div class="well well-sm">
 \begin{bmatrix}c - \frac{1}{2} \sin{\left (2 c \right )}\end{bmatrix}</div>
 
-<p>What do you get when $c = \pi/4$?</p><form name='WeaveQuestion' data-id='cizqJDfA' data-controltype='numeric'>
+<p>What do you get when $c = \pi/4$?</p><form name='WeaveQuestion' data-id='wOrs9MIT' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="cizqJDfA" type="number" class="form-control">
+<input id="wOrs9MIT" type="number" class="form-control">
 
 </div>
   
-<div id='cizqJDfA_message'></div>
+<div id='wOrs9MIT_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#cizqJDfA').on('change', function() {
+$('#wOrs9MIT').on('change', function() {
   correct = Math.abs(this.value - 0.2853981633974483) <= 0.001;
 
   if(correct) {
-     $('#cizqJDfA_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#wOrs9MIT_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#cizqJDfA_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#wOrs9MIT_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h4>Question</h4><p>You have a 12-inch wide rectangular piece of metal that you will fold into three 4 inch strips in a symmetric manner. Let $\theta$ be the amount each wing is folded up ($\theta \in [0, 90^\circ]$). What value of $\theta$ will produce the larges cross sectional area?</p><p>The area as a function of $\theta$ is that of two right triangles with hypotenuse $4$ and height given by $h/4 = \sin(\theta)$ and base given by $b/4 = \cos(\theta)$. The total area then is:</p>$$~
 A(\theta) = 2 \cdot (1/2) \cdot 4\sin(\theta) \cdot 4 \cos(\theta) + 4 \cdot 4\sin(\theta)
-~$$<p>In degrees, what angle maximizes the area?</p><form name='WeaveQuestion' data-id='YLUl1SEF' data-controltype='numeric'>
+~$$
+<p>In degrees, what angle maximizes the area?</p><form name='WeaveQuestion' data-id='OMaHc61A' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="YLUl1SEF" type="number" class="form-control">
+<input id="OMaHc61A" type="number" class="form-control">
 
 </div>
   
-<div id='YLUl1SEF_message'></div>
+<div id='OMaHc61A_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#YLUl1SEF').on('change', function() {
+$('#OMaHc61A').on('change', function() {
   correct = Math.abs(this.value - 49.6569) <= 0.01;
 
   if(correct) {
-     $('#YLUl1SEF_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#OMaHc61A_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#YLUl1SEF_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#OMaHc61A_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -1038,23 +1048,23 @@ $('#YLUl1SEF').on('change', function() {
 f(x) = cos(x) - sin(x)
 integrate(f(x), x)</pre>
 <div class="well well-sm">
-$$\sin{\left (x \right )} + \cos{\left (x \right )}$$</div>
+sin(x) + cos(x)</div>
 
 <p>One can parameterize an integral using a constant:</p><pre class="sourceCode julia">integrate(1/cos(x + a), x)</pre>
 <div class="well well-sm">
-$$- \log{\left (\tan{\left (\frac{a}{2} + \frac{x}{2} \right )} - 1 \right )} + \log{\left (\tan{\left (\frac{a}{2} + \frac{x}{2} \right )} + 1 \right )}$$</div>
+-log(tan(a/2 + x/2) - 1) + log(tan(a/2 + x/2) + 1)</div>
 
 <p>Integrate can do many of the integrals thrown at it.</p><pre class="sourceCode julia">integrate(x^3 * (1-x)^4, x)</pre>
 <div class="well well-sm">
-$$\frac{x^{8}}{8} - \frac{4 x^{7}}{7} + x^{6} - \frac{4 x^{5}}{5} + \frac{x^{4}}{4}$$</div>
+x^8/8 - 4*x^7/7 + x^6 - 4*x^5/5 + x^4/4</div>
 
 <pre class="sourceCode julia">integrate(x/(x^2+1), x)</pre>
 <div class="well well-sm">
-$$\frac{1}{2} \log{\left (x^{2} + 1 \right )}$$</div>
+log(x^2 + 1)/2</div>
 
 <h3>Definite integrals</h3><p>By specifying a range to integrate over, the definite integral $\int_a^b f(x) dx$ can be found.</p><pre class="sourceCode julia">integrate(x^2, (x, 0, 1))                                </pre>
 <div class="well well-sm">
-$$\frac{1}{3}$$</div>
+1/3</div>
 
 <p>More interestingly, we can find the median value of an integral by solving with the  resulting symbolic answer from <code>integrate</code>:</p><pre class="sourceCode julia">f(x) = 4x^3
 b = Sym("b")
@@ -1066,117 +1076,117 @@ filter(ispositive, xs)</pre>
 <div class="well well-sm">
 \begin{bmatrix}\frac{2^{\frac{3}{4}}}{2}\end{bmatrix}</div>
 
-<p>The equation <code>eq</code> is a 4th degree polynomial. It has two real and two complex roots. We used <code>real_roots</code> to get the two real ones, and then filtered for the positive one.</p><h3>Practice</h3><h4>Question</h4><p>Integrate $f(x) = 2/(x \cdot \log(x))$. What do you get:</p><form name="WeaveQuestion" data-id="optQiSmV" data-controltype="radio">
+<p>The equation <code>eq</code> is a 4th degree polynomial. It has two real and two complex roots. We used <code>real_roots</code> to get the two real ones, and then filtered for the positive one.</p><h3>Practice</h3><h4>Question</h4><p>Integrate $f(x) = 2/(x \cdot \log(x))$. What do you get:</p><form name="WeaveQuestion" data-id="JbfLiw7U" data-controltype="radio">
 <div class="form-group ">
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_optQiSmV" value="1"><div class="markdown"><p>3*log(x)</p>
+      <input type="radio" name="radio_JbfLiw7U" value="1"><div class="markdown"><p>3*log(x)</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_optQiSmV" value="2"><div class="markdown"><p>3*log(x)^2/2</p>
+      <input type="radio" name="radio_JbfLiw7U" value="2"><div class="markdown"><p>3*log(x)^2/2</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_optQiSmV" value="3"><div class="markdown"><p>log(log(x))</p>
+      <input type="radio" name="radio_JbfLiw7U" value="3"><div class="markdown"><p>log(log(x))</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_optQiSmV" value="4"><div class="markdown"><p>3*log(log(x))</p>
+      <input type="radio" name="radio_JbfLiw7U" value="4"><div class="markdown"><p>3*log(log(x))</p>
 </div>
     </label>
     </div>
     
 
 
-<div id="optQiSmV_message"></div>
+<div id="JbfLiw7U_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_optQiSmV']").on("change", function() {
+$("input:radio[name='radio_JbfLiw7U']").on("change", function() {
   correct = this.value == 3;
 
   if(correct) {
-     $("#optQiSmV_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#JbfLiw7U_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#optQiSmV_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#JbfLiw7U_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question</h4><p>Integrate $f(x) = (2x+5)(x^2 + 5x)^7$ from $0$ to $1$.</p><form name='WeaveQuestion' data-id='ulVDAW6q' data-controltype='numeric'>
+<h4>Question</h4><p>Integrate $f(x) = (2x+5)(x^2 + 5x)^7$ from $0$ to $1$.</p><form name='WeaveQuestion' data-id='0ZAJLghv' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="ulVDAW6q" type="number" class="form-control">
+<input id="0ZAJLghv" type="number" class="form-control">
 
 </div>
   
-<div id='ulVDAW6q_message'></div>
+<div id='0ZAJLghv_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#ulVDAW6q').on('change', function() {
+$('#0ZAJLghv').on('change', function() {
   correct = Math.abs(this.value - 209952.0) <= 0.001;
 
   if(correct) {
-     $('#ulVDAW6q_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#0ZAJLghv_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#ulVDAW6q_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#0ZAJLghv_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Questions</h4><p>Integrate <code>f&#40;x&#41; &#61; sqrt&#40;4 - sqrt&#40;x&#41;&#41;</code> over $[0,9]$. What value do you get? Does it make any sense?</p><form name="WeaveQuestion" data-id="U297vCKt" data-controltype="radio">
+<h4>Questions</h4><p>Integrate <code>f&#40;x&#41; &#61; sqrt&#40;4 - sqrt&#40;x&#41;&#41;</code> over $[0,9]$. What value do you get? Does it make any sense?</p><form name="WeaveQuestion" data-id="luseDuHq" data-controltype="radio">
 <div class="form-group ">
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_U297vCKt" value="1"><div class="markdown"><p>Inf, and yes it makes sense as the vertical asymptote at 0 makes this a problem integral.</p>
+      <input type="radio" name="radio_luseDuHq" value="1"><div class="markdown"><p>-8.884, and no it makes no sense as f(x) > 0, but the integral is negative</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_U297vCKt" value="2"><div class="markdown"><p>-8.884, and no it makes no sense as f(x) > 0, but the integral is negative</p>
+      <input type="radio" name="radio_luseDuHq" value="2"><div class="markdown"><p>Inf, and yes it makes sense as the vertical asymptote at 0 makes this a problem integral.</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_U297vCKt" value="3"><div class="markdown"><p>12.5333, and yes it makes sense.</p>
+      <input type="radio" name="radio_luseDuHq" value="3"><div class="markdown"><p>12.5333, and yes it makes sense.</p>
 </div>
     </label>
     </div>
     
 
 
-<div id="U297vCKt_message"></div>
+<div id="luseDuHq_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_U297vCKt']").on("change", function() {
-  correct = this.value == 2;
+$("input:radio[name='radio_luseDuHq']").on("change", function() {
+  correct = this.value == 1;
 
   if(correct) {
-     $("#U297vCKt_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#luseDuHq_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#U297vCKt_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#luseDuHq_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -1185,21 +1195,22 @@ $("input:radio[name='radio_U297vCKt']").on("change", function() {
 a,b = -3, 1
 tl(c) = x -> f(c) + 2*c*(x-c)
 plot([f, tl(a), tl(b)], a, b)</pre>
-<pre class="output">
-KeyError(:xguide)
-</pre>
-
+    <div id="5c7328b4-edf2-4890-82e1-b4b7f0e37406" style="width:600px;height:400px;"></div>
+    <script>
+    PLOT = document.getElementById('5c7328b4-edf2-4890-82e1-b4b7f0e37406');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[8.767146283063122,6.758649790325665,5.677146611615815,4.836267430512117,3.9991685226853266,3.297857386921068,2.621019224060325,1.933938636170908,1.4108203201077876,1.0198387374854518,0.6656963565241224,0.3853689071674177,0.1640649755323036,0.039914540502861806,0.00018604343600962575,0.03736450907138017,0.17027390208518306,0.3829530547625036,0.9009112663278118],"type":"scatter","name":"y1","yaxis":"y","x":[-2.9609367239208475,-2.5997403313265086,-2.3826763547775043,-2.199151525136937,-1.9997921198677944,-1.8160003818614874,-1.6189562143740408,-1.3906612226458708,-1.1877795755559142,-1.00987065383912,-0.8159021733787222,-0.6207808849887516,-0.40504934950238297,-0.19978623702062615,0.013639774045402136,0.19329901466738048,0.41264258394545644,0.618832008514834,0.9491634560642397]},{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[8.765620343525086,6.598441987959052,5.296058128665026,4.194909150821623,2.9987527192067667,1.8960022911689247,0.7137372862442444,-0.6560326641247762,-1.8733225466645145,-2.94077607696528,-4.104586959727666,-5.275314690067491,-6.569703902985701,-7.801282577876243,-9.081838644272413,-10.159794088004283,-11.47585550367274,-12.712992051089003,-14.694980736385439],"type":"scatter","name":"y2","yaxis":"y","x":[-2.9609367239208475,-2.5997403313265086,-2.3826763547775043,-2.199151525136937,-1.9997921198677944,-1.8160003818614874,-1.6189562143740408,-1.3906612226458708,-1.1877795755559142,-1.00987065383912,-0.8159021733787222,-0.6207808849887516,-0.40504934950238297,-0.19978623702062615,0.013639774045402136,0.19329901466738048,0.41264258394545644,0.618832008514834,0.9491634560642397]},{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(62, 164, 78, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-6.921873447841695,-6.199480662653017,-5.765352709555009,-5.398303050273874,-4.999584239735588,-4.632000763722974,-4.237912428748082,-3.7813224452917416,-3.375559151111828,-3.01974130767824,-2.6318043467574443,-2.241561769977503,-1.810098699004766,-1.3995724740412525,-0.9727204519091956,-0.6134019706652389,-0.17471483210908723,0.237664017029668,0.8983269121284794],"type":"scatter","name":"y3","yaxis":"y","x":[-2.9609367239208475,-2.5997403313265086,-2.3826763547775043,-2.199151525136937,-1.9997921198677944,-1.8160003818614874,-1.6189562143740408,-1.3906612226458708,-1.1877795755559142,-1.00987065383912,-0.8159021733787222,-0.6207808849887516,-0.40504934950238297,-0.19978623702062615,0.013639774045402136,0.19329901466738048,0.41264258394545644,0.618832008514834,0.9491634560642397]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5],"visible":true,"ticks":"inside","range":[-2.9609367239208475,0.9491634560642397],"domain":[0.05100612423447069,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-2.5","-2.0","-1.5","-1.0","-0.5","0.0","0.5"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-10.0,-5.0,0.0,5.0],"visible":true,"ticks":"inside","range":[-14.694980736385439,8.767146283063122],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-10","-5","0","5"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    </script>
 <p>The intersection point is clearly $c=-1 = (a+b)/2$.</p><p>Let's see if we can get this fact using <code>SymPy</code>. First we define many variables:</p><pre class="sourceCode julia">x, c2, c1, c0, a, b = Sym("x", "c2", "c1", "c0", "a", "b")
 p = c2*x^2 + c1*x + c0</pre>
 <div class="well well-sm">
-$$c_{0} + c_{1} x + c_{2} x^{2}$$</div>
+c0 + c1*x + c2*x^2</div>
 
 <p>Then we create values for the tangent lines at <code>a</code> and <code>b</code></p><pre class="sourceCode julia">fa, fb = [replace(p, x, c) for c in [a,b]]
 ma, mb = [replace(diff(p, x), x, c) for c in [a,b]]
 tla = fa + ma*(x-a)
 tlb = fb + mb*(x-b)</pre>
 <div class="well well-sm">
-$$b^{2} c_{2} + b c_{1} + c_{0} + \left(- b + x\right) \left(2 b c_{2} + c_{1}\right)$$</div>
+b^2*c2 + b*c1 + c0 + (-b + x)*(2*b*c2 + c1)</div>
 
 <p>Finally, we solve for the intersection:</p><pre class="sourceCode julia">solve(tla - tlb, x)</pre>
 <div class="well well-sm">
@@ -1207,10 +1218,11 @@ $$b^{2} c_{2} + b c_{1} + c_{0} + \left(- b + x\right) \left(2 b c_{2} + c_{1}\r
 
 <h3>Maximization in two variables</h3><p>For simple ballistic motion, we "know" that launching the projectile at 45 degrees will yield the optimal distance. Let's see that it is the case. We'll start with the equation of motion</p>$$~
 y(x) = \tan(\theta) x - (1/2) \cdot g(\frac{x}{v_0 \cos\theta})^2.
-~$$<p>This is valid for $\theta \in [0,\pi/2]$ and for $x \in [0, x^*]$, where $x^*$ is when the projectile returns to ground, that is $y(x*) = 0$.</p><p>We code this expression with:</p><pre class="sourceCode julia">x, theta, v0, grav =  Sym("x", "theta", "v0", "grav")
+~$$
+<p>This is valid for $\theta \in [0,\pi/2]$ and for $x \in [0, x^*]$, where $x^*$ is when the projectile returns to ground, that is $y(x*) = 0$.</p><p>We code this expression with:</p><pre class="sourceCode julia">x, theta, v0, grav =  Sym("x", "theta", "v0", "grav")
 y = tan(theta) * x - (1//2)*grav*(x / (v0*cos(theta)))^2</pre>
 <div class="well well-sm">
-$$- \frac{grav x^{2}}{2 v_{0}^{2} \cos^{2}{\left (\theta \right )}} + x \tan{\left (\theta \right )}$$</div>
+-grav*x^2/(2*v0^2*cos(theta)^2) + x*tan(theta)</div>
 
 <p>The use of the rational value for $1/2$ (the <code>1//2</code>) is needed, as this will convert to a symbolic value of $1/2$, and not a floating point value of $0.5$.</p><p>First we need to solve when <code>y&#40;x&#41;&#61;0</code>:</p><pre class="sourceCode julia">xs = solve(y, x)</pre>
 <div class="well well-sm">
@@ -1218,7 +1230,7 @@ $$- \frac{grav x^{2}}{2 v_{0}^{2} \cos^{2}{\left (\theta \right )}} + x \tan{\le
 
 <p>There are, of course, two values. The first is 0, the starting point. We want the latter:</p><pre class="sourceCode julia">xstar = xs[2]</pre>
 <div class="well well-sm">
-$$\frac{v_{0}^{2}}{grav} \sin{\left (2 \theta \right )}$$</div>
+v0^2*sin(2*theta)/grav</div>
 
 <p>Now, we want to find the critical point for <code>xstar</code>. We take the derivative with respect to <code>theta</code> and solve for when that is 0:</p><pre class="sourceCode julia">solve(diff(xstar, theta), theta)</pre>
 <div class="well well-sm">
@@ -1231,33 +1243,33 @@ ma, mb = [replace(diff(p, x), x, c) for c in [a,b]]
 tla = fa + ma*(x-a)
 tlb = fb + mb*(x-b)</pre>
 <div class="well well-sm">
-$$b^{2} c_{2} + b c_{1} + c_{0} + \left(- b + x\right) \left(2 b c_{2} + c_{1}\right)$$</div>
+b^2*c2 + b*c1 + c0 + (-b + x)*(2*b*c2 + c1)</div>
 
 <p>We need to solve for the intersection point:</p><pre class="sourceCode julia">c = solve(tla - tlb, x)[1]	# only one solution</pre>
 <div class="well well-sm">
-$$\frac{a}{2} + \frac{b}{2}$$</div>
+a/2 + b/2</div>
 
 <p>Then the areas are:</p><pre class="sourceCode julia">area_ac = integrate(p - tla, (x, a, c))
 area_cb = integrate(p - tlb, (x, c, b))
 area_ac, area_cb</pre>
 <pre class="output">
-(-a^3*c2/3 + a^2*c2*(a/2 + b/2) - a*c2*(a/2 + b/2)^2 + c2*(a/2 + b/2)^3/3,b^3*c2/3 - b^2*c2*(a/2 + b/2) + b*c2*(a/2 + b/2)^2 - c2*(a/2 + b/2)^3/3)</pre>
+(-a^3*c2/3 + a^2*c2*(a/2 + b/2) - a*c2*(a/2 + b/2)^2 + c2*(a/2 + b/2)^3/3, b^3*c2/3 - b^2*c2*(a/2 + b/2) + b*c2*(a/2 + b/2)^2 - c2*(a/2 + b/2)^3/3)</pre>
 
 <p>Okay, are they equal?</p><pre class="sourceCode julia">area_ac - area_cb</pre>
 <div class="well well-sm">
-$$- \frac{a^{3} c_{2}}{3} + a^{2} c_{2} \left(\frac{a}{2} + \frac{b}{2}\right) - a c_{2} \left(\frac{a}{2} + \frac{b}{2}\right)^{2} - \frac{b^{3} c_{2}}{3} + b^{2} c_{2} \left(\frac{a}{2} + \frac{b}{2}\right) - b c_{2} \left(\frac{a}{2} + \frac{b}{2}\right)^{2} + \frac{2 c_{2}}{3} \left(\frac{a}{2} + \frac{b}{2}\right)^{3}$$</div>
+-a^3*c2/3 + a^2*c2*(a/2 + b/2) - a*c2*(a/2 + b/2)^2 - b^3*c2/3 + b^2*c2*(a/2 + b/2) - b*c2*(a/2 + b/2)^2 + 2*c2*(a/2 + b/2)^3/3</div>
 
 <p>Hard to tell. Maybe we need to simplify:</p><pre class="sourceCode julia">simplify(area_ac - area_cb)</pre>
 <div class="well well-sm">
-$$0$$</div>
+0</div>
 
 <p>Ahh, 0, as expected.</p><p>Now, is the sum only dependent on the distance – and not the values?</p><pre class="sourceCode julia">simplify(area_ac + area_cb)</pre>
 <div class="well well-sm">
-$$\frac{c_{2}}{12} \left(- a^{3} + 3 a^{2} b - 3 a b^{2} + b^{3}\right)$$</div>
+c2*(-a^3 + 3*a^2*b - 3*a*b^2 + b^3)/12</div>
 
 <p>Hard to tell, we also factor:</p><pre class="sourceCode julia">simplify(area_ac + area_cb) |> factor</pre>
 <div class="well well-sm">
-$$- \frac{c_{2}}{12} \left(a - b\right)^{3}$$</div>
+-c2*(a - b)^3/12</div>
 
 <p>We see in fact, that it only depends on the distance (<code>b-a</code>) and the value of <code>c2</code>, the quadratic term, and not the linear or constant term.</p>
   </div>

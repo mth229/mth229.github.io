@@ -23,18 +23,60 @@ The notes mostly follow topics of a standard first-semester
 calculus course after some background material is presented for
 learning `julia` within a mathematical framework.
 
-The notes assume that the [MTH229](https://github.com/mth229/MTH229.jl) add-on package is installed. This can be done through the command:
+### The MTH229 package
 
-```verbatim
-Pkg.clone("https://github.com/mth229/MTH229.jl")
+The notes assume that the
+[MTH229](https://github.com/mth229/MTH229.jl) add-on package is
+installed. In the lab this will be the case. If using `juliabox` then
+it must be done (once). The process involves:
+
+
+* Clicking on the packages menu item at the top of the juliabox page
+* Click the "Yours" tab of the "Package Builder" window
+* Under "Unregistered Packages", copy and paste the url
+  "`https://github.com/mth229/MTH229.jl`" into the textbox and click
+  the "+" button for Julia version `0.6`.
+* Click the "Start" button and wait.  
+
+
+
+```
+ImageFile("figures/package-builder.png")
 ```
 
-(If using `IJulia`, this command should be run in a Julia "Console".)
 
-The projects, or "ipynb" files, can be installed into `juliabox.com` by following the instructions [here](https://github.com/mth229/229-projects). Otherwise, they can be downloaded by clicking, and uploaded through `juliabox`'s "Files" tab.
+(For other Julia installations the command
+`Pkg.clone("https://github.com/mth229/MTH229.jl")` should work.)
 
 
-----
+
+### The projects
+
+Accompanying each set of notes is a "project" that is to be completed
+in the lab time. For the lab machines these are pre-loaded.
+
+For `juliabox` usage, the projects may be copied in all at once. This
+is completed by:
+
+* Clicking the "Git" menu item at the top of the juliabox page
+* Copying and pasting the "Git Clone URL": "`https://github.com/mth229/229-projects.git`" into the text box
+* Clicking the "+" button to the right (accepting the defaults for the
+other two text boxes.)
+* Waiting for it too happen
+
+If all goes to plan, a "folder" titled "229-projects" will contain the
+projects for your usage.
+
+
+```
+ImageFile("figures/sync-dialog.png")
+```
+
+Otherwise, each project individually comes as an "`ipynb`" file. These
+can be downloaded from this page, and then "uploaded" into juliabox
+using the "upload" button of the file manager.
+
+## The projects for MTH 229
 
 
 * [Calculator](http://mth229.github.io/calculator.html)
@@ -168,7 +210,6 @@ An assignment for this material:
 Discusses how to do some symbolic math in `julia` through the `SymPy` package.
 
 
-<br/>
 An assignment for this material: 
 [ipynb](http://mth229.github.io/232-projects/symbolic.ipynb) 
 [view](http://nbviewer.ipython.org/url/mth229.github.io/232-projects/symbolic.ipynb?create=1)
@@ -270,17 +311,18 @@ action(function_object, args...)
 
 For example, the notes use:
 
-* `plot(f, a, b)` to plot `f` over `[a,b]` (from `Gadfly`)
+* `plot(f, a, b)` to plot `f` over `[a,b]` 
 * `plot([f,g], a, b)` to plot both `f` and `g` over the interval `[a,b]`
-* `roots(f)` to find the roots of a polynomial function, `f` (from `Polynomials`)
 * `fzeros(f)` to find the real roots of a polynomial function `f` (from `Roots`)
 * `fzero(f, a, b)` to find a root inside the bracketing interval `[a,b]` (from `Roots`)
 * `limit(f, c)` to find the limit of `f` at `c` (from `SymPy`)
 * `f'` or `D(f)` to return a function that computes the derivative of `f` (from the `Roots` package)
-* `fzero(f, a)` or `[fzero(f, x) for x in [x1,x2, ...]]` to find root(s) of `f` starting at `a` or each of the x's
-* `quadgk(f, a, b)` to find the numeric integral of `f` over `(a,b)` (from base `julia`)
+* `fzero(f, a)` to search for a zero of `f` starting at `a`
+* `quadgk(f, a, b)` to find the numeric integral of `f` over `(a,b)`
+  (from the `QuadGK` package)
 * `integrate(f)` to find the symbolic integral of `f` (from the `SymPy` package)
-* `integrate(f, a, b)` to find the definite integral over `[a,b]` symbolically
+* `integrate(f, a, b)` to find the definite integral over `[a,b]`
+  symbolically (from the `SymPy` package).
 
 
 With just this basic set of actions, akin to buttons on the calculator, a rich variety of problems can be addressed.
@@ -297,19 +339,26 @@ With just this basic set of actions, akin to buttons on the calculator, a rich v
 
 * some blog posts are collected [here](http://www.reddit.com/r/Julia/).
 
-* At forio.com a tutorial is provided [here](http://forio.com/products/julia-studio/tutorials/).
-
 * A tutorial in `IJulia` format by Isaiah Norton is  [here](http://nbviewer.ipython.org/github/JuliaX/JuliaTutorial/blob/master/JuliaTutorial.ipynb?create=1), with the original file found [here](https://github.com/JuliaX/JuliaTutorial/blob/master/JuliaTutorial.ipynb).
 
 
 Before starting out with `Julia` it must be available. 
+
+We recommend taking advantage of the free web service at
+[juliabox.com](juliabox.com), but `Julia` can be easily installed on a local
+computer, as described in the following.
+
 
 ### Downloading `julia`
 
 In order to get started with `Julia` it needs to be installed. If this
 is not done already, you have a bit of work to do to get `julia` and the notebook interface provided by `IJulia`.
 
-First to install `julia` you can download a copy or install it from source. Likely a download is easiest. Official releases are available from [julialang.org](http://julialang.org/) but it is best to download a cutting-edge release from [status.julialang.org](http://status.julialang.org/). Installation is hopefully similar to what you do for other software on your system.
+First to install `julia` you can download a copy or install it from
+source. Likely a download is easiest. Official releases are available
+from [julialang.org](http://julialang.org/). Download the latest
+released version. Installation is hopefully similar to what you do for
+other software on your system.
 
 
 ### Starting `julia`
@@ -329,12 +378,12 @@ pro within the terminal:
 ```verbatim
                _
    _       _ _(_)_     |  A fresh approach to technical computing
-  (_)     | (_) (_)    |  Documentation: http://docs.julialang.org
+  (_)     | (_) (_)    |  Documentation: https://docs.julialang.org
    _ _   _| |_  __ _   |  Type "?help" for help.
   | | | | | | |/ _` |  |
-  | | |_| | | | (_| |  |  Version 0.4.1 (2015-11-08 10:33 UTC)
+  | | |_| | | | (_| |  |  Version 0.6.2 (2017-12-13 18:08 UTC)
  _/ |\__'_|_|_|\__'_|  |  Official http://julialang.org/ release
- |__/                  |  x86_64-apple-darwin13.4.0
+|__/                   |  x86_64-apple-darwin14.5.0
  
 julia> 
 ```
@@ -360,6 +409,8 @@ One command that the notes assume you have typed is the one to install the add-o
 Pkg.clone("https://github.com/mth229/MTH229.jl")
 ```
 
+This may take a while to complete.
+
 ### IJulia <small>An enhanced interface for using julia interactively</small>
 
 The command line is not the most comfortable learning experience for
@@ -380,7 +431,7 @@ provided by the `Gadfly` package.
 
 Using `IJulia` will require one more additional installation step:
 
-```
+```verbatim
 Pkg.add("IJulia")
 ```
 
@@ -397,7 +448,7 @@ packages. As well, external libraries *should* also be installed for
 you. This magic attempts to automatically identify what your computer
 system needs and acts accordingly.
 
-The above commands need only be done when new packages are being installed. However, each time you wish to actual **use** an external package in a session, it must be added. This is done with the `using` command, as `using Plots`
+The above commands need only be done when new packages are being installed. However, each time you wish to actually **use** an external package in a session, it must be added. This is done with the `using` command, as `using Plots`
 """)
 ```
 
@@ -411,12 +462,10 @@ notebook()
 ```
 
 
-For now, you can use `Julia` online through [juliabox.com](juliabox).
-
 ## Extending Julia with packages
 
 `Julia` can be extended through external packages. Although a
-relatively young language, there are already over 600 add-on packages
+relatively young language, there are already around 1000 add-on packages
 readily available for Julia through its package manager.
 
 For example, the `MTH229` package installs the `Plots` package for making plots, the `Roots` package for finding zeros of functions and the `SymPy` package for symbolic math within `Julia`.

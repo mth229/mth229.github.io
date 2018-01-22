@@ -499,7 +499,9 @@ numericq(val, 1e-5)
 
 `Julia` provides the `quadgk` function to do adaptive Gauss-Konrod
 quadrature, a modern, fast and accurate means to compute 1-dimensional
-integrals numerically.
+integrals numerically. This is in the `QuadGK` package which is loaded
+with `MTH229`.
+
 The use is straightforward, and
 similar to `riemann` above: you specify a function object, and the
 limits of integration. You don't specify $n$ -- as this is computed

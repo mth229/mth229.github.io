@@ -838,7 +838,8 @@ radioq(choices, ans)
 
 To specify the $y$ values we wish to "map" the function `f` to each
 $x$ value.  In `julia` there are many different ways to do this, we
-list four for completeness, but will restrict our attention to just the first two styles.
+list four for completeness, but will restrict our attention to just
+the first three styles.
 
 ### The map function
 
@@ -904,7 +905,7 @@ of 5 for different bases. The value 5 is replicated once for each of
 the bases:
 
 ```
-log.([2,e,5,10], 5)
+log.([2,pi,5,10], 5)
 ```
 
 ```
@@ -914,6 +915,7 @@ more explicit and easier to reason about. Best to start with `map` and
 if you find it being used often, transition to thinking about using
 the "dot" broadcasting.
 """)
+```
 
 
 
@@ -934,7 +936,7 @@ notation above. The syntax is similar:
 
 ```
 xs = linspace(0, 2.0, 5)
-[f(x) for x in xs]  
+[f(x) for x in xs]
 ```
 
 

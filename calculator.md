@@ -569,6 +569,14 @@ exp(2)
 As, `e` can be redefined, it is best to use the latter style, though
 it takes a bit more typing.
 
+```
+note("""
+In fact starting with `v0.7.0` of Julia, the value `e` will not be
+available, rather it will be accessed through `\euler[tab]`, a unicode
+version of `e`. Using `exp()` is suggested.
+""")
+```
+
 The logarithm function, `log` does log base $e$:
 
 ```
@@ -578,7 +586,7 @@ log(exp(2))
 To do base 10, there is a `log10` function:
 
 ```
-log10(e^2)
+log10(exp(2))
 ```
 
 There is also a `log2` function for base 2. However, there are many more possible choices for a base. Rather than create functions for each possible one of interest the `log` function has an alternative form taking *two argument*. The first is interpreted as the base, the second the $x$ value. So the above, is also done through:

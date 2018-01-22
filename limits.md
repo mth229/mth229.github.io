@@ -37,7 +37,7 @@ $x$ gets "close" to $c$ (but not equal), then $f(x)$ should get
 
 
 
-## Many limits are found just by evaluating the function...
+## Many limits are found just by evaluating the function
 
 
 Before beginning, it should be noted that for most values of $c$, the
@@ -185,8 +185,8 @@ f(x) = \frac{(x-2)(x-3)}{(x-2)(x+3)}
 
 Written in this form, we clearly see that this is the same function as
 $g(x) = (x-3)/(x+3)$ when $x \neq 2$. The function $g(x)$ is 
-continuous at $x=2$. So were one to redefine $f(x)$ at $x=2$ to be $g(2) = (2
-- 3)/(2 + 3) = -0.2$ it would be made continuous, hence the term
+continuous at $x=2$. So were one to redefine $f(x)$ at $x=2$ to be
+$g(2) = (2-3)/(2+3) = -0.2$ it would be made continuous, hence the term
 removable singularity.
 
 

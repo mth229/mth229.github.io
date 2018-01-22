@@ -375,12 +375,8 @@ If you want, we can find the roots numerically. For example,
 
 ```
 using Roots
-roots(fp)
+fzeros(fp, -10, 10)
 ```       
-
-In general, we could use the `fzero` function for finding roots, but
-in this case, the approximate derivative is still a polynomial, so
-`roots` will work, as above. 
 
 
 

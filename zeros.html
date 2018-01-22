@@ -34,7 +34,7 @@ pre {display: block;}
 
 <!-- not TeX-AMS-MML_HTMLorMML-->
 <script type="text/javascript"
-  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG">  
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
 </script>
 <script>
 MathJax.Hub.Config({
@@ -103,20 +103,25 @@ $( document ).ready(function() {
 
 <div class="container-fluid">
   <div class="span10 offset1">
-<h2>Solving for zeros with julia</h2><h2>Introduction</h2><p>Solving for zero is a mathematical skill taught early on. In some cases, such as with linear equations, solving for zeros can be done directly using algebra. Similarly, in the case of factorable polynomials, we are taught to factor and then set each term to 0 to find the possible solutions, utilizing the fact that for the real numbers the product of two numbers is $0$ only if one or both of the numbers is as well.</p><p>However, in general, the problem of finding one (or all) solutions to the equation</p>$$~
+<h2>Solving for zeros with julia</h2><h2>Introduction</h2><p>A <em>zero</em> of the function $f$ is a value $x$ with $f(x) = 0$.</p><p>Solving for zero of a function is a mathematical skill taught early on. In some cases, such as with linear equations, solving for zeros can be done directly using algebra. Similarly, in the case of factorable polynomials, we are taught to factor and then set each term to 0 to find the possible solutions, utilizing the fact that for the real numbers the product of two numbers is $0$ only if one or both of the numbers is as well.</p><p>However, in general, the problem of finding one (or all) solutions to the equation</p>$$~
 f(x) = 0.
-~$$<p>for an arbitrary $f$ has no well-defined process.  </p><p>A related problem is to find one (or all) solutions to an equation of this type:</p>$$~
+~$$
+<p>for an arbitrary $f$ has no well-defined process.  </p><p>A related problem is to find one (or all) solutions to an equation of this type:</p>$$~
 f(x) = g(x)
-~$$<p>Conceptually this is identical to the above, as we just set $h(x) = f(x) - g(x)$ and solve for when $h(x)$ is $0$.</p><p>Here we discuss a few different elementary means to do find zeros with <code>julia</code>, leaving some others for a later time. </p><p>We will use the add-on package <code>Roots</code>, which provides implementations of a few root-finding algorithms. This is loaded with the <code>MTH229</code> package:</p><pre class="sourceCode julia">using MTH229    # loads the Roots package</pre>
+~$$
+<p>Conceptually this is identical to the above, as we just set $h(x) = f(x) - g(x)$ and solve for when $h(x)$ is $0$.</p><p>Here we discuss a few different elementary means to do find zeros with <code>Julia</code>, leaving some others for a later time. </p><p>We will use the add-on packages <code>Roots</code> and <code>PolynomialZeros</code>, which provide implementations of a few zero- and root-finding algorithms. These are loaded with the <code>MTH229</code> package:</p><pre class="sourceCode julia">using MTH229    # loads the Roots package</pre>
 <h2>Zeros of a polynomial</h2><p>Univariate polynomials are algebraic expessions involving an indeterminate. Polynomial functions are functions whose body evaluates a polynomial expression.  These are special functions, in that their relatively simple form allows for many explicit things to be known. A famous example is the <strong>quadratic formula</strong> which for polynomials of degree 2 gives an explicit formula for the <em>roots</em>:</p>$$~
 \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}.
-~$$<div class="alert alert-success" role="alert"><div class="markdown"><p>A "root" of a polynomial is just a polynomial-specific name for a zero of the polynomial viewed as a function.</p>
-</div></div>
+~$$
+<div class="alert alert-success" role="alert">
+<div class="markdown"><p>A "root" of a polynomial is just a polynomial-specific name for a zero of the polynomial viewed as a function.</p>
+</div> 
+</div>
 <p>For example, if we have the quadratic polynomial $2x^2 + 3x - 2$ we can solve for the roots with:</p><pre class="sourceCode julia">a = 2; b = 3; c = -2
 discr = b^2 - 4*a*c
 (-b + sqrt(discr))/(2a), (-b - sqrt(discr))/(2a) </pre>
 <pre class="output">
-(0.5,-2.0)</pre>
+(0.5, -2.0)</pre>
 
 <p>If you wanted to write a function to do this, it would be  straightforward, save the detail of needing to make a negative number complex in order to take its square root:</p><pre class="sourceCode julia">## find roots of ax^2 + bx + c
 function quadratic(a, b, c)
@@ -128,229 +133,236 @@ end</pre>
 <pre class="output">
 quadratic (generic function with 1 method)</pre>
 
-<div class="alert alert-success" role="alert"><div class="markdown"><p>This is an example where the function is not <em>type-stable</em> as it returns either real-valued answers or complex-valued answers depending on the <em>values</em> of the input variables.</p>
-</div></div>
+<div class="alert alert-success" role="alert">
+<div class="markdown"><p>This is an example where the function is not <em>type-stable</em> as it returns either real-valued answers or complex-valued answers depending on the <em>values</em> of the input variables. In general, <code>Julia</code> functions avoid this behaviour, as it leads to less performant code.</p>
+</div> 
+</div>
 <p>To find the roots of $x^2 + x - 1$ we could simply use:</p><pre class="sourceCode julia">quadratic(1, 1, -1)</pre>
 <pre class="output">
 2-element Array{Float64,1}:
  -1.61803 
   0.618034</pre>
 
-<p>There are also such formula for third and fourth degree polynomials. However, Galois – at the tender age of 20 – demonstrated that, in general, there can be no such formula for the roots of a fifth or higher degree polynomial. There are still facts known about such polynomials. For example, the <em>Fundamental theorem of algebra</em> states that every real-valued polynomial of degree $n$ will have $n$ roots, where we count complex roots and multiplicities.</p><p>How to find them is left to numeric methods though. In <code>Julia</code> there is an add-on package that will do this work for us. The actual code is in the function <code>roots</code> from the <code>Polynomials</code> package, but we employ the easier interface for polynomial functions provided by the <code>Roots</code> package.</p><p>Rather than write the quadratic polynomial in terms of its coefficients alone, we can pass in a quadratic function, as follows:</p><pre class="sourceCode julia">using Roots			# only needs to be done once per session
+<p>There are also such formula for third and fourth degree polynomials. However, Galois – at the tender age of 20 – demonstrated that, in general, there can be no such formula for the roots of a fifth or higher degree polynomial. There are still facts known about such polynomials. For example, the <em>Fundamental theorem of algebra</em> states that every real-valued polynomial of degree $n$ will have $n$ roots, where we count complex roots and multiplicities.</p><p>How to find these roots is then often left to numeric methods though. In <code>Julia</code> there is an add-on package that will do this work for us. We make use of the <code>PolynomialZeros</code> pacakge, which provides an interface to a few different packages for finding roots of a polynomial.</p><p>Rather than write the quadratic polynomial in terms of its coefficients alone, we can pass in a quadratic function, as follows:</p><pre class="sourceCode julia">using PolynomialZeros
 f(x) = x^2 + x - 1
-roots(f)</pre>
+poly_roots(f)</pre>
 <pre class="output">
-2-element Array{Float64,1}:
- -1.61803 
-  0.618034</pre>
+2-element Array{Complex{Float64},1}:
+ -1.61803+0.0im
+ 0.618034+0.0im</pre>
 
-<p>That is, the command to find the roots of the polynomial $f(x)$ is simply <code>roots</code> and the the function is called just by passing in the function name (or an anonymous function).</p><div class="alert alert-success" role="alert"><div class="markdown"><p>This is another example of a general template <strong>action(function_object, args...)</strong> for performing some action on a function. In this case, the action is to find the roots of a function which specifies a polynomial function and the additional <em>args...</em> are not necessary.)</p>
-</div></div>
-<p>That was so easy, we'll do it again. What are the roots of the polynomial $f(x) = -16x^2 + 32x + 6$?</p><pre class="sourceCode julia">f(x) = -16x^2 + 32x + 6
-roots(f)</pre>
+<p>(The <code>PolynomialZeros</code> package is not in the <code>MTH229</code> package.)</p><p>That is, the command to find the roots of the polynomial $f(x)$ is simply <code>poly_roots</code> and the the function is called just by passing in the function name (or an anonymous function).</p><p>By default, the values returned by <code>poly_roots</code> are complex numbers, even if they could be real valules. This is because the fundamental theorem of algebra only guarantees $n$ roots for an $n$th degree polynomial if complex values are considered.</p><p>That was so easy, we'll do it again. What are the roots of the polynomial $f(x) = -16x^2 + 32x + 6$?</p><pre class="sourceCode julia">f(x) = -16x^2 + 32x + 6
+poly_roots(f)</pre>
 <pre class="output">
-2-element Array{Float64,1}:
- -0.172604
-  2.1726  </pre>
+2-element Array{Complex{Float64},1}:
+    2.1726+0.0im
+ -0.172604+0.0im</pre>
 
-<p>What if the function has no real roots, as this polynomial?</p><pre class="sourceCode julia">f(x) = x^2 + x + 1
-roots(f)</pre>
+<p>As can be seen, $f$ has two real roots. This next polynomial has none:</p><pre class="sourceCode julia">f(x) = x^2 + x + 1
+poly_roots(f)</pre>
 <pre class="output">
 2-element Array{Complex{Float64},1}:
  -0.5+0.866025im
  -0.5-0.866025im</pre>
 
-<p>We see the answers are complex valued, as is necessary. </p><p>The following polynomial has both real roots and complex roots:</p><pre class="sourceCode julia">f(x) = (x^2 + x + 1) * (x^2 + x - 1)
-roots(f)</pre>
+<h3>Real roots</h3><p>These are examples of the general template <strong>action(function_object, args...)</strong> for performing some action on a function. In this case, the action is to find the roots of a function which specifies a polynomial function and the additional <em>args...</em> are not necessary–if only complex values are desired.</p><p>For some problems only the possible real roots are desired. While one can filter out the real from the complex in the answers above, numeric instabilities can lead to answers where real roots are returned as complex numbers. Other algorithms can do a better job for this more specific task.</p><p>Setting the domain to be <code>Over.R</code> instructs <code>poly_roots</code> to look for just real roots for polynomials with real coefficients.</p><p>The following polynomial has both real roots and complex roots, but we will find only the real ones:</p><pre class="sourceCode julia">f(x) = (x^2 + x + 1) * (x^2 + x - 1)
+poly_roots(f, Over.R)</pre>
+<pre class="output">
+2-element Array{Float64,1}:
+  0.618034
+ -1.61803 </pre>
+
+<p>Compare this to the search over all complex numbers too:</p><pre class="sourceCode julia">poly_roots(f)</pre>
 <pre class="output">
 4-element Array{Complex{Float64},1}:
- 0.618034+0.0im     
-     -0.5+0.866025im
-     -0.5-0.866025im
- -1.61803+0.0im     </pre>
+ -1.61803+0.0im        
+     -0.5-0.866025im   
+ 0.618034+3.08149e-33im
+     -0.5+0.866025im   </pre>
 
-<p>The returned value uses complex numbers, as that type is needed to describe <em>all</em> four values that are returned. The two real roots (previously seen to be <code>-1.61803</code> and <code>0.618034</code>) are there, they have an additional <code>0.0im</code> added to them to make them complex values.</p><p>To get just the <em>real roots</em>, the related function <code>fzeros</code> can be used:</p><pre class="sourceCode julia">fzeros(f)			# for polynomials functions just the real roots are returned</pre>
+<p>When looking over the reals, the algorithm needs to know if the polynomial has any double roots. A polynomial without a double root is called <em>square free</em>. This is assumed by default. Pass in <code>square_free&#61;false</code> if that is not the case:</p><pre class="sourceCode julia">f(x) = x^2 * (x-3)
+poly_roots(f, Over.R, square_free=false)</pre>
 <pre class="output">
-2-element Array{Real,1}:
- -1.61803 
-  0.618034</pre>
+2-element Array{Float64,1}:
+ 0.0
+ 3.0</pre>
 
-<h3>Practice</h3><h4>Question</h4><p>Find all roots of the function $f(x) = x^4 - 4x^2 -4x + 2$. Are they all real numbers?</p><form name="WeaveQuestion" data-id="oNtXlaId" data-controltype="radio">
+<h3>Practice</h3><h4>Question</h4><p>Find all roots of the function $f(x) = x^4 - 4x^2 -4x + 2$. Are they all real numbers?</p><form name="WeaveQuestion" data-id="tpUuB0YF" data-controltype="radio">
 <div class="form-group ">
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_oNtXlaId" value="1"><div class="markdown"><p>No, some are real, some are complex</p>
+      <input type="radio" name="radio_tpUuB0YF" value="1"><div class="markdown"><p>Yes, the are all real</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_oNtXlaId" value="2"><div class="markdown"><p>No, none are real</p>
+      <input type="radio" name="radio_tpUuB0YF" value="2"><div class="markdown"><p>No, none are real</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_oNtXlaId" value="3"><div class="markdown"><p>Yes, the are all real</p>
+      <input type="radio" name="radio_tpUuB0YF" value="3"><div class="markdown"><p>No, some are real, some are complex</p>
 </div>
     </label>
     </div>
     
 
 
-<div id="oNtXlaId_message"></div>
+<div id="tpUuB0YF_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_oNtXlaId']").on("change", function() {
-  correct = this.value == 1;
+$("input:radio[name='radio_tpUuB0YF']").on("change", function() {
+  correct = this.value == 3;
 
   if(correct) {
-     $("#oNtXlaId_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#tpUuB0YF_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#oNtXlaId_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#tpUuB0YF_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question</h4><p>Use the <code>roots</code> command to find the largest real root of the polynomial $x^2 + x - 5$</p><form name='WeaveQuestion' data-id='eF2wjLou' data-controltype='numeric'>
+<h4>Question</h4><p>Use the <code>Over.R</code> specification to find the largest real root of the polynomial $x^2 + x - 5$</p><form name='WeaveQuestion' data-id='u920stfg' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="eF2wjLou" type="number" class="form-control">
+<input id="u920stfg" type="number" class="form-control">
 
 </div>
   
-<div id='eF2wjLou_message'></div>
+<div id='u920stfg_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#eF2wjLou').on('change', function() {
-  correct = Math.abs(this.value - 1.7912878474779204) <= 0.001;
+$('#u920stfg').on('change', function() {
+  correct = Math.abs(this.value - 1.7912878474779201) <= 0.001;
 
   if(correct) {
-     $('#eF2wjLou_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#u920stfg_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#eF2wjLou_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#u920stfg_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Use the <code>roots</code> command to find the largest real root of the polynomial $x^3 - x - 17$</p><form name='WeaveQuestion' data-id='VBwV8048' data-controltype='numeric'>
+<h4>Question</h4><p>Use the <code>Over.R</code> specification to find the largest real root of the polynomial $x^3 - x - 17$</p><form name='WeaveQuestion' data-id='PcdbetIc' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="VBwV8048" type="number" class="form-control">
+<input id="PcdbetIc" type="number" class="form-control">
 
 </div>
   
-<div id='VBwV8048_message'></div>
+<div id='PcdbetIc_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#VBwV8048').on('change', function() {
-  correct = Math.abs(this.value - 4.653311931459037) <= 0.001;
+$('#PcdbetIc').on('change', function() {
+  correct = Math.abs(this.value - 1.7912878474779201) <= 0.001;
 
   if(correct) {
-     $('#VBwV8048_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#PcdbetIc_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#VBwV8048_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#PcdbetIc_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h4>Question</h4><p><a href="http://en.wikipedia.org/wiki/Descartes_rule_of_signs">The rule of signs of Descartes</a>  is a simple means to give an upper bound on the number of positive real roots a polynomial has. One counts the number of sign changes amongst the polynomials coefficients. Suppose this is $k$, then the number of <em>positive</em> real roots (counting multiplicities) is one of $k$, $k-2$, $k-4$, ... . In particular if $k$ is odd, there must be at least one real root.</p><p>For example, the polynomial $x^3 -x^2 -x - 1$ has signs <code>&#43; - - -</code>, so there is just one sign change. This implies there must be exactly one <em>positive</em> real root, which is found with:</p><pre class="sourceCode julia">f(x) = x^3 -x^2 -x - 1
-roots(f)</pre>
+poly_roots(f, Over.R)</pre>
 <pre class="output">
-3-element Array{Complex{Float64},1}:
- -0.419643+0.606291im
- -0.419643-0.606291im
-   1.83929+0.0im     </pre>
+1-element Array{Float64,1}:
+ 1.83929</pre>
 
-<p>For the polynomial $f(x) = x^5 -x + 1$ has potentially 2 <em>positive</em>, real roots? Are there $0$ or $2$ positive, real roots?</p><form name="WeaveQuestion" data-id="fC0zmbJx" data-controltype="radio">
+<p>For the polynomial $f(x) = x^5 -x + 1$ has potentially 2 <em>positive</em>, real roots? Are there $0$ or $2$ positive, real roots?</p><form name="WeaveQuestion" data-id="6W7U60xs" data-controltype="radio">
 <div class="form-group ">
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_fC0zmbJx" value="1"><div class="markdown"><p>two</p>
+      <input type="radio" name="radio_6W7U60xs" value="1"><div class="markdown"><p>two</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_fC0zmbJx" value="2"><div class="markdown"><p>zero</p>
+      <input type="radio" name="radio_6W7U60xs" value="2"><div class="markdown"><p>zero</p>
 </div>
     </label>
     </div>
     
 
 
-<div id="fC0zmbJx_message"></div>
+<div id="6W7U60xs_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_fC0zmbJx']").on("change", function() {
+$("input:radio[name='radio_6W7U60xs']").on("change", function() {
   correct = this.value == 2;
 
   if(correct) {
-     $("#fC0zmbJx_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#6W7U60xs_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#fC0zmbJx_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#6W7U60xs_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question</h4><p>The number of possible <em>negative</em>, real roots can also be found from Descartes' rule. Instead of looking at the sign changes of $f(x)$, one must look at the sign changes of $g(x) = f(-x)$. </p><p>If $f(x) = x^5 - x +1$ we have $g(x) = -x^5 +x + 1$ (just change the signs of the coefficients of the odd powers). Then $g(x)$ has one sign change. This means there is one <em>negative</em> real root. What is it?</p><form name='WeaveQuestion' data-id='y1PPbeiB' data-controltype='numeric'>
+<h4>Question</h4><p>The number of possible <em>negative</em>, real roots can also be found from Descartes' rule. Instead of looking at the sign changes of $f(x)$, one must look at the sign changes of $g(x) = f(-x)$. </p><p>If $f(x) = x^5 - x +1$ we have $g(x) = -x^5 +x + 1$ (just change the signs of the coefficients of the odd powers). Then $g(x)$ has one sign change. This means there is one <em>negative</em> real root. What is it?</p><form name='WeaveQuestion' data-id='5cpLlw3E' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="y1PPbeiB" type="number" class="form-control">
+<input id="5cpLlw3E" type="number" class="form-control">
 
 </div>
   
-<div id='y1PPbeiB_message'></div>
+<div id='5cpLlw3E_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#y1PPbeiB').on('change', function() {
-  correct = Math.abs(this.value - -1.1673039782614187) <= 0.01;
+$('#5cpLlw3E').on('change', function() {
+  correct = Math.abs(this.value - 1.7912878474779201) <= 0.01;
 
   if(correct) {
-     $('#y1PPbeiB_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#5cpLlw3E_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#y1PPbeiB_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#5cpLlw3E_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h2>Graphical solutions</h2><p>More generally, the equation $f(x) = 0$ may not have any special form leading to a known solution. In this case, there are various techniques to find zeros. Here we mention graphing, such as is done with a graphing calculator. In the next section, we discuss the bisection algorithm for root finding.</p><div class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-th" aria-hidden="true"></span>
-  <span class="text-uppercase">example:</span><div class="markdown"><p>Finding a zero</p>
+<span class="glyphicon glyphicon-th" aria-hidden="true"></span>
+<span class="text-uppercase">example:</span><div class="markdown"><p>Finding a zero</p>
 </div>
 </div>
 <p>The flight of an arrow can be modeled using various functions, depending on assumptions. Suppose an arrow is launched in the air from a height of 0 feet above the ground at an angle of $\theta = \pi/4$. With a suitable choice for the initial velocity, a model without wind resistance for the height of the arrow at a distance $x$ units away may be:</p>$$~
 j(x) = \tan(\theta) x - (1/2) \cdot g(\frac{x}{v_0 \cos\theta})^2.
-~$$<p>In <code>julia</code> we have, taking $v_0=200$:</p><pre class="sourceCode julia">j(x; theta=pi/4, g=32, v0=200) = tan(theta)*x - (1/2)*g*(x/(v0*cos(theta)))^2</pre>
+~$$
+<p>In <code>Julia</code> we have, taking $v_0=200$:</p><pre class="sourceCode julia">j(x; theta=pi/4, g=32, v0=200) = tan(theta)*x - (1/2)*g*(x/(v0*cos(theta)))^2</pre>
 <pre class="output">
 j (generic function with 1 method)</pre>
 
 <p>With a velocity-dependent wind resistance given by $\gamma$, again with some units, a similar equation can be constructed. It takes a different form:</p>$$~
 y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
       \frac{g}{\gamma^2}\log(\frac{v_0\cos(\theta) - \gamma x}{v_0\cos(\theta)})
-~$$<p>Again, $v_0$ is the initial velocity and is taken to be $200$ and $\gamma$ a resistance, which we take to be $1$. With this, we have the following <code>julia</code> definition (with a slight reworking of $\gamma$):</p><pre class="sourceCode julia">function y(x; theta=pi/4, g=32, v0=200, gamma=1) 
+~$$
+<p>Again, $v_0$ is the initial velocity and is taken to be $200$ and $\gamma$ a resistance, which we take to be $1$. With this, we have the following <code>Julia</code> definition (with a slight reworking of $\gamma$):</p><pre class="sourceCode julia">function y(x; theta=pi/4, g=32, v0=200, gamma=1) 
 	 a = gamma * v0 * cos(theta)
 	 (g/a + tan(theta)) * x + g/gamma^2 * log((a-gamma^2 * x)/a)
 end</pre>
@@ -358,22 +370,22 @@ end</pre>
 y (generic function with 1 method)</pre>
 
 <p>For each model, we wish to find the value of $x$ after launching where the height is modeled to be 0. That is how far will the arrow travel before touching the ground?</p><p>For the model without wind resistance, we can graph the function easily enough. Let's guess the distance is no more than 500 feet:</p><pre class="sourceCode julia">plot(j, 0, 500)</pre>
-    <div id="9e853df5-48e5-40f2-9bf7-bd30715487b4" style="width:600px;height:400px;"></div>
+    <div id="dd5826e0-6a60-4331-88e7-bb291df19118" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('9e853df5-48e5-40f2-9bf7-bd30715487b4');
-    Plotly.plot(PLOT, [{"yaxis":"y","y":[0.0,5.030098969492908,10.019385776961531,14.967860422405876,19.87552290582593,24.74237322722171,29.5684113865932,34.35363738394041,39.09805121926333,43.801652892561975,48.46444240383634,53.08641975308642,57.66758494031221,62.207937965513715,66.70747882869094,71.16620752984387,75.58412406897253,79.96122844607692,84.29752066115701,88.59300071421282,92.84766860524435,97.0615243342516,101.23456790123456,105.36679930619323,109.45821854912764,113.50882563003773,117.51862054892356,121.4876033057851,125.41577390062237,129.30313233343534,133.14967860422402,136.95541271298845,140.72033465972856,144.4444444444444,148.12774206713596,151.77022752780326,155.37190082644625,158.93276196306496,162.4528109376594,165.93204775022954,169.3704724007754,172.76808488929697,176.12488521579428,179.4408733802673,182.71604938271602,185.95041322314046,189.14396490154064,192.29670441791652,195.4086317722681,198.47974696459545,201.51004999489845,204.49954086317717,207.44821956943164,210.3560861136618,213.2231404958677,216.04938271604934,218.83481277420668,221.57943067033972,224.28323640444847,226.94622997653295,229.56841138659314,232.14978063462908,234.69033772064068,237.19008264462803,239.6490154065911,242.0671360065299,244.4444444444444,246.78094072033463,249.07662483420052,251.33149678604218,253.54555657585956,255.71880420365267,257.85123966942143,259.942862973166,261.9936741148862,264.00367309458215,265.9728599122538,267.9012345679012,269.7887970615243,271.63554739312315,273.44148556269766,275.2066115702479,276.93092541577386,278.61442709927553,280.257116620753,281.85899398020604,283.4200591776349,284.9403122130394,286.4197530864197,287.8583817977757,289.2561983471074,290.6132027344148,291.92939495969796,293.2047750229568,294.43934292419135,295.6330986634016,296.7860422405877,297.89817365574936,298.9694929088868,300.0],"showlegend":true,"name":"y1","type":"scatter","xaxis":"x","line":{"width":1,"dash":"solid","color":"rgba(0, 154, 250, 1.000)","shape":"linear"},"x":[0.0,5.05050505050505,10.1010101010101,15.151515151515152,20.2020202020202,25.252525252525253,30.303030303030305,35.35353535353536,40.4040404040404,45.45454545454545,50.505050505050505,55.55555555555556,60.60606060606061,65.65656565656566,70.70707070707071,75.75757575757575,80.8080808080808,85.85858585858585,90.9090909090909,95.95959595959596,101.01010101010101,106.06060606060606,111.11111111111111,116.16161616161617,121.21212121212122,126.26262626262626,131.31313131313132,136.36363636363637,141.41414141414143,146.46464646464648,151.5151515151515,156.56565656565655,161.6161616161616,166.66666666666666,171.7171717171717,176.76767676767676,181.8181818181818,186.86868686868686,191.91919191919192,196.96969696969697,202.02020202020202,207.07070707070707,212.12121212121212,217.17171717171718,222.22222222222223,227.27272727272728,232.32323232323233,237.37373737373738,242.42424242424244,247.4747474747475,252.5252525252525,257.57575757575756,262.62626262626264,267.67676767676767,272.72727272727275,277.77777777777777,282.82828282828285,287.8787878787879,292.92929292929296,297.979797979798,303.030303030303,308.0808080808081,313.1313131313131,318.1818181818182,323.2323232323232,328.2828282828283,333.3333333333333,338.3838383838384,343.4343434343434,348.4848484848485,353.5353535353535,358.5858585858586,363.6363636363636,368.6868686868687,373.73737373737373,378.7878787878788,383.83838383838383,388.8888888888889,393.93939393939394,398.989898989899,404.04040404040404,409.09090909090907,414.14141414141415,419.19191919191917,424.24242424242425,429.2929292929293,434.34343434343435,439.3939393939394,444.44444444444446,449.4949494949495,454.54545454545456,459.5959595959596,464.64646464646466,469.6969696969697,474.74747474747477,479.7979797979798,484.8484848484849,489.8989898989899,494.949494949495,500.0],"mode":"lines"}], {"yaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.0688976377952756,0.9606299212598425],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"x","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"annotations":[],"width":600,"plot_bgcolor":"rgb(255, 255, 255)","showlegend":true,"legend":{"bgcolor":"rgb(255, 255, 255)","font":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"},"bordercolor":"rgb(0, 0, 0)"},"xaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.07874015748031496,0.9671916010498688],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"y","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"paper_bgcolor":"rgb(255, 255, 255)","height":400,"margin":{"r":0,"l":0,"b":0,"t":20}});
+    PLOT = document.getElementById('dd5826e0-6a60-4331-88e7-bb291df19118');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[4.863835265668613,48.02986105460374,72.40184961592706,92.08908086175168,112.52078747304368,130.47676357041226,148.78944898054388,168.79270591557008,185.4757672208569,199.25848308947582,213.3836868745123,226.64384441096968,240.196720330727,252.01175639268288,263.17966315931994,271.6978943699767,281.003705421208,288.65468724121035,298.6967819741143],"type":"scatter","name":"y1","yaxis":"y","x":[4.882909509894065,50.032458584186415,77.16545565281194,100.10605935788287,125.02598501652571,147.9999522673141,172.63047320324492,201.16734716926615,226.5275530555107,248.76616827011,273.0122283276597,297.40238937640606,324.36883131220213,350.0267203724217,376.7049717556753,399.16237683342257,426.58032299318205,452.35400106435424,493.64543200802996]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[100.0,200.0,300.0,400.0],"visible":true,"ticks":"inside","range":[4.882909509894065,493.64543200802996],"domain":[0.05100612423447069,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["100","200","300","400"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[50.0,100.0,150.0,200.0,250.0],"visible":true,"ticks":"inside","range":[4.863835265668613,298.6967819741143],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["50","100","150","200","250"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
-<p>Well, we haven't even seen the peak yet. Better to do a little spade work first. This is a quadratic equation, so we can use the <code>roots</code> function:</p><pre class="sourceCode julia">roots(j) </pre>
+<p>Well, we haven't even seen the peak yet. Better to do a little spade work first. This is a quadratic equation, so we can use the <code>poly_roots</code> function:</p><pre class="sourceCode julia">poly_roots(j, Over.R) </pre>
 <pre class="output">
 2-element Array{Float64,1}:
- 1250.0
-    0.0</pre>
+    0.0
+ 1250.0</pre>
 
 <p>We see that $1250$ is the largest root. So we plot over this domain to visualize the flight:</p><pre class="sourceCode julia">plot(j, 0, 1250)</pre>
-    <div id="d6318488-138b-4c17-8ea3-5afbcab15d7d" style="width:600px;height:400px;"></div>
+    <div id="8b55b7cf-1a11-45e5-b7ee-4289bd4e981b" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('d6318488-138b-4c17-8ea3-5afbcab15d7d');
-    Plotly.plot(PLOT, [{"yaxis":"y","y":[0.0,12.49872461993674,24.74237322722171,36.7309458218549,48.46444240383634,59.942862973165994,71.16620752984387,82.13447607386999,92.84766860524435,103.30578512396693,113.50882563003773,123.45679012345676,133.14967860422402,142.58749107233953,151.77022752780326,160.69788797061523,169.3704724007754,177.7879808182838,185.95041322314046,193.85776961534535,201.51004999489845,208.90725436179974,216.04938271604934,222.93643505764715,229.56841138659314,235.9453117028874,242.0671360065299,247.93388429752065,253.54555657585956,258.90215284154675,264.00367309458215,268.8501173349658,273.44148556269766,277.7777777777777,281.85899398020604,285.6851341699826,289.2561983471074,292.5721865115804,295.6330986634016,298.4389348025711,300.98969492908884,303.2853790429547,305.3259871441689,307.1115192327312,308.6419753086419,309.9173553719007,310.9376594225078,311.70288746046316,312.2130394857667,312.4681154984184,312.4681154984184,312.21303948576667,311.70288746046316,310.93765942250786,309.9173553719008,308.64197530864186,307.11151923273127,305.3259871441689,303.28537904295473,300.9896949290887,298.438934802571,295.6330986634016,292.5721865115804,289.2561983471074,285.6851341699827,281.85899398020604,277.7777777777777,273.4414855626976,268.85011733496583,264.00367309458215,258.9021528415467,253.54555657585956,247.93388429752054,242.06713600652995,235.94531170288747,229.56841138659308,222.93643505764703,216.0493827160493,208.9072543617998,201.5100499948985,193.85776961534532,185.95041322314034,177.7879808182837,169.37047240077538,160.69788797061528,151.77022752780317,142.58749107233928,133.14967860422382,123.4567901234567,113.50882563003779,103.30578512396687,92.84766860524405,82.13447607386979,71.16620752984386,59.94286297316603,48.4644424038363,36.73094582185513,24.742373227221606,12.49872461993641,-2.2737367544323206e-13],"showlegend":true,"name":"y1","type":"scatter","xaxis":"x","line":{"width":1,"dash":"solid","color":"rgba(0, 154, 250, 1.000)","shape":"linear"},"x":[0.0,12.626262626262626,25.252525252525253,37.878787878787875,50.505050505050505,63.13131313131313,75.75757575757575,88.38383838383838,101.01010101010101,113.63636363636364,126.26262626262626,138.88888888888889,151.5151515151515,164.14141414141415,176.76767676767676,189.3939393939394,202.02020202020202,214.64646464646464,227.27272727272728,239.8989898989899,252.5252525252525,265.1515151515151,277.77777777777777,290.4040404040404,303.030303030303,315.65656565656565,328.2828282828283,340.90909090909093,353.5353535353535,366.16161616161617,378.7878787878788,391.4141414141414,404.04040404040404,416.6666666666667,429.2929292929293,441.9191919191919,454.54545454545456,467.17171717171715,479.7979797979798,492.42424242424244,505.050505050505,517.6767676767677,530.3030303030303,542.929292929293,555.5555555555555,568.1818181818181,580.8080808080808,593.4343434343434,606.060606060606,618.6868686868687,631.3131313131313,643.939393939394,656.5656565656566,669.1919191919192,681.8181818181819,694.4444444444445,707.070707070707,719.6969696969697,732.3232323232323,744.9494949494949,757.5757575757576,770.2020202020202,782.8282828282828,795.4545454545455,808.0808080808081,820.7070707070707,833.3333333333334,845.959595959596,858.5858585858585,871.2121212121212,883.8383838383838,896.4646464646464,909.0909090909091,921.7171717171717,934.3434343434343,946.969696969697,959.5959595959596,972.2222222222222,984.8484848484849,997.4747474747475,1010.10101010101,1022.7272727272727,1035.3535353535353,1047.979797979798,1060.6060606060605,1073.2323232323233,1085.858585858586,1098.4848484848485,1111.111111111111,1123.7373737373737,1136.3636363636363,1148.989898989899,1161.6161616161617,1174.2424242424242,1186.8686868686868,1199.4949494949494,1212.121212121212,1224.7474747474748,1237.3737373737374,1250.0],"mode":"lines"}], {"yaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.0688976377952756,0.9606299212598425],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"x","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"annotations":[],"width":600,"plot_bgcolor":"rgb(255, 255, 255)","showlegend":true,"legend":{"bgcolor":"rgb(255, 255, 255)","font":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"},"bordercolor":"rgb(0, 0, 0)"},"xaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.07874015748031496,0.9671916010498688],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"y","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"paper_bgcolor":"rgb(255, 255, 255)","height":400,"margin":{"r":0,"l":0,"b":0,"t":20}});
+    PLOT = document.getElementById('8b55b7cf-1a11-45e5-b7ee-4289bd4e981b');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[6.073833380765314,12.088059748326092,64.87458805146514,112.56491190057437,138.77325606344442,163.1411014014994,182.30790622063472,200.1590327938873,218.05950871275985,234.40747789455168,248.10346856765068,260.4799513126489,272.2831946664091,282.56978161623096,292.5912623215887,300.5768600875651,305.96496568311863,309.7452211721906,311.7369997425798,312.49238829631145,311.90712680203774,309.8521867369781,306.3022270169878,301.26506740703786,293.96471226500773,284.8463846462861,274.4827394407695,262.4732760576867,248.2409247309123,232.22925066196763,217.3715074780264,201.25292668702014,179.864616887093,156.59694765811741,133.0109725638224,107.76429126623646,63.85563212388956,15.684517308101931,7.892734322006845],"type":"scatter","name":"y1","yaxis":"y","x":[6.103636887367582,12.207273774735164,68.6442101176006,125.08114646046603,158.99739279624794,192.91363913202986,221.5893937633685,250.26514839470715,281.41505546801073,312.5649625413143,341.28242160479977,369.9998806682852,400.7880318381988,431.5761830081123,467.24727546563884,502.91836792316536,534.6186252809711,566.3188826387768,594.1171516570259,621.915420675275,652.2229957472122,682.5305708191494,713.0182721300823,743.5059734410152,777.2140258607602,810.9220782805053,842.9944396057798,875.0668009310543,908.4146151601212,941.7624293891881,969.8341857363723,997.9059420835564,1032.1783747832558,1066.450807482955,1098.6679050719204,1130.8850026608857,1182.4992913404803,1234.113580020075,1242.0567900100375]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[250.0,500.0,750.0,1000.0],"visible":true,"ticks":"inside","range":[6.103636887367582,1242.0567900100375],"domain":[0.05100612423447069,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["250","500","750","1000"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[50.0,100.0,150.0,200.0,250.0,300.0],"visible":true,"ticks":"inside","range":[6.073833380765314,312.49238829631145],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["50","100","150","200","250","300"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
 <p>As for the model with wind resistance,  a quick plot over the same interval, $[0, 1250]$ yields:</p><pre class="sourceCode julia">plot(y, 0, 1250)</pre>
 <pre class="output">
@@ -383,212 +395,209 @@ DomainError()
 <p>Oh, "Domain Error." Of course, when the argument to the logarithm is negative we will have issues. We don't have the simplicity of using <code>roots</code> to find out the answer, so we solve for when $a-\gamma^2 x$ is $0$:</p><pre class="sourceCode julia">gamma = 1
 a = 200 * cos(pi/4)
 b = a/gamma^2</pre>
-<pre class="output">
-141.4213562373095</pre>
+<div class="well well-sm">
+141.4213562373095</div>
 
 <p>We try on the reduced interval avoiding the obvious <em>asymptote</em> at <code>b</code>  by subtracting $1$:</p><pre class="sourceCode julia">plot(y, 0, b - 1) </pre>
-    <div id="21711bea-4b10-4689-90f6-96314529b069" style="width:600px;height:400px;"></div>
+    <div id="34369829-b7cc-492d-8150-1dbe7c6c1b3c" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('21711bea-4b10-4689-90f6-96314529b069');
-    Plotly.plot(PLOT, [{"yaxis":"y","y":[0.0,1.4167772132650003,2.8302697411509463,4.240409999259903,5.647128295607603,7.050352742070126,8.450009161130204,9.846020987620722,11.23830916513965,12.626792036786064,14.01138522983931,15.392001533973987,16.76855077257094,18.140939666649356,19.50907169090608,20.872846921306603,22.232161873625486,23.586909332283575,24.93697816877381,26.282253148906136,27.62261472803523,28.957938833360345,30.288096632305656,31.61295428589897,32.93237268596776,34.246207174861105,35.55430724628461,36.85651622570015,38.15267092859214,39.4426012947349,40.72612999641021,42.00307201831594,43.27323420667529,44.53641478479657,45.79240283204257,47.04097772284213,48.28190852200939,49.51495333222228,50.73985858904538,51.95635829835394,53.164173210417616,54.36300992422467,55.55255991485322,56.732498475818,57.90248356731367,59.062154560125556,60.211130863656855,61.349010425001495,62.475368084238525,63.58975376909724,64.6916905097923,65.780672252095,66.85616144352207,67.91758636379681,68.96433816636615,69.99576759261224,71.0111813143207,72.00983785276519,72.99094301420057,73.95364477132432,74.89702750799768,75.82010552974444,76.72181572467633,77.60100923778256,78.45644199500748,79.28676388100065,80.0905063342673,80.86606807361147,81.61169860753981,82.32547910010733,83.00530006777569,83.64883525582852,84.25351088108741,84.81646921824924,85.3345252337466,85.80411461074489,86.22123102938826,86.58134992140029,86.87933504045088,87.10932298041398,87.2645790848012,87.33731579712077,87.31846105458425,87.19735927397083,86.96137992419881,86.59539714088385,86.08108578095516,85.3959502816356,84.51195454954328,83.39353844195634,81.99465858908366,80.2542142044245,78.08866912747331,75.37951591109511,71.95054064284969,67.5229591701555,61.61618146043918,53.28898957563,40.2593016466779,13.739281226751757],"showlegend":true,"name":"y1","type":"scatter","xaxis":"x","line":{"width":1,"dash":"solid","color":"rgba(0, 154, 250, 1.000)","shape":"linear"},"x":[0.0,1.418397537750601,2.836795075501202,4.255192613251803,5.673590151002404,7.091987688753005,8.510385226503606,9.928782764254208,11.347180302004809,12.76557783975541,14.18397537750601,15.602372915256613,17.020770453007213,18.439167990757813,19.857565528508417,21.275963066259013,22.694360604009617,24.11275814176022,25.53115567951082,26.949553217261418,28.36795075501202,29.786348292762625,31.204745830513225,32.623143368263825,34.041540906014426,35.45993844376503,36.878335981515626,38.296733519266226,39.71513105701683,41.133528594767434,42.55192613251803,43.970323670268634,45.388721208019234,46.80711874576984,48.22551628352044,49.643913821271035,51.06231135902164,52.48070889677224,53.899106434522835,55.31750397227344,56.73590151002404,58.15429904777465,59.57269658552525,60.99109412327584,62.40949166102645,63.82788919877705,65.24628673652765,66.66468427427824,68.08308181202885,69.50147934977946,70.91987688753007,72.33827442528066,73.75667196303125,75.17506950078186,76.59346703853245,78.01186457628306,79.43026211403367,80.84865965178426,82.26705718953487,83.68545472728547,85.10385226503605,86.52224980278666,87.94064734053727,89.35904487828786,90.77744241603847,92.19583995378908,93.61423749153968,95.03263502929028,96.45103256704088,97.86943010479148,99.28782764254207,100.70622518029268,102.12462271804328,103.54302025579388,104.96141779354448,106.37981533129509,107.79821286904567,109.21661040679628,110.63500794454689,112.05340548229749,113.47180302004809,114.89020055779869,116.3085980955493,117.7269956332999,119.1453931710505,120.5637907088011,121.98218824655169,123.4005857843023,124.8189833220529,126.23738085980351,127.6557783975541,129.0741759353047,130.4925734730553,131.9109710108059,133.3293685485565,134.7477660863071,136.1661636240577,137.58456116180832,139.00295869955892,140.4213562373095],"mode":"lines"}], {"yaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.0688976377952756,0.9606299212598425],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"x","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"annotations":[],"width":600,"plot_bgcolor":"rgb(255, 255, 255)","showlegend":true,"legend":{"bgcolor":"rgb(255, 255, 255)","font":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"},"bordercolor":"rgb(0, 0, 0)"},"xaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.07874015748031496,0.9671916010498688],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"y","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"paper_bgcolor":"rgb(255, 255, 255)","height":400,"margin":{"r":0,"l":0,"b":0,"t":20}});
+    PLOT = document.getElementById('34369829-b7cc-492d-8150-1dbe7c6c1b3c');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[1.3698153190140672,13.881991698382278,21.252222755383244,27.383056181453128,33.92503254945725,39.833467476125215,46.01874290036265,52.960837068885446,58.891714665138366,63.87272470865594,69.02294681772823,73.84454233231418,78.64552804177623,82.53672612043044,84.22215358218418,85.61656711947111,86.51783884706515,87.11589866179634,87.33237686163673,86.80915275523635,86.23096341344575,85.38463042332445,84.21324153098263,82.63959061151952,81.01728661923174,78.99034851675387,76.44928348765704,73.23309805253245,71.29868592384285,69.09088570719524,66.55101621565778,63.59920606249061,60.12277703612334,55.955383772360804,53.53666603015931,50.83638213047095,47.79305090698013,44.32255807973921,41.924048818299354,39.28191941793352,36.34724929480481,33.05472094561546,29.314359733755623,24.997312539485733,19.90961818899828],"type":"scatter","name":"y1","yaxis":"y","x":[1.3713295515267618,14.05125138055695,21.67135587487563,28.114057245213044,35.11263676185216,41.564708040866634,48.48201035017634,56.496383440340075,63.6186124503478,69.8641654688952,76.67349474227998,83.5232937289027,91.09662242794097,98.30245358798591,102.04864982926225,105.79484607053858,108.9483453491265,112.10184462771443,115.95190981270939,119.80197499770435,121.61156241269325,123.42114982768214,125.23073724267104,127.04032465765994,128.48987434118249,129.93942402470503,131.38897370822758,132.8385233917501,133.56329823351138,134.28807307527262,135.0128479170339,135.73762275879517,136.46239760055644,137.18717244231772,137.54955986319834,137.911947284079,138.27433470495964,138.63672212584027,138.8598013897739,139.08288065370758,139.30595991764125,139.5290391815749,139.75211844550853,139.9751977094422,140.19827697337587]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[25.0,50.0,75.0,100.0,125.0],"visible":true,"ticks":"inside","range":[1.3713295515267618,140.19827697337587],"domain":[0.03619130941965587,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["25","50","75","100","125"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[20.0,40.0,60.0,80.0],"visible":true,"ticks":"inside","range":[1.3698153190140672,87.33237686163673],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["20","40","60","80"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
 <p>Now we can see the zero is around 140. We re-plot:</p><pre class="sourceCode julia">plot(y, 135, 141)</pre>
-    <div id="d27ea228-7f53-4bf1-9643-aa0e6114d8c7" style="width:600px;height:400px;"></div>
+    <div id="d55ba6d2-2aa6-4dd3-8e84-9a820a5e65c5" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('d27ea228-7f53-4bf1-9643-aa0e6114d8c7');
-    Plotly.plot(PLOT, [{"yaxis":"y","y":[66.599351220559,66.37021408000436,66.13817167863114,65.90316784899115,65.66514477889528,65.42404294656305,65.17980105254428,64.93235594821776,64.68164256065843,64.4275938136499,64.17014054460121,63.90921141711269,63.644732828911685,63.37662881486321,63.104820944734456,62.82922821536961,62.54976693690392,62.2663506126174,61.9788898119963,61.68729203653655,61.39146157778575,61.09129936707785,60.78670281637102,60.477565649548865,60.16377772349061,59.84522483815702,59.52178853487173,59.19334588190904,58.85976924641359,58.52092605159618,58.17667851804811,57.826883387912346,57.4713916305289,57.11004812804113,56.74269133930399,56.36915294027101,55.989257438857265,55.602821762072764,55.20965481299578,54.80955699490245,54.402319699587125,53.98772475659064,53.56554383969649,53.135537826652964,52.697456107629534,52.25103583739761,51.79600112565207,51.33206215922864,50.85891424922565,50.37623679518585,49.88369215752189,49.38092442825533,48.86755808886279,48.34319654255424,47.80742050661689,47.2597862485038,46.69982364707978,46.12703405780678,45.54088795758503,44.94082234137946,44.326237838568275,43.69649551199842,43.050913296914686,42.3887620300182,41.7092610107089,41.011573026776006,40.294798765076564,39.55797051363601,38.800045044566474,38.01989554651635,37.21630245014126,36.38794295917057,35.53337906154184,34.65104374785807,33.73922510555809,32.796047883342595,31.819452027133934,30.807167570243564,29.756685108413848,28.66522089409483,27.529675328554703,26.346583294206795,25.112054323197498,23.821699999529585,22.470545179603647,21.05291850029542,19.562316090822776,17.99123021209897,16.33093140238654,14.571188118672552,12.699901037134424,10.702618807057434,8.561885927400198,6.256347669260919,3.7594946189622362,1.0378573566183888,-1.9516657108962363,-5.2659004072257005,-8.981922938764455,-13.207995152416458],"showlegend":true,"name":"y1","type":"scatter","xaxis":"x","line":{"width":1,"dash":"solid","color":"rgba(0, 154, 250, 1.000)","shape":"linear"},"x":[135.0,135.06060606060606,135.12121212121212,135.1818181818182,135.24242424242425,135.3030303030303,135.36363636363637,135.42424242424244,135.4848484848485,135.54545454545453,135.6060606060606,135.66666666666666,135.72727272727272,135.78787878787878,135.84848484848484,135.9090909090909,135.96969696969697,136.03030303030303,136.0909090909091,136.15151515151516,136.21212121212122,136.27272727272728,136.33333333333334,136.3939393939394,136.45454545454547,136.5151515151515,136.57575757575756,136.63636363636363,136.6969696969697,136.75757575757575,136.8181818181818,136.87878787878788,136.93939393939394,137.0,137.06060606060606,137.12121212121212,137.1818181818182,137.24242424242425,137.3030303030303,137.36363636363637,137.42424242424244,137.4848484848485,137.54545454545453,137.6060606060606,137.66666666666666,137.72727272727272,137.78787878787878,137.84848484848484,137.9090909090909,137.96969696969697,138.03030303030303,138.0909090909091,138.15151515151516,138.21212121212122,138.27272727272728,138.33333333333334,138.3939393939394,138.45454545454547,138.5151515151515,138.57575757575756,138.63636363636363,138.6969696969697,138.75757575757575,138.8181818181818,138.87878787878788,138.93939393939394,139.0,139.06060606060606,139.12121212121212,139.1818181818182,139.24242424242425,139.3030303030303,139.36363636363637,139.42424242424244,139.4848484848485,139.54545454545453,139.6060606060606,139.66666666666666,139.72727272727272,139.78787878787878,139.84848484848484,139.9090909090909,139.96969696969697,140.03030303030303,140.0909090909091,140.15151515151516,140.21212121212122,140.27272727272728,140.33333333333334,140.3939393939394,140.45454545454547,140.5151515151515,140.57575757575756,140.63636363636363,140.6969696969697,140.75757575757575,140.8181818181818,140.87878787878788,140.93939393939394,141.0],"mode":"lines"}], {"yaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.0688976377952756,0.9606299212598425],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"x","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"annotations":[],"width":600,"plot_bgcolor":"rgb(255, 255, 255)","showlegend":true,"legend":{"bgcolor":"rgb(255, 255, 255)","font":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"},"bordercolor":"rgb(0, 0, 0)"},"xaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.07874015748031496,0.9671916010498688],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"y","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"paper_bgcolor":"rgb(255, 255, 255)","height":400,"margin":{"r":0,"l":0,"b":0,"t":20}});
+    PLOT = document.getElementById('d55ba6d2-2aa6-4dd3-8e84-9a820a5e65c5');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[66.37786404644925,64.1943775581188,62.751718073301845,61.44473069214101,59.92367095075889,58.41685625876019,56.6756058793396,54.4715981647508,52.31743764452436,50.25124528308275,47.7768422556433,45.010149439681385,41.55387807717315,37.77711107066281,33.188956052789365,28.627186930879958,25.427577182722814,21.822956523941684,17.96781915962299,13.52643216334647,9.415060486489637,4.647110033441095,1.9469471747602825,-1.0171303238253984,-4.30062353957689,-7.978620976678371,-9.205278681096132,-10.482759298163842,-11.815371248220657],"type":"scatter","name":"y1","yaxis":"y","x":[135.05859491411871,135.60038950301023,135.92598546783375,136.20127271229458,136.5003118201983,136.77599942720778,137.07156567843893,137.4140081660312,137.7183306366661,137.9851940192413,138.27614673993193,138.56882867251687,138.89242597574642,139.20032064446906,139.52045966106812,139.78994852200108,139.95445619895963,140.11896387591818,140.2736059443452,140.42824801277226,140.5521223056033,140.67599659843432,140.73793374484984,140.79987089126536,140.86180803768087,140.92374518409636,140.94280888807225,140.96187259204817,140.98093629602408]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[136.0,137.0,138.0,139.0,140.0],"visible":true,"ticks":"inside","range":[135.05859491411871,140.98093629602408],"domain":[0.03619130941965587,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["136","137","138","139","140"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.0,20.0,40.0,60.0],"visible":true,"ticks":"inside","range":[-11.815371248220657,66.37786404644925],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0","20","40","60"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
 <pre class="sourceCode julia">plot([y, x -> 0], 140, 141)</pre>
-    <div id="bb6c83dc-d9ca-46ac-8422-983840b33602" style="width:600px;height:400px;"></div>
+    <div id="bc1ce8be-f47c-4403-8c2c-3dff67a7a636" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('bb6c83dc-d9ca-46ac-8422-983840b33602');
-    Plotly.plot(PLOT, [{"yaxis":"y","y":[24.47415135643098,24.258314858158315,24.04083898005902,23.821699999529585,23.600873675295702,23.378335232180547,23.154059345310543,22.928020123731898,22.70019109341311,22.470545179603647,22.239054688521378,22.00569128833598,21.770425989416935,21.53322912381128,21.294070323914212,21.05291850029542,20.80974181863931,20.564507675757454,20.317182674627276,20.067732598409748,19.81612238339494,19.562316090822776,19.306276877521526,19.047966965304227,18.787347609060248,18.524379063473134,18.259020548294842,17.99123021209897,17.720965094433865,17.4481810862886,17.17283288878204,16.89487396997737,16.614256519719675,16.33093140238654,16.044848107435143,15.755954697621291,15.464197754757464,15.169522322868659,14.871871848593827,14.571188118672552,14.267411194342685,13.960479342465106,13.650328963177458,13.336894513864053,13.020108429215668,12.699901037134424,12.37620047022287,12.048932572574671,11.718020801566269,11.383386124322328,11.044946908507114,10.702618807057434,10.356314636465385,10.005944248151167,9.651414392466961,9.292628574811431,8.929486903301665,8.561885927400198,8.189718466845022,7.812873430175159,7.431235622082596,7.0446855387553455,6.6530991503010455,6.256347669260919,5.854297304132473,5.446808996720847,5.033738142028568,4.6149342892720995,4.190240822478074,3.7594946189622362,3.322525683828218,2.8791567584355846,2.429202900581572,1.9724710339069702,1.5087594637799953,1.0378573566183888,0.559544179287343,0.07358909484094056,-0.42024968953663233,-0.9222256270004152,-1.4326045930629618,-1.9516657108962363,-2.479702246331243,-3.017022579739063,-3.5639512628586374,-4.120830169637827,-4.688019751307593,-5.2659004072257005,-5.854873984546572,-6.455365421523595,-7.067824551274555,-7.692728085188122,-8.33058179787676,-8.981922938764455,-9.64732289911592,-10.327390167680932,-11.022773613262615,-11.734166138587568,-12.462308757044951,-13.207995152416458],"showlegend":true,"name":"y1","type":"scatter","xaxis":"x","line":{"width":1,"dash":"solid","color":"rgba(0, 154, 250, 1.000)","shape":"linear"},"x":[140.0,140.010101010101,140.02020202020202,140.03030303030303,140.04040404040404,140.05050505050505,140.06060606060606,140.07070707070707,140.08080808080808,140.0909090909091,140.1010101010101,140.11111111111111,140.12121212121212,140.13131313131314,140.14141414141415,140.15151515151516,140.16161616161617,140.17171717171718,140.1818181818182,140.1919191919192,140.2020202020202,140.21212121212122,140.22222222222223,140.23232323232324,140.24242424242425,140.25252525252526,140.26262626262627,140.27272727272728,140.2828282828283,140.2929292929293,140.3030303030303,140.31313131313132,140.32323232323233,140.33333333333334,140.34343434343435,140.35353535353536,140.36363636363637,140.37373737373738,140.3838383838384,140.3939393939394,140.40404040404042,140.41414141414143,140.42424242424244,140.43434343434345,140.44444444444446,140.45454545454547,140.46464646464648,140.4747474747475,140.4848484848485,140.4949494949495,140.5050505050505,140.5151515151515,140.5252525252525,140.53535353535352,140.54545454545453,140.55555555555554,140.56565656565655,140.57575757575756,140.58585858585857,140.59595959595958,140.6060606060606,140.6161616161616,140.62626262626262,140.63636363636363,140.64646464646464,140.65656565656565,140.66666666666666,140.67676767676767,140.68686868686868,140.6969696969697,140.7070707070707,140.7171717171717,140.72727272727272,140.73737373737373,140.74747474747474,140.75757575757575,140.76767676767676,140.77777777777777,140.78787878787878,140.7979797979798,140.8080808080808,140.8181818181818,140.82828282828282,140.83838383838383,140.84848484848484,140.85858585858585,140.86868686868686,140.87878787878788,140.88888888888889,140.8989898989899,140.9090909090909,140.91919191919192,140.92929292929293,140.93939393939394,140.94949494949495,140.95959595959596,140.96969696969697,140.97979797979798,140.989898989899,141.0],"mode":"lines"},{"yaxis":"y","y":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"showlegend":true,"name":"y2","type":"scatter","xaxis":"x","line":{"width":1,"dash":"solid","color":"rgba(227, 111, 71, 1.000)","shape":"linear"},"x":[140.0,140.010101010101,140.02020202020202,140.03030303030303,140.04040404040404,140.05050505050505,140.06060606060606,140.07070707070707,140.08080808080808,140.0909090909091,140.1010101010101,140.11111111111111,140.12121212121212,140.13131313131314,140.14141414141415,140.15151515151516,140.16161616161617,140.17171717171718,140.1818181818182,140.1919191919192,140.2020202020202,140.21212121212122,140.22222222222223,140.23232323232324,140.24242424242425,140.25252525252526,140.26262626262627,140.27272727272728,140.2828282828283,140.2929292929293,140.3030303030303,140.31313131313132,140.32323232323233,140.33333333333334,140.34343434343435,140.35353535353536,140.36363636363637,140.37373737373738,140.3838383838384,140.3939393939394,140.40404040404042,140.41414141414143,140.42424242424244,140.43434343434345,140.44444444444446,140.45454545454547,140.46464646464648,140.4747474747475,140.4848484848485,140.4949494949495,140.5050505050505,140.5151515151515,140.5252525252525,140.53535353535352,140.54545454545453,140.55555555555554,140.56565656565655,140.57575757575756,140.58585858585857,140.59595959595958,140.6060606060606,140.6161616161616,140.62626262626262,140.63636363636363,140.64646464646464,140.65656565656565,140.66666666666666,140.67676767676767,140.68686868686868,140.6969696969697,140.7070707070707,140.7171717171717,140.72727272727272,140.73737373737373,140.74747474747474,140.75757575757575,140.76767676767676,140.77777777777777,140.78787878787878,140.7979797979798,140.8080808080808,140.8181818181818,140.82828282828282,140.83838383838383,140.84848484848484,140.85858585858585,140.86868686868686,140.87878787878788,140.88888888888889,140.8989898989899,140.9090909090909,140.91919191919192,140.92929292929293,140.93939393939394,140.94949494949495,140.95959595959596,140.96969696969697,140.97979797979798,140.989898989899,141.0],"mode":"lines"}], {"yaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.0688976377952756,0.9606299212598425],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"x","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"annotations":[],"width":600,"plot_bgcolor":"rgb(255, 255, 255)","showlegend":true,"legend":{"bgcolor":"rgb(255, 255, 255)","font":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"},"bordercolor":"rgb(0, 0, 0)"},"xaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.07874015748031496,0.9671916010498688],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"y","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"paper_bgcolor":"rgb(255, 255, 255)","height":400,"margin":{"r":0,"l":0,"b":0,"t":20}});
+    PLOT = document.getElementById('bc1ce8be-f47c-4403-8c2c-3dff67a7a636');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[24.265503326888023,22.260794979358565,20.985335449704735,19.86132099138132,18.58898758966825,17.364751217797732,15.992816117449308,14.318928249649503,12.74736379849594,11.297212118829663,9.631285472631731,7.856197401663735,5.763080003305674,3.6267600129618245,1.2329498798454779,-0.9395152484905225,-2.346054076490276,-3.820474376087674,-5.274359148999167,-6.800574019978114,-9.415429257577387,-12.27265180716077,-12.736791326549024],"type":"scatter","name":"y1","yaxis":"y","x":[140.00976581901978,140.10006491716837,140.15433091130564,140.20021211871577,140.25005197003304,140.29599990453465,140.34526094640648,140.40233469433855,140.453055106111,140.49753233654022,140.54602445665532,140.5948047787528,140.6487376626244,140.70005344074482,140.75340994351134,140.79832475366686,140.8257426998266,140.85316064598635,140.87893432405752,140.90470800212873,140.94599943307242,140.98729086401607,140.99364543200804]},{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"type":"scatter","name":"y2","yaxis":"y","x":[140.00976581901978,140.10006491716837,140.15433091130564,140.20021211871577,140.25005197003304,140.29599990453465,140.34526094640648,140.40233469433855,140.453055106111,140.49753233654022,140.54602445665532,140.5948047787528,140.6487376626244,140.70005344074482,140.75340994351134,140.79832475366686,140.85316064598635,140.90470800212873,140.98729086401607]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[140.20000000000002,140.4,140.6,140.8],"visible":true,"ticks":"inside","range":[140.00976581901978,140.99364543200804],"domain":[0.05100612423447069,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["140.2","140.4","140.6","140.8"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-10.0,0.0,10.0,20.0],"visible":true,"ticks":"inside","range":[-12.736791326549024,24.265503326888023],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-10","0","10","20"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
 <p>The answer is approximately $140.7$</p><p>Finally, we plot both graphs at once to see that it was a very windy day indeed.</p><pre class="sourceCode julia">b = 140.7
 plot([j, u -> u < b ? y(u) : NaN] , 0, 1250)</pre>
-    <div id="6bd4a9fa-43eb-416b-9e10-653b140effd3" style="width:600px;height:400px;"></div>
+    <div id="d5eb1098-47a4-4ad7-96d4-e505ae0443f5" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('6bd4a9fa-43eb-416b-9e10-653b140effd3');
-    Plotly.plot(PLOT, [{"yaxis":"y","y":[0.0,12.49872461993674,24.74237322722171,36.7309458218549,48.46444240383634,59.942862973165994,71.16620752984387,82.13447607386999,92.84766860524435,103.30578512396693,113.50882563003773,123.45679012345676,133.14967860422402,142.58749107233953,151.77022752780326,160.69788797061523,169.3704724007754,177.7879808182838,185.95041322314046,193.85776961534535,201.51004999489845,208.90725436179974,216.04938271604934,222.93643505764715,229.56841138659314,235.9453117028874,242.0671360065299,247.93388429752065,253.54555657585956,258.90215284154675,264.00367309458215,268.8501173349658,273.44148556269766,277.7777777777777,281.85899398020604,285.6851341699826,289.2561983471074,292.5721865115804,295.6330986634016,298.4389348025711,300.98969492908884,303.2853790429547,305.3259871441689,307.1115192327312,308.6419753086419,309.9173553719007,310.9376594225078,311.70288746046316,312.2130394857667,312.4681154984184,312.4681154984184,312.21303948576667,311.70288746046316,310.93765942250786,309.9173553719008,308.64197530864186,307.11151923273127,305.3259871441689,303.28537904295473,300.9896949290887,298.438934802571,295.6330986634016,292.5721865115804,289.2561983471074,285.6851341699827,281.85899398020604,277.7777777777777,273.4414855626976,268.85011733496583,264.00367309458215,258.9021528415467,253.54555657585956,247.93388429752054,242.06713600652995,235.94531170288747,229.56841138659308,222.93643505764703,216.0493827160493,208.9072543617998,201.5100499948985,193.85776961534532,185.95041322314034,177.7879808182837,169.37047240077538,160.69788797061528,151.77022752780317,142.58749107233928,133.14967860422382,123.4567901234567,113.50882563003779,103.30578512396687,92.84766860524405,82.13447607386979,71.16620752984386,59.94286297316603,48.4644424038363,36.73094582185513,24.742373227221606,12.49872461993641,-2.2737367544323206e-13],"showlegend":true,"name":"y1","type":"scatter","xaxis":"x","line":{"width":1,"dash":"solid","color":"rgba(0, 154, 250, 1.000)","shape":"linear"},"x":[0.0,12.626262626262626,25.252525252525253,37.878787878787875,50.505050505050505,63.13131313131313,75.75757575757575,88.38383838383838,101.01010101010101,113.63636363636364,126.26262626262626,138.88888888888889,151.5151515151515,164.14141414141415,176.76767676767676,189.3939393939394,202.02020202020202,214.64646464646464,227.27272727272728,239.8989898989899,252.5252525252525,265.1515151515151,277.77777777777777,290.4040404040404,303.030303030303,315.65656565656565,328.2828282828283,340.90909090909093,353.5353535353535,366.16161616161617,378.7878787878788,391.4141414141414,404.04040404040404,416.6666666666667,429.2929292929293,441.9191919191919,454.54545454545456,467.17171717171715,479.7979797979798,492.42424242424244,505.050505050505,517.6767676767677,530.3030303030303,542.929292929293,555.5555555555555,568.1818181818181,580.8080808080808,593.4343434343434,606.060606060606,618.6868686868687,631.3131313131313,643.939393939394,656.5656565656566,669.1919191919192,681.8181818181819,694.4444444444445,707.070707070707,719.6969696969697,732.3232323232323,744.9494949494949,757.5757575757576,770.2020202020202,782.8282828282828,795.4545454545455,808.0808080808081,820.7070707070707,833.3333333333334,845.959595959596,858.5858585858585,871.2121212121212,883.8383838383838,896.4646464646464,909.0909090909091,921.7171717171717,934.3434343434343,946.969696969697,959.5959595959596,972.2222222222222,984.8484848484849,997.4747474747475,1010.10101010101,1022.7272727272727,1035.3535353535353,1047.979797979798,1060.6060606060605,1073.2323232323233,1085.858585858586,1098.4848484848485,1111.111111111111,1123.7373737373737,1136.3636363636363,1148.989898989899,1161.6161616161617,1174.2424242424242,1186.8686868686868,1199.4949494949494,1212.121212121212,1224.7474747474748,1237.3737373737374,1250.0],"mode":"lines"},{"yaxis":"y","y":[0.0,12.490585916996094,24.672144923508213,36.473428457723614,47.79529776215046,58.493951577685436,68.34927707581494,76.99900272192394,83.78174384393854,87.27740995103898,83.37124764141267,41.59426615017034,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"showlegend":true,"name":"y2","type":"scatter","xaxis":"x","line":{"width":1,"dash":"solid","color":"rgba(227, 111, 71, 1.000)","shape":"linear"},"x":[0.0,12.626262626262626,25.252525252525253,37.878787878787875,50.505050505050505,63.13131313131313,75.75757575757575,88.38383838383838,101.01010101010101,113.63636363636364,126.26262626262626,138.88888888888889,151.5151515151515,164.14141414141415,176.76767676767676,189.3939393939394,202.02020202020202,214.64646464646464,227.27272727272728,239.8989898989899,252.5252525252525,265.1515151515151,277.77777777777777,290.4040404040404,303.030303030303,315.65656565656565,328.2828282828283,340.90909090909093,353.5353535353535,366.16161616161617,378.7878787878788,391.4141414141414,404.04040404040404,416.6666666666667,429.2929292929293,441.9191919191919,454.54545454545456,467.17171717171715,479.7979797979798,492.42424242424244,505.050505050505,517.6767676767677,530.3030303030303,542.929292929293,555.5555555555555,568.1818181818181,580.8080808080808,593.4343434343434,606.060606060606,618.6868686868687,631.3131313131313,643.939393939394,656.5656565656566,669.1919191919192,681.8181818181819,694.4444444444445,707.070707070707,719.6969696969697,732.3232323232323,744.9494949494949,757.5757575757576,770.2020202020202,782.8282828282828,795.4545454545455,808.0808080808081,820.7070707070707,833.3333333333334,845.959595959596,858.5858585858585,871.2121212121212,883.8383838383838,896.4646464646464,909.0909090909091,921.7171717171717,934.3434343434343,946.969696969697,959.5959595959596,972.2222222222222,984.8484848484849,997.4747474747475,1010.10101010101,1022.7272727272727,1035.3535353535353,1047.979797979798,1060.6060606060605,1073.2323232323233,1085.858585858586,1098.4848484848485,1111.111111111111,1123.7373737373737,1136.3636363636363,1148.989898989899,1161.6161616161617,1174.2424242424242,1186.8686868686868,1199.4949494949494,1212.121212121212,1224.7474747474748,1237.3737373737374,1250.0],"mode":"lines"}], {"yaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.0688976377952756,0.9606299212598425],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"x","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"annotations":[],"width":600,"plot_bgcolor":"rgb(255, 255, 255)","showlegend":true,"legend":{"bgcolor":"rgb(255, 255, 255)","font":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"},"bordercolor":"rgb(0, 0, 0)"},"xaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.07874015748031496,0.9671916010498688],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"y","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"paper_bgcolor":"rgb(255, 255, 255)","height":400,"margin":{"r":0,"l":0,"b":0,"t":20}});
+    PLOT = document.getElementById('d5eb1098-47a4-4ad7-96d4-e505ae0443f5');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[6.073833380765314,12.088059748326092,64.87458805146514,112.56491190057437,138.77325606344442,163.1411014014994,182.30790622063472,200.1590327938873,218.05950871275985,234.40747789455168,248.10346856765068,260.4799513126489,272.2831946664091,282.56978161623096,292.5912623215887,300.5768600875651,305.96496568311863,309.7452211721906,311.7369997425798,312.49238829631145,311.90712680203774,309.8521867369781,306.3022270169878,301.26506740703786,293.96471226500773,284.8463846462861,274.4827394407695,262.4732760576867,248.2409247309123,232.22925066196763,217.3715074780264,201.25292668702014,179.864616887093,156.59694765811741,133.0109725638224,107.76429126623646,63.85563212388956,15.684517308101931,7.892734322006845],"type":"scatter","name":"y1","yaxis":"y","x":[6.103636887367582,12.207273774735164,68.6442101176006,125.08114646046603,158.99739279624794,192.91363913202986,221.5893937633685,250.26514839470715,281.41505546801073,312.5649625413143,341.28242160479977,369.9998806682852,400.7880318381988,431.5761830081123,467.24727546563884,502.91836792316536,534.6186252809711,566.3188826387768,594.1171516570259,621.915420675275,652.2229957472122,682.5305708191494,713.0182721300823,743.5059734410152,777.2140258607602,810.9220782805053,842.9944396057798,875.0668009310543,908.4146151601212,941.7624293891881,969.8341857363723,997.9059420835564,1032.1783747832558,1066.450807482955,1098.6679050719204,1130.8850026608857,1182.4992913404803,1234.113580020075,1242.0567900100375]},{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[12.080722324756263,84.3241038982046,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"type":"scatter","name":"y2","yaxis":"y","x":[12.207273774735164,125.08114646046603,192.91363913202986,250.26514839470715,312.5649625413143,369.9998806682852,431.5761830081123,502.91836792316536,566.3188826387768,621.915420675275,682.5305708191494,743.5059734410152,810.9220782805053,875.0668009310543,941.7624293891881,997.9059420835564,1066.450807482955,1130.8850026608857,1234.113580020075]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[250.0,500.0,750.0,1000.0],"visible":true,"ticks":"inside","range":[6.103636887367582,1242.0567900100375],"domain":[0.05100612423447069,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["250","500","750","1000"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[50.0,100.0,150.0,200.0,250.0,300.0],"visible":true,"ticks":"inside","range":[6.073833380765314,312.49238829631145],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["50","100","150","200","250","300"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
-<div class="alert alert-success" role="alert"><div class="markdown"><p>The last two plots used <em>anonymous</em> functions to plot. Again, they can be a bit more confusing to read, but they allow us to compose many operations in one quite easily.</p>
-</div></div>
+<div class="alert alert-success" role="alert">
+<div class="markdown"><p>The last two plots used <em>anonymous</em> functions to plot. Again, they can be a bit more confusing to read, but they allow us to compose multiple operations at once quite easily.</p>
+</div> 
+</div>
 <div class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-th" aria-hidden="true"></span>
-  <span class="text-uppercase">example:</span><div class="markdown"><p>Finding a zero</p>
+<span class="glyphicon glyphicon-th" aria-hidden="true"></span>
+<span class="text-uppercase">example:</span><div class="markdown"><p>Finding a zero</p>
 </div>
 </div>
 <p>Sometimes, the equation $f(x)=0$ is actually presented as $h(x)= g(x)$. This form can be rewritten as $f(x) = h(x) - g(x) = 0$, or if working graphically we can just look for crossing points of the graphs of $g(x)$ and $h(x)$. Here we shall do that.</p><p>We wish to compare two trash collection plans</p><ul>
-<li>Plan 1: You pay 47.49 plus 0.77 per bag.</li>
-<li>Plan 2: You pay 30.00 plus 2.00 per bag.</li>
+<li><p>Plan 1: You pay 47.49 plus 0.77 per bag.</p>
+</li>
+<li><p>Plan 2: You pay 30.00 plus 2.00 per bag.</p>
+</li>
 </ul><p>There are some cases where plan 1 is cheaper and some where plan 2 is. Categorize them.</p><p>Both plans are <em>linear models</em> and may be expressed in <em>slope-intercept</em> form:</p><pre class="sourceCode julia">plan1(x) = 47.49 + 0.77x
 plan2(x) = 30.00 + 2.00x</pre>
 <pre class="output">
 plan2 (generic function with 1 method)</pre>
 
 <p>Assuming this is a realistic problem and an average American household might produce 10-20 bags of trash a month (yes, that seems too much!) we plot in that range:</p><pre class="sourceCode julia">plot([plan1, plan2], 10, 20)</pre>
-    <div id="23cec5ba-bae4-4d7a-954f-15e29f94fe87" style="width:600px;height:400px;"></div>
+    <div id="8a5e7594-49ec-4b46-a62a-355b9df6dc5d" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('23cec5ba-bae4-4d7a-954f-15e29f94fe87');
-    Plotly.plot(PLOT, [{"yaxis":"y","y":[55.190000000000005,55.26777777777778,55.345555555555556,55.42333333333333,55.501111111111115,55.57888888888889,55.656666666666666,55.73444444444445,55.812222222222225,55.89,55.96777777777778,56.04555555555556,56.123333333333335,56.20111111111112,56.278888888888886,56.35666666666667,56.434444444444445,56.51222222222223,56.59,56.66777777777778,56.745555555555555,56.82333333333334,56.90111111111111,56.97888888888889,57.05666666666667,57.13444444444445,57.21222222222222,57.29,57.36777777777778,57.44555555555556,57.52333333333334,57.60111111111111,57.67888888888889,57.75666666666667,57.83444444444444,57.912222222222226,57.99,58.06777777777778,58.14555555555556,58.223333333333336,58.30111111111111,58.378888888888895,58.45666666666667,58.534444444444446,58.61222222222222,58.69,58.76777777777778,58.845555555555556,58.92333333333333,59.001111111111115,59.07888888888889,59.156666666666666,59.23444444444445,59.312222222222225,59.39,59.46777777777778,59.54555555555556,59.623333333333335,59.70111111111111,59.77888888888889,59.85666666666667,59.93444444444445,60.01222222222222,60.09,60.16777777777778,60.245555555555555,60.32333333333334,60.40111111111111,60.47888888888889,60.55666666666667,60.63444444444445,60.71222222222222,60.790000000000006,60.86777777777778,60.94555555555556,61.02333333333333,61.101111111111116,61.17888888888889,61.25666666666667,61.33444444444444,61.412222222222226,61.49,61.56777777777778,61.64555555555556,61.723333333333336,61.80111111111111,61.878888888888895,61.95666666666667,62.034444444444446,62.11222222222222,62.19,62.26777777777778,62.345555555555556,62.42333333333333,62.501111111111115,62.57888888888889,62.656666666666666,62.73444444444445,62.812222222222225,62.89],"showlegend":true,"name":"y1","type":"scatter","xaxis":"x","line":{"width":1,"dash":"solid","color":"rgba(0, 154, 250, 1.000)","shape":"linear"},"x":[10.0,10.1010101010101,10.202020202020202,10.303030303030303,10.404040404040405,10.505050505050505,10.606060606060606,10.707070707070708,10.808080808080808,10.909090909090908,11.01010101010101,11.11111111111111,11.212121212121213,11.313131313131313,11.414141414141413,11.515151515151516,11.616161616161616,11.717171717171718,11.818181818181818,11.919191919191919,12.02020202020202,12.121212121212121,12.222222222222221,12.323232323232324,12.424242424242424,12.525252525252526,12.626262626262626,12.727272727272727,12.828282828282829,12.929292929292929,13.030303030303031,13.131313131313131,13.232323232323232,13.333333333333334,13.434343434343434,13.535353535353535,13.636363636363637,13.737373737373737,13.83838383838384,13.93939393939394,14.04040404040404,14.141414141414142,14.242424242424242,14.343434343434344,14.444444444444445,14.545454545454545,14.646464646464647,14.747474747474747,14.848484848484848,14.94949494949495,15.05050505050505,15.151515151515152,15.252525252525253,15.353535353535353,15.454545454545455,15.555555555555555,15.656565656565656,15.757575757575758,15.858585858585858,15.95959595959596,16.060606060606062,16.161616161616163,16.262626262626263,16.363636363636363,16.464646464646464,16.565656565656564,16.666666666666668,16.767676767676768,16.86868686868687,16.96969696969697,17.07070707070707,17.171717171717173,17.272727272727273,17.373737373737374,17.474747474747474,17.575757575757574,17.67676767676768,17.77777777777778,17.87878787878788,17.97979797979798,18.08080808080808,18.181818181818183,18.282828282828284,18.383838383838384,18.484848484848484,18.585858585858585,18.68686868686869,18.78787878787879,18.88888888888889,18.98989898989899,19.09090909090909,19.19191919191919,19.292929292929294,19.393939393939394,19.494949494949495,19.595959595959595,19.696969696969695,19.7979797979798,19.8989898989899,20.0],"mode":"lines"},{"yaxis":"y","y":[50.0,50.2020202020202,50.4040404040404,50.60606060606061,50.80808080808081,51.01010101010101,51.21212121212121,51.41414141414141,51.61616161616162,51.81818181818181,52.02020202020202,52.22222222222222,52.42424242424242,52.62626262626263,52.82828282828282,53.03030303030303,53.23232323232323,53.43434343434343,53.63636363636364,53.838383838383834,54.04040404040404,54.24242424242424,54.44444444444444,54.64646464646465,54.848484848484844,55.05050505050505,55.25252525252525,55.45454545454545,55.65656565656566,55.858585858585855,56.06060606060606,56.26262626262626,56.464646464646464,56.66666666666667,56.868686868686865,57.07070707070707,57.27272727272727,57.474747474747474,57.67676767676768,57.878787878787875,58.08080808080808,58.282828282828284,58.484848484848484,58.68686868686869,58.888888888888886,59.09090909090909,59.292929292929294,59.494949494949495,59.696969696969695,59.898989898989896,60.101010101010104,60.303030303030305,60.505050505050505,60.707070707070706,60.90909090909091,61.111111111111114,61.31313131313131,61.515151515151516,61.717171717171716,61.91919191919192,62.121212121212125,62.323232323232325,62.525252525252526,62.72727272727273,62.92929292929293,63.13131313131313,63.333333333333336,63.535353535353536,63.73737373737374,63.93939393939394,64.14141414141415,64.34343434343435,64.54545454545455,64.74747474747474,64.94949494949495,65.15151515151516,65.35353535353536,65.55555555555556,65.75757575757575,65.95959595959596,66.16161616161617,66.36363636363637,66.56565656565657,66.76767676767676,66.96969696969697,67.17171717171718,67.37373737373738,67.57575757575758,67.77777777777777,67.97979797979798,68.18181818181819,68.38383838383838,68.58585858585859,68.78787878787878,68.98989898989899,69.1919191919192,69.39393939393939,69.5959595959596,69.79797979797979,70.0],"showlegend":true,"name":"y2","type":"scatter","xaxis":"x","line":{"width":1,"dash":"solid","color":"rgba(227, 111, 71, 1.000)","shape":"linear"},"x":[10.0,10.1010101010101,10.202020202020202,10.303030303030303,10.404040404040405,10.505050505050505,10.606060606060606,10.707070707070708,10.808080808080808,10.909090909090908,11.01010101010101,11.11111111111111,11.212121212121213,11.313131313131313,11.414141414141413,11.515151515151516,11.616161616161616,11.717171717171718,11.818181818181818,11.919191919191919,12.02020202020202,12.121212121212121,12.222222222222221,12.323232323232324,12.424242424242424,12.525252525252526,12.626262626262626,12.727272727272727,12.828282828282829,12.929292929292929,13.030303030303031,13.131313131313131,13.232323232323232,13.333333333333334,13.434343434343434,13.535353535353535,13.636363636363637,13.737373737373737,13.83838383838384,13.93939393939394,14.04040404040404,14.141414141414142,14.242424242424242,14.343434343434344,14.444444444444445,14.545454545454545,14.646464646464647,14.747474747474747,14.848484848484848,14.94949494949495,15.05050505050505,15.151515151515152,15.252525252525253,15.353535353535353,15.454545454545455,15.555555555555555,15.656565656565656,15.757575757575758,15.858585858585858,15.95959595959596,16.060606060606062,16.161616161616163,16.262626262626263,16.363636363636363,16.464646464646464,16.565656565656564,16.666666666666668,16.767676767676768,16.86868686868687,16.96969696969697,17.07070707070707,17.171717171717173,17.272727272727273,17.373737373737374,17.474747474747474,17.575757575757574,17.67676767676768,17.77777777777778,17.87878787878788,17.97979797979798,18.08080808080808,18.181818181818183,18.282828282828284,18.383838383838384,18.484848484848484,18.585858585858585,18.68686868686869,18.78787878787879,18.88888888888889,18.98989898989899,19.09090909090909,19.19191919191919,19.292929292929294,19.393939393939394,19.494949494949495,19.595959595959595,19.696969696969695,19.7979797979798,19.8989898989899,20.0],"mode":"lines"}], {"yaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.0688976377952756,0.9606299212598425],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"x","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"annotations":[],"width":600,"plot_bgcolor":"rgb(255, 255, 255)","showlegend":true,"legend":{"bgcolor":"rgb(255, 255, 255)","font":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"},"bordercolor":"rgb(0, 0, 0)"},"xaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.07874015748031496,0.9671916010498688],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"y","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"paper_bgcolor":"rgb(255, 255, 255)","height":400,"margin":{"r":0,"l":0,"b":0,"t":20}});
+    PLOT = document.getElementById('8a5e7594-49ec-4b46-a62a-355b9df6dc5d');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[55.26519680645237,55.96049986219647,56.378348017053305,56.7316333141114,57.1154001692545,57.46919926491664,57.848509287329975,58.2879771464067,58.678524317054865,59.0209989913597,59.394388316245966,59.769996796396654,60.18528000220792,60.5804114937353,60.9912565650374,61.33710060323471,61.75933697409501,62.15625161639106,62.792139652923666],"type":"scatter","name":"y1","yaxis":"y","x":[10.097658190197881,11.000649171683728,11.543309113056239,12.002121187157657,12.500519700330514,12.959999045346281,13.4526094640649,14.023346943385324,14.530551061110215,14.9753233654022,15.460244566553195,15.948047787528122,16.487376626244043,17.000534407448434,17.534099435113504,17.98324753666845,18.531606459863642,19.047080021287083,19.8729086401606]},{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[50.19531638039577,52.00129834336745,53.08661822611248,54.00424237431531,55.00103940066103,55.91999809069256,56.9052189281298,58.04669388677065,59.06110212222043,59.9506467308044,60.920489133106386,61.89609557505624,62.974753252488085,64.00106881489687,65.06819887022701,65.9664950733369,67.06321291972728,68.09416004257417,69.7458172803212],"type":"scatter","name":"y2","yaxis":"y","x":[10.097658190197881,11.000649171683728,11.543309113056239,12.002121187157657,12.500519700330514,12.959999045346281,13.4526094640649,14.023346943385324,14.530551061110215,14.9753233654022,15.460244566553195,15.948047787528122,16.487376626244043,17.000534407448434,17.534099435113504,17.98324753666845,18.531606459863642,19.047080021287083,19.8729086401606]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[12.0,14.0,16.0,18.0],"visible":true,"ticks":"inside","range":[10.097658190197881,19.8729086401606],"domain":[0.0658209390492855,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["12","14","16","18"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[52.5,55.0,57.5,60.0,62.5,65.0,67.5],"visible":true,"ticks":"inside","range":[50.19531638039577,69.7458172803212],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["52.5","55.0","57.5","60.0","62.5","65.0","67.5"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
-<p>We can see the intersection point is around 14 and that if a family generates between 0-14 bags of trash per month that plan 2 would be cheaper, otherwise they should opt for plan 1.</p><h3>Practice</h3><h4>Question</h4><p>Graphically estimate the one zero of $f(x) = e^x - x^3$ over the interval $[0,4]$.</p><form name='WeaveQuestion' data-id='clXLkyBN' data-controltype='numeric'>
+<p>We can see the intersection point is around 14 and that if a family generates between 0-14 bags of trash per month that plan 2 would be cheaper, otherwise they should opt for plan 1.</p><h3>Practice</h3><h4>Question</h4><p>Graphically estimate the one zero of $f(x) = e^x - x^3$ over the interval $[0,4]$.</p><form name='WeaveQuestion' data-id='zpjwTwfC' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="clXLkyBN" type="number" class="form-control">
+<input id="zpjwTwfC" type="number" class="form-control">
 
 </div>
   
-<div id='clXLkyBN_message'></div>
+<div id='zpjwTwfC_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#clXLkyBN').on('change', function() {
-  correct = Math.abs(this.value - 1.8571838602078354) <= 0.1;
+$('#zpjwTwfC').on('change', function() {
+  correct = Math.abs(this.value - 1.8571838602078352) <= 0.1;
 
   if(correct) {
-     $('#clXLkyBN_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#zpjwTwfC_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#clXLkyBN_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#zpjwTwfC_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Solving equations of the type $f(x)=g(x)$ for $x$ can also be done graphically. One method is to plot <em>both</em> functions and look for crossing points. Use this approach to graphically estimate all solutions to $\cos(x) = x^2$ over the interval $(-\pi/2, \pi/2)$. What are they?</p><form name="WeaveQuestion" data-id="Yqoauznq" data-controltype="radio">
+<h4>Question</h4><p>Solving equations of the type $f(x)=g(x)$ for $x$ can also be done graphically. One method is to plot <em>both</em> functions and look for crossing points. Use this approach to graphically estimate all solutions to $\cos(x) = x^2$ over the interval $(-\pi/2, \pi/2)$. What are they?</p><form name="WeaveQuestion" data-id="zArgONAF" data-controltype="radio">
 <div class="form-group ">
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_Yqoauznq" value="1"><div class="markdown"><p>-1.57, 1.57</p>
+      <input type="radio" name="radio_zArgONAF" value="1"><div class="markdown"><p>-1.57, 1.57</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_Yqoauznq" value="2"><div class="markdown"><p>0.0</p>
+      <input type="radio" name="radio_zArgONAF" value="2"><div class="markdown"><p>0.0</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_Yqoauznq" value="3"><div class="markdown"><p>-0.82, 0.82</p>
+      <input type="radio" name="radio_zArgONAF" value="3"><div class="markdown"><p>-0.82, 0.82</p>
 </div>
     </label>
     </div>
     
 
 
-<div id="Yqoauznq_message"></div>
+<div id="zArgONAF_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_Yqoauznq']").on("change", function() {
+$("input:radio[name='radio_zArgONAF']").on("change", function() {
   correct = this.value == 3;
 
   if(correct) {
-     $("#Yqoauznq_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#zArgONAF_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#Yqoauznq_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#zArgONAF_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question</h4><p>In an analysis of rainbows, <a href="http://en.wikipedia.org/wiki/Airy_function">Airy</a> developed a special function implemented as <code>airy</code> in <code>julia</code>. The zeros are all negative. The first one is between $-3$ and $-1$. Find it graphically.</p><form name='WeaveQuestion' data-id='HoqeJYuz' data-controltype='numeric'>
+<h4>Question</h4><p>In an analysis of rainbows, <a href="http://en.wikipedia.org/wiki/Airy_function">Airy</a> developed a special function implemented as <code>airyai</code> in <code>Julia</code>'s <code>SpecialFunctions</code> package, which is loaded with the <code>MTH229</code> package. The zeros of this function are all negative. The first one is between $-3$ and $-1$. Find it graphically.</p><form name='WeaveQuestion' data-id='fTpJ6FaJ' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="HoqeJYuz" type="number" class="form-control">
+<input id="fTpJ6FaJ" type="number" class="form-control">
 
 </div>
   
-<div id='HoqeJYuz_message'></div>
+<div id='fTpJ6FaJ_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#HoqeJYuz').on('change', function() {
+$('#fTpJ6FaJ').on('change', function() {
   correct = Math.abs(this.value - -2.338107410459764) <= 0.1;
 
   if(correct) {
-     $('#HoqeJYuz_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#fTpJ6FaJ_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#HoqeJYuz_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#fTpJ6FaJ_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>The polynomial $f(x) = x^5 - 6x^3 - 6x^2 -7x - 6$ has three real roots. Which of the following values is one of them? Try to solve this graphically.</p><form name="WeaveQuestion" data-id="5hpm4qAa" data-controltype="radio">
+<h4>Question</h4><p>The polynomial $f(x) = x^5 - 6x^3 - 6x^2 -7x - 6$ has three real roots. Which of the following values is one of them? Try to solve this graphically.</p><form name="WeaveQuestion" data-id="jnnN6FFG" data-controltype="radio">
 <div class="form-group ">
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_5hpm4qAa" value="1"><div class="markdown"><p>-4.575</p>
+      <input type="radio" name="radio_jnnN6FFG" value="1"><div class="markdown"><p>-1.0</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_5hpm4qAa" value="2"><div class="markdown"><p>-3.068</p>
-</div>
-    </label>
-    </div>
-    
-    <div   class="radio"> 
-    <label>
-      <input type="radio" name="radio_5hpm4qAa" value="3"><div class="markdown"><p>-2.0</p>
+      <input type="radio" name="radio_jnnN6FFG" value="2"><div class="markdown"><p>[1.032, -3.359]</p>
 </div>
     </label>
     </div>
     
 
 
-<div id="5hpm4qAa_message"></div>
+<div id="jnnN6FFG_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_5hpm4qAa']").on("change", function() {
-  correct = this.value == 3;
+$("input:radio[name='radio_jnnN6FFG']").on("change", function() {
+  correct = this.value == 1;
 
   if(correct) {
-     $("#5hpm4qAa_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#jnnN6FFG_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#5hpm4qAa_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#jnnN6FFG_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question</h4><p>Let $y(x)$ be defined as above to model the flight of an arrow. If $\gamma=1/2$ when will the arrow strike the ground after launch?</p><form name='WeaveQuestion' data-id='9KWAfC0g' data-controltype='numeric'>
+<h4>Question</h4><p>Let $y(x)$ be defined as above to model the flight of an arrow. If $\gamma=1/2$ when will the arrow strike the ground after launch?</p><form name='WeaveQuestion' data-id='m0byWHsd' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="9KWAfC0g" type="number" class="form-control">
+<input id="m0byWHsd" type="number" class="form-control">
 
 </div>
   
-<div id='9KWAfC0g_message'></div>
+<div id='m0byWHsd_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#9KWAfC0g').on('change', function() {
-  correct = Math.abs(this.value - 92.04101415218251) <= 2;
+$('#m0byWHsd').on('change', function() {
+  correct = Math.abs(this.value - 92.04101415218264) <= 2;
 
   if(correct) {
-     $('#9KWAfC0g_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#m0byWHsd_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#9KWAfC0g_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#m0byWHsd_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -596,62 +605,64 @@ $('#9KWAfC0g').on('change', function() {
 <pre class="output">
 hill (generic function with 1 method)</pre>
 
-<p>By solving <code>y&#40;x&#41; &#61; hill&#40;x&#41;</code> solve for how far the arrow will fly before hitting the hill.</p><form name='WeaveQuestion' data-id='dfdDQMhk' data-controltype='numeric'>
+<p>By solving <code>y&#40;x&#41; &#61; hill&#40;x&#41;</code> solve for how far the arrow will fly before hitting the hill.</p><form name='WeaveQuestion' data-id='pcYssnaD' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="dfdDQMhk" type="number" class="form-control">
+<input id="pcYssnaD" type="number" class="form-control">
 
 </div>
   
-<div id='dfdDQMhk_message'></div>
+<div id='pcYssnaD_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#dfdDQMhk').on('change', function() {
-  correct = Math.abs(this.value - 0.0) <= 2;
+$('#pcYssnaD').on('change', function() {
+  correct = Math.abs(this.value - 117.12786286825506) <= 2;
 
   if(correct) {
-     $('#dfdDQMhk_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#pcYssnaD_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#dfdDQMhk_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#pcYssnaD_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h2>Bisection algorithm</h2><p>The last example had us graphically "zoom" in on a zero, and led us to an estimate to $1$ or $2$ decimal points. Trying to get more accuracy than that graphically is at best tedious.  Here we discuss a method to get as much accuracy as is numerically possible based on the <a href="http://en.wikipedia.org/wiki/Intermediate_value_theorem">intermediate value theorem</a>:</p><p><strong>The intermediate value theorem</strong>: If $f(x)$ is a continuous function on $[a,b]$ then at some point in the interval $f(x)$ takes on any value between $f(a)$ and $f(b)$. In particular if $f(x)$ is continuous with $f(a)$ and $f(b)$ having <em>different</em> signs then there must be a point $c$ in $[a,b]$ where $f(c) = 0$.</p><p>The bisection algorithm is a simple, <em>iterative</em> procedure for finding such a value $c$ when we have a continuous function and a bracketing interval.  (When $f(a)$ and $f(b)$ have different signs, we say $a$ and $b$ <em>bracket</em> a root.) </p><div class="alert alert-success" role="alert"><div class="markdown"><p>The bisection method does not work when the function does not <strong>cross</strong> the $x$ axis at the root. For example, the zero at $0$ of $f(x) = x^2 e^x$ would not be found with this method.</p>
-</div></div>
+<h2>Bisection algorithm</h2><p>The last example had us graphically "zoom" in on a zero, and led us to an estimate to $1$ or $2$ decimal points. Trying to get more accuracy than that graphically is at best tedious.  Here we discuss a method to get as much accuracy as is numerically possible based on the <a href="http://en.wikipedia.org/wiki/Intermediate_value_theorem">intermediate value theorem</a>:</p><p><strong>The intermediate value theorem</strong>: If $f(x)$ is a continuous function on $[a,b]$ then at some point in the interval $f(x)$ takes on any value between $f(a)$ and $f(b)$.</p><p>In particular if $f(x)$ is continuous with $f(a)$ and $f(b)$ having <em>different</em> signs then there must be a point $c$ in $[a,b]$ where $f(c) = 0$. (When $f(a)$ and $f(b)$ have different signs, we say $a$ and $b$ <em>bracket</em> a root.)  This observation is due to Bolzano.</p><p>The bisection algorithm utilizes Bolzano's observation. It is a simple <em>iterative</em> procedure for finding such a value $c$ when we have a continuous function and a bracketing interval.  </p><div class="alert alert-success" role="alert">
+<div class="markdown"><p>The bisection method does not work when the function does not <strong>cross</strong> the $x$ axis at the root. For example, the zero at $0$ of $f(x) = x^2 e^x$ would not be found with this method.</p>
+</div> 
+</div>
 <p>Mathematically the basic idea is simple.</p><p>Starting with $[a,b]$, the midpoint $M = (a + b)/2$, is tested for its function value. If $f(M) = 0$, great, we are done. If it has opposite sign of $f(a)$, then a root must be in the interval $[a,M]$, so the problem is reduced a smaller interval. Otherwise, it has opposite sign of $f(b)$ and the problem is reduced to $[M,b]$. Either way, the algorithm is repeated for the smaller interval where a root is known. As each step halves the interval length, it must eventually converge to an answer.</p><p>Graphically, we could do this. For example, Let's consider $f(x) = x^2 - 2$ with the bracketing interval $[1,2]$. We first plot:</p><pre class="sourceCode julia">f(x) = x^2 - 2
 a,b = 1, 2
 plot(f, a, b)</pre>
-    <div id="4287e128-ed23-4857-b789-4da25fef0463" style="width:600px;height:400px;"></div>
+    <div id="f7443052-a99a-4fa8-99a7-87024f099e4e" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('4287e128-ed23-4857-b789-4da25fef0463');
-    Plotly.plot(PLOT, [{"yaxis":"y","y":[-1.0,-0.9796959493929189,-0.959187837975717,-0.938475665748393,-0.9175594327109478,-0.896439138863381,-0.8751147842056934,-0.853586368737884,-0.831853892459953,-0.809917355371901,-0.7877767574737271,-0.765432098765432,-0.7428833792470158,-0.7201305989184779,-0.6971737577798183,-0.6740128558310374,-0.6506478930721356,-0.627078869503112,-0.6033057851239667,-0.5793286399347009,-0.5551474339353129,-0.5307621671258034,-0.5061728395061726,-0.4813794510764209,-0.4563820018365472,-0.43118049178655227,-0.4057749209264363,-0.3801652892561984,-0.35435159677583905,-0.32833384348535843,-0.3021120293847568,-0.2756861544740332,-0.24905621875318817,-0.22222222222222232,-0.19518416488113455,-0.1679420467299253,-0.14049586776859524,-0.11284562799714326,-0.0849913274155698,-0.056932966023874876,-0.028670543822059136,-0.0002040608101214758,0.028466483011937882,0.05734108764411783,0.08641975308641969,0.11570247933884303,0.14518926640138785,0.1748801142740537,0.20477502295684102,0.23487399244975027,0.2651770227527801,0.29568411386593185,0.3263952657892055,0.35731047852259934,0.3884297520661155,0.4197530864197532,0.4512804815835123,0.483011937557392,0.5149474543413937,0.5470870319355168,0.5794306703397609,0.611978369554127,0.6447301295786145,0.6776859504132235,0.7108458320579532,0.7442097745128047,0.7777777777777781,0.8115498418528717,0.8455259667380881,0.8797061524334255,0.9140903989388836,0.9486787062544635,0.9834710743801653,1.0184675033159887,1.0536679930619322,1.089072543617998,1.1246811549841853,1.1604938271604937,1.1965105601469235,1.2327313539434752,1.2691562085501484,1.3057851239669418,1.342618100193858,1.3796551372308952,1.416896235078053,1.454341393735333,1.4919906132027347,1.5298438934802574,1.567901234567901,1.6061626364656667,1.6446280991735542,1.683297622691562,1.722171207019692,1.7612488521579435,1.8005305581063151,1.8400163248648096,1.879706152433425,1.9196000408121625,1.95969799000102,2.0],"showlegend":true,"name":"y1","type":"scatter","xaxis":"x","line":{"width":1,"dash":"solid","color":"rgba(0, 154, 250, 1.000)","shape":"linear"},"x":[1.0,1.0101010101010102,1.02020202020202,1.0303030303030303,1.0404040404040404,1.0505050505050506,1.0606060606060606,1.0707070707070707,1.0808080808080809,1.0909090909090908,1.101010101010101,1.1111111111111112,1.121212121212121,1.1313131313131313,1.1414141414141414,1.1515151515151516,1.1616161616161615,1.1717171717171717,1.1818181818181819,1.1919191919191918,1.202020202020202,1.2121212121212122,1.2222222222222223,1.2323232323232323,1.2424242424242424,1.2525252525252526,1.2626262626262625,1.2727272727272727,1.2828282828282829,1.292929292929293,1.303030303030303,1.3131313131313131,1.3232323232323233,1.3333333333333333,1.3434343434343434,1.3535353535353536,1.3636363636363635,1.3737373737373737,1.3838383838383839,1.393939393939394,1.404040404040404,1.4141414141414141,1.4242424242424243,1.4343434343434343,1.4444444444444444,1.4545454545454546,1.4646464646464648,1.4747474747474747,1.4848484848484849,1.494949494949495,1.505050505050505,1.5151515151515151,1.5252525252525253,1.5353535353535352,1.5454545454545454,1.5555555555555556,1.5656565656565657,1.5757575757575757,1.5858585858585859,1.595959595959596,1.606060606060606,1.6161616161616161,1.6262626262626263,1.6363636363636365,1.6464646464646464,1.6565656565656566,1.6666666666666667,1.6767676767676767,1.6868686868686869,1.696969696969697,1.707070707070707,1.7171717171717171,1.7272727272727273,1.7373737373737375,1.7474747474747474,1.7575757575757576,1.7676767676767677,1.7777777777777777,1.7878787878787878,1.797979797979798,1.8080808080808082,1.8181818181818181,1.8282828282828283,1.8383838383838385,1.8484848484848484,1.8585858585858586,1.8686868686868687,1.878787878787879,1.8888888888888888,1.898989898989899,1.9090909090909092,1.9191919191919191,1.9292929292929293,1.9393939393939394,1.9494949494949494,1.9595959595959596,1.9696969696969697,1.97979797979798,1.9898989898989898,2.0],"mode":"lines"}], {"yaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.0688976377952756,0.9606299212598425],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"x","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"annotations":[],"width":600,"plot_bgcolor":"rgb(255, 255, 255)","showlegend":true,"legend":{"bgcolor":"rgb(255, 255, 255)","font":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"},"bordercolor":"rgb(0, 0, 0)"},"xaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.07874015748031496,0.9671916010498688],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"y","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"paper_bgcolor":"rgb(255, 255, 255)","height":400,"margin":{"r":0,"l":0,"b":0,"t":20}});
+    PLOT = document.getElementById('f7443052-a99a-4fa8-99a7-87024f099e4e');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-0.9803729907392966,-0.7898571780153407,-0.6675201472043284,-0.5594908700878127,-0.43737007221648705,-0.3203842474462346,-0.19027298607351484,-0.03345740505445538,0.11136914139531218,0.24260309898361054,0.3901916205763758,0.543402282332806,0.7183358801561837,0.8901817013883804,1.0744464300044778,1.2339719196509193,1.434204379832598,1.6279125733731359,1.9493249782016986],"type":"scatter","name":"y1","yaxis":"y","x":[1.009765819019788,1.100064917168373,1.1543309113056237,1.2002121187157657,1.2500519700330515,1.2959999045346282,1.34526094640649,1.4023346943385322,1.4530551061110215,1.49753233654022,1.5460244566553194,1.5948047787528121,1.6487376626244041,1.7000534407448433,1.7534099435113506,1.7983247536668452,1.853160645986364,1.9047080021287084,1.98729086401606]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[1.2000000000000002,1.4000000000000001,1.6,1.8],"visible":true,"ticks":"inside","range":[1.009765819019788,1.98729086401606],"domain":[0.0658209390492855,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["1.2","1.4","1.6","1.8"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-0.5,0.0,0.5,1.0,1.5],"visible":true,"ticks":"inside","range":[-0.9803729907392966,1.9493249782016986],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-0.5","0.0","0.5","1.0","1.5"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
 <p>We can see that $c = (a + b)/2 = 3/2$ will have $f(c) > 0$, so the new bracket is $[a,c]$:</p><pre class="sourceCode julia">a, b = a, (a + b)/2
 plot(f, a, b)</pre>
-    <div id="1b16bcd6-ded5-40cd-a287-33721e41135c" style="width:600px;height:400px;"></div>
+    <div id="6e06b912-ee4b-4e94-bbbc-b72fee158a0e" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('1b16bcd6-ded5-40cd-a287-33721e41135c');
-    Plotly.plot(PLOT, [{"yaxis":"y","y":[-1.0,-0.9898734822977249,-0.9796959493929189,-0.9694674012855831,-0.959187837975717,-0.94885725946332,-0.938475665748393,-0.9280430568309359,-0.9175594327109478,-0.9070247933884299,-0.896439138863381,-0.8858024691358024,-0.8751147842056934,-0.8643760840730537,-0.853586368737884,-0.8427456382001839,-0.831853892459953,-0.8209111315171922,-0.809917355371901,-0.798872564024079,-0.7877767574737271,-0.776629935720845,-0.765432098765432,-0.7541832466074891,-0.7428833792470158,-0.7315324966840118,-0.7201305989184779,-0.7086776859504129,-0.6971737577798183,-0.6856188144066933,-0.6740128558310374,-0.6623558820528517,-0.6506478930721356,-0.6388888888888886,-0.627078869503112,-0.6152178349148048,-0.6033057851239667,-0.591342720130599,-0.5793286399347009,-0.5672635445362717,-0.5551474339353129,-0.5429803081318236,-0.5307621671258034,-0.5184930109172534,-0.5061728395061726,-0.49380165289256195,-0.4813794510764209,-0.468906234057749,-0.4563820018365472,-0.44380675441281525,-0.43118049178655227,-0.41850321395775936,-0.4057749209264363,-0.3929956126925822,-0.3801652892561984,-0.36728395061728425,-0.35435159677583905,-0.34136822773186415,-0.32833384348535843,-0.3152484440363228,-0.3021120293847568,-0.28892459953065996,-0.2756861544740332,-0.2623966942148761,-0.24905621875318817,-0.23566472808897054,-0.22222222222222232,-0.20872870115294329,-0.19518416488113455,-0.18158861340679544,-0.1679420467299253,-0.15424446485052545,-0.14049586776859524,-0.1266962554841342,-0.11284562799714326,-0.09894398530762127,-0.0849913274155698,-0.07098765432098775,-0.056932966023874876,-0.04282726252423208,-0.028670543822059136,-0.014462809917355157,-0.0002040608101214758,0.014105703499642797,0.028466483011937882,0.04287827772676245,0.05734108764411783,0.07185491276400402,0.08641975308641969,0.10103560861136573,0.11570247933884303,0.1304203652688498,0.14518926640138785,0.16000918273645537,0.1748801142740537,0.1898020610141824,0.20477502295684102,0.21979900010203002,0.23487399244975027,0.25],"showlegend":true,"name":"y1","type":"scatter","xaxis":"x","line":{"width":1,"dash":"solid","color":"rgba(0, 154, 250, 1.000)","shape":"linear"},"x":[1.0,1.005050505050505,1.0101010101010102,1.0151515151515151,1.02020202020202,1.0252525252525253,1.0303030303030303,1.0353535353535352,1.0404040404040404,1.0454545454545454,1.0505050505050506,1.0555555555555556,1.0606060606060606,1.0656565656565657,1.0707070707070707,1.0757575757575757,1.0808080808080809,1.0858585858585859,1.0909090909090908,1.095959595959596,1.101010101010101,1.106060606060606,1.1111111111111112,1.1161616161616161,1.121212121212121,1.1262626262626263,1.1313131313131313,1.1363636363636365,1.1414141414141414,1.1464646464646464,1.1515151515151516,1.1565656565656566,1.1616161616161615,1.1666666666666667,1.1717171717171717,1.1767676767676767,1.1818181818181819,1.1868686868686869,1.1919191919191918,1.196969696969697,1.202020202020202,1.207070707070707,1.2121212121212122,1.2171717171717171,1.2222222222222223,1.2272727272727273,1.2323232323232323,1.2373737373737375,1.2424242424242424,1.2474747474747474,1.2525252525252526,1.2575757575757576,1.2626262626262625,1.2676767676767677,1.2727272727272727,1.2777777777777777,1.2828282828282829,1.2878787878787878,1.292929292929293,1.297979797979798,1.303030303030303,1.3080808080808082,1.3131313131313131,1.3181818181818181,1.3232323232323233,1.3282828282828283,1.3333333333333333,1.3383838383838385,1.3434343434343434,1.3484848484848484,1.3535353535353536,1.3585858585858586,1.3636363636363635,1.3686868686868687,1.3737373737373737,1.378787878787879,1.3838383838383839,1.3888888888888888,1.393939393939394,1.398989898989899,1.404040404040404,1.4090909090909092,1.4141414141414141,1.4191919191919191,1.4242424242424243,1.4292929292929293,1.4343434343434343,1.4393939393939394,1.4444444444444444,1.4494949494949494,1.4545454545454546,1.4595959595959596,1.4646464646464648,1.4696969696969697,1.4747474747474747,1.47979797979798,1.4848484848484849,1.4898989898989898,1.494949494949495,1.5],"mode":"lines"}], {"yaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.0688976377952756,0.9606299212598425],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"x","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"annotations":[],"width":600,"plot_bgcolor":"rgb(255, 255, 255)","showlegend":true,"legend":{"bgcolor":"rgb(255, 255, 255)","font":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"},"bordercolor":"rgb(0, 0, 0)"},"xaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.07874015748031496,0.9671916010498688],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"y","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"paper_bgcolor":"rgb(255, 255, 255)","height":400,"margin":{"r":0,"l":0,"b":0,"t":20}});
+    PLOT = document.getElementById('6e06b912-ee4b-4e94-bbbc-b72fee158a0e');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-0.9902103381749299,-0.8974318359196487,-0.8397145811482702,-0.7897666581640703,-0.7343165330375963,-0.682096109594245,-0.624937773315134,-0.5571970040943477,-0.49563016159566087,-0.44058305698398703,-0.37943986652824635,-0.3167470400403922,-0.2460471986487518,-0.17742785428048258,-0.10468342074320569,-0.0423446432538479,0.03513141795133201,0.1093321444076385,0.23097667655845422],"type":"scatter","name":"y1","yaxis":"y","x":[1.0048829095098941,1.0500324585841865,1.0771654556528119,1.1001060593578829,1.1250259850165256,1.1479999522673139,1.1726304732032449,1.201167347169266,1.2265275530555109,1.24876616827011,1.2730122283276597,1.2974023893764062,1.3243688313122022,1.3500267203724219,1.3767049717556752,1.3991623768334225,1.4265803229931822,1.4523540010643543,1.49364543200803]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[1.1,1.2000000000000002,1.3,1.4000000000000001],"visible":true,"ticks":"inside","range":[1.0048829095098941,1.49364543200803],"domain":[0.08063575386410031,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["1.1","1.2","1.3","1.4"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-0.75,-0.5,-0.25,0.0],"visible":true,"ticks":"inside","range":[-0.9902103381749299,0.23097667655845422],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-0.75","-0.50","-0.25","0.00"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
 <p>Now the midpoint is negative, so we modify <code>a</code>:</p><pre class="sourceCode julia">a, b = (a + b)/2, b
 plot(f, a, b)</pre>
-    <div id="ea37876f-1464-450f-8b56-bf0c897edae9" style="width:600px;height:400px;"></div>
+    <div id="d368bfa8-f6ca-4ef8-b5b6-d097c1a75c1e" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('ea37876f-1464-450f-8b56-bf0c897edae9');
-    Plotly.plot(PLOT, [{"yaxis":"y","y":[-0.4375,-0.43118049178655227,-0.4248482297724725,-0.41850321395775936,-0.41214544434241396,-0.4057749209264363,-0.3993916437098255,-0.3929956126925822,-0.3865868278747069,-0.3801652892561984,-0.37373099683705724,-0.36728395061728425,-0.3608241505968779,-0.35435159677583905,-0.3478662891541682,-0.34136822773186415,-0.33485741250892764,-0.32833384348535843,-0.3217975206611572,-0.3152484440363228,-0.3086866136108557,-0.3021120293847568,-0.2955246913580247,-0.28892459953065996,-0.28231175390266317,-0.2756861544740332,-0.2690478012447708,-0.2623966942148761,-0.2557328333843485,-0.24905621875318817,-0.24236685032139604,-0.23566472808897054,-0.22894985205591256,-0.22222222222222232,-0.21548183858789915,-0.20872870115294329,-0.2019628099173556,-0.19518416488113455,-0.188392766044281,-0.18158861340679544,-0.17477170696867672,-0.1679420467299253,-0.16109963269054206,-0.15424446485052545,-0.14737654320987637,-0.14049586776859524,-0.13360243852668097,-0.1266962554841342,-0.1197773186409552,-0.11284562799714326,-0.10590118355269862,-0.09894398530762127,-0.09197403326191211,-0.0849913274155698,-0.0779958677685948,-0.07098765432098775,-0.06396668707274755,-0.056932966023874876,-0.04988649117437016,-0.04282726252423208,-0.03575528007346174,-0.028670543822059136,-0.021573053770023387,-0.014462809917355157,-0.00733981226405489,-0.0002040608101214758,0.006944444444444642,0.014105703499642797,0.021279716355473877,0.028466483011937882,0.03566600346903348,0.04287827772676245,0.05010330578512434,0.05734108764411783,0.06459162330374468,0.07185491276400402,0.07913095602489495,0.08641975308641969,0.09372130394857692,0.10103560861136573,0.10836266707478837,0.11570247933884303,0.12305504540352974,0.1304203652688498,0.1377984389348028,0.14518926640138785,0.15259284766860493,0.16000918273645537,0.16743827160493874,0.1748801142740537,0.1823347107438016,0.1898020610141824,0.19728216508519525,0.20477502295684102,0.21228063462911972,0.21979900010203002,0.22733011937557412,0.23487399244975027,0.24243061932455845,0.25],"showlegend":true,"name":"y1","type":"scatter","xaxis":"x","line":{"width":1,"dash":"solid","color":"rgba(0, 154, 250, 1.000)","shape":"linear"},"x":[1.25,1.2525252525252526,1.255050505050505,1.2575757575757576,1.2601010101010102,1.2626262626262625,1.2651515151515151,1.2676767676767677,1.27020202020202,1.2727272727272727,1.2752525252525253,1.2777777777777777,1.2803030303030303,1.2828282828282829,1.2853535353535352,1.2878787878787878,1.2904040404040404,1.292929292929293,1.2954545454545454,1.297979797979798,1.3005050505050506,1.303030303030303,1.3055555555555556,1.3080808080808082,1.3106060606060606,1.3131313131313131,1.3156565656565657,1.3181818181818181,1.3207070707070707,1.3232323232323233,1.3257575757575757,1.3282828282828283,1.3308080808080809,1.3333333333333333,1.3358585858585859,1.3383838383838385,1.3409090909090908,1.3434343434343434,1.345959595959596,1.3484848484848484,1.351010101010101,1.3535353535353536,1.356060606060606,1.3585858585858586,1.3611111111111112,1.3636363636363635,1.3661616161616161,1.3686868686868687,1.371212121212121,1.3737373737373737,1.3762626262626263,1.378787878787879,1.3813131313131313,1.3838383838383839,1.3863636363636365,1.3888888888888888,1.3914141414141414,1.393939393939394,1.3964646464646464,1.398989898989899,1.4015151515151516,1.404040404040404,1.4065656565656566,1.4090909090909092,1.4116161616161615,1.4141414141414141,1.4166666666666667,1.4191919191919191,1.4217171717171717,1.4242424242424243,1.4267676767676767,1.4292929292929293,1.4318181818181819,1.4343434343434343,1.4368686868686869,1.4393939393939394,1.4419191919191918,1.4444444444444444,1.446969696969697,1.4494949494949494,1.452020202020202,1.4545454545454546,1.457070707070707,1.4595959595959596,1.4621212121212122,1.4646464646464648,1.4671717171717171,1.4696969696969697,1.4722222222222223,1.4747474747474747,1.4772727272727273,1.47979797979798,1.4823232323232323,1.4848484848484849,1.4873737373737375,1.4898989898989898,1.4924242424242424,1.494949494949495,1.4974747474747474,1.5],"mode":"lines"}], {"yaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.0688976377952756,0.9606299212598425],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"x","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"annotations":[],"width":600,"plot_bgcolor":"rgb(255, 255, 255)","showlegend":true,"legend":{"bgcolor":"rgb(255, 255, 255)","font":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"},"bordercolor":"rgb(0, 0, 0)"},"xaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.07874015748031496,0.9671916010498688],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"y","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"paper_bgcolor":"rgb(255, 255, 255)","height":400,"margin":{"r":0,"l":0,"b":0,"t":20}});
+    PLOT = document.getElementById('d368bfa8-f6ca-4ef8-b5b6-d097c1a75c1e');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-0.43139040241131155,-0.37433361504177287,-0.339554553547458,-0.3098621200226055,-0.2773096444970049,-0.2470240631980758,-0.2142615884263499,-0.17592374064663674,-0.1415118756072824,-0.11107113804341417,-0.07760079538631715,-0.04363496797779409,-0.005735176178035983,0.030663076709195547,0.06885787363095508,0.10128562181160472,0.14121809673271946,0.17909853690017563,0.2404782431456356],"type":"scatter","name":"y1","yaxis":"y","x":[1.2524414547549472,1.275016229292093,1.2885827278264061,1.3000530296789414,1.3125129925082628,1.323999976133657,1.3363152366016224,1.3505836735846333,1.3632637765277553,1.374383084135055,1.3865061141638297,1.3987011946882029,1.4121844156561012,1.425013360186211,1.4383524858778376,1.4495811884167111,1.463290161496591,1.4761770005321773,1.4968227160040148]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[1.3,1.35,1.4000000000000001,1.4500000000000002],"visible":true,"ticks":"inside","range":[1.2524414547549472,1.4968227160040148],"domain":[0.0658209390492855,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["1.30","1.35","1.40","1.45"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-0.4,-0.30000000000000004,-0.2,-0.1,0.0,0.1,0.2],"visible":true,"ticks":"inside","range":[-0.43139040241131155,0.2404782431456356],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-0.4","-0.3","-0.2","-0.1","0.0","0.1","0.2"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
 <p>And again, this has a midpoint in the negative territory so again we modify <code>a</code>:</p><pre class="sourceCode julia">a, b = (a + b)/2, b
 plot(f, a, b)</pre>
-    <div id="6ba6cf58-4847-478f-b142-706a05997bdd" style="width:600px;height:400px;"></div>
+    <div id="301cbaa6-1470-4224-8894-b7da8566ddf8" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('6ba6cf58-4847-478f-b142-706a05997bdd');
-    Plotly.plot(PLOT, [{"yaxis":"y","y":[-0.109375,-0.10590118355269862,-0.10242417865523912,-0.09894398530762127,-0.0954606035098462,-0.09197403326191211,-0.08848427456382013,-0.0849913274155698,-0.08149519181716136,-0.0779958677685948,-0.07449335526987055,-0.07098765432098775,-0.06747876492194682,-0.06396668707274755,-0.060451420773390385,-0.056932966023874876,-0.05341132282420191,-0.04988649117437016,-0.04635847107438029,-0.04282726252423208,-0.03929286552392597,-0.03575528007346174,-0.03221450617283983,-0.028670543822059136,-0.02512339302112032,-0.021573053770023387,-0.018019526068768332,-0.014462809917355157,-0.010902905315784306,-0.00733981226405489,-0.003773530762167132,-0.0002040608101214758,0.003368597592082523,0.006944444444444642,0.010523479746964881,0.014105703499642797,0.017691115702479276,0.021279716355473877,0.024871505458626597,0.028466483011937882,0.03206464901540684,0.03566600346903348,0.039270546372819126,0.04287827772676245,0.046489197530864335,0.05010330578512434,0.053720602489542024,0.05734108764411783,0.060964761248852195,0.06459162330374468,0.06822167380879529,0.07185491276400402,0.07549134016937087,0.07913095602489495,0.08277376033057848,0.08641975308641969,0.09006893429241902,0.09372130394857692,0.09737686205489249,0.10103560861136573,0.10469754361799799,0.10836266707478837,0.11203097898173642,0.11570247933884303,0.11937716814610777,0.12305504540352974,0.12673611111111072,0.1304203652688498,0.13410780787674748,0.1377984389348028,0.14149225844301627,0.14518926640138785,0.1488894628099171,0.15259284766860493,0.1562994209774513,0.16000918273645537,0.163722132945618,0.16743827160493874,0.17115759871441671,0.1748801142740537,0.17860581828384836,0.1823347107438016,0.18606679165391293,0.1898020610141824,0.19354051882460954,0.19728216508519525,0.20102699979593908,0.20477502295684102,0.20852623456790154,0.21228063462911972,0.2160382231404956,0.21979900010203002,0.223562965513723,0.22733011937557412,0.23110046168758291,0.23487399244975027,0.23865071166207485,0.24243061932455845,0.24621371543720016,0.25],"showlegend":true,"name":"y1","type":"scatter","xaxis":"x","line":{"width":1,"dash":"solid","color":"rgba(0, 154, 250, 1.000)","shape":"linear"},"x":[1.375,1.3762626262626263,1.3775252525252526,1.378787878787879,1.380050505050505,1.3813131313131313,1.3825757575757576,1.3838383838383839,1.3851010101010102,1.3863636363636365,1.3876262626262625,1.3888888888888888,1.3901515151515151,1.3914141414141414,1.3926767676767677,1.393939393939394,1.39520202020202,1.3964646464646464,1.3977272727272727,1.398989898989899,1.4002525252525253,1.4015151515151516,1.4027777777777777,1.404040404040404,1.4053030303030303,1.4065656565656566,1.4078282828282829,1.4090909090909092,1.4103535353535352,1.4116161616161615,1.4128787878787878,1.4141414141414141,1.4154040404040404,1.4166666666666667,1.417929292929293,1.4191919191919191,1.4204545454545454,1.4217171717171717,1.422979797979798,1.4242424242424243,1.4255050505050506,1.4267676767676767,1.428030303030303,1.4292929292929293,1.4305555555555556,1.4318181818181819,1.4330808080808082,1.4343434343434343,1.4356060606060606,1.4368686868686869,1.4381313131313131,1.4393939393939394,1.4406565656565657,1.4419191919191918,1.4431818181818181,1.4444444444444444,1.4457070707070707,1.446969696969697,1.4482323232323233,1.4494949494949494,1.4507575757575757,1.452020202020202,1.4532828282828283,1.4545454545454546,1.4558080808080809,1.457070707070707,1.4583333333333333,1.4595959595959596,1.4608585858585859,1.4621212121212122,1.4633838383838385,1.4646464646464648,1.4659090909090908,1.4671717171717171,1.4684343434343434,1.4696969696969697,1.470959595959596,1.4722222222222223,1.4734848484848484,1.4747474747474747,1.476010101010101,1.4772727272727273,1.4785353535353536,1.47979797979798,1.481060606060606,1.4823232323232323,1.4835858585858586,1.4848484848484849,1.4861111111111112,1.4873737373737375,1.4886363636363635,1.4898989898989898,1.4911616161616161,1.4924242424242424,1.4936868686868687,1.494949494949495,1.496212121212121,1.4974747474747474,1.4987373737373737,1.5],"mode":"lines"}], {"yaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.0688976377952756,0.9606299212598425],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"x","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"annotations":[],"width":600,"plot_bgcolor":"rgb(255, 255, 255)","showlegend":true,"legend":{"bgcolor":"rgb(255, 255, 255)","font":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"},"bordercolor":"rgb(0, 0, 0)"},"xaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.07874015748031496,0.9671916010498688],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"y","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"paper_bgcolor":"rgb(255, 255, 255)","height":400,"margin":{"r":0,"l":0,"b":0,"t":20}});
+    PLOT = document.getElementById('301cbaa6-1470-4224-8894-b7da8566ddf8');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-0.10601650953661812,-0.07482123179137323,-0.055951592517059945,-0.03992575774644558,-0.02244266674305373,-0.006256033699275854,0.011171030344629074,0.03145682002681571,0.049569863493995836,0.0655195285904373,0.08297938677629357,0.10061715402170357,0.12020451769756679,0.13892578931695665,0.15847883281611708,0.1750072967654348,0.1952721453056232,0.21440738462417697,0.24523659778942042],"type":"scatter","name":"y1","yaxis":"y","x":[1.3762207273774734,1.3875081146460466,1.394291363913203,1.4000265148394706,1.4062564962541315,1.4119999880668286,1.418157618300811,1.4252918367923166,1.4316318882638777,1.4371915420675274,1.443253057081915,1.4493505973441014,1.4560922078280505,1.4625066800931052,1.4691762429389188,1.4747905942083557,1.4816450807482955,1.4880885002660886,1.4984113580020075]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[1.4000000000000001,1.425,1.4500000000000002,1.475],"visible":true,"ticks":"inside","range":[1.3762207273774734,1.4984113580020075],"domain":[0.0658209390492855,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["1.400","1.425","1.450","1.475"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-0.1,0.0,0.1,0.2],"visible":true,"ticks":"inside","range":[-0.10601650953661812,0.24523659778942042],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-0.1","0.0","0.1","0.2"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
 <p>And now, as the midpoint is in positive territory we would modify $b$ ...</p><p>This gets tedious to do graphically. But it can be easily programmed. The main step might look something like this:</p><pre class="sourceCode julia">f(x) = x^2 - 2
 a, b = 1, 2
@@ -664,11 +675,11 @@ else
 end
 a,b</pre>
 <pre class="output">
-(1,1.5)</pre>
+(1, 1.5)</pre>
 
 <p>Here $c=1.5$ and the new interval is $[1.0, 1.5]$, as we had graphically. We just need to repeat the above.</p><p>It seems as though we could be here all day. Indeed, if doing this by hand it might take up quite a bit of time. We should automate this. Before automating this, we need to think: <em>when would we stop?</em></p><p>Mathematically we can keep taking halves using the concept of a limit. See for example <a href="http://en.wikipedia.org/wiki/Zenos_paradoxes">Zeno's paradox</a>. On a computer we don't have such a luxury. In fact, for floating point numbers we couldn't keep taking halves – even if we wanted – as ultimately we should expect tp get <code>a</code> and <code>b</code> being floating point values that are next to each other – and hence there is no midpoint. (Well, there are some cases that suggest a more careful numeric approach to the above.)</p><p>So even though this doesn't make mathematical sense we can try stopping when the following condition is no longer true:</p><pre class="sourceCode julia">a < c < b</pre>
-<pre class="output">
-false</pre>
+<div class="well well-sm">
+false</div>
 
 <p>A <code>while</code> loop is used to repeat the central step until the above is <code>false</code>. Our code looks like this:</p><pre class="sourceCode julia">function bisection (f::Function, a, b)
 
@@ -693,276 +704,273 @@ false</pre>
 end</pre>
 <p>Such a function is already defined in the <code>MTH229</code> package.</p><p>Okay, let's look at the function $f(x) = -16x^2 + 32x$. We know that 0 and $2$ are roots. Let's see if our algorithm finds them:</p><pre class="sourceCode julia">f(x) = -16x^2 + 32x
 bisection(f, -1, 1) ## should find 0</pre>
-<pre class="output">
-UndefVarError(:bisection)
-</pre>
+<div class="well well-sm">
+0.0</div>
 
 <pre class="sourceCode julia">bisection(f, 1, 3)  ## should find 2</pre>
-<pre class="output">
-UndefVarError(:bisection)
-</pre>
+<div class="well well-sm">
+2.0</div>
 
 <p>Okay, it seems to work. Lets try it on a less trivial problem. We know $\sin(x)$ and $\cos(x)$ cross in the interval $[0, \pi/2]$. If we are too tired to remember where, we can simply ask:</p><pre class="sourceCode julia">f(x) = cos(x) - sin(x)
 x = bisection(f, 0, pi/2)</pre>
-<pre class="output">
-UndefVarError(:bisection)
-</pre>
+<div class="well well-sm">
+0.7853981633974483</div>
 
 <p>Is <code>x</code> really a zero?</p><pre class="sourceCode julia">x, f(x)</pre>
 <pre class="output">
-(-2,0.4931505902785393)</pre>
+(0.7853981633974483, 1.1102230246251565e-16)</pre>
 
 <p>Hmm, the answer is <code>1.1102230246251565e-16</code>. So technically this is not a zero. But <em>computationally</em> it is a zero! First it should be clear that it is <em>really close</em> to zero. But even more so, it is as close to $0$ as can be possible using floating point values.</p><p>The <code>nextfloat</code> and <code>prevfloat</code> functions find the floating point values just bigger than <code>x</code> and just smaller. In this case we have:</p><pre class="sourceCode julia">f(x) * f(nextfloat(x))</pre>
-<pre class="output">
-MethodError(nextfloat,(-2,))
-</pre>
+<div class="well well-sm">
+-1.232595164407831e-32</div>
 
 <p>So $f$ is crossing $0$ between the value we found, <code>x</code> and the floating point value just smaller. We can't realistically expect to get any closer than that.</p><div class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-th" aria-hidden="true"></span>
-  <span class="text-uppercase">example:</span><div class="markdown"><p>Graphical and numerical answers</p>
+<span class="glyphicon glyphicon-th" aria-hidden="true"></span>
+<span class="text-uppercase">example:</span><div class="markdown"><p>Graphical and numerical answers</p>
 </div>
 </div>
 <p>One needs to know where to look in order to use the bisection method. The basic "one-two punch" is:</p><ul>
-<li>graph the function to identify quickly values $[a,b]$ which bound a zero, then</li>
-</ul><ul>
-<li>use the bisection method to find the zero to many decimal points.</li>
+<li><p>graph the function to identify quickly values $[a,b]$ which bound a</p>
+</li>
+</ul><p>zero, then</p><ul>
+<li><p>use the bisection method to find the zero to many decimal points.</p>
+</li>
 </ul><p>Here we illustrate with the problem of finding all intersection points of $e^x = x^4$ over the interval $[0,10]$. </p><p>Recall, solving for $g(x) = h(x)$ is identical to the problem of solving $f(x) = 0$, where we define $f(x) = g(x) - h(x)$. So our problem is to find solutions to $e^x - x^4 = 0$.</p><p>A quick plot shows that the function has such a wide range that looking over the entire domain at once will be problematic:</p><pre class="sourceCode julia">f(x) = exp(x) - x^4
 plot(f, 0, 10)</pre>
-    <div id="cb3c32a4-8bca-42c8-8bc4-4fe5a96ba131" style="width:600px;height:400px;"></div>
+    <div id="c0cd27e8-cf37-4da5-ad4f-f0c8a8334fa5" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('cb3c32a4-8bca-42c8-8bc4-4fe5a96ba131');
-    Plotly.plot(PLOT, [{"yaxis":"y","y":[1.0,1.106183714295825,1.222207099994187,1.34552322789392,1.471214344406376,1.5920054364812437,1.6982792383187086,1.778092833112286,1.8171960193546388,1.7990516292579415,1.7048580067747707,1.5135738747587568,1.201945845201433,0.7445388534720934,0.11376982734654106,-0.7200550653566173,-1.7886992101697512,-3.1259499596097946,-4.767568201536491,-6.751232567241566,-9.116477709537527,-11.904626020559288,-15.15871209200009,-18.92339914639074,-23.24488658604217,-28.170807715566756,-33.75011659355009,-40.032962857933605,-47.07055324686094,-54.91499840087696,-63.61914338206745,-73.23638017944808,-83.82044028596053,-95.42516522893067,-108.10425271070991,-121.91097576716021,-136.89787207610684,-153.1164002430662,-170.61655955433304,-189.4464693144546,-209.65190347240264,-231.27577578417828,-254.357570254474,-278.93271104122346,-305.03186538868164,-332.6801724707856,-361.8963902699574,-392.6919517795219,-425.06992089193557,-459.02383731065896,-494.5364386902328,-531.5782469554146,-570.1060043632601,-610.0609433376624,-651.3668724083797,-693.9280587087037,-737.626885408427,-782.3212601604782,-827.8417480970076,-873.9884000978873,-920.5272439427988,-967.186402515533,-1013.6517994207069,-1059.5624081598557,-1104.504996352829,-1148.0083113339492,-1189.5366477478915,-1228.48273145937,-1264.159847109126,-1295.7931289250305,-1322.5099258525213,-1343.3291426157878,-1357.1494478636318,-1362.7362289848938,-1358.7071603797024,-1343.5162378137886,-1315.436115819181,-1272.5385677757913,-1212.6728691377439,-1133.4418830600298,-1032.1756042186425,-905.9018906611295,-751.3140848094431,-564.7351929698925,-342.07825756144666,-78.8025173946753,230.13509167747088,590.3335909988718,1008.0073161413184,1490.051582864804,2044.1153325694258,2678.6814990735975,3403.1559174017766,4227.96568249299,5164.667962241679,6226.070376039193,7426.364168087466,8781.271535413338,10308.20861505607,12026.465794806718],"showlegend":true,"name":"y1","type":"scatter","xaxis":"x","line":{"width":1,"dash":"solid","color":"rgba(0, 154, 250, 1.000)","shape":"linear"},"x":[0.0,0.10101010101010101,0.20202020202020202,0.30303030303030304,0.40404040404040403,0.5050505050505051,0.6060606060606061,0.7070707070707071,0.8080808080808081,0.9090909090909091,1.0101010101010102,1.1111111111111112,1.2121212121212122,1.3131313131313131,1.4141414141414141,1.5151515151515151,1.6161616161616161,1.7171717171717171,1.8181818181818181,1.9191919191919191,2.0202020202020203,2.121212121212121,2.2222222222222223,2.323232323232323,2.4242424242424243,2.525252525252525,2.6262626262626263,2.727272727272727,2.8282828282828283,2.9292929292929295,3.0303030303030303,3.1313131313131315,3.2323232323232323,3.3333333333333335,3.4343434343434343,3.5353535353535355,3.6363636363636362,3.7373737373737375,3.8383838383838382,3.9393939393939394,4.040404040404041,4.141414141414141,4.242424242424242,4.343434343434343,4.444444444444445,4.545454545454546,4.646464646464646,4.747474747474747,4.848484848484849,4.94949494949495,5.05050505050505,5.151515151515151,5.252525252525253,5.353535353535354,5.454545454545454,5.555555555555555,5.656565656565657,5.757575757575758,5.858585858585859,5.959595959595959,6.0606060606060606,6.161616161616162,6.262626262626263,6.363636363636363,6.4646464646464645,6.565656565656566,6.666666666666667,6.767676767676767,6.8686868686868685,6.96969696969697,7.070707070707071,7.171717171717172,7.2727272727272725,7.373737373737374,7.474747474747475,7.575757575757576,7.6767676767676765,7.777777777777778,7.878787878787879,7.97979797979798,8.080808080808081,8.181818181818182,8.282828282828282,8.383838383838384,8.484848484848484,8.585858585858587,8.686868686868687,8.787878787878787,8.88888888888889,8.98989898989899,9.090909090909092,9.191919191919192,9.292929292929292,9.393939393939394,9.494949494949495,9.595959595959595,9.696969696969697,9.797979797979798,9.8989898989899,10.0],"mode":"lines"}], {"yaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.0688976377952756,0.9606299212598425],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"x","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"annotations":[],"width":600,"plot_bgcolor":"rgb(255, 255, 255)","showlegend":true,"legend":{"bgcolor":"rgb(255, 255, 255)","font":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"},"bordercolor":"rgb(0, 0, 0)"},"xaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.07874015748031496,0.9671916010498688],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"y","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"paper_bgcolor":"rgb(255, 255, 255)","height":400,"margin":{"r":0,"l":0,"b":0,"t":20}});
+    PLOT = document.getElementById('c0cd27e8-cf37-4da5-ad4f-f0c8a8334fa5');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[1.1024948893433963,1.7174478165762217,-0.9929341237453118,-8.663239746973904,-26.906164548075388,-57.46758219417567,-110.5159102051456,-206.1415024707974,-328.50258924929983,-467.9570835072931,-653.7358105939574,-868.6880196079692,-1114.437992434711,-1304.5139270084962,-1356.6062885579765,-1351.2400627951483,-1281.8844074846834,-1130.36300530596,-985.9129240612097,-793.0485280413964,-542.977489684019,-225.54969369713763,144.70031862550513,595.9626509937134,1140.9875414818216,1794.333919002327,2406.9434351580157,3109.2877954774367,3912.046578843867,4827.084405576586,5867.580100901487,7048.169904279293,7696.01116230823,8385.106252005535,9117.768136056344,9896.43382659484,10399.750077937266,10922.093983132736,11464.110540970029],"type":"scatter","name":"y1","yaxis":"y","x":[0.09765819019788131,1.0006491716837282,1.5433091130562389,2.002121187157657,2.500519700330514,2.9599990453462817,3.4526094640648983,4.023346943385323,4.530551061110215,4.9753233654022,5.460244566553195,5.948047787528121,6.487376626244043,7.000534407448435,7.267316921280971,7.5340994351135055,7.758673485890979,7.983247536668451,8.12033726746725,8.257426998266046,8.394516729064843,8.53160645986364,8.6604748502195,8.789343240575363,8.918211630931225,9.047080021287085,9.150308598646273,9.253537176005462,9.356765753364652,9.459994330723841,9.56322290808303,9.66645148544222,9.718065774121815,9.76968006280141,9.821294351481004,9.872908640160599,9.904681480120448,9.9364543200803,9.96822716004015]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[2.0,4.0,6.0,8.0],"visible":true,"ticks":"inside","range":[0.09765819019788131,9.96822716004015],"domain":[0.08063575386410031,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["2","4","6","8"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.0,2500.0,5000.0,7500.0,10000.0],"visible":true,"ticks":"inside","range":[-1356.6062885579765,11464.110540970029],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0","2500","5000","7500","10000"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
 <p>Instead, we look between $[0,3]$ and $[8,9]$. A quick confirmation shows these are good choices to use. For example, between $8$ and $9$ we have:</p><pre class="sourceCode julia">plot(f, 8, 9)     </pre>
-    <div id="ebb29a8c-3317-4af5-8018-e7e667c916e6" style="width:600px;height:400px;"></div>
+    <div id="f98ce2bc-2ff1-4276-99ca-bf87a7c2afd1" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('ebb29a8c-3317-4af5-8018-e7e667c916e6');
-    Plotly.plot(PLOT, [{"yaxis":"y","y":[-1115.0420129582717,-1105.5048200674873,-1095.7389458133694,-1085.7414692994948,-1075.509438213071,-1065.0398685034575,-1054.329744057427,-1043.3760163711122,-1032.1756042186425,-1020.7253933174038,-1009.0222359899026,-997.0629508221937,-984.8443223188574,-972.3631005544494,-959.6160008214288,-946.5997032745058,-933.3108525713815,-919.7460575098339,-905.9018906611295,-891.7748879997089,-877.361548529107,-862.6583339040849,-847.6616680489219,-832.3679367718205,-816.7734873754252,-800.874628263361,-784.6676285427861,-768.1487176229111,-751.3140848094431,-734.1598788949,-716.6822077447955,-698.8771378795868,-680.7406940524024,-662.2688588224755,-643.4575721242418,-624.302730832077,-604.8001883205889,-584.945754020484,-564.7351929698925,-544.1642253611462,-523.2285260829685,-501.92372425800204,-480.24540277563756,-458.1890978201236,-435.75029839386025,-412.924445835868,-389.70693333535837,-366.09310544038,-342.07825756144666,-317.6576354701756,-292.82643479278795,-267.57980049849084,-241.9128263826633,-215.8205545447945,-189.29797486110147,-162.34002445184342,-134.94158714317564,-107.09749292356355,-78.8025173946753,-50.0513812167128,-20.838749548064698,8.840768520652091,38.99262053836901,69.62231127110772,100.73540328539912,132.3375175376168,164.43433396931687,197.03159210857302,230.13509167747088,263.75069320573766,297.884318650611,332.5419520230007,367.7296400199966,403.4534926638371,439.7196839472954,476.53445248567914,513.9041021754283,551.835002859395,590.3335909988718,629.4063703524807,669.059912661889,709.3008583445417,750.1359171934109,791.5718690838385,833.6155646875568,876.2739261939996,919.553948038847,963.4626976400559,1008.0073161413184,1053.195019163073,1099.0330975611432,1145.528918193102,1192.6899246923513,1240.523638250129,1289.0376584054247,1338.2396638429145,1388.1374131989915,1438.7387458760286,1490.051582864804,1542.0839275753842],"showlegend":true,"name":"y1","type":"scatter","xaxis":"x","line":{"width":1,"dash":"solid","color":"rgba(0, 154, 250, 1.000)","shape":"linear"},"x":[8.0,8.01010101010101,8.02020202020202,8.030303030303031,8.04040404040404,8.05050505050505,8.06060606060606,8.070707070707071,8.080808080808081,8.090909090909092,8.1010101010101,8.11111111111111,8.121212121212121,8.131313131313131,8.141414141414142,8.151515151515152,8.16161616161616,8.171717171717171,8.181818181818182,8.191919191919192,8.202020202020202,8.212121212121213,8.222222222222221,8.232323232323232,8.242424242424242,8.252525252525253,8.262626262626263,8.272727272727273,8.282828282828282,8.292929292929292,8.303030303030303,8.313131313131313,8.323232323232324,8.333333333333334,8.343434343434344,8.353535353535353,8.363636363636363,8.373737373737374,8.383838383838384,8.393939393939394,8.404040404040405,8.414141414141413,8.424242424242424,8.434343434343434,8.444444444444445,8.454545454545455,8.464646464646465,8.474747474747474,8.484848484848484,8.494949494949495,8.505050505050505,8.515151515151516,8.525252525252526,8.535353535353535,8.545454545454545,8.555555555555555,8.565656565656566,8.575757575757576,8.585858585858587,8.595959595959595,8.606060606060606,8.616161616161616,8.626262626262626,8.636363636363637,8.646464646464647,8.656565656565656,8.666666666666666,8.676767676767676,8.686868686868687,8.696969696969697,8.707070707070708,8.717171717171718,8.727272727272727,8.737373737373737,8.747474747474747,8.757575757575758,8.767676767676768,8.777777777777779,8.787878787878787,8.797979797979798,8.808080808080808,8.818181818181818,8.828282828282829,8.83838383838384,8.848484848484848,8.858585858585858,8.868686868686869,8.878787878787879,8.88888888888889,8.8989898989899,8.909090909090908,8.919191919191919,8.929292929292929,8.93939393939394,8.94949494949495,8.95959595959596,8.969696969696969,8.97979797979798,8.98989898989899,9.0],"mode":"lines"}], {"yaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.0688976377952756,0.9606299212598425],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"x","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"annotations":[],"width":600,"plot_bgcolor":"rgb(255, 255, 255)","showlegend":true,"legend":{"bgcolor":"rgb(255, 255, 255)","font":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"},"bordercolor":"rgb(0, 0, 0)"},"xaxis":{"linecolor":"rgb(0, 0, 0)","type":"-","domain":[0.07874015748031496,0.9671916010498688],"titlefont":{"size":15,"color":"rgb(0, 0, 0)","family":"Helvetica"},"tickcolor":"rgb(0, 0, 0)","title":"","showgrid":true,"zeroline":false,"anchor":"y","tickfont":{"size":11,"color":"rgb(0, 0, 0)","family":"Helvetica"}},"paper_bgcolor":"rgb(255, 255, 255)","height":400,"margin":{"r":0,"l":0,"b":0,"t":20}});
+    PLOT = document.getElementById('f98ce2bc-2ff1-4276-99ca-bf87a7c2afd1');
+    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-1105.8249537990787,-1010.128150473924,-942.9228437960646,-879.9627370885314,-804.7958868459059,-728.8812315467603,-640.0192975834698,-526.7896200432351,-416.31679390392674,-311.3475275157589,-187.78861152540412,-53.36167342261979,107.80394103289746,274.1161610729923,461.28459711209143,630.7509475277957,739.8107270803184,853.2854562276025,964.1039492045038,1079.0632512955463,1272.171630075447,1476.7337968557358,1509.2658918101442],"type":"scatter","name":"y1","yaxis":"y","x":[8.009765819019787,8.100064917168373,8.154330911305625,8.200212118715765,8.250051970033052,8.295999904534629,8.345260946406489,8.402334694338533,8.453055106111021,8.49753233654022,8.54602445665532,8.594804778752811,8.648737662624404,8.700053440744842,8.75340994351135,8.798324753666845,8.825742699826606,8.853160645986364,8.878934324057536,8.904708002128709,8.945999433072384,8.98729086401606,8.99364543200803]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[8.200000000000001,8.4,8.6,8.8],"visible":true,"ticks":"inside","range":[8.009765819019787,8.99364543200803],"domain":[0.08063575386410031,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["8.2","8.4","8.6","8.8"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-1000.0,-500.0,0.0,500.0,1000.0,1500.0],"visible":true,"ticks":"inside","range":[-1105.8249537990787,1509.2658918101442],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-1000","-500","0","500","1000","1500"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
 <p>So we find the values of the zero in the bracketed region $[8,9]$:</p><pre class="sourceCode julia">bisection(f, 8, 9)</pre>
-<pre class="output">
-UndefVarError(:bisection)
-</pre>
+<div class="well well-sm">
+8.613169456441398</div>
 
 <p>The root within $[0, 3]$ is found with:</p><pre class="sourceCode julia">bisection(f, 0, 3)</pre>
-<pre class="output">
-UndefVarError(:bisection)
-</pre>
+<div class="well well-sm">
+1.4296118247255556</div>
 
 <h3>The Roots package and fzero</h3><p>The bisection method, while easy to describe and understand, can be made a bit more efficient. The <code>fzero</code> (<strong>f</strong>unction <strong>zero</strong>) function In the <code>Roots</code> package does so. It is used like our <code>bisection</code> method – but does not need to typed in.</p><p>For example, to find a root of $f(x) = 2x \cdot \exp(-20) - 2 \cdot \exp(-20x) + 1$ in the interval $[0,1]$ we have:</p><pre class="sourceCode julia">using Roots
 f(x) = 2x*exp(-20) - 2*exp(-20x) + 1
 fzero(f, 0, 1)</pre>
-<pre class="output">
-0.03465735902085385</pre>
+<div class="well well-sm">
+0.03465735902085385</div>
 
-<p>The <code>fzero</code> function is actually an interface to different root-finding algorithms. When called as above – with two intial starting points – it uses a bracketing approach as discussed here.</p><h3>Problems</h3><h4>Question</h4><p>In the bisection method algorithm we checked that the value of $f$ at $a$ and $b$ had opposite signs by looking at $f(a)\cdot f(b)$. Why did this work?</p><form name="WeaveQuestion" data-id="VoMkezHh" data-controltype="radio">
+<p>The <code>fzero</code> function is actually an interface to various root-finding algorithms. When called as above – with two intial starting points – it uses a bracketing approach as discussed here.</p><h3>Problems</h3><h4>Question</h4><p>In the bisection method algorithm we checked that the value of $f$ at $a$ and $b$ had opposite signs by looking at $f(a)\cdot f(b)$. Why did this work?</p><form name="WeaveQuestion" data-id="bWSdyIYk" data-controltype="radio">
 <div class="form-group ">
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_VoMkezHh" value="1"><div class="markdown"><p>The product of 2 numbers with opposite signs is negative, the product of 2 numbers with the same signs is positive</p>
+      <input type="radio" name="radio_bWSdyIYk" value="1"><div class="markdown"><p>The product of two numbers is never negative</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_VoMkezHh" value="2"><div class="markdown"><p>The product of two numbers will have the sign of the first one.</p>
+      <input type="radio" name="radio_bWSdyIYk" value="2"><div class="markdown"><p>The product of two numbers will have the sign of the first one.</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_VoMkezHh" value="3"><div class="markdown"><p>The product of two numbers is never negative</p>
+      <input type="radio" name="radio_bWSdyIYk" value="3"><div class="markdown"><p>The product of 2 numbers with opposite signs is negative, the product of 2 numbers with the same signs is positive</p>
 </div>
     </label>
     </div>
     
 
 
-<div id="VoMkezHh_message"></div>
+<div id="bWSdyIYk_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_VoMkezHh']").on("change", function() {
-  correct = this.value == 1;
+$("input:radio[name='radio_bWSdyIYk']").on("change", function() {
+  correct = this.value == 3;
 
   if(correct) {
-     $("#VoMkezHh_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#bWSdyIYk_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#VoMkezHh_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#bWSdyIYk_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question <small>Are there other roots in [-10, 0]?</small></h4><p>There is another root in the interval $[-10, 0]$ for the function $f(x) = e^x - x^4$. Find its value numerically:</p><form name='WeaveQuestion' data-id='Pv3Gqhb9' data-controltype='numeric'>
+<h4>Question <small>Are there other roots in [-10, 0]?</small></h4><p>There is another root in the interval $[-10, 0]$ for the function $f(x) = e^x - x^4$. Find its value numerically:</p><form name='WeaveQuestion' data-id='lI2nFnh6' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="Pv3Gqhb9" type="number" class="form-control">
+<input id="lI2nFnh6" type="number" class="form-control">
 
 </div>
   
-<div id='Pv3Gqhb9_message'></div>
+<div id='lI2nFnh6_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#Pv3Gqhb9').on('change', function() {
+$('#lI2nFnh6').on('change', function() {
   correct = Math.abs(this.value - -0.7034674224983917) <= 0.001;
 
   if(correct) {
-     $('#Pv3Gqhb9_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#lI2nFnh6_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#Pv3Gqhb9_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#lI2nFnh6_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question <small>Relation between $x^2$ and $x \log(x)$</small></h4><p>Let $f(x) = x^2 - 10 \cdot x \cdot \log(x)$. This function has two zeros on the positive $x$ axis. You are asked to find the largest (graph and bracket...):</p><form name='WeaveQuestion' data-id='8W6m3tmI' data-controltype='numeric'>
+<h4>Question <small>Relation between $x^2$ and $x \log(x)$</small></h4><p>Let $f(x) = x^2 - 10 \cdot x \cdot \log(x)$. This function has two zeros on the positive $x$ axis. You are asked to find the largest (graph and bracket...):</p><form name='WeaveQuestion' data-id='nW7o41Pv' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="8W6m3tmI" type="number" class="form-control">
+<input id="nW7o41Pv" type="number" class="form-control">
 
 </div>
   
-<div id='8W6m3tmI_message'></div>
+<div id='nW7o41Pv_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#8W6m3tmI').on('change', function() {
-  correct = Math.abs(this.value - 35.77152063957298) <= 0.001;
+$('#nW7o41Pv').on('change', function() {
+  correct = Math.abs(this.value - 35.77152063957297) <= 0.001;
 
   if(correct) {
-     $('#8W6m3tmI_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#nW7o41Pv_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#8W6m3tmI_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#nW7o41Pv_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>The <code>airy</code> function has infinitely many negative roots, as the function oscillates when $x < 0$. In a previous problem we graphically found the largest root. Now find the <em>second largest root</em> using the graph to bracket the answer, and then solving.</p><form name='WeaveQuestion' data-id='SBRqzTSs' data-controltype='numeric'>
+<h4>Question</h4><p>The <code>airyai</code> function has infinitely many negative roots, as the function oscillates when $x < 0$. In a previous problem we graphically found the largest root. Now find the <em>second largest root</em> using the graph to bracket the answer, and then solving.</p><form name='WeaveQuestion' data-id='GGBg24yY' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 
 <div class="input-group">
-<input id="SBRqzTSs" type="number" class="form-control">
+<input id="GGBg24yY" type="number" class="form-control">
 
 </div>
   
-<div id='SBRqzTSs_message'></div>
+<div id='GGBg24yY_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#SBRqzTSs').on('change', function() {
+$('#GGBg24yY').on('change', function() {
   correct = Math.abs(this.value - -4.087949444130973) <= 1.0e-8;
 
   if(correct) {
-     $('#SBRqzTSs_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#GGBg24yY_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#SBRqzTSs_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#GGBg24yY_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question <small>What goes up must come down...</small></h4><p><img src="http://ej.iop.org/images/0143-0807/33/1/149/Full/ejp405251f1_online.jpg" height="200" width="300" /></p><p>In 1638, according to <a href="http://books.google.com/books?id&#61;kvGt2OlUnQ4C&amp;pg&#61;PA28&amp;lpg&#61;PA28&amp;dq&#61;mersenne&#43;cannon&#43;ball&#43;tests&amp;source&#61;bl&amp;ots&#61;wEUd7e0jFk&amp;sig&#61;LpFuPoUvODzJdaoug4CJsIGZZHw&amp;hl&#61;en&amp;sa&#61;X&amp;ei&#61;KUGcU6OAKJCfyASnioCoBA&amp;ved&#61;0CCEQ6AEwAA#v&#61;onepage&amp;q&#61;mersenne&#37;20cannon&#37;20ball&#37;20tests&amp;f&#61;false">Amir D. Aczel</a>, an experiment was performed in the French Countryside. A monk, Marin Mersenne, launched a cannonball straight up into the air in an attempt to help Descartes prove facts about the rotation of the earth. Though the experiment was not successful, Mersenne later observed that the time for the cannonball to go up was greater than the time to come down. <a href="http://www.maa.org/publications/periodicals/american-mathematical-monthly/american-mathematical-monthly-contents-junejuly-2014">According to "Vertical Projection in a Resisting Medium: Reflections on Observations of Mersenne ".</a></p><p>This isn't the case for simple ballistic motion where the time to go up is equal to the time to come down. We can "prove" this numerically. For simple ballistic motion, $f(t) = -(1/2)\cdot 32 t^2 + v_0t$. The time to go up and down are found by the two zeros of this function. The peak time is related to a zero of a function given by <code>D&#40;f&#41;</code>, which for now we'll take as a mystery function, but later will be known as the derivative.</p><p>Let $v_0= 390$. The three times in question can be found from the zeros of <code>f</code> and <code>D&#40;f&#41;</code>. What are they?</p><form name="WeaveQuestion" data-id="PrUwMlyU" data-controltype="radio">
+<h4>Question <small>What goes up must come down...</small></h4><p><img src="http://ej.iop.org/images/0143-0807/33/1/149/Full/ejp405251f1_online.jpg" height="200" width="300" /></p><p>In 1638, according to <a href="http://books.google.com/books?id&#61;kvGt2OlUnQ4C&amp;pg&#61;PA28&amp;lpg&#61;PA28&amp;dq&#61;mersenne&#43;cannon&#43;ball&#43;tests&amp;source&#61;bl&amp;ots&#61;wEUd7e0jFk&amp;sig&#61;LpFuPoUvODzJdaoug4CJsIGZZHw&amp;hl&#61;en&amp;sa&#61;X&amp;ei&#61;KUGcU6OAKJCfyASnioCoBA&amp;ved&#61;0CCEQ6AEwAA#v&#61;onepage&amp;q&#61;mersenne&#37;20cannon&#37;20ball&#37;20tests&amp;f&#61;false">Amir D. Aczel</a>, an experiment was performed in the French Countryside. A monk, Marin Mersenne, launched a cannonball straight up into the air in an attempt to help Descartes prove facts about the rotation of the earth. Though the experiment was not successful, Mersenne later observed that the time for the cannonball to go up was greater than the time to come down. <a href="http://www.maa.org/publications/periodicals/american-mathematical-monthly/american-mathematical-monthly-contents-junejuly-2014">According to "Vertical Projection in a Resisting Medium: Reflections on Observations of Mersenne ".</a></p><p>This isn't the case for simple ballistic motion where the time to go up is equal to the time to come down. We can "prove" this numerically. For simple ballistic motion, $f(t) = -(1/2)\cdot 32 t^2 + v_0t$. The time to go up and down are found by the two zeros of this function. The peak time is related to a zero of a function given by <code>D&#40;f&#41;</code>, which for now we'll take as a mystery function, but later will be known as the derivative.</p><p>Let $v_0= 390$. The three times in question can be found from the zeros of <code>f</code> and <code>D&#40;f&#41;</code>. What are they?</p><form name="WeaveQuestion" data-id="PFzfcAxH" data-controltype="radio">
 <div class="form-group ">
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_PrUwMlyU" value="1"><div class="markdown"><p>(0.0, 12.1875, 24.375)</p>
+      <input type="radio" name="radio_PFzfcAxH" value="1"><div class="markdown"><p>(0.0, 625.0, 1250.0)</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_PrUwMlyU" value="2"><div class="markdown"><p>(0.0, 625.0, 1250.0)</p>
+      <input type="radio" name="radio_PFzfcAxH" value="2"><div class="markdown"><p>(0.0, 12.1875, 24.375)</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_PrUwMlyU" value="3"><div class="markdown"><p>(-4.9731, 0.0, 4.9731)</p>
+      <input type="radio" name="radio_PFzfcAxH" value="3"><div class="markdown"><p>(-4.9731, 0.0, 4.9731)</p>
 </div>
     </label>
     </div>
     
 
 
-<div id="PrUwMlyU_message"></div>
+<div id="PFzfcAxH_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_PrUwMlyU']").on("change", function() {
-  correct = this.value == 1;
+$("input:radio[name='radio_PFzfcAxH']").on("change", function() {
+  correct = this.value == 2;
 
   if(correct) {
-     $("#PrUwMlyU_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#PFzfcAxH_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#PrUwMlyU_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#PFzfcAxH_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
 <h4>Question <small>What goes up must come down... (again)</small></h4><p>For simple ballistic motion you find that the time to go up is the time to come down. For motion within a resistant medium, such as air, this isn't the case. Suppose a model for the height as a function of time is given by</p>$$~
 h(t) = (\frac{g}{\gamma^2} + \frac{v_0}{\gamma})(1 - e^{-\gamma t}) - \frac{gt}{\gamma}
-~$$<p>(<a href="http://www.researchgate.net/publication/230963032_On_the_trajectories_of_projectiles_depicted_in_early_ballistic_woodcuts">From "On the trajectories of projectiles depicted in early ballistic Woodcuts"</a>)</p><p>Here $g=32$, again we take $v_0=390$, and $\gamma$ is a drag coefficient that we will take to be $1$.  This is valid when $h(t) \geq 0$.  In <code>Julia</code>, rather than hard-code the parameter values, for added flexibility we can pass them in as keyword arguments:</p><pre class="sourceCode julia">h(t; g=32, v0=390, gamma=1) = (g/gamma^2 + v0/gamma)*(1 - exp(-gamma*t)) - g*t/gamma</pre>
+~$$
+<p>(<a href="http://www.researchgate.net/publication/230963032_On_the_trajectories_of_projectiles_depicted_in_early_ballistic_woodcuts">From "On the trajectories of projectiles depicted in early ballistic Woodcuts"</a>)</p><p>Here $g=32$, again we take $v_0=390$, and $\gamma$ is a drag coefficient that we will take to be $1$.  This is valid when $h(t) \geq 0$.  In <code>Julia</code>, rather than hard-code the parameter values, for added flexibility we can pass them in as keyword arguments:</p><pre class="sourceCode julia">h(t; g=32, v0=390, gamma=1) = (g/gamma^2 + v0/gamma)*(1 - exp(-gamma*t)) - g*t/gamma</pre>
 <pre class="output">
 h (generic function with 1 method)</pre>
 
-<p>Now find the three times: $t_0$, the starting time; $t_a$, the time at the apex of the flight; and $t_f$, the time the object returns to the ground.</p><form name="WeaveQuestion" data-id="6EYB5GeA" data-controltype="radio">
+<p>Now find the three times: $t_0$, the starting time; $t_a$, the time at the apex of the flight; and $t_f$, the time the object returns to the ground.</p><form name="WeaveQuestion" data-id="ivkJhVk8" data-controltype="radio">
 <div class="form-group ">
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_6EYB5GeA" value="1"><div class="markdown"><p>(0, 32.0, 390.0)</p>
+      <input type="radio" name="radio_ivkJhVk8" value="1"><div class="markdown"><p>(0, 2.579, 13.187)</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_6EYB5GeA" value="2"><div class="markdown"><p>(0, 2.579, 13.187)</p>
+      <input type="radio" name="radio_ivkJhVk8" value="2"><div class="markdown"><p>(0, 32.0, 390.0)</p>
 </div>
     </label>
     </div>
     
-    <div   class="radio"> 
+    <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_6EYB5GeA" value="3"><div class="markdown"><p>(0, 13.187, 30.0)</p>
+      <input type="radio" name="radio_ivkJhVk8" value="3"><div class="markdown"><p>(0, 13.187, 30.0)</p>
 </div>
     </label>
     </div>
     
 
 
-<div id="6EYB5GeA_message"></div>
+<div id="ivkJhVk8_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_6EYB5GeA']").on("change", function() {
-  correct = this.value == 2;
+$("input:radio[name='radio_ivkJhVk8']").on("change", function() {
+  correct = this.value == 1;
 
   if(correct) {
-     $("#6EYB5GeA_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#ivkJhVk8_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#6EYB5GeA_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#ivkJhVk8_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h2>The <code>fzeros</code> function</h2><p>So, <code>fzero</code> finds one value within a bracket. But this suggests a means to find all (most?) of the zeros within an interval – split the interval up into many pieces; identify those that bracket a zero; use <code>fzero</code> on those intervals.</p><p>This is basically implemented in the <code>fzeros&#40;f, a, b&#41;</code> function. (Here <code>f</code> need not be a polynomial function, but we do need to specify an interval to search over, unlike the case when <code>f</code> is a polynomial function discussed above.)</p><p>So, to find the zeros of $e^x - x^4$ over $[-10, 10]$ we have:</p><pre class="sourceCode julia">f(x) = exp(x) - x^4
+<h2>The <code>fzeros</code> function</h2><p>So, <code>fzero</code> finds one value within a bracket. But this suggests a means to find all (most?) of the zeros within an interval – split the interval up into many pieces; identify those that bracket a zero; use <code>fzero</code> on those intervals; accumulate the results.</p><p>This is basically implemented in the <code>fzeros&#40;f, a, b&#41;</code> function. So, to find the zeros of $e^x - x^4$ over $[-10, 10]$ we have:</p><pre class="sourceCode julia">f(x) = exp(x) - x^4
 fzeros(f, -10, 10)</pre>
 <pre class="output">
 3-element Array{Float64,1}:
@@ -973,7 +981,8 @@ fzeros(f, -10, 10)</pre>
 <p>The above description will only work for zeros which cross the $x$ axis, but <code>fzeros</code> tries a bit more. So, it will find the zero of $f(x) = x^2 \cdot e^x$:</p><pre class="sourceCode julia">f(x) = x^2 * exp(x)
 fzeros(f, -1, 1)</pre>
 <pre class="output">
-0-element Array{Float64,1}</pre>
+1-element Array{Float64,1}:
+ 1.93788e-8</pre>
 
 <p>That being said, <code>fzeros</code> can miss zeros, so a graph is always suggested to verify the zeros are exhausted.</p>
   </div>

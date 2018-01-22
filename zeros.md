@@ -128,16 +128,18 @@ coefficients alone, we can pass in a quadratic function, as follows:
 
 
 ```
-using MTH229
+using PolynomialZeros
 f(x) = x^2 + x - 1
-polyroots(f)
+poly_roots(f)
 ```
 
+(The `PolynomialZeros` package is not in the `MTH229` package.)
+
 That is, the command to find the roots of the polynomial $f(x)$ is simply
-`polyroots` and the the function is called just by passing in the function name (or an anonymous function).
+`poly_roots` and the the function is called just by passing in the function name (or an anonymous function).
 
 
-By default, the values returned by `polyroots` are complex numbers,
+By default, the values returned by `poly_roots` are complex numbers,
 even if they could be real valules. This is because the fundamental
 theorem of algebra only guarantees $n$ roots for an $n$th degree
 polynomial if complex values are considered.
@@ -149,14 +151,14 @@ polynomial $f(x) = -16x^2 + 32x + 6$?
 
 ```
 f(x) = -16x^2 + 32x + 6
-polyroots(f)
+poly_roots(f)
 ```
 
 As can be seen, $f$ has two real roots. This next polynomial has none:
 
 ```
 f(x) = x^2 + x + 1
-polyroots(f)
+poly_roots(f)
 ```
 
 ### Real roots
@@ -174,7 +176,7 @@ instabilities can lead to answers where real roots are returned as
 complex numbers. Other algorithms can do a better job for this more
 specific task.
 
-The `realroots` function instructs `polyroots` to look for just real
+Setting the domain to be `Over.R` instructs `poly_roots` to look for just real
 roots for polynomials with real coefficients.
 
 The following polynomial has both real roots and complex roots, but we
@@ -182,13 +184,13 @@ will find only the real ones:
 
 ```
 f(x) = (x^2 + x + 1) * (x^2 + x - 1)
-realroots(f, Over.R)
+poly_roots(f, Over.R)
 ```
 
 Compare this to the search over all complex numbers too:
 
 ```
-polyroots(f)
+poly_roots(f)
 ```
 
 When looking over the reals, the algorithm needs to know if the
@@ -198,7 +200,7 @@ called *square free*. This is assumed by default. Pass in
 
 ```
 f(x) = x^2 * (x-3)
-realroots(f, Over.R, square_free=false)
+poly_roots(f, Over.R, square_free=false)
 ```
 
 ### Practice
@@ -216,19 +218,19 @@ radioq(choices, ans)
 
 #### Question
 
-Use the `realroots` function to find the largest real root of the
+Use the `Over.R` specification to find the largest real root of the
 polynomial $x^2 + x - 5$
 
 
 ```
-p = polyroots(x -> x^2 + x - 5, Over.R)
+p = poly_roots(x -> x^2 + x - 5, Over.R)
 val = maximum(p);
 numericq(val, 1e-3)
 ```
 
 #### Question
 
-Use the `realroots` function to find the largest real root of the polynomial $x^3 - x - 17$
+Use the `Over.R` specification to find the largest real root of the polynomial $x^3 - x - 17$
 
 ```
 zs = fzeros(x -> x^2 - x - 17);
@@ -253,7 +255,7 @@ real root, which is found with:
 
 ```
 f(x) = x^3 -x^2 -x - 1
-realroots(f)
+poly_roots(f, Over.R)
 ```
 
 
@@ -356,10 +358,10 @@ plot(j, 0, 500)
 ```
 
 Well, we haven't even seen the peak yet. Better to do a little spade
-work first. This is a quadratic equation, so we can use the `roots` function:
+work first. This is a quadratic equation, so we can use the `poly_roots` function:
 
 ```
-realroots(j) 
+poly_roots(j, Over.R) 
 ```
 
 
@@ -519,7 +521,7 @@ graphically.
 ```
 rts =[-2, -1, 3];
 x = rts[randperm(3)[1]];
-choices = round([x, -5 + 10*rand(2)], 3);
+choices = round.([x, -5 + 10*rand(2)], 3, 10);
 ans = 1;
 radioq(choices, ans)
 ```
