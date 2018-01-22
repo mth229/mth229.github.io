@@ -154,7 +154,7 @@ An assignment for this material:
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/derivatives.ipynb?create=1)
 
 
-* [First and second derivatives](http://mth229.github.io/first_second_derivatives.html)
+* [First and second derivatives](http://mth229.github.io/first-second-derivatives.html)
 
 A look at the relationship between a function and its first and second
 derivatives.

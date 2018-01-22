@@ -19,7 +19,7 @@ md_files = filter(x-> ismatch(r"\.md$", x), readdir())
 html_files = map(x -> replace(x, r"md$", "html"), md_files)
 
 for (m,h) in zip(md_files, html_files)
-    if true || mtime(h) == 0.0 || (mtime(m) > mtime(h))	
+    if mtime(h) == 0.0 || (mtime(m) > mtime(h))	
         println("process $m")
         markdownToHTML(m)
     end    		       
