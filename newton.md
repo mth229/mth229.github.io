@@ -120,28 +120,40 @@ x = x - f(x)/fp(x)		# new value, x_1
 x, f(x)
 ```
 
-This will compute $x_2$:
+We can visualize our progress as follows, noting that `x` holds $x_1$,
+and zooming into the domain $[1,3]$:
+
+```
+x0, x1 = 2, x
+plot(f, 1, 3, legend=false)
+plot!([x0, x0, x1], [0, f(x0), 0])  # why these values?
+scatter!([x0, x1], [0, 0])
+```
+
+
+
+Continuing, though without visualizing the progress, this next step will compute $x_2$:
 
 ```
 x = x - f(x)/fp(x)
 x, f(x)
 ```
 
-This will compute $x_3$:
+This next step will compute $x_3$:
 
 ```
 x = x - f(x)/fp(x)
 x, f(x)
 ```
 
-This will compute $x_4$:
+This next step will compute $x_4$:
 
 ```
 x = x - f(x)/fp(x)
 x, f(x)
 ```
 
-This will compute $x_5$:
+This next step will compute $x_5$:
 
 ```
 x = x - f(x)/fp(x)		# x stopped changing
@@ -158,7 +170,7 @@ You can see in this case that the convergence happens quickly as soon
 as the algorithm gets close.
 
 The approximate root is $x_4$.  It is important to realize that the
-actual answer is not likely to be the value computed by Newton's
+actual, *exact*, answer is not likely to be the value computed by Newton's
 method, which we call `xstar` at times. In most cases, the true answer
 will be irrational and `xstar` a floating point number, which
 ultimately can never be better than an approximation to an irrational
@@ -302,7 +314,7 @@ good if the answers are very large.
 
 
 A basic algorithm is to repeat a step of Newton's method until the
-above occurs. We wrap this up in a function for reuse and employ a
+above occurs. We wrap this up in a function for reuse, and employ a
 `while` loop to repeat the update step until something happens:
 
 ```
@@ -583,30 +595,34 @@ The above can be written without repeating `fzero` by using a comprehension:
 [fzero(f, x) for x in [9, 2, -1]]
 ```
 
+Or even more compactly, using the broadcast notation:
 
+```
+fzero.(f, [-1, 2, 9])
+```
 
 
 ----
 
 As another illustration, let $f(x) = \cos^2(x^2)$ on $[-1,2]$. Find all the zeros of the derivative of $f(x)$.
 
-We graph `D(f)` to identify starting points:
+We graph the derivative to identify starting points:
 
 ```
 f(x) = cos(x^2)^2
-plot(D(f), -1, 2)
+plot(f', -1, 2)
 ```
 
 We see there are 3 potential zeros, one near 0, one near 1.2 and close to 1.7. Here we improve our guesses:
 
 ```
-xs = [fzero(D(f), x) for x in [0, 1.2, 1.7]]
+xs = fzero.(f', [0, 1.2, 1.7])   # or [fzero(f', x) for x in [0, 1.2, 1.7]]
 ```
 
 The function values at these points can be found with
 
 ```
-[f(x) for x in xs]		# or simply map(f, xs)
+f.(xs)               # or map(f, xs) or [f(x) for x in xs]
 ```
 
 

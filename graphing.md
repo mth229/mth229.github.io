@@ -4,12 +4,14 @@
 
 The `Julia` language is a new language and as such, certain design
 decisions are still being made. One key decision is the interface for
-creating graphics. At this point there are many different
-ones (`Winston`, `Gadfly`, `Gaston`, `PyPlot`, plotly, ...), and perhaps more will be
-generated before a dominant one is arrived at. As such, we don't try
-to teach the details of any one of them. 
+creating graphics. At this point there are many different ones
+(`Winston`, `Gadfly`, `Gaston`, `PyPlot`, plotly, plotlyjs, `GR`...),
+and perhaps more will be generated before a dominant one is arrived
+at. As such, we don't try to teach the details of any one of them.
 
-Rather, we use the `Plots` package which provides a unified interface to many backend plotting pacakges. This package is loaded when the `MTH229` package is.
+Rather, we use the `Plots` package which provides a unified interface
+to many backend plotting pacakges. This package is loaded when the
+`MTH229` package is.
 
 ```
 note("""Packages are described a bit more [here](http://mth229.github.io/index.html/#_packages_).""")
@@ -42,12 +44,12 @@ Graphs can be layered by using the `plot!` function (with an exclamation point i
 f(x) = cos(x)
 g(x) = 1 - x^2/2
 plot(f, -pi/2, pi/2)
-plot!(g, -pi/2, pi/2)   # try without the a and b, it may work.
+plot!(g)        #  the domain to plot is optional if adding a layer
 ```
 
 
 
-Graphing two or more functions can also be done by combining tge together into a container of functions using `[]`:
+Graphing two or more functions can also be done by combining two together into a container of functions using `[]`:
 
 
 ```
@@ -67,7 +69,7 @@ are used to make the plot.
 The most basic usage for plotting a function follows this pattern:
 
 ```verbatim
-plot(function_object, from, to)
+plot(function_object, from, to)     # or plot(f, a, b)
 ```
 
 as in
@@ -114,10 +116,10 @@ A graph can have layers added to it using `plot!` or other such functions. For e
 ```
 f(x) = x^2 - 2x + 2
 plot(f, -3, 3)
-plot!(zero, -3, 3)     # x axis
+plot!(zero)     # x axis
 ```
 
-The automatic legend can be supressed by passing `legend=false` to the initial `plot` command.
+The automatic legend can be supressed by passing the argument `legend=false` to the initial `plot` command.
 
 Adding points can be done with the `scatter!` command. We put the `x` and `y` values into containers defined by `[]`. For example, the polynomial $x^2 - 3x +2$ has roots at $2$ and $1$, we emphasize this through:
 
@@ -378,7 +380,10 @@ of a small amount and makes it huge.  Clearly we need to really avoid
 the issue. It isn't hard -- just add a little bit more to $0$.
 
 
-One solution to all avoiding this issue is to use the `trim` function that was previously defined. This just caps off really large values so that the vertical asymptotes don't affect the scale of the graph. We can see the asymptotes pretty clearly with:
+One solution to avoiding this issue is to use the `trim` function that
+was previously defined. This just caps off really large values so that
+the vertical asymptotes don't affect the scale of the graph. We can
+see the asymptotes pretty clearly with:
 
 ```
 trim(f; val=10) = x -> abs(f(x)) > val ? NaN : f(x)
@@ -542,9 +547,7 @@ vectors going forward.
 
 
 
-```
-note("Containers for like values...")
-```
+**Containers are for like values...**
 
 In general, `julia` uses `[` and `]' to create containers for like
 values. These containers can be more complicated than a single row or
@@ -556,8 +559,6 @@ just floating point values:
 ```
 [1, 2.0]
 ```
-
-
 
 ### Creating arithmetic sequences
 
@@ -761,6 +762,19 @@ x[2:end]
 (But not without indexing, as you can see by typing `2:end` by itself.)
 
 
+```
+note("""**Left side of an `=` sign**: `Julia` allows only three
+different types of expressions on the left side of an equals sign:
+
+* a variable name, as in `x = 42`,
+* a function definition, as in `f(x) = x^2 - 2`, or
+* a assignment setting an index, as in `x[1] = 2`.
+
+The left side is quite unlike a math equation, where arbitray
+expressions are typical.
+""")
+```
+
 
 ### Practice
 
@@ -872,6 +886,37 @@ We use `u` for the dummy variable in the anonymous function, so as not
 to get it confused with the variable `x` holding our values, but this
 is not necessary.
 
+### Broadcasting
+
+`Julia` allows a function to be broadcast over a collection of values
+with a simple notational trick or inserting a "." *before* the
+parenthesis. To see, we have:
+
+```
+sin.([1,2,3])
+```
+
+In this use, the output is the same as though `map(sin, [1,2,3])` were
+called. In general, this "." notation is a bit different, as there can
+be multiple arguments passed and the size of the values is matched if
+possible by replication. For example, this command find the logarithm
+of 5 for different bases. The value 5 is replicated once for each of
+the bases:
+
+```
+log.([2,e,5,10], 5)
+```
+
+```
+note("""
+The "dot" broadcasting is very succinct and useful, but using `map` is
+more explicit and easier to reason about. Best to start with `map` and
+if you find it being used often, transition to thinking about using
+the "dot" broadcasting.
+""")
+
+
+
 ### Comprehensions
 
 Mathematicians are fond of set notation, as in this way to describe
@@ -927,7 +972,10 @@ comprehensions use expressions.
 
 
 ### For loops
-Next, for completeness, we mention two other means to generate vectors of numbers.
+
+Finally, for completeness, we mention another means to generate
+vectors of numbers that is more familiar to users of other computer
+languages.
 
 The `for` loop is a very common pattern in
 computer programming. For speed reasons, some languages (e.g.,
@@ -992,68 +1040,6 @@ We will use `while` loops when we iterate some process and are waiting
 until some computed value gets close to $0$.
 
 
-### Vectorization
-
-Finally, we note that `julia` allows for "vectorization" of
-values. That means, many functions work on an array all at once. Many
-
-```
-sin(x)
-```
-
-but not all:
-
-```
-x^2
-```
-
-The latter fails, whereas the `sin` function naturally returns the 5
-values for `x`. The reason is the definitions of multiplication,
-division and powers are mathematically different for single numbers
-(scalars) than for column vectors, or more generally matrices. Like
-`MATLAB`, `julia` chose the simplest notation to do matrix
-multiplication, powers, and division. To get element-by-element
-operations, we *prefix* the operator with a "dot", as in `.^`:
-
-```
-x .^ 2
-```
-
-So, if we were to redefine our function $f(x)  = -16x^2 + 32x$ with:
-
-```
-f(x) = -16x.^2 + 32x
-```
-
-Then we could have simply done:
-
-```
-f(x)
-```
-
-Though this is easy to do, it is also rather tedious, as putting in
-the "dots" is, for some reason, not that intuitive, so
-mistakes are often made. (It can surprisingly, also be slower to perform.)
-
-
-We do use this style to generate simple values, for example here we
-step through some powers of $1/10$ without much fuss:
-
-```
-(1/10).^(1:5)
-```
-
-### the "dot" call in Julia since v"0.5.0"
-
-Since version 0.5.0 of `Julia`, one can preface a function call's parentheses with a single dot to get "broadcasting" behaviour. This is like `map`, but a bit more general. To illustrate, we have:
-
-```
-f(x) = -16x^2 + 32x
-xs = [1,2,3]
-f.(xs)
-```
-
-
 
 ### Example
 
@@ -1064,6 +1050,15 @@ we could do any of these:
 f(x) = x^2
 xs = 1:4
 ys = map(f, xs)
+[xs ys]                                  # integer type
+```
+
+or
+
+```
+f(x) = x^2
+xs = 1:4
+ys = f.(xs)
 [xs ys]                                  # integer type
 ```
 
@@ -1087,11 +1082,6 @@ end
 [xs ys]
 ```
 
-```
-xs = linspace(1.0, 4.0, 4)
-ys = xs.^2 
-[xs ys]                                   # Float type, as x is here
-```
 
 The comments show that each is slightly different for technical reasons, but all display the same values.
 
@@ -1260,7 +1250,7 @@ simply finds the slope between the two points $(a,f(a))$ and
 $(b,f(b))$. The second does something with the point-slope form of a
 line using the point $(a, f(a))$. The tricky part is that last line
 defines an anonymous function to be returned (the `x ->` part). So
-`secline` is an *operator* -- a function which accepts a function for
+`secant` is an *operator* -- a function which accepts a function for
 an argument and returns a function.
 
 Using this function makes it simple to add a secant line to a graph. 
@@ -1269,7 +1259,7 @@ Using this function makes it simple to add a secant line to a graph.
 f(x) = sin(x)
 a, b = 0, pi/2
 plot(f, a, b)
-plot!(secant(f, a, b), a, b)
+plot!(secant(f, a, b))
 ```
 
 

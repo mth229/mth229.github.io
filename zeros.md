@@ -2,7 +2,9 @@
 
 ## Introduction
 
-Solving for zero is a mathematical skill taught early on. In some
+A *zero* of the function $f$ is a value $x$ with $f(x) = 0$.
+
+Solving for zero of a function is a mathematical skill taught early on. In some
 cases, such as with linear equations, solving for zeros can be done
 directly using algebra. Similarly, in the case of factorable
 polynomials, we are taught to factor and then set each term to 0 to
@@ -31,10 +33,11 @@ f(x) - g(x)$ and solve for when $h(x)$ is $0$.
 
 
 Here we discuss a few different elementary means to do find zeros with
-`julia`, leaving some others for a later time. 
+`Julia`, leaving some others for a later time. 
 
 
-We will use the add-on package `Roots`, which provides implementations of a few root-finding algorithms. This is loaded with the `MTH229` package:
+We will use the add-on packages `Roots` and `PolynomialZeros`, which
+provide implementations of a few zero- and root-finding algorithms. These are loaded with the `MTH229` package:
 
 ```
 using MTH229    # loads the Roots package
@@ -44,7 +47,7 @@ using MTH229    # loads the Roots package
 plotly()
 ```
 
-
+	
 ## Zeros of a polynomial
 
 Univariate polynomials are algebraic expessions involving an
@@ -95,7 +98,8 @@ end
 alert("""
 This is an example where the function is not *type-stable* as it
 returns either real-valued answers or complex-valued answers depending
-on the *values* of the input variables.
+on the *values* of the input variables. In general, `Julia` functions
+avoid this behaviour, as it leads to less performant code.
 """)
 ```
 
@@ -113,11 +117,10 @@ For example, the *Fundamental theorem of algebra* states that every
 real-valued polynomial of degree $n$ will have $n$ roots, where we count complex
 roots and multiplicities.
 
-How to find them is left to numeric methods though. In `Julia` there
-is an add-on package that will do this work for us. The actual code is
-in the function `roots` from the `Polynomials` package, but we employ
-the easier interface for polynomial functions provided by the `Roots` package.
-
+How to find these roots is then often left to numeric methods though. In `Julia` there
+is an add-on package that will do this work for us. We make use of the
+`PolynomialZeros` pacakge, which provides an interface to a few
+different packages for finding roots of a polynomial.
 
 Rather than write the quadratic polynomial in terms of its
 coefficients alone, we can pass in a quadratic function, as follows:
@@ -125,22 +128,20 @@ coefficients alone, we can pass in a quadratic function, as follows:
 
 
 ```
-using Roots			# only needs to be done once per session
+using MTH229
 f(x) = x^2 + x - 1
-roots(f)
+polyroots(f)
 ```
 
 That is, the command to find the roots of the polynomial $f(x)$ is simply
-`roots` and the the function is called just by passing in the function name (or an anonymous function).
+`polyroots` and the the function is called just by passing in the function name (or an anonymous function).
 
-```
-alert("""
-This is another example of a general template **action(function_object,
-args...)** for performing some action on a function. In this case, the
-action is to find the roots of a function which specifies a polynomial function
-and the additional *args...* are not necessary.)
-""")
-```
+
+By default, the values returned by `polyroots` are complex numbers,
+even if they could be real valules. This is because the fundamental
+theorem of algebra only guarantees $n$ roots for an $n$th degree
+polynomial if complex values are considered.
+
 
 
 That was so easy, we'll do it again. What are the roots of the
@@ -148,35 +149,57 @@ polynomial $f(x) = -16x^2 + 32x + 6$?
 
 ```
 f(x) = -16x^2 + 32x + 6
-roots(f)
+polyroots(f)
 ```
 
-What if the function has no real roots, as this polynomial?
+As can be seen, $f$ has two real roots. This next polynomial has none:
 
 ```
 f(x) = x^2 + x + 1
-roots(f)
+polyroots(f)
 ```
 
-We see the answers are complex valued, as is necessary. 
+### Real roots
+
+These are examples of the general template **action(function_object,
+args...)** for performing some action on a function. In this case, the
+action is to find the roots of a function which specifies a polynomial function
+and the additional *args...* are not necessary--if only complex values
+are desired.
 
 
-The following polynomial has both real roots and complex roots:
+For some problems only the possible real roots are desired. While one
+can filter out the real from the complex in the answers above, numeric
+instabilities can lead to answers where real roots are returned as
+complex numbers. Other algorithms can do a better job for this more
+specific task.
+
+The `realroots` function instructs `polyroots` to look for just real
+roots for polynomials with real coefficients.
+
+The following polynomial has both real roots and complex roots, but we
+will find only the real ones:
 
 ```
 f(x) = (x^2 + x + 1) * (x^2 + x - 1)
-roots(f)
+realroots(f, Over.R)
 ```
 
-The returned value uses complex numbers, as that type is needed to
-describe *all* four values that are returned. The two real roots (previously seen to be `-1.61803` and `0.618034`) are there, they have an additional `0.0im` added to them to make them complex values.
-
-To get just the *real roots*, the related function `fzeros` can be used:
+Compare this to the search over all complex numbers too:
 
 ```
-fzeros(f)			# for polynomials functions just the real roots are returned
+polyroots(f)
 ```
 
+When looking over the reals, the algorithm needs to know if the
+polynomial has any double roots. A polynomial without a double root is
+called *square free*. This is assumed by default. Pass in
+`square_free=false` if that is not the case:
+
+```
+f(x) = x^2 * (x-3)
+realroots(f, Over.R, square_free=false)
+```
 
 ### Practice
 
@@ -193,19 +216,19 @@ radioq(choices, ans)
 
 #### Question
 
-Use the `roots` command to find the largest real root of the
+Use the `realroots` function to find the largest real root of the
 polynomial $x^2 + x - 5$
 
 
 ```
-p = roots(x -> x^2 + x - 5)
+p = polyroots(x -> x^2 + x - 5, Over.R)
 val = maximum(p);
 numericq(val, 1e-3)
 ```
 
 #### Question
 
-Use the `roots` command to find the largest real root of the polynomial $x^3 - x - 17$
+Use the `realroots` function to find the largest real root of the polynomial $x^3 - x - 17$
 
 ```
 zs = fzeros(x -> x^2 - x - 17);
@@ -230,7 +253,7 @@ real root, which is found with:
 
 ```
 f(x) = x^3 -x^2 -x - 1
-roots(f)
+realroots(f)
 ```
 
 
@@ -294,7 +317,7 @@ $$~
 j(x) = \tan(\theta) x - (1/2) \cdot g(\frac{x}{v_0 \cos\theta})^2.
 ~$$
 
-In `julia` we have, taking $v_0=200$:
+In `Julia` we have, taking $v_0=200$:
 
 ```
 j(x; theta=pi/4, g=32, v0=200) = tan(theta)*x - (1/2)*g*(x/(v0*cos(theta)))^2
@@ -311,7 +334,7 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
 
 Again, $v_0$ is the initial velocity and is taken to be $200$
 and $\gamma$ a resistance, which we take to be $1$. With this, we have
-the following `julia` definition (with a slight reworking of $\gamma$):
+the following `Julia` definition (with a slight reworking of $\gamma$):
 
 ```
 function y(x; theta=pi/4, g=32, v0=200, gamma=1) 
@@ -336,7 +359,7 @@ Well, we haven't even seen the peak yet. Better to do a little spade
 work first. This is a quadratic equation, so we can use the `roots` function:
 
 ```
-roots(j) 
+realroots(j) 
 ```
 
 
@@ -395,8 +418,8 @@ plot([j, u -> u < b ? y(u) : NaN] , 0, 1250)
 ```
 alert("""
 The last two plots used *anonymous* functions to plot. Again, they can
-be a bit more confusing to read, but they allow us to compose many
-operations in one quite easily.
+be a bit more confusing to read, but they allow us to compose multiple
+operations at once quite easily.
 """)
 ```
 
@@ -472,12 +495,14 @@ radioq(choices, ans)
 
 In an analysis of rainbows,
 [Airy](http://en.wikipedia.org/wiki/Airy_function) developed a special
-function implemented as `airy` in `julia`. The zeros are all
+function implemented as `airyai` in `Julia`'s `SpecialFunctions`
+package, which is loaded with the `MTH229` package. The zeros of this
+function are all
 negative. The first one is between $-3$ and $-1$. Find it graphically.
 
 
 ```
-val = fzero(airy, -3, -1);
+val = fzero(airyai, -3, -1);
 numericq(val, 1e-1)
 ```
 
@@ -553,18 +578,21 @@ theorem](http://en.wikipedia.org/wiki/Intermediate_value_theorem):
 
 **The intermediate value theorem**: If $f(x)$ is a continuous function
 on $[a,b]$ then at some point in the interval $f(x)$ takes on any
-value between $f(a)$ and $f(b)$. In particular if $f(x)$ is continuous
-with $f(a)$ and $f(b)$ having *different* signs then there must be a
-point $c$ in $[a,b]$ where $f(c) = 0$.
+value between $f(a)$ and $f(b)$.
+
+
+In particular if $f(x)$ is continuous with $f(a)$ and $f(b)$ having
+*different* signs then there must be a point $c$ in $[a,b]$ where
+$f(c) = 0$. (When $f(a)$ and $f(b)$ have different signs, we say $a$
+and $b$ *bracket* a root.)  This observation is due to Bolzano.
 
 
 
 
 
-The bisection algorithm is a simple, *iterative* procedure for finding
+The bisection algorithm utilizes Bolzano's observation. It is a simple *iterative* procedure for finding
 such a value $c$ when we have a continuous function and a bracketing
-interval.  (When $f(a)$ and $f(b)$ have different signs, we say $a$
-and $b$ *bracket* a root.) 
+interval.  
 
 ```
 alert(L"""
@@ -749,7 +777,9 @@ of $e^x = x^4$ over the interval $[0,10]$.
 
 
 
-Recall, solving for $g(x) = h(x)$ is identical to the problem of solving $f(x) = 0$, where we define $f(x) = g(x) - h(x)$. So our problem is to find solutions to $e^x - x^4 = 0$.
+Recall, solving for $g(x) = h(x)$ is identical to the problem of
+solving $f(x) = 0$, where we define $f(x) = g(x) - h(x)$. So our
+problem is to find solutions to $e^x - x^4 = 0$.
 
 
 A quick plot shows that the function has such a wide range that
@@ -798,7 +828,7 @@ fzero(f, 0, 1)
 ```
 
 
-The `fzero` function is actually an interface to different
+The `fzero` function is actually an interface to various
 root-finding algorithms. When called as above -- with two intial
 starting points -- it uses a bracketing approach as discussed here.
 
@@ -849,12 +879,12 @@ numericq(val, 1e-3)
 ```
 #### Question
 
-The `airy` function has infinitely many negative roots, as the function oscillates when $x < 0$. In a previous problem we graphically found the largest root. Now find the *second largest root* using the graph to bracket the answer, and then solving.
+The `airyai` function has infinitely many negative roots, as the function oscillates when $x < 0$. In a previous problem we graphically found the largest root. Now find the *second largest root* using the graph to bracket the answer, and then solving.
 
 
 
 ```
-val = fzero(airy, -5, -4);
+val = fzero(airyai, -5, -4);
 numericq(val, 1e-8)
 ```
 
@@ -929,11 +959,12 @@ radioq(choices, ans)
 
 ## The `fzeros` function
 
-So, `fzero` finds one value within a bracket. But this suggests a means to find all (most?) of the zeros within an interval -- split the interval up into many pieces; identify those that bracket a zero; use `fzero` on those intervals.
+So, `fzero` finds one value within a bracket. But this suggests a
+means to find all (most?) of the zeros within an interval -- split the
+interval up into many pieces; identify those that bracket a zero; use
+`fzero` on those intervals; accumulate the results.
 
-This is basically implemented in the `fzeros(f, a, b)` function. (Here `f` need not be a polynomial function, but we do need to specify an interval to search over, unlike the case when `f` is a polynomial function discussed above.)
-
-
+This is basically implemented in the `fzeros(f, a, b)` function.
 So, to find the zeros of $e^x - x^4$ over $[-10, 10]$ we have:
 
 ```

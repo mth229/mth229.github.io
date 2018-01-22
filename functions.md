@@ -3,9 +3,9 @@
 ## Introduction
 
 
-We see in this section how to easily create functions in `julia`. In
+We see in this section how to easily create functions in `Julia`. In
 the following section we begin to do things with function, by learning
-how to graph functions with `julia`.
+how to graph functions with `Julia`.
 
 For basic things creating a new function and plotting it is as familiar as this:
 
@@ -15,7 +15,7 @@ plotly()
 ```
 
 ```
-using Plots			# for the plot function
+using MTH229			# loads the plot function from `Plots`
 f(x) = sin(3x^2 - 2x^3)
 plot(f, 0, pi)
 ```
@@ -28,9 +28,9 @@ these projects is really this straightforward.
 Mathematically, a function can be viewed in many different ways. An
 abstract means is to think of a function as a mapping, assigning to
 each $x$ value in the function's domain, a corresponding $y$ value in
-the function's range. With computer languages, such as `julia`, the
+the function's range. With computer languages, such as `Julia`, the
 same holds, though there may be more than one argument to the function
-and with `julia` the number of arguments and type of each argument are
+and with `Julia` the number of arguments and type of each argument are
 consulted to see exactly which function is to be called.
 
 Here we don't work abstractly though. For a mathematical function
@@ -42,7 +42,7 @@ $$~
 f(x) = \sin(x) - \cos(x).
 ~$$
 
-In `julia` there are a few different ways to define a function, we
+In `Julia` there are a few different ways to define a function, we
 start with the most natural one which makes it very simple to work
 with such functions.
 
@@ -93,7 +93,7 @@ f(212)
 alert("""
 **Calling a function**
 Evaluating a function for a given value is also known in programming languages as "calling"
-`f`. When we work with functions in `julia`, the distinction between
+`f`. When we work with functions in `Julia`, the distinction between
 the function object and calling the function is important to keep
 straight -- though not too hard to do. In mathematical notation, it is
 sort of like the difference between writing \$f\$ -- as opposed to \$f(x)\$ --
@@ -115,7 +115,7 @@ g(2)
 
 The convention is that when variables are immediately preceded by a
 numeric literal (and by immediately it is meant no spaces are in
-between) `julia` will assume multiplication is intended. (This can
+between) `Julia` will assume multiplication is intended. (This can
 bypass the usual order of operations, e.g.  `5/9(x-32)` is not `5/9*(x-32)`.)
 
 This can also be used when simple parentheses are involved:
@@ -124,7 +124,7 @@ This can also be used when simple parentheses are involved:
 k(x) = 2(x - 1)^2 + 3(x+1)
 ```
 
-But won't work with expressions such as `(x+1)(x-1)`, as `julia` will
+But won't work with expressions such as `(x+1)(x-1)`, as `Julia` will
 then think the first parenthetical pair is a function and try to call
 it with a value of `x-1`.
 
@@ -146,7 +146,7 @@ f(x) = 5/9 \cdot (x - 32)
 ~$$
 
 As the graph of the function $f(x)$ is the same as the graph of the
-equation $y=f(x)$. There is a distinction in `julia` as
+equation $y=f(x)$. There is a distinction in `Julia` as these commands
 
 ```
 x = -40
@@ -213,31 +213,15 @@ For the fractional power, this shows the required
 parentheses around `(1/4)` to ensure that division occurs before the
 higher-precedence power operation (compare `2^1/4` to `2^(1/4)`).
 
-
-Negative powers can be confusing. For example, though these two functions are equivalent mathematically they do not always give the same results with `julia`:
-
-```
-f(x) = 1/x
-g(x) = (x)^(-1)
-```
-
-Compare the values of `f(1)` with `g(1)`. The latter will be an error,
-as the power operation is defined in a type-stable way: when it
-encounters integers, it expects to output integers. This, of course,
-can't be guaranteed for negative powers, so the error is
-thrown. However, `g(1.0)` will work, as the power operator for
-floating point values is defined to return floating point values. For
-simplicity, it is best to use the reciprocal form, e.g. (`1/x^2` instead of `(x)^(-2)`).
-
 ## Common functions
 
 
-Of course `julia` has readily available all the usual built-in
-functions found on a scientific calculator, and many more. See section
-1.4.3 in `julia`'s manual, [mathematical
-functions](http://docs.julialang.org/en/latest/stdlib/base/#mathematical-functions)
-of the official `julia` documentation for lists of available function. In the following, we show how to
-translate some basic math functions into `julia` functions:
+Of course `Julia` has readily available all the usual built-in
+functions found on a scientific calculator, and many more. See the
+section on [mathematical
+operations and functions](https://docs.julialang.org/en/latest/manual/mathematical-operations/)
+of the official `Julia` documentation. In the following, we show how to
+translate some basic math functions into `Julia` functions:
 
 
 
@@ -254,19 +238,24 @@ f(x) = cos(x) - sin(x)^2
 ```
 
 ```
-note("About exponents and functions...")
+note(L"""
+**About exponents and functions...**
+
+The conversion from the commonly written form ($\sin^2(x)$) to the far less ambiguous $\sin(x)^2$ is very important. This is necessary with `Julia` -- as it is with calculators -- as there is no function `sin^2`. In Julia, squaring is done on values -- not functions, like `sin`. (And most likely squaring of a function is more likely to be composition, which is not the usage here.) So, to have success, learn to drop the notations $\sin^2(x)$ or for the arc sine function $\sin^{-1}(x)$. These shortcuts are best left in the age when mathematics was done just on paper.
+""")
 ```
-
-The conversion from the commonly written form ($\sin^2(x)$) to the far less ambiguous $\sin(x)^2$ is very important. This is necessary with `julia` -- as it is with calculators -- as there is no function `sin^2`. In Julia, squaring is done on values -- not functions, like `sin`. (And most likely squaring of a function is more likely to be composition, which is not the usage here.) So, to have success, learn to drop the notations $\sin^2(x)$ or for the arc sine function $\sin^{-1}(x)$. These shortcuts are best left in the age when mathematics was done just on paper.
-
 
 ----
 
-If you want to work in degrees you can do so with the degree-based trigonometric functions:
+If you want to work in degrees you can do so with the degree-based
+trigonometric functions, which follow the same naming pattern save a
+trailing "d":
 
 ```
 fd(x) = cosd(x) - sind(x)^2
 ```
+
+
 
 
 ### Inverse trigonometric functions
@@ -283,7 +272,7 @@ becomes
 f(x) = 2atan( sqrt(1-x^2) / (1 + x) )
 ```
 
-This particular function is just an alternative expression for the arc cosine (mathematically $\cos^{-1}$ but in `julia` `acos`) using the arctan function, as seen here:
+This particular function is just an alternative expression for the arc cosine (mathematically $\cos^{-1}$ but in `Julia` `acos`) using the arctan function, as seen here:
 
 ```
 f(.5) - acos(.5) ## nearly 0
@@ -292,7 +281,7 @@ f(.5) - acos(.5) ## nearly 0
 
 The exponent in the inverse trigonometric functions is *just*
 mathematical notation for the longer expression "arctan" or
-"arccos". (It definitely is not a reciprocal.)  The `julia` functions
+"arccos". (It definitely is not a reciprocal.)  The `Julia` functions
 -- like most all computer languages -- abbreviate these names to
 `atan`, `acos` or `asin`.
 
@@ -313,7 +302,7 @@ Can be expressed as
 f(x) = e^(-(1/2)*x^2)
 ```
 
-The value of $e$ is built-in to `julia`, but $e$ can be inadvertently
+The value of $e$ is built-in to `Julia`, but $e$ can be inadvertently
 redefined. As such, it is a safer practice to use the `exp` function,
 as in:
 
@@ -321,7 +310,8 @@ as in:
 f(x) = exp(-(1/2)*x^2)
 ```
 
-There isn't much difference in use, but don't try to do both at once: `exp^(-(1/2)*x^2)`!
+There isn't much difference in use, but don't try to do both at once,
+as in `exp^(-(1/2)*x^2)`!
 
 
 ### Logarithms
@@ -353,7 +343,7 @@ can be done through:
 f(x) = log(10, 1 + x)
 ```
 
-where the *first* argument expresses the base.  For convenience, `julia` also gives the
+where the *first* argument expresses the base.  For convenience, `Julia` also gives the
 functions `log10` and `log2` for base 10 and 2 respectively.
 
 
@@ -643,7 +633,7 @@ f(x) = \begin{cases}
 \end{cases}
 ~$$
 
-Translating this notation to `julia` can also be done with the `if-else-end` construct:
+Translating this notation to `Julia` can also be done with the `if-else-end` construct:
 
 ```
 function f(x)
@@ -657,7 +647,11 @@ end
 
 
 
-The expression after `if` is a *Boolean value* (a `true` or `false` value). In these examples they are generated through the *Boolean operators*, which include the familiar comparison symbols `<`, `<=`, `==`, `>=`, and `>`. (Only `==` takes learning. Double equal signs are used for comparison, a single one is for assignment.)
+The expression after `if` is a *Boolean value* (a `true` or `false`
+value). In these examples they are generated through the *Boolean
+operators*, which include the familiar comparison symbols `<`, `<=`,
+`==`, `>=`, and `>`. (Only `==` takes learning, as double equal signs
+are used for comparison, a single one is for assignment.)
 
 
 
@@ -724,7 +718,7 @@ Which of these definitions will be the equivalent of $f(x) = |x|$? (The `abs` fu
 choices =  ["`f(x) = x`",
 	    "`f(x) = x > 0 ? x : 0.0`",
 	    "`f(x) =   x > 0.0 ? x : -x`",
-		"`f(x) = x > 0.0 ? -x : x"
+		"`f(x) = x > 0.0 ? -x : x`"
 	     ];	   
 ans = 3;
 radioq(choices, ans)
@@ -794,7 +788,7 @@ just uses the change-of-base formula for logarithms.
 
 But not so fast, on the left side is a function with two arguments and
 on the right side the functions have one argument -- yet they share
-the same name. How does `julia` know which to use? `Julia` uses the
+the same name. How does `Julia` know which to use? `Julia` uses the
 number, order, and *type* of the arguments passed to a function to
 determine which function definition to use. This is technically known
 as **multiple dispatch** or **polymorphism**. As a feature of the
@@ -805,7 +799,7 @@ example addition. It is defined for real numbers, integers, complex
 numbers, ... . Each definition may be different, but to the end user
 only the operator `+` need be used. The rest happens behind the
 scenes. As an example, to see how many different definitions ("methods") are defined
-in the base `julia` language for the `log` operator, we can execute:
+in the base `Julia` language for the `log` operator, we can execute:
 
 
 ```
@@ -836,9 +830,9 @@ h(w) = (20  - 2*w)/2
 ```
 
 By hand we would substitute this last expression into that for the
-area (to get $A=w\cdot (20-2 \cdot w)/2 = -w^2 + 10$) and simplify. However, within `julia`
+area (to get $A=w\cdot (20-2 \cdot w)/2 = -w^2 + 10$) and simplify. However, within `Julia`
 we can let composition do the substitution and leave algebraic
-simplification for `julia` to do:
+simplification for `Julia` to do:
 
 
 ```
@@ -849,7 +843,7 @@ This might seem odd, as now we have two *different* but related
 functions named `Area`. Julia will decide which to use based on the
 number of arguments when the function is called. This allows both to
 be used on the same line, as above. This usage is not common with
-computer languages, but is a feature of `julia` which is built around
+computer languages, but is a feature of `Julia` which is built around
 the concept of *generic* functions with multiple dispatch rules to
 decide which rule to call.
 
@@ -861,7 +855,7 @@ variable. Behind the scenes, then the function `A(w)` will be used in this graph
 plot(Area, 0, 10)
 ```
 
-From this, we can see that that width for maximum area is $w=5$ and so $h=5$ as well.
+From this, we can see that that the width yielding the maximum area is $w=5$, and so $h=5$ as well.
 
 ## Functions with parameters
 
@@ -922,7 +916,7 @@ g(50, theta=pi/8)		## smaller in this case.
 
 
 Passing in parameters has the big advantage of explicitly showing how
-`julia` will find variables used within a function, as otherwise you
+`Julia` will find variables used within a function, as otherwise you
 need to have an understanding of the *scoping rules* in
 place. (Scoping rules determine where variables that are not passed in
 as arguments are found when referred to within a function.)
@@ -1023,7 +1017,7 @@ x \rightarrow -16x^2 + 32x
 ~$$
 
 
-You can do the exact thing in `julia` to create a function:
+You can do the exact thing in `Julia` to create a function:
 
 ```
 x -> -16x^2 + 32x
@@ -1206,7 +1200,7 @@ radioq(choices, ans)
 
 
 This section presents some additional details on writing functions in
-`julia` that are here for informational purposes only.
+`Julia` that are here for informational purposes only.
 
 ### Return values, tuples
 
@@ -1235,7 +1229,7 @@ f(x) = x > 0 ?  (x^x, "") : (NaN, "You can't use non-positive numbers")
 ```
 
 We include a message even when the value of $x$ is okay, as it is good
-practice --though not a requirement of `julia` -- to always return the
+practice --though not a requirement of `Julia` -- to always return the
 same type of object, regardless the input.
 
 A simple call would be:
@@ -1302,7 +1296,7 @@ issues with loss of precision, though it does specialize to integers,
 and any sub-type. It also always returns an integer, whereas ours
 returns a floating-point value.)
 
-Types in `julia` are a more complicated matter than we want to get
+Types in `Julia` are a more complicated matter than we want to get
 into here, but we do want to list the common types useful for basic
 calculus: `Function`, `Real`, `Integer`, `Rational`, `Complex`, and
 `Number` (real or complex).
@@ -1314,7 +1308,7 @@ a mathematical function, it is enough to specify values of `Real`.
 
 ### Generic and anonymous functions
 
-In `julia` there are really two types of functions: *generic functions*
+In `Julia` there are really two types of functions: *generic functions*
 and *anonymous functions*. A generic function is created when we use this form
 to create a function:
 
@@ -1343,10 +1337,10 @@ you try to redefine a generic function as an anonymous function:
 g1 = x -> sin(2x^2)
 ```
 
-Or vice versa. Basically, `julia` has assigned a certain function type
+Or vice versa. Basically, `Julia` has assigned a certain function type
 to that name and you can't change that type though you can change the
 function's definition. (This is one exception to the "dynamic" aspect
-of `julia`.)
+of `Julia`.)
 
 We use the generic function approach in these notes to define our
 named functions, as the basic notation so closely mirrors the standard

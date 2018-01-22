@@ -12,7 +12,7 @@ though it offers many improvements over that language. For these
 notes, the focus will be on its more transparent syntax, but in
 general a major selling point of `Julia` is that it is much faster
 that `MATLAB` at many tasks.  (Well it should be, `MATLAB` was started
-back in the 70s.) Even better, `julia` is an open-source project which
+back in the 70s.) Even better, `Julia` is an open-source project which
 means it is free to download and install, unlike the commercial
 package `MATLAB`.
 
@@ -26,7 +26,7 @@ idiosyncrasies we will see along the way, for the most part the
 `Julia` language will be both powerful and easy to learn.
 
 
-In this project we start with baby steps -- how to use `julia` to
+In this project we start with baby steps -- how to use `Julia` to
 perform operations we can do on the calculator. The use of a
 calculator requires knowledge about several things we take for granted
 here:
@@ -49,12 +49,12 @@ Parallells of each of these will be discussed in the following.
 notations. The familiar binary operators are `+`, `-`, `*`, `/`, and
 `^`.  With a calculator you "punch" in numbers and operators and to
 get an answer push the `=` key. Using `Julia` is not much different:
-you type in an expression then send to `julia` to compute. The "equals
+you type in an expression then send to `Julia` to compute. The "equals
 key" on a calculator is replaced by the *enter* key on the keyboard
 (or *shift-enter* if using `IJulia`). Beyond that there isn't much
 difference.
 
-For example, to add two and two we simple execute:
+For example, to add two and two we simply execute:
 
 ```
 2 + 2
@@ -89,7 +89,7 @@ To find the value of $\sqrt{15}$ we can use  power notation:
 
 #### Question
 
-Compute $22/7$ in `julia`.
+Compute $22/7$ in `Julia`.
 
 ```
 val = 22/7
@@ -99,7 +99,7 @@ numericq(val, 1e-5)
 
 #### Question
 
-Compute $\sqrt{220}$ in `julia`.
+Compute $\sqrt{220}$ in `Julia`.
 
 ```
 val = sqrt(220)
@@ -108,7 +108,7 @@ numericq(val, 1e-5)
 
 #### Question
 
-Compute $2^8$ in `julia`.
+Compute $2^8$ in `Julia`.
 
 ```
 val = 2^8
@@ -142,7 +142,7 @@ be $3 + 2 + 1$. This is because addition is *associative*. (Well, not
 really on the computer, but that is another lesson.) In the case of $3
 \cdot 2 + 1$ the order certainly matters.
 
-For $3 \cdot 2 + 1$ if we did the addition first, the expression would
+For $3 \cdot 2 + 1$ if we did the addition first, the expression would be
 $9 = 3\cdot 3$. If we did the multiplication first, the value would be
 $7=6+1$. In this case, we all know that the correct answer is $7$, as
 we perform multiplication before addition, or in more precise terms
@@ -161,8 +161,8 @@ so we spell it out here:
 * (`AS`) then addition or subtraction.
 
 
-This has the precedence of multiplication (`MD`) higher than that of
-subtraction (`AS`), as just mentioned.
+This has the precedence of multiplication (part of `MD`) higher than that of
+subtraction (part of `AS`), as just mentioned.
 
 
 Applying this, if we have the mathematical expression
@@ -202,7 +202,7 @@ There is a little more to the story, as we need to understand what
 happens when we have more then one operation with the same level. For
 instance, what is $2 - 3- 4$? Is it $(2 - 3) - 4$ or $2 - (3 - 4)$. 
 
-Unlike addition, subtraction is *not associative8 so this really
+Unlike addition, subtraction is *not associative* so this really
 matters.  The subtraction operator is [left
 associative](http://en.wikipedia.org/wiki/Operator_associativity)
 meaning the evaluation of $2 - 3 - 4$ is done by $(2-3) - 4$. The
@@ -220,7 +220,7 @@ alert("""
 ```
 
 
-To see that `julia` has left associative subtraction, we can just
+To see that `Julia` has left associative subtraction, we can just
 check. 
 
 ```
@@ -238,30 +238,30 @@ usage. For example:
 
 
 What about the case where we have different operations with the same
-precedence? What happens then? A simple example would be $2 + 3 - 4$?
+precedence? What happens then? A simple example would be $2 / 3 * 4$?
 Is this done in a left to right manner as in:
 
 ```
-(2 + 3) - 4
+(2 / 3) * 4
 ```
 
 Or a right-to-left manner, as in:
 
 ```
-2 + (3 - 4)
+2 / (3 * 4)
 ```
 
 And the answer is *left-to-right*:
 
 ```
-2 + 3 - 4
+2 / 3 * 4
 ```
 
 ### Practice
 
 #### Question
 
-Wich of the following is a valid `julia` expression for 
+Wich of the following is a valid `Julia` expression for 
 
 $$~
 \frac{3 - 2}{4 - 1}
@@ -280,7 +280,7 @@ radioq(choices, ans)
 
 #### Question
 
-Wich of the following is a valid `julia` expression for 
+Wich of the following is a valid `Julia` expression for 
 
 $$~
 \frac{3\cdot2}{4}
@@ -297,7 +297,7 @@ radioq(choices, ans)
 
 #### Question
 
-Wich of the following is a valid `julia` expression for 
+Wich of the following is a valid `Julia` expression for 
 
 $$~
 2^{4 - 2}
@@ -379,7 +379,7 @@ numericq(val, .001)
 
 #### Question
 
-Compute the following using `julia`:
+Compute the following using `Julia`:
 
 $$~
 \frac{(.25 - .2)^2}{(1/4)^2 + (1/3)^2}
@@ -394,7 +394,7 @@ numericq(ans)
 
 #### Question
 
-Compute the decimal representation of the following using `julia`:
+Compute the decimal representation of the following using `Julia`:
 
 $$~
 1 + \frac{1}{2} + \frac{1}{2^2} + \frac{1}{2^3} + \frac{1}{2^4}
@@ -409,7 +409,7 @@ numericq(ans)
 
 #### Question
 
-Compute the following using `julia`:
+Compute the following using `Julia`:
 
 $$~
 \frac{3 - 2^2}{4 - 2\cdot3}
@@ -424,7 +424,7 @@ numericq(ans)
 
 #### Question
 
-Compute the following using `julia`:
+Compute the following using `Julia`:
 
 $$~
 (1/2) \cdot 32 \cdot 3^2 + 100 \cdot 3 - 20
@@ -464,7 +464,7 @@ notation:
 
 Additionally, parentheses are also used to make "tuples", a concept we
 don't pursue here but that is important for programming with
-`julia`. The point here is the context of how parentheses are used is
+`Julia`. The point here is the context of how parentheses are used is
 important, though for the most part the usage is the same as their
 dual use in your calculus text.
 
@@ -489,7 +489,7 @@ cbrt(-8)			## correct
 
 (The latter is an error as the power function has an output type that
 depends on the power being real, not a specific value of a real. For
-1/2 the above would clearly be an error, so then for 1/3 `julia` makes
+1/2 the above would clearly be an error, so then for 1/3 `Julia` makes
 this an error.)
 
 
@@ -497,7 +497,7 @@ this an error.)
 
 
 
-The basic trigonometric functions in `julia` work with radians:
+The basic trigonometric functions in `Julia` work with radians:
 
 ```
 sin(pi/4)
@@ -512,7 +512,7 @@ sin(45 * pi/180)
 cos(60 * pi/180)
 ```
 
-However, `julia` provides the student-friendly functions `sind`,
+However, `Julia` provides the student-friendly functions `sind`,
 `cosd`, and `tand` to work directly with degrees:
 
 ```
@@ -532,7 +532,7 @@ cos(pi/4)^2			# not cos^2(pi/4) !!!
 
 The math notation $\sin^{-1}(x)$ is also a source of confusion. This
 is **not** a power, rather it indicates an *inverse* function, in this
-case the arcsine. The arcsine function is written `asin` in `julia`.
+case the arcsine. The arcsine function is written `asin` in `Julia`.
 
 For certain values, the arcsine and sine function are inverses:
 
@@ -610,12 +610,7 @@ ceil(3.14)
 
 The observant eye will notice the answers above are not integers. (We
 discuss how to tell later.)  What to do if you want an integer? These
-functions have versions `iround`, `ifloor`, and `iceil` to return
-integer values.  (Why this is needed is due to the fact that `julia`
-code can run faster when the "type" of a value doesn't change during
-the calling of a function. So for these functions there are good
-reasons for the default to keep the same output type as the input
-value, e.g. floating point to floating point.)
+functions take a "type" argument, as in `rount(Int, 3.14)`. 
 
 
 ### Practice
@@ -695,23 +690,6 @@ numericq(pi - ans)
 
 
 
-#### Question
-
-Search the page [mathematical
-functions](http://docs.julialang.org/en/latest/stdlib/base/#mathematical-functions)
-for a function which finds the factorial of `n`. The proper `julia`
-command to find $10!$ would be:
-
-```
-choices = [
-"`fact(10)`",
-"`10!`",
-"`factorial(10)`"
-];
-ans = 3;
-radioq(choices, ans)
-```
-
 
 
 
@@ -743,7 +721,7 @@ x = sqrt(2) ## a Float64 now
 
 
  
-In `julia` one can have single letter names, or much longer ones, such as
+In `Julia` one can have single letter names, or much longer ones, such as
 
 ```
 some_ridiculously_long_name = 3
@@ -812,7 +790,7 @@ a=0; b=1;
 ```
 
 
-Note that `julia` makes this task even easier, as one can do
+Note that `Julia` makes this task even easier, as one can do
 multiple assignments via "tuple destructuring:"
 
 ```
@@ -897,7 +875,7 @@ complex numbers are needed to fully discuss polynomial functions. This
 is not the case with calculators.
 
 Most calculators treat all numbers as floating point numbers -- an
-approximation to the real numbers.  Not so with `julia`.  `Julia` has
+approximation to the real numbers.  Not so with `Julia`.  `Julia` has
 types for many different numbers: `Integer`, `Real`, `Rational`,
 `Complex`, and specializations depending on the number of bits that
 are used, e.g., `Int64` and `Float64`. For the most part there is no
@@ -946,7 +924,7 @@ This gives back the floating point value `2.0`. First the integer and floating p
 
 Powers are different. This value will be an error `10^(-2)`, but `10.0^(-2)` will not. 
 
-> In base `julia`, if possible,  functions are [type stable](http://docs.julialang.org/en/latest/manual/faq/#why-does-julia-give-a-domainerror-for-perfectly-sensible-operations). This means, the type of the output depends 
+> In base `Julia`, if possible,  functions are [type stable](http://docs.julialang.org/en/latest/manual/faq/#why-does-julia-give-a-domainerror-for-perfectly-sensible-operations). This means, the type of the output depends 
 > on the type of the input -- not the value. In this case, integer powers and bases
 > are expected to return integer answers, which $10^{-2}$ is not.
 
@@ -1000,7 +978,7 @@ The following works though:
 ```
 
 This is because the value `2.0` will use floating point arithmetic
-which has a much wider range of values. (The `julia` documentation
+which has a much wider range of values. (The `Julia` documentation
 sends you to this interesting blog post
 [johndcook](http://www.johndcook.com/blog/2009/04/06/anatomy-of-a-floating-point-number/),
 which indicates the largest floating point value is $2^{1023}(2 -
@@ -1010,9 +988,10 @@ which indicates the largest floating point value is $2^{1023}(2 -
 > Scientific notation is used to represent many numbers
 
 
-A number in `julia` may be represented in scientific notation. The
-basic canonical form is $a\cdot 10^b$, with $-10 < a < 10$ and $b$ is an
-integer. This is written in `julia` as `aeb` where `e` is used to
+A number in `Julia` may be represented in scientific notation. The
+basic canonical form is $a\cdot 10^b$, with $1 \leq |a| < 10$
+and $b$ is an
+integer. This is written in `Julia` as `aeb` where `e` is used to
 separate the value from the exponent. The value `1.8e308` means $1.8
 \cdot 10^{308}$. Scientific notation makes it very easy to focus on
 the gross size of a number, as the exponent is set off.
@@ -1087,7 +1066,7 @@ The `===` operator has an even more precise notion of equality:
 ### Scientific notation
 
 As mentioned, one can write `3e8` for  $3 \cdot 10^8$, but in fact
-to `julia` the two values `3e8` and `3*10^8` are not
+to `Julia` the two values `3e8` and `3*10^8` are not
 quite the same, as one is stored in floating point, and one as an
 integer. One can use `3.0 * 10.0^8` to get a floating point equivalent to `3e8`.
 
@@ -1123,7 +1102,7 @@ x^2/(1-cos(x))			## should be about 2
 In addition to special classes for integer and floating point values,
 `Julia` has a special class for rational numbers, or ratios of
 integers. To distinguish between regular division and rational
-numbers, `julia` has the `//` symbol to define rational numbers:
+numbers, `Julia` has the `//` symbol to define rational numbers:
 
 ```
 1//2
@@ -1143,7 +1122,7 @@ numbers:
 ```
 
 Rational numbers are used typically to avoid round off error when
-using floating point values. This is easy to do, as `julia` will
+using floating point values. This is easy to do, as `Julia` will
 convert them when needed:
 
 
@@ -1175,7 +1154,7 @@ In `Julia` a complex number may be constructed by the `Complex` function:
 z = Complex(1,2)
 ```
 
-We see that `julia` uses `im` (and not `i`) for the $i$. It can be
+We see that `Julia` uses `im` (and not `i`) for the $i$. It can be
 more direct to just use this value in constructing complex numbers:
 
 ```
@@ -1189,7 +1168,7 @@ z^2, 1/z, conj(z)
 ```
 
 The value of $i$ comes from taking the square root of $-1$. This is
-almost true in `julia`, but not quite. As the `sqrt` function will
+almost true in `Julia`, but not quite. As the `sqrt` function will
 return a real value for any real input, directly trying `sqrt(-1.0)`
 will give a `DomainError`, as in $-1.0$ is not in the domain of the
 function. However, the `sqrt` function will return complex numbers for
@@ -1326,7 +1305,7 @@ numericq(val; hint="This value is indistinguishable from 3.5")
 
 #### question
 
-If you need more bits, `julia` provides the `BigInt` and `BigFloat`
+If you need more bits, `Julia` provides the `BigInt` and `BigFloat`
 classes which give $256$ bits of precision. Using this allows one to compute $2^3^4$ precisely as an integer:
 
 ```verbatim

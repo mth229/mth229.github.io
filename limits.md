@@ -263,7 +263,7 @@ numericq(val, 1e-2)
 The following limit is commonly used:
 
 $$~
-\lim_{h \rightarrow 0} \frac{e^{x + h} - e^x}{h} = L.
+L = \lim_{h \rightarrow 0} \frac{e^{x + h} - e^x}{h}.
 ~$$
 
 Factoring out $e^x$ from the top and using rules of limits this becomes, 
@@ -276,7 +276,7 @@ What is $L$?
 
 
 ```
-choices = ["0", "1", "e^x"]
+choices = [L"0", L"1", L"e^x"]
 ans = 3
 radioq(choices, ans)
 ```
@@ -304,7 +304,7 @@ L = \cos(x) \lim_{h \rightarrow 0}\frac{\sin(h)}{h} + \sin(x) \lim_{h \rightarro
 Using the last result, what is the value of $L$?
 
 ```
-choices = ["cos(x)", "sin(x)", "1", "0", "sin(h)/h"]
+choices = [L"cos(x)", L"sin(x)", L"1", L"0", L"sin(h)/h"]
 ans = 1
 radioq(choices, ans, keep_order=true)
 ```
@@ -422,7 +422,7 @@ estimate the length of the range of the plotted values:
 ```
 function epsilon(f, c, delta)
 	 xs = linspace(c - delta, c + delta)
-	 ys = map(f, xs)	# like drawing a plot
+	 ys = f.(xs)    	# like drawing a plot
 	 m, M = extrema(ys)	# minimum and maximum
 	 M - m
 end
@@ -507,7 +507,7 @@ $$~
 which we know is simply $-1/5$. To approach this problem using a table we would first need to produce some values of $x$ getting close to $2$. Here we get values approaching 2 from above:
 
 ```
-hs = [1/10, 1/100, 1/1000, 1/10000, 1/100000]  # of [1/10^i for i in 1:5]
+hs = [1/10, 1/100, 1/1000, 1/10000, 1/100000]  # or [1/10^i for i in 1:5]
 xs = 2 + hs
 ```
 
@@ -515,12 +515,14 @@ The corresponding $y$ values are found by applying $f$ to each:
 
 ```
 f(x) = ((x+2)*(x-3)) / ((x+2)*(x+3))
-ys = map(f, xs)
+ys = f.(xs)
 ```
 
 The `ys` are clearly getting closer to $-0.2$, as expected.
 
-The pairs of values `xs` and `ys` can be more naturally displayed with a table, the square-bracket notation is useful here:
+The pairs of values `xs` and `ys` can be more naturally displayed with
+a table, the square-bracket notation is useful here to put the values
+into two columns:
 
 ```
 [xs ys]
@@ -532,15 +534,17 @@ used `xs` defined with:
 
 ```
 xs = [2 - 1/10, 2 - 1/100, 2 - 1/1000, 2 - 1/10000, 2 - 1/100000]    	  	       
-ys = map(f, xs)
+ys = f.(xs)
 [xs ys]
 ```
 
 We see the same phenomenon -- $f(x)$ gets close to $-0.2$ as $x$ gets close to $c=2$ from the left or the right. 
 
-The three steps above are  bit tedious to type for each problem, so for convenience we encapsulate them into a function:
+The three steps above are  bit tedious to type for each problem, so
+for convenience we encapsulate them into a function (available in the
+`MTH229` package):
 
-```
+```verbatim
 function lim(f::Function, c::Real; n::Int=6, dir="+")
 	hs =  [(1/10)^i for i in 1:n]
 	 if dir == "+"
@@ -548,12 +552,14 @@ function lim(f::Function, c::Real; n::Int=6, dir="+")
 	 else
 	   xs = c - hs
 	 end
-	 ys = map(f, xs)
+	 ys = f.(xs)
 	 [xs ys]
 end
 ```
 
-We used keywords, `n`, to allow the user to change how close the `xs` get to $c$ and `dir` to indicate the direction. The default direction is from the right.
+We used keywords, `n`, to allow the user to change how close the `xs`
+get to $c$ and `dir` to indicate the direction. The default direction
+is from the right.
 
 
 Now consider the limit of $x^x$ as $x$ goes to $0$ from the
@@ -794,7 +800,7 @@ Consider different values of $k$ to see if the limit depends on $k$ or not. What
 
 
 ```
-choices = ["1", "k", "log(k)", "The limit does not exist"]
+choices = [L"1", L"k", L"\log(k)", "The limit does not exist"]
 ans = 2
 radioq(choices, ans)
 ```
@@ -814,7 +820,7 @@ Consider different values of $k$ to see if this limit depends on $k$ or not. Wha
 
 
 ```
-choices = ["1", "k", "log(k)", "The limit does not exist"]
+choices = [L"1", L"k", L"\log(k)", "The limit does not exist"]
 ans = 1
 radioq(choices, ans)
 ```
@@ -1031,7 +1037,7 @@ Here is a first attempt
 f(x) = (1 - cos(x))/x^2
 c = 0
 xs = [c + (1/10)^i for i in 1:10]
-ys = map(f, xs)
+ys = f.(xs)
 [xs ys]
 ```
 
@@ -1238,7 +1244,7 @@ It has a right limit at $c=0$, but not what is expected, which might appear to b
 
 ```
 xs = [0 + (1/10)^i for i in 2:6]
-ys = map(f, xs)
+ys = f.(xs)
 [xs ys]
 ```
 
@@ -1247,6 +1253,42 @@ But in fact the limit is quite different from $0$:
 ```
 limit(f, 0, dir="+")
 ```
+
+### limits with parameters
+
+Consider the limit
+
+$$~
+L = \lim_{x \rightarrow 0} \frac{b^x - 1}{x}.
+~$$
+
+It's answer depends on the value of $b$. How would we approach this
+with `SymPy`? The interface described above where functions are use is not the only one `SymPy`
+knows of, and indeed is not typical of how one works with
+`SymPy`. Typically, symbolic values are defined and then symbolic
+expressions are used.
+
+Here is how we define a symbolic value (in fact two):
+
+```
+@vars x b
+```
+
+And here is how we use them:
+
+```
+limit((b^x - 1) / x, x=>0)
+```
+
+First, we see the $\log(b)$ value "magically" appearing. That may not
+have been expected.
+
+More importantly for using this on a different problem, note that
+*instead* of a function an *expression* was used. (This being `(b^x -
+1)/x`.) Symbolic values when combined create symbolic expressions
+which can be passed on the `SymPy` function, like `limit`. To specify
+the $x \rightarrow c$ we have the "pair" notation `x => 0`. And that
+was it.
 
 ### Problem
 
