@@ -78,6 +78,8 @@ using the "upload" button of the file manager.
 
 ## The projects for MTH 229
 
+See all projects at [https://github.com/mth229/229-projects](https://github.com/mth229/229-projects).x
+
 
 * [Calculator](http://mth229.github.io/calculator.html)
 
@@ -85,8 +87,8 @@ Basics of types, order of operations, assignment and variables.
 
 <br/>
 An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/calculator.ipynb) 
-[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/calculator.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/01-calculator.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/01-calculator.ipynb?create=1)
 
 * [Functions](http://mth229.github.io/functions.html)
 
@@ -95,8 +97,8 @@ ternary operator, multiple arguments, and return values (tuples).
 
 <br/>
 An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/functions.ipynb) 
-[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/functions.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/02-functions.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/02-functions.ipynb?create=1)
 
 
 * [Graphing](http://mth229.github.io/graphing.html)
@@ -111,8 +113,8 @@ array is given. This will be useful later on with limits, ...
 
 <br/>
 An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/graphics.ipynb) 
-[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/graphics.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/03-graphics.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/03-graphics.ipynb?create=1)
 
 
 * [Zeros](http://mth229.github.io/zeros.html)
@@ -125,8 +127,8 @@ The add-on `Roots` package provides some convenient functionality.
 
 <br/>
 An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/zeros.ipynb) 
-[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/zeros.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/04-zeros.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/04-zeros.ipynb?create=1)
 
 * [Limits](http://mth229.github.io/limits.html)
 
@@ -136,8 +138,8 @@ Discussion on floating point representation and potential issues (subtracting li
 
 <br/>
 An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/limits.ipynb) 
-[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/limits.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/05-limits.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/05-limits.ipynb?create=1)
 
 * [Derivatives](http://mth229.github.io/derivatives.html)
 
@@ -145,13 +147,12 @@ Explore forward difference and central difference with a bit on error
 analysis.
 
 We end with a brief discussion on automatic differentiation, as
-implemented in the `ForwardDiff` add-on package via the `Roots`
-package.
+implemented in the `ForwardDiff` add-on package.
 
 <br/>
 An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/derivatives.ipynb) 
-[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/derivatives.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/06-derivatives.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/06-derivatives.ipynb?create=1)
 
 
 * [First and second derivatives](http://mth229.github.io/first-second-derivatives.html)
@@ -161,8 +162,8 @@ derivatives.
 
 <br/>
 An assignment for this material: 
-[ipynb](http://mth229.github.io/229-projects/first_second_derivatives.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/229-projects/first_second_derivatives.ipynb?create=1)
+[ipynb](http://mth229.github.io/229-projects/07-first_second_derivatives.ipynb) 
+[view](http://nbviewer.ipython.org/url/mth229.github.io/229-projects/07-first_second_derivatives.ipynb?create=1)
 
 * [Newton's method](http://mth229.github.io/newton.html)
 
@@ -176,8 +177,8 @@ The `fzero` function of the `Roots` package is discussed.
 
 <br/>
 An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/newton.ipynb) 
-[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/newton.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/08-newton.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/08-newton.ipynb?create=1)
 
 
 * [Extrema](http://mth229.github.io/extrema.html)
@@ -186,8 +187,8 @@ A project on minimization and maximization. Some standard applied problems are p
 
 <br/>
 An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/extrema.ipynb) 
-[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/extrema.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/09-extrema.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/09-extrema.ipynb?create=1)
 
 * [Integration](http://mth229.github.io/integration.html)
 
@@ -197,13 +198,13 @@ of solids of revolution.
 
 <br/>
 An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/integration.ipynb) 
-[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/integration.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/10-integration.ipynb) 
+[view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/10-integration.ipynb?create=1)
 
 
 ### Calculus II material
 
-
+See the projects at [https://github.com/mth229/232-projects](https://github.com/mth229/232-projects).
 
 * [Symbolic](http://mth229.github.io/symbolic.html)
 
