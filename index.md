@@ -7,6 +7,11 @@ note(""" For a more thorough introduction, visit [Calculus with Julia](http://ca
 
 ## Introduction
 
+```
+note(""" These use version v0.6 of Julia, not v1.0. There are some
+surface level changes that need updating to use under the newer
+See all projects at [https://github.com/mth229/229-projects](https://github.com/mth229/229-projects)version.""")
+```
 
 This is a collection of notes for exploring calculus concepts
 with the `Julia` programming language, as is done with MTH229 at the College of Staten Island.
