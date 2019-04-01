@@ -155,8 +155,8 @@ The standard order of the basic mathematical operations is remembered
 by many students through the mnemonic PEMDAS, which can be misleading,
 so we spell it out here:
 
-* (`P`) First parentheses 
-* (`E`) then exponents (or powers) 
+* (`P`) First parentheses
+* (`E`) then exponents (or powers)
 * (`MD`) then multiplication or division
 * (`AS`) then addition or subtraction.
 
@@ -189,18 +189,18 @@ not just the last one evaluated. This trick is also a useful trick
 within an `IJulia` notebook.
 
 """)
-```		
+```
 
 > Parentheses are used to force lower precedence operations to happen
 > before higher precedence ones.
 
 
-### Same precedence -- what to do 
+### Same precedence -- what to do
 
 
 There is a little more to the story, as we need to understand what
 happens when we have more then one operation with the same level. For
-instance, what is $2 - 3- 4$? Is it $(2 - 3) - 4$ or $2 - (3 - 4)$. 
+instance, what is $2 - 3- 4$? Is it $(2 - 3) - 4$ or $2 - (3 - 4)$.
 
 Unlike addition, subtraction is *not associative* so this really
 matters.  The subtraction operator is [left
@@ -221,7 +221,7 @@ alert("""
 
 
 To see that `Julia` has left associative subtraction, we can just
-check. 
+check.
 
 ```
 2 - 3 - 4, (2 - 3) - 4, 2 - (3 - 4)
@@ -261,11 +261,11 @@ And the answer is *left-to-right*:
 
 #### Question
 
-Wich of the following is a valid `Julia` expression for 
+Wich of the following is a valid `Julia` expression for
 
 $$~
 \frac{3 - 2}{4 - 1}
-~$$ 
+~$$
 
 that uses the least number of parentheses?
 
@@ -280,11 +280,11 @@ radioq(choices, ans)
 
 #### Question
 
-Wich of the following is a valid `Julia` expression for 
+Wich of the following is a valid `Julia` expression for
 
 $$~
 \frac{3\cdot2}{4}
-~$$ 
+~$$
 
 that uses the least number of parentheses?
 
@@ -297,11 +297,11 @@ radioq(choices, ans)
 
 #### Question
 
-Wich of the following is a valid `Julia` expression for 
+Wich of the following is a valid `Julia` expression for
 
 $$~
 2^{4 - 2}
-~$$ 
+~$$
 
 that uses the least number of parentheses?
 
@@ -365,7 +365,7 @@ radioq(choices, ans)
 
 #### Question
 
-Compute the value of 
+Compute the value of
 
 $$~
 \frac{9 - 5 \cdot (3-4)}{6 - 2}.
@@ -441,7 +441,7 @@ numericq(ans)
 Most all calculators used are not limited to these basic arithmetic
 operations. So-called scientific calculators provide buttons for many
 of the common mathematical functions, such as exponential, logs, and
-trigonometric functions. `Julia` provides these too, of course. 
+trigonometric functions. `Julia` provides these too, of course.
 
 There are special functions to perform common powers. For example, the
 square-root function is used as:
@@ -537,7 +537,7 @@ case the arcsine. The arcsine function is written `asin` in `Julia`.
 For certain values, the arcsine and sine function are inverses:
 
 ```
-asin(sin(0.1))		
+asin(sin(0.1))
 ```
 
 However, this isn't true for all values of $x$, as $\sin(x)$ is not
@@ -554,30 +554,21 @@ completeness `asec`, `acsc`, and `acot` are available for use.
 
 ### Exponential and logs
 
-The values $e^x$ can be computed with the built-in constant `e`:
-
-```
-e^2
-```
-
-Or through the function `exp(x)`:
+The values $e^x$ can be computed through the function `exp(x)`:
 
 ```
 exp(2)
 ```
 
-As, `e` can be redefined, it is best to use the latter style, though
-it takes a bit more typing.
+The constant value of `e` is only available on demand:
 
 ```
-note("""
-In fact starting with `v0.7.0` of Julia, the value `e` will not be
-available, rather it will be accessed through `\euler[tab]`, a unicode
-version of `e`. Using `exp()` is suggested.
-""")
+using Base.MathConstants
+e
 ```
 
-The logarithm function, `log` does log base $e$:
+
+The logarithm function, `log` (and **not**  `ln`) does log base $e$:
 
 ```
 log(exp(2))
@@ -618,7 +609,7 @@ ceil(3.14)
 
 The observant eye will notice the answers above are not integers. (We
 discuss how to tell later.)  What to do if you want an integer? These
-functions take a "type" argument, as in `rount(Int, 3.14)`. 
+functions take a "type" argument, as in `rount(Int, 3.14)`.
 
 
 ### Practice
@@ -728,7 +719,7 @@ x = sqrt(2) ## a Float64 now
 ```
 
 
- 
+
 In `Julia` one can have single letter names, or much longer ones, such as
 
 ```
@@ -748,7 +739,7 @@ begin with a number or include spaces.
 
 ```
 
-alert(""" 
+alert("""
 
 In fact, only *most* objects bound to a name can be arbitrarily
 redefined. When we discuss functions, we will see that redefining
@@ -928,15 +919,28 @@ For example, we can add the two:
 1 + 1.0
 ```
 
-This gives back the floating point value `2.0`. First the integer and floating point value are promoted to a common type (floating point in this case) and then added. 
-
-Powers are different. This value will be an error `10^(-2)`, but `10.0^(-2)` will not. 
-
-> In base `Julia`, if possible,  functions are [type stable](http://docs.julialang.org/en/latest/manual/faq/#why-does-julia-give-a-domainerror-for-perfectly-sensible-operations). This means, the type of the output depends 
-> on the type of the input -- not the value. In this case, integer powers and bases
-> are expected to return integer answers, which $10^{-2}$ is not.
+This gives back the floating point value `2.0`. First the integer and floating point value are promoted to a common type (floating point in this case) and then added.
 
 
+Sometimes there can be an issue. The value `2^(-3)` we know should be $1/2^3 = 1/8$ or `0.125` and `Julia` agrees:
+
+```
+2^(-3)
+```
+
+However, this is special cased. If `-3` is replaced with a variable name, there will be a failure:
+
+```
+x = -3
+2^x
+```
+
+This gotcha has an explanation: in `julia`, most functions are "type-stable" meaning, the type of the input (integer/integer in this case) should determine the type of the output (in this case floating point). But for this operation to be fast, `julia` insists (in general) it be an integer, as what happens when the base is non-negative. It is not a "gotcha" when either the exponent or the base is a floating point number:
+
+```
+x = -3
+2.0^x
+```
 
 
 When a computer is used to represent numeric values there are
@@ -945,7 +949,7 @@ value. This works great in most cases, but since there are infinitely
 many numbers, not all possible numbers can be represented on the
 computer.
 
-> The first limitation is numbers can not be arbitrarily large. 
+> The first limitation is numbers can not be arbitrarily large.
 
 
 
@@ -971,7 +975,7 @@ So if working with really large values, one must be mindful of the difference --
 
 <span class="label label-info">Gotchas</span>
 
-Look at the output of 
+Look at the output of
 
 ```
 2^3^4
@@ -1037,7 +1041,7 @@ $0.9999999999999999$ or $1$, with nothing in between.
 
 
 <span class="label label-info">Comparing values</span>
- 
+
 
 A typical expression in computer languages is to use `==` to compare
 the values on the left- and right-hand sides. This is not assignment,
@@ -1154,7 +1158,7 @@ Complex numbers are an extension of the real numbers when the values
 $i = \sqrt{-1}$ is added. Complex numbers have two terms: a real and
 imaginary part. They are typically written as $a + bi$, though the
 polar form $r\cdot e^{i\theta}$ is also used. The complex numbers have
-the usual arithmetic operations defined for them.  
+the usual arithmetic operations defined for them.
 
 In `Julia` a complex number may be constructed by the `Complex` function:
 
@@ -1332,6 +1336,3 @@ choices = [
 ans = 1;
 radioq(choices, ans)
 ```
-
-
-

@@ -5,7 +5,7 @@
 The `Julia` language is a new language and as such, certain design
 decisions are still being made. One key decision is the interface for
 creating graphics. At this point there are many different ones
-(`Winston`, `Gadfly`, `Gaston`, `PyPlot`, plotly, plotlyjs, `GR`...),
+(`Makie`, `PyPlot`, plotly, plotlyjs, `GR`, `Winston`, `Gadfly`, `Gaston`,...),
 and perhaps more will be generated before a dominant one is arrived
 at. As such, we don't try to teach the details of any one of them.
 
@@ -64,7 +64,7 @@ details including how to specify a graph by defining the points that
 are used to make the plot.
 
 
-## The plot function 
+## The plot function
 
 The most basic usage for plotting a function follows this pattern:
 
@@ -106,7 +106,7 @@ Again, we plot a function, this time a basic polynomial:
 
 ```
 f(x) = x^2 - 2x + 2
-plot(f, -3, 3) 
+plot(f, -3, 3)
 ```
 
 ### Adding layers using "plot!"
@@ -141,7 +141,7 @@ point value for infinity and results from evaluations like `1/0` and
 `NaN` stands for "not a number", and results from indeterminate
 evaluations such as `0/0`.)
 
-The values which are `Inf` can not reasonably be plotted. Values 
+The values which are `Inf` can not reasonably be plotted. Values
 which are `NaN` can not reasonably plotted. What to do? Such points are simply
 not plotted, and no line segments are drawn causing the plot to be
 discontinuous. This convention can be utilized to good effect.
@@ -156,7 +156,7 @@ trim(f; val=10) = x -> abs(f(x)) > val ? NaN : f(x)
 ```
 
 (This is somewhat related to [clamping](http://en.wikipedia.org/wiki/Clamping_(graphics)).)
-Using `trim` is fairly simple. The output 
+Using `trim` is fairly simple. The output
 is a function, so can be passed directly to the `plot` call:
 
 ```
@@ -166,6 +166,14 @@ plot(trim(f), -3, 3)
 
 This trimming also works when `Inf` and `-Inf` values are encountered,
 as both can be ordered by `>`.
+
+
+The `trim` function above is not very robust, as not all plotting packages work will with `NaN` values. Use the `trimplot` function from `MTH229` for trimming:
+
+```
+trimplot(f, -3, 3)
+```
+
 
 
 ### Plotting with anonymous functions
@@ -180,7 +188,7 @@ end
 ```
 
 Plotting `g` will use the default value of $\pi/4$. To plot with a
-different value, say $\pi/6$ we can create a new function:
+different value, say $\pi/3$ we can create a new function:
 
 ```
 f(x) = g(x, theta=pi/3)
@@ -204,7 +212,7 @@ can simplify many expressions if used properly.
 
 #### Question
 
-Plot the function $f(x) = x^3 - x$ over $[-2,2]$. How many zeros are there? 
+Plot the function $f(x) = x^3 - x$ over $[-2,2]$. How many zeros are there?
 
 ```
 val = 3;
@@ -314,7 +322,7 @@ asymptote at $0$.
 One can try a simple plot:
 
 ```
-plot(x -> 1/x, -3, 3) 
+plot(x -> 1/x, -3, 3)
 ```
 
 The issue at $0$ is avoided, as the points chosen by `Plots` do not
@@ -367,7 +375,7 @@ minimum. Similarly, a plot of the left of the asymptote can be
 illustrative. Here we step back by a bit:
 
 ```
-plot(f, -3, 1 - 0.1)    
+plot(f, -3, 1 - 0.1)
 ```
 
 It appears that the relative maximum occurs between $-1$ and $0$.
@@ -380,14 +388,13 @@ of a small amount and makes it huge.  Clearly we need to really avoid
 the issue. It isn't hard -- just add a little bit more to $0$.
 
 
-One solution to avoiding this issue is to use the `trim` function that
-was previously defined. This just caps off really large values so that
+One solution to avoiding this issue is to use the `trimplot` function that
+was previously described. This just caps off really large values so that
 the vertical asymptotes don't affect the scale of the graph. We can
 see the asymptotes pretty clearly with:
 
 ```
-trim(f; val=10) = x -> abs(f(x)) > val ? NaN : f(x)
-plot(trim(f, val=20), -10, 10)
+trimplot(f, -10, 10)    # use trimplot(f, -10, 10, c) for different trim values
 ```
 
 
@@ -408,7 +415,7 @@ The domain comes from the fact that $\sin(0) = 0$ and $\cos(\pi/2) =
 
 ```
 f(x) = 5/cos(x) + 10/sin(x)
-plot(f, 0, pi/2) 
+plot(f, 0, pi/2)
 ```
 
 As typical with vertical asymptotes, we can't see finer features of
@@ -418,7 +425,7 @@ from the boundaries. Since $\sin(x)$ behaves like $x$ near $0$, we pick
 
 ```
 delta = 0.3;
-plot(f, 0 + delta, pi/2 - delta) 
+plot(f, 0 + delta, pi/2 - delta)
 ```
 
 With this, we see the minimum value is near $y=20$ and occurs around $0.9$.
@@ -474,7 +481,7 @@ numericq(val, 1e-16)
 ## Arrays
 
 When we learn how to make a graph using paper and pencil, the "T" method is employed, so
-called as we draw a "T" and fill in values to plot for $x$ and $y$. 
+called as we draw a "T" and fill in values to plot for $x$ and $y$.
 
 For example, a chalkboard after the instructor shows how to plot $f(x)
 = x^2$ might have this drawn on it:
@@ -539,7 +546,7 @@ type `Vector`) are created when no commas are specified:
 
 The notation is that `[a, b, c]` combines `a`, `b`, and `c` vertically
 and `[a b c]` combines them horizontally. The former is good to make
-column vectors for single values (scalars). 
+column vectors for single values (scalars).
 
 
 Row and column vectors are different! We will primarily use column
@@ -549,7 +556,7 @@ vectors going forward.
 
 **Containers are for like values...**
 
-In general, `julia` uses `[` and `]' to create containers for like
+In general, `julia` uses `[` and `]` to create containers for like
 values. These containers can be more complicated than a single row or
 column. One subtle thing is that each object must be of the same
 value, though sometimes this happens by a silent conversion. So,
@@ -576,29 +583,22 @@ It should be possible to specify arithmetic sequences either by
 
 * the start and end points and step size.
 
-In `julia` the `linspace` function will do the former and the range
+In `julia` the `range` function will do the former and the range
 operator the latter.
 
 Here are 5 evenly spaced numbers from $0$ to $\pi/2$ given by
-`linspace` (*linearly spaced* numbers):
+`range`
 
 ```
-linspace(0, pi/2, 5)
+range(0, stop=pi/2, length=5)   # using `stop=` is now unnecessary
 ```
 
 The values are not displayed, but will be if `collect`ed:
 
 ```
-collect(linspace(0, pi/2, 5))
+collect(range(0, stop=pi/2, length=5))
 ```
 
-
-The `5` above is optional -- the default
-is 50 points:
-
-```
-linspace(0, pi/2)
-```
 
 ### The range operator
 
@@ -629,7 +629,7 @@ The range operator can also work with a step size:
 ```
 a=0; b=10; h=3
 a:h:b
-[a:h:b]
+collect(a:h:b)
 ```
 
 Notice, the value for `b` is treated as as suggestion, the range will stop without exceeding `b`.
@@ -637,23 +637,10 @@ Notice, the value for `b` is treated as as suggestion, the range will stop witho
 
 The $x$ values for a plot are typically a sequence of increasing
 values from $a$ to $b$. We would generally like to be able to specify
-the number of values to plot. This makes `linspace` the go-to choice
-to use. 
+the number of values to plot. This makes `range` the go-to choice
+to use.
 
 
-
-```
-alert("""
-
-
-Watch the order of the arguments between `linspace` and the range
-operator: With `linspace` the third argument is optional and is used
-to indicate how many points, whereas with the range operator, the
-middle (second) argument is optional, and is used to specify the step
-size, which is related to how many total values are generated.
-
-""")
-```
 
 
 ### Practice
@@ -663,21 +650,21 @@ size, which is related to how many total values are generated.
 Which command will produce the sequence $1,3,5,7,9,11, ..., 99$?
 
 ```
-choices=["`linspace(1, 99, 2)`",
+choices=["`range(1, stop=99, length=2)`",
        "`[1,3,5,7,9,11, ..., 99]`",
        "`1:2:99`",
        "`1:99`"];
 ans=3;
 radioq(choices, ans)
 ```
-      
+
 #### Question
 
 Which command produces 10 numbers between 0 and 10 that are evenly spaced?
 
 ```
 choices=[
-"`linspace(0, 10, 10)`",
+"`range(0, stop=10, length=10)`",
 "`0:10`",
 "`0:1:101",
 "`[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]`"
@@ -685,7 +672,7 @@ choices=[
 ans=1;
 radioq(choices, ans)
 ```
- 
+
 #### Question
 
 Which command does not produce the numbers $1, 2, 3, 4, 5$?
@@ -693,7 +680,7 @@ Which command does not produce the numbers $1, 2, 3, 4, 5$?
 
 ```
 choices=[
-"`linspace(1, 5, 5)`",
+"`range(1, stop=5, length=5)`",
 "`[1, 2, 3, 4, 5]`",
 "`1:5`",
 "`1:5:1`"
@@ -712,7 +699,7 @@ Which command does  produces the numbers $1, 1, 2, 3, 5, 8, 13$?
 choices=[
 "`[1,1,2,3,5,8,13]`",
 "`1:2:13`",
-"`linspace(1, 13, 7)`",
+"`range(1, stop=13, length=7)`",
 "`[0, 1, 1, 2, 3, 5]`"
 ];
 ans=1;
@@ -780,7 +767,7 @@ expressions are typical.
 
 #### Question
 
-Let 
+Let
 
 ```
 x = [1, 1, 2, 3, 5, 8, 13]
@@ -795,7 +782,7 @@ numericq(val, 1e-16)
 
 #### Question
 
-Let 
+Let
 
 ```
 x = [1, 1, 2, 3, 5, 8, 13]
@@ -841,6 +828,7 @@ $x$ value.  In `julia` there are many different ways to do this, we
 list four for completeness, but will restrict our attention to just
 the first three styles.
 
+
 ### The map function
 
 The `map` function. In many areas of mathematics, one refers to a
@@ -862,7 +850,7 @@ If we want to look at this function for $x$ values between $0$ and $2$
 we might define the $x$ values with:
 
 ```
-x = linspace(0, 2, 5)
+x = range(0, stop=2, length=5)
 ```
 
 Then the `map` function will create the corresponding $y$ values:
@@ -875,7 +863,7 @@ The syntax of `map` requires a slight pause. Here we do not actually
 call the function `f`, as in `f(2)`. Rather, we pass the name of the
 function object to the `map` argument -- and `map` calls the function for
 each value in the column vector `x` and returns a corresponding column
-vector. 
+vector.
 
 It is also quite common to use anonymous functions with `map`. For example:
 
@@ -908,12 +896,12 @@ the bases:
 log.([2,pi,5,10], 5)
 ```
 
+
+
 ```
 note("""
 The "dot" broadcasting is very succinct and useful, but using `map` is
-more explicit and easier to reason about. Best to start with `map` and
-if you find it being used often, transition to thinking about using
-the "dot" broadcasting.
+more explicit and easier to reason about. We will mostly use broadcasting due to the simplicity.
 """)
 ```
 
@@ -935,7 +923,7 @@ the interval $[0,2]$, then use a "comprehension" to create the set
 notation above. The syntax is similar:
 
 ```
-xs = linspace(0, 2.0, 5)
+xs = range(0, stop=2.0, length=5)
 [f(x) for x in xs]
 ```
 
@@ -964,12 +952,12 @@ g(xs)
 ```
 
 
-The two approaches, maps and comprehensions, are equally
+The two approaches, broadcasting/maps and comprehensions, are equally
 useful. Perhaps `map` is a bit less trouble, but comprehensions mirror
 a more familiar mathematical syntax and generalize to functions of
 more than one variable nicely. One difference to keep in mind when
-deciding which to use, is that mapping requires a function, whereas
-comprehensions use expressions.
+deciding which to use, is that broadcasting/mapping requires a
+function, whereas comprehensions use expressions.
 
 
 
@@ -983,7 +971,7 @@ The `for` loop is a very common pattern in
 computer programming. For speed reasons, some languages (e.g.,
 `MATLAB` and `R`) try to avoid for loops for a "vectorized" approach
 (see below), but `julia` works well with `for` loops, and they are
-generally faster than a vectorized approach.
+sometimes easier to understand than a vectorized approach.
 
 A `for` loop simply loops over each value in the iterable data vector
 `x` giving it a temporary name as it goes. To use a `for` loop to
@@ -1001,7 +989,7 @@ end
 
 The `for` loop ends with the keyword `end`. Here we loop over each
 index of `x` and assign to the corresponding `y` value `f(x[i])`.
-      
+
 Conceptually this is the opposite of `map` where we think of the
 function acting on the entire column vector `x`. Instead, we iterate
 one-by-one over the values of `x` saving the function values as we
@@ -1034,7 +1022,7 @@ loop:
 i, n = 1, length(x)
 while (i <= n)
   print( x[i], " " )			## do something ...
-  i = i + 1
+  global i = i + 1              ## global may be necesary here
 end
 ```
 
@@ -1052,7 +1040,7 @@ we could do any of these:
 f(x) = x^2
 xs = 1:4
 ys = map(f, xs)
-[xs ys]                                  # integer type
+[xs ys]
 ```
 
 or
@@ -1061,7 +1049,7 @@ or
 f(x) = x^2
 xs = 1:4
 ys = f.(xs)
-[xs ys]                                  # integer type
+[xs ys]
 ```
 
 or
@@ -1069,7 +1057,7 @@ or
 ```
 xs = [1, 2, 3, 4]
 ys = [x^2 for x in xs]
-[xs ys]                                   # Any type, as y is -- not the same
+[xs ys]
 ```
 
 or
@@ -1078,14 +1066,13 @@ or
 ```
 xs = 1:4
 ys = similar(xs)
-for i in 1:length(xs)			   
-    ys[i] = xs[i]^2			  # integer, as x[i] is
+for i in 1:length(xs)
+    ys[i] = xs[i]^2
 end
 [xs ys]
 ```
 
 
-The comments show that each is slightly different for technical reasons, but all display the same values.
 
 
 ### Practice
@@ -1124,7 +1111,7 @@ Let $f(x) = x^2 - 2x$. Which command will produce the $y$ values for plotting $f
 choices=[
 "`[f(x) for x in [0,2]]`",
 "`map(f(x), [0,2])`",
-"`map(f, linspace(0, 2, 100))`"];
+"`map(f, range(0, stop=2, length=100))`"];
 ans = 3;
 radioq(choices, ans)
 ```
@@ -1143,25 +1130,6 @@ f(x) = x^2 - 2x
 booleanq(true)
 ```
 
-#### Questions
-
-Sometimes the function is used to ask a question. For example, this command answers if the values are prime or not:
-
-```
-[isprime(i) for i in 1:10]
-```
-
-Showing there are 4 primes in 1 to 10. How many primes are there between 100 and 110?
-
-```
-p = [isprime(i) for i in 100:110];
-val = sum(p);
-numericq(val, 1e-16)
-```
-
-(It is easier to write `map(isprime, 1:10)` in this case, which leads to `filter(isprime, 1:10)`.)
-
-
 
 ## Graphing points connected with lines
 
@@ -1176,16 +1144,16 @@ For example, to plot $y=x^2$ over $[-1,1]$ we might do:
 
 ```
 f(x) = x^2
-xs = linspace(-1, 1)
+xs = range(-1, stop=1, length=101)
 ys = map(f, xs)
 plot(xs, ys)
-``` 
+```
 
 
 One can place both to get both points and lines. The `scatter` function will plot the points, but not connect the lines. In the following, the `scatter!` function is used. (Not the `!` at the end.) This form adds the plot of the lines to the last graph, rather than make a new one.
 
 ```
-xs = linspace(-2, 2, 5)
+xs = range(-2, stop=2, length=5)
 ys = map(f, xs)
 plot(xs, ys)
 scatter!(xs, ys, markersize=5)
@@ -1202,7 +1170,7 @@ make a vector of functions and hand this off to `plot`.
 For example, to graph both the sine and cosine function we have:
 
 ```
-plot([sin, cos], 0, 2pi) 
+plot([sin, cos], 0, 2pi)
 ```
 
 
@@ -1243,7 +1211,7 @@ $b$:
 ```verbatim
 function secant(f, a, b)
 	 m =  (f(b) - f(a)) / (b-a)	# slope of secant line
-	 x -> f(a) + m * (x - a)	
+	 x -> f(a) + m * (x - a)
 end
 ```
 
@@ -1255,7 +1223,7 @@ defines an anonymous function to be returned (the `x ->` part). So
 `secant` is an *operator* -- a function which accepts a function for
 an argument and returns a function.
 
-Using this function makes it simple to add a secant line to a graph. 
+Using this function makes it simple to add a secant line to a graph.
 
 ```
 f(x) = sin(x)
@@ -1338,5 +1306,3 @@ choices = [
 ans = 3;
 radioq(choices, ans)
 ```
-
-

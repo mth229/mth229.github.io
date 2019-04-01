@@ -41,10 +41,10 @@ As mentioned, intuitively, the tangent line is the best straight-line
 approximation to a function near the point $(c, f( c))$ and would have
 slope given by the derivative.
 
-This graph shows $f(x) = 2 - x^2$ and various secant lines when $c=-0.75$ (see also `derivative_viz(f, c)` in the `MTH229` package):
+This graph shows $f(x) = 2 - x^2$ and various secant lines when $c=-0.75$.
 
 ```
-using MTH229 
+using MTH229
 f(x) = 2 - x^2
 c = -0.75
 sec_line(h) = secant(f, c, c+h)                # secant in MTH229 package
@@ -84,7 +84,7 @@ This is known as the *forward difference* approximation to the
 derivative. For this example, the difference between the approximation
 and the actual slope is:
 
-```			
+```
 ( f(c + h) - f(c) ) / h - fp(c)
 ```
 
@@ -168,7 +168,7 @@ using a numeric derivative.  We use $h=0.0001$:
 ```
 f(x) = x^x
 c = 2; h = 0.0001
-m = ( f(c + h) - f(c) ) / h	 
+m = ( f(c + h) - f(c) ) / h
 tangent_line(x) = f(c) + m * (x - c)
 ```
 
@@ -216,16 +216,16 @@ numericq(val, 1e-6)
 
 #### Question
 
-The built-in `airy` function, when called as `airy(x)`, returns the
+The built-in `airyai` function, when called as `airyai(x)`, returns the
 so-called Airy function, a special function named after
 
-[George Biddell Airy](http://en.wikipedia.org/wiki/Airy_function). 
+[George Biddell Airy](http://en.wikipedia.org/wiki/Airy_function).
 
 Compute the derivative at $c=-3$ using $h=0.0001$.
 
 
 ```
-f(x) = airy(x)
+f(x) = airyai(x)
 c, h = -3, 0.0001;
 val = (f(c+h) - f(c))/h;
 numericq(val, 1e-6)
@@ -235,7 +235,7 @@ numericq(val, 1e-6)
 #### Question
 
 Let $f(x) = \sin(x)$. The slope of the tangent line at $c=\pi/4$ is
-well known to have slope $\sqrt{2}/2$. 
+well known to have slope $\sqrt{2}/2$.
 
 Compute the forward difference quotient for $f$ at $c$ using
 $h=0.01$. What is the order of the difference between the two values?
@@ -246,7 +246,7 @@ choices=["3 parts in 100",
 	 "3 parts in 10,000",
 	 "3 parts in 100,000"]
 ans = 2
-radioq(choices, ans, hint="Look at `sqrt(2)/2` minus the computed value")
+radioq(choices, ans, hint="Look at `sqrt(2)/2` minus the computed value",keep_order=true)
 ```
 
 #### Question
@@ -260,7 +260,7 @@ crosses the $x$ axis. The value is near:
 ```
 choices = [-2, -1.5, -1, -0.5, 0, 1]
 ans = 3
-radioq(choices, ans)
+radioq(choices, ans, keep_order=true)
 ```
 
 
@@ -304,12 +304,13 @@ To see this work, we can find and plot the derivative of $\sin(x)$:
 ```
 f(x) = sin(x)
 fp(x) = Df(f)(x)
-plot([f, fp], 0, 2pi)
+plot(f, 0, 2pi)
+plot!(fp)
 ```
 
 Well, we already knew that should just be $\cos(x)$.  The point is we
 can easily make the an approximate derivative function from `f` with
-the definition `fp(x) = Df(f)(x)`. 
+the definition `fp(x) = Df(f)(x)`.
 
 ```
 alert("""
@@ -329,11 +330,10 @@ approximate derivative) which is then evaluated at `x`.
 ```
 alert("""
 **Defining `fp` or `fp(x)`**
-We could also have just plotted `[f, Df(f)]` without naming `fp`. As
+We could also have just plotted `f` and `Df(f)` without naming `fp`. As
 well, could have written `fp = Df(f)`, but that creates `fp` as an
 *anonymous* function and we then couldn't redefine it through `fp(x) =
 ...`, which would attempt to make it a *generic* function.
-
 """)
 ```
 
@@ -343,7 +343,8 @@ Let's look at a different function, where we don't know in our heads the answer.
 
 ```
 f(x) = exp(x)/(1 + exp(x))
-plot([f, Df(f)], 0, 5)
+plot(f, 0, 5)
+plot!(Df(f))
 ```
 
 If we look, we can see from the graph that `f` is increasing and `Df(f)` is positive -- this is no coincidence, of course.
@@ -368,7 +369,8 @@ You can check the zeroes graphically, say by zooming in a bit and
 adding the line $y=0$:
 
 ```
-plot([fp, x->0], -2, 2) 
+plot(fp, -2, 2)
+plot!(zero)
 ```
 
 If you want, we can find the roots numerically. For example,
@@ -376,13 +378,11 @@ If you want, we can find the roots numerically. For example,
 ```
 using Roots
 fzeros(fp, -10, 10)
-```       
-
-
-
 ```
-example("When is a function increasing?")
-```
+
+
+### Example: When is a function increasing?
+
 
 Let $f(x) = \cos(x)$ over the interval $[0, 360]$ (in degrees). When is the
 function increasing?
@@ -403,17 +403,11 @@ fp(x) = Df(f)(x)                # use default h
 Then we wish to indicate on the graph where `fp(x) > 0`. We can do
 this by defining a function that is $0$ when that is the case and
 `NaN` otherwise (so that those points are not plotted). We do so below
-with an anonymous function:
-
+using the `plotif` function from the `MTH229` package
 
 ```
-plot([f, x -> fp(x) > 0 ? 0.0 : NaN], 0, 360)
+plotif(f, fp, 0, 360)  # second color when fp > 0
 ```
-
-The graph of the second function is only drawn when the first function
-is increasing. It is from 180 to 360 degrees, or the third and fourth
-quadrant, as anticipated.
-
 
 
 ### Practice
@@ -462,7 +456,6 @@ ans = 2
 radioq(choices, ans)
 ```
 
-
 ## Improvements to the basic forward difference equation
 
 The error in the approximation of the derivative depends on the size
@@ -476,7 +469,7 @@ and a known derivative.
 ```
 f(x) = sin(x)
 fp(x) = cos(x)
-[ Df(f,h=h)(.5) - fp(.5) for h=[.1, .01, .001, .0001, .00001] ] 
+[ Df(f,h=h)(.5) - fp(.5) for h=[.1, .01, .001, .0001, .00001] ]
 ```
 
 It gets better as $h$ gets smaller. In fact, it looks like when $h$
@@ -518,7 +511,7 @@ Let's compare. To make our life easier we again create some functions, as we did
 
 ```
 central_difference(f, x0, h) = (f(x0 + h) - f(x0 - h)) / (2h)
-Dc(f; h=0.0001) = x -> central_difference(f, x, h) 
+Dc(f; h=0.0001) = x -> central_difference(f, x, h)
 ```
 
 Now to see whether a forward difference or central difference works
@@ -528,7 +521,7 @@ better. We can do so with a table. Again with $f(x) = \sin(x)$
 f(x) = sin(x)
 fp(x) = cos(x)
 using_D =  [ Df(f,h=h)(.5) - fp(.5) for h in hs ];
-using_Dc = [ Dc(f,h=h)(.5) - fp(.5) for h in hs ]; 
+using_Dc = [ Dc(f,h=h)(.5) - fp(.5) for h in hs ];
 [hs using_D using_Dc]
 ```
 
@@ -546,7 +539,7 @@ Let $f(x) = 10/(1+x^2) - 10\exp(-(1/2)x^2)$. The tangent line at $x=c$ is given 
 
 $$~
 y = f( c) - f'( c)(x - c)
-~$$ 
+~$$
 
 and this intersects the $x$ axis when $y=0$. Solving this gives:
 
@@ -574,7 +567,9 @@ intersection_point(c)
 You can tell from the graph of $f(x)$ that this value should be more than 1, as it is.
 
 ```
-plot([f, x -> 0, x -> f(c) + fp(c)*(x-c)], .5, 2.1) 
+plot(f, .5, 2.1, legend=false)
+plot!(zero)
+plot!(x -> f(c) + fp(c)*(x-c))
 ```
 
 <hr/>
@@ -599,7 +594,7 @@ Then it could easily be reused for other problems.
 
 #### question
 
-Let 
+Let
 
 ```
 f(x) = besselj(1, x)
@@ -645,7 +640,7 @@ numericq(ans, 1e-10)
 ## Automatic differentiation
 
 
-We discuss now [Forward Mode Automatic Differentiation](http://en.wikipedia.org/wiki/Automatic_differentiation). 
+We discuss now [Forward Mode Automatic Differentiation](http://en.wikipedia.org/wiki/Automatic_differentiation).
 
 
 
@@ -655,7 +650,7 @@ differences have a long history, automatic differentiation only dates
 back to the 60s.
 
 The `ForwardDiff` package implements automatic differentiation.
-The `Roots` package provides an interface `D`, used like `D(f)`. The `MTH229` package overloads the idea of `'` -- at the expense of a warning on startup -- that uses automatic differentiation when the notation `f'` is encountered.
+The `MTH229` package overloads the idea of `'` -- at the expense of a warning on startup -- that uses automatic differentiation when the notation `f'` is encountered. Also, the `D` operation can be used, allowing a second argument to specify the order of the derivative.
 
 That means, we can find derivatives, as familiarly as:
 
@@ -808,7 +803,7 @@ m = (A(30) - A(0)) / (30 - 0)
 
 The units are in pounds per day.
 
-The second question is done with `D` as follows:
+The second question is done through the derivative, as follows:
 
 ```
 A'(15)
@@ -968,8 +963,8 @@ terms $f(x+h)$ and $f(x)$ so the total error could be as big as
 $2\epsilon$. But this is divided by $h$ as we have:
 
 $$~
-\frac{f(x+h) - f(x)}{h} = \frac{float(x +h) + \epsilon - float(x) + \epsilon}{h} = 
-	     \frac{float(x+h)-float(x)}{h} + \frac{2\epsilon}{h}.
+\frac{f(x+h) - f(x)}{h} = \frac{float(f(x +h)) + \epsilon - float(f(x_) + \epsilon}{h} =
+	     \frac{float(f(x+h))-float(f(x))}{h} + \frac{2\epsilon}{h}.
 ~$$
 
 The errors may or *may not* cancel so the algebra with $\epsilon$ is unusual to
@@ -1076,7 +1071,7 @@ choices = [
 "`1e-12`"
 ];
 ans = 1;
-radioq(choices, ans)
+radioq(choices, ans, keep_order=true)
 ```
 
 
@@ -1095,5 +1090,3 @@ Do they show the smallest error around $10^{-6}$ as expected?
 ```
 booleanq(true)
 ```
-
-

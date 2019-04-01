@@ -10,7 +10,7 @@ integrals.  The *formal definition* of a limit is a bit difficult to
 appreciate and grasp. It involves an  "$\epsilon-\delta$" formulation:
 
 
-> The limit of $f(x)$ as $x$ approaches $c$ is $L$ if for every $\epsilon > 0$ 
+> The limit of $f(x)$ as $x$ approaches $c$ is $L$ if for every $\epsilon > 0$
 > there exists a $\delta > 0$ such that whenever $0 < |x - c| < \delta$ then $|f(x) - L| < \epsilon$.
 
 
@@ -26,7 +26,7 @@ under a parabola over 2000 years ago by the method of exhaustion, a
 limiting process. Fermat in 1629 essentially took a limit to find the
 slope of a tangent line to a polynomial curve. Newton in the late
 1600s, exploited the idea in his development of calculus (as did
-Leibnez). Yet it wasn't until the 1800s that [Bolzano, Cauchy and
+Leibnez). Yet it wasn't until the 1800s that [Bolzano, Cauchy, and
 Weierstrass](http://en.wikipedia.org/wiki/Limit_of_a_function#History)
 put the idea on a firm footing, as above.
 
@@ -92,15 +92,15 @@ alert(L"""
 
 Operations involving `NaN` will also return `NaN`.  In
 this example, the ratio defining $f(x)$ is like $0/0$ when $c=0$ -- an
-indeterminate form.  
+indeterminate form.
 The value `NaN` is returned by *most* of the
 indeterminate forms listed above, but not all. For example, `0^0` is `1` to `Julia`:
 
 
-It proved more useful to adhere to the simply stated rule *anything
-raised to the $0$ gives $1$ then special case $0^0$. Some comments by
-the "father of floating point" can be read
-[near the end of this](http://people.freebsd.org/~das/kahan86branch.pdf).
+> It proved more useful to adhere to the simply stated rule *anything
+  raised to the $0$ gives $1$ then special case $0^0$. Some comments by
+  the "father of floating point" can be read
+  [near the end of this](http://people.freebsd.org/~das/kahan86branch.pdf).
 
 """)
 ```
@@ -184,7 +184,7 @@ f(x) = \frac{(x-2)(x-3)}{(x-2)(x+3)}
 ~$$
 
 Written in this form, we clearly see that this is the same function as
-$g(x) = (x-3)/(x+3)$ when $x \neq 2$. The function $g(x)$ is 
+$g(x) = (x-3)/(x+3)$ when $x \neq 2$. The function $g(x)$ is
 continuous at $x=2$. So were one to redefine $f(x)$ at $x=2$ to be
 $g(2) = (2-3)/(2+3) = -0.2$ it would be made continuous, hence the term
 removable singularity.
@@ -213,7 +213,7 @@ Graphically look at the following limit
 
 $$~
 L = \lim_{x \rightarrow -2} \frac{x}{x+1} \frac{x^2}{x^2 + 4}
-~$$ 
+~$$
 
 What is the value?
 
@@ -247,7 +247,7 @@ numericq(val, 1e-1)
 Graphically investigate the limit
 
 $$~
-\lim{x \rightarrow 0} \frac{cos(x) - 1}{x}.
+\lim{x \rightarrow 0} \frac{\cos(x) - 1}{x}.
 ~$$
 
 The limit exists, what is the value?
@@ -266,7 +266,7 @@ $$~
 L = \lim_{h \rightarrow 0} \frac{e^{x + h} - e^x}{h}.
 ~$$
 
-Factoring out $e^x$ from the top and using rules of limits this becomes, 
+Factoring out $e^x$ from the top and using rules of limits this becomes,
 
 $$~
 L = e^x \lim_{h \rightarrow 0} \frac{e^h - 1}{h}.
@@ -304,7 +304,7 @@ L = \cos(x) \lim_{h \rightarrow 0}\frac{\sin(h)}{h} + \sin(x) \lim_{h \rightarro
 Using the last result, what is the value of $L$?
 
 ```
-choices = [L"cos(x)", L"sin(x)", L"1", L"0", L"sin(h)/h"]
+choices = [L"\cos(x)", L"\sin(x)", L"1", L"0", L"\sin(h)/h"]
 ans = 1
 radioq(choices, ans, keep_order=true)
 ```
@@ -355,7 +355,7 @@ radioq(choices, ans)
 
 #### Question
 
-The highly oscillatory function 
+The highly oscillatory function
 
 $$~
 f(x) = x^2 (\cos(1/x) - 1)
@@ -414,14 +414,14 @@ plot(f, c-delta, c+delta)
 The graphs have a similar shape -- but different scales. A closer look
 at the $y$ axis shows that for `delta = 1e-1` (or $1/10$) the range of
 $y$ values is about $1/1000$ and for `delta = 1e-3` it is about
-$1/10,000,000$. 
+$1/10,000,000$.
 
-We can be more precise. The following function 
+We can be more precise. The following function
 estimate the length of the range of the plotted values:
 
 ```
 function epsilon(f, c, delta)
-	 xs = linspace(c - delta, c + delta)
+	 xs = range(c - delta, stop=c + delta, length=100)
 	 ys = f.(xs)    	# like drawing a plot
 	 m, M = extrema(ys)	# minimum and maximum
 	 M - m
@@ -440,7 +440,7 @@ We can empirically verify this for one value of $\delta$ with
 
 ```
 delta = 1e-2
-epsilon(f, 0, delta) / (1/6*delta^2) 
+epsilon(f, 0, delta) / (1/6*delta^2)
 ```
 
 The ratio is basically $1$, as advertised.
@@ -478,7 +478,7 @@ Guess the relationship between `epsilon` and `delta`
 ```
 choices = [
 L" $\epsilon/\delta$ is constant",
-L" $\epsilon/\delta^2$ is constant", 
+L" $\epsilon/\delta^2$ is constant",
 L" $\epsilon/\delta^3$ is constant"]
 ans = 1
 radioq(choices, ans, keep_order=true)
@@ -508,7 +508,7 @@ which we know is simply $-1/5$. To approach this problem using a table we would 
 
 ```
 hs = [1/10, 1/100, 1/1000, 1/10000, 1/100000]  # or [1/10^i for i in 1:5]
-xs = 2 + hs
+xs = 2 .+ hs
 ```
 
 The corresponding $y$ values are found by applying $f$ to each:
@@ -533,12 +533,12 @@ are always more than 2 but getting closer. The left limit might have
 used `xs` defined with:
 
 ```
-xs = [2 - 1/10, 2 - 1/100, 2 - 1/1000, 2 - 1/10000, 2 - 1/100000]    	  	       
+xs = [2 - 1/10, 2 - 1/100, 2 - 1/1000, 2 - 1/10000, 2 - 1/100000]
 ys = f.(xs)
 [xs ys]
 ```
 
-We see the same phenomenon -- $f(x)$ gets close to $-0.2$ as $x$ gets close to $c=2$ from the left or the right. 
+We see the same phenomenon -- $f(x)$ gets close to $-0.2$ as $x$ gets close to $c=2$ from the left or the right.
 
 The three steps above are  bit tedious to type for each problem, so
 for convenience we encapsulate them into a function (available in the
@@ -548,9 +548,9 @@ for convenience we encapsulate them into a function (available in the
 function lim(f::Function, c::Real; n::Int=6, dir="+")
 	hs =  [(1/10)^i for i in 1:n]
 	 if dir == "+"
-	   xs = c + hs
+	   xs = c .+ hs
 	 else
-	   xs = c - hs
+	   xs = c .- hs
 	 end
 	 ys = f.(xs)
 	 [xs ys]
@@ -679,13 +679,13 @@ L = \lim_{x \rightarrow 0}(1+x)^{1/x}.
 ~$$
 
 ```
-numericq(e, 0.001)
+numericq(exp(1), 0.001)
 ```
 
 
 #### Question
 
-Find the limit 
+Find the limit
 
 $$~
 L = \lim_{x \rightarrow \pi/2} \frac{\tan (2x)}{x - \pi/2}
@@ -739,7 +739,7 @@ ImageFile("figures/limits/subtended-angle.png")
 // text(.5, 0, "1", pos=1)
 </script>
 
-Let $f(\theta)$ be the area of the triangle and $g(\theta)$ the shaded region. What is the limit 
+Let $f(\theta)$ be the area of the triangle and $g(\theta)$ the shaded region. What is the limit
 
 $$~
 \lim_{\theta \rightarrow 0+} \frac{f(\theta)}{g(\theta)}?
@@ -768,7 +768,7 @@ choices = [
 "Yes, the value is `-11.5123`",
 "No, the value heads to negative infinity"
 ];
-ans = 3;      
+ans = 3;
 radioq(choices, ans)
 ```
 
@@ -779,7 +779,7 @@ radioq(choices, ans)
 
 #### Question <small>$0^0$</small>
 
-Is the form $0^0$ really indeterminate? 
+Is the form $0^0$ really indeterminate?
 
 Consider this limit:
 
@@ -874,7 +874,7 @@ ImageFile("figures/limits/gauss-inscribed.png")
 
 
 
-Thus the total length is 
+Thus the total length is
 
 $$~
 l_n = n \cdot 2 \sin(\frac{2\pi}{2n})
@@ -956,7 +956,7 @@ numericq(exp(1), .001)
 Euler looked at $\sin(x)/x$ in his solution to the "Basel" problem, that is finding the sum of:
 
 $$~
-1 + \frac{1}{2^2} + \frac{1}{3^2} + \frac{1}{4^2} + \frac{1}{5^2} + \cdots = 
+1 + \frac{1}{2^2} + \frac{1}{3^2} + \frac{1}{4^2} + \frac{1}{5^2} + \cdots =
 \lim_{n \rightarrow \infty} \sum_n \frac{1}{i^2}.
 ~$$
 
@@ -977,8 +977,8 @@ choices=[
 "`10_000`"
 ];
 ans=3;
-radioq(choices, ans)
-```		   
+radioq(choices, ans, keep_order=true)
+```
 
 
 #### Question
@@ -1008,7 +1008,7 @@ numericq(euler_mascheroni(10^7), 1e-4)
 
 ## Floating point uncertainties
 
-A related limit to $\sin(x)/x \rightarrow 0$ is that
+A related limit to $\sin(x)/x \rightarrow 0$ is:
 
 $$~
 \lim_{x \rightarrow 0} \frac{1-\cos(x)}{x^2} = \frac{1}{2}.
@@ -1019,7 +1019,7 @@ $0$: $\sin(x) \approx x$ and $1 - \cos(x) \approx (1/2) x^2$. A
 graphic shows the latter approximation:
 
 ```
-plot([x -> 1 - cos(x), x -> x^2/2], -pi, pi) 
+plot([x -> 1 - cos(x), x -> x^2/2], -pi, pi)
 ```
 
 Note in the figure how the parabola tracks the shape of the
@@ -1042,7 +1042,7 @@ ys = f.(xs)
 ```
 
 We notice something odd -- the values ultimately become $0$ when we just
-said they should become $1/2$. Atleast for most of the
+said they should become $1/2$. At least for most of the
 output things look okay, but then something goes terribly wrong.
 
 The culprit? Floating point approximation involves round off errors.
@@ -1073,7 +1073,7 @@ numerator = [ 1-cos(x) for x in xs ]
 ```
 
 Instead of giving a value that is roughly $5 \cdot 10^{-(2n+1)}$, the
-value become $0$ -- not just numbers close to $0$. Hence, when the
+value becomes $0$ -- not just numbers close to $0$. Hence, when the
 numerator is divided by even the smallest of numbers, the answer is
 simply $0$.
 
@@ -1149,21 +1149,21 @@ is `eps() == nextfloat(1.0)`?
 booleanq(true)
 ```
 
-#### Question <small>(bits etc)</small>
+#### Question <small>(bitstring etc)</small>
 
-The `bits` function prints the bit representation of a number. For
+The `bitstring` function prints the bit representation of a number. For
 real numbers, the first bit is the sign, the next 11 the exponent and
 the last 52 are for the precision. Let's look at the values for a few:
 
 ```
-bits(cos(1e-7))
-bits(cos(1e-8))
-bits(1.0)
+bitstring(cos(1e-7))
+bitstring(cos(1e-8))
+bitstring(1.0)
 ```
 
 We see here how two different real numbers have the same floating point representation.
 
-For fun, what is the difference between `bits(-1.0)` and `bits(1.0)`?
+For fun, what is the difference between `bitstring(-1.0)` and `bitstring(1.0)`?
 
 
 ```
@@ -1176,9 +1176,9 @@ radioq(choices, ans)
 ```
 
 
-#### Question <small>(bits etc.)</small>
+#### Question <small>(bitstring etc.)</small>
 
-What is the difference between `bits(NaN)` and `bits(Inf)`? (These two
+What is the difference between `bitstring(NaN)` and `bitstring(Inf)`? (These two
 are coded specially in floating point.)
 
 
@@ -1286,7 +1286,7 @@ have been expected.
 More importantly for using this on a different problem, note that
 *instead* of a function an *expression* was used. (This being `(b^x -
 1)/x`.) Symbolic values when combined create symbolic expressions
-which can be passed on the `SymPy` function, like `limit`. To specify
+which can be passed onto a `SymPy` function, like `limit`. To specify
 the $x \rightarrow c$ we have the "pair" notation `x => 0`. And that
 was it.
 
@@ -1294,7 +1294,7 @@ was it.
 
 #### Question
 
-What value is symbolically computed for 
+What value is symbolically computed for
 
 $$~
 \lim_{h \rightarrow 0} \frac{1 - \cos(x)}{x^2}?
@@ -1353,4 +1353,3 @@ $$~
 val = 1
 numericq(val)
 ```
-

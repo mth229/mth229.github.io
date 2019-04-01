@@ -24,7 +24,7 @@ $$~
 ~$$
 
 
-This is great as long as some antiderivative is known. There will be several different techniques for finding antiderivatives. The `integrate` function in the `SymPy` package can do many of them:
+This is great as long as some antiderivative is known. There are several different techniques for finding antiderivatives. The `integrate` function in the `SymPy` package can do many of them:
 
 ```nocode, noout
 using MTH229
@@ -63,7 +63,7 @@ calculating area was one of being able to construct a square of equal
 area to a figure. This was known as *quadrature*.  Finding such
 answers for figures bounded by curves was difficult, though
 [Archimedes](http://en.wikipedia.org/wiki/The_Quadrature_of_the_Parabola)
-effectively computed this area under $f(x) = x^2$ about 2,000 years
+effectively computed the area under $f(x) = x^2$ about 2,000 years
 before Riemann sums using triangles, not rectangles to approximate the
 area.  By medieval Europe, the term *quadrature* evolved to be the
 computation of an area by any means. For example, [Galileo and
@@ -119,14 +119,14 @@ commands like:
 ```
 a, b, n = 1, 3, 5;
 delta = (b-a)/n;
-x = a + (0:n) * delta   		# alternatively linspace(a, b, n+1)
+xs = a .+ (0:n) * delta
 ```
 
 To apply a function to a range of values, we may use a map, a comprehension, a `for` loop or the "dot" notation. We will use `map` here. Recall, the syntax:
 
 ```
 f(x) = x^2
-fx = map(f, x)
+fx = map(f, xs)
 ```
 
 Now to add the numbers up. For this task, the `sum` function is available
@@ -139,13 +139,13 @@ sum(fx)
 Okay, just one subtlety, we really only want the points
 
 ```
-[ a + (0:n-1) * delta ]'
+[ a .+ (0:n-1) * delta ]'
 ```
 
-for the left Riemann sum and the points 
+for the left Riemann sum and the points
 
 ```
-[ a + (1:n) * delta ]'
+[ a .+ (1:n) * delta ]'
 ```
 
 for the right.
@@ -156,8 +156,8 @@ Putting this together, here are commands to approximate the area under the curve
 f(x) = x^2
 a, b, n = 1, 3, 10;		   ## note n=10
 delta = (b - a)/n;		   ## nothing to change below here
-xs = a + (0:n-1) * delta;          ## n, right is 1:n * delta 
-fx = map(f, xs);               
+xs = a .+ (0:n-1) * delta;          ## n, right is 1:n * delta
+fx = map(f, xs);
 sum(fx) * delta
 ```
 
@@ -174,7 +174,7 @@ Boy, not too close. We need a better approximation of course. This can be achiev
 
 ### Practice
 
-#### Question 
+#### Question
 
 Repeat with n=100
 
@@ -183,12 +183,12 @@ For the same problem, let $n=100$. What do you get?
 ```
 f(x) = x.^2
 a=1; b=3; n=100;
-x = linspace(a, b, n+1);
+x = range(a, stop=b, length=n+1);
 val = sum(f(x[1:n])) * (b-a)/n;
 numericq(val, 1e-4)
 ```
 
-#### Question 
+#### Question
 
 Repeat with n=1,000
 
@@ -198,12 +198,12 @@ For the same problem, let $n=1000$. What do you get?
 ```
 f(x) = x.^2
 a=1; b=3; n=1000;
-x = linspace(a, b, n+1);
+x = range(a, stop=b, length=n+1);
 val = sum(f(x[1:n])) * (b-a)/n;
 numericq(val, 1e-4)
 ```
 
-#### Question 
+#### Question
 
 Repeat with n=10,000
 
@@ -213,7 +213,7 @@ answer and the actual answer within $0.001$?
 ```
 f(x) = x.^2
 a=1; b=3; n=10_000;
-x = linspace(a, b, n+1);
+x = range(a, stop=b, length=n+1);
 val = sum(f(x[1:n])) * (b-a)/n;
 F(x) = x^3/3
 booleanq(abs(F(b) - F(a) - val) < 1e-3)
@@ -236,10 +236,10 @@ radioq(choices, 2)
 
 ## Integrate function
 
-Here we write a function to do the integration. This needs the basic inputs of 
+Here we write a function to do the integration. This needs the basic inputs of
 
 * a function,
-* the interval's start and end value, and 
+* the interval's start and end value, and
 * the number of equal-sized subintervals.
 
 In addition, we allow for the possibility of using different methods to approximate the area over a sub interval.
@@ -265,7 +265,7 @@ function riemann(f::Function, a::Real, b::Real, n::Int; method="right")
      meth(f,l,r) = (1/6) * (f(l) + 4*(f((l+r)/2)) + f(r)) * (r-l)
   end
 
-  xs = a + (0:n) * (b-a)/n
+  xs = a .+ (0:n) * (b-a)/n
   as = [meth(f, l, r) for (l,r) in zip(xs[1:end-1], xs[2:end])]
   sum(as)
 end
@@ -278,7 +278,7 @@ we approximate the integral of $e^{-x^2}$ from $0$ to $3$ using $10,000$
 subintervals:
 
 ```
-f(x) =  exp(-x^2)  	  	
+f(x) =  exp(-x^2)
 riemann(f, 0, 3, 10_000)
 ```
 
@@ -295,7 +295,7 @@ We see a value around $0.886$ as the answer.
 
 ### left versus right
 
-Using different methods allows us to compare the right and left Riemann sums. Let's do so for the monotonic function $e^x$ over the interval $[0,2]$. 
+Using different methods allows us to compare the right and left Riemann sums. Let's do so for the monotonic function $e^x$ over the interval $[0,2]$.
 
 ```
 f(x) = exp(x)
@@ -397,7 +397,7 @@ We now compare the error with the left Riemann sum for the same size $n$:
 ns = [10^i for i in 1:5]
 left_r = [riemann(f, 0, 1, n) for n in ns];
 trapezoid_r = [riemann(f, 0, 1, n, method="trapezoid") for n in ns];
-[ns 1-left_r 1-trapezoid_r]
+[ns (1).-left_r (1).-trapezoid_r]
 ```
 
 One can see that the errors are much smaller for the trapezoid method.
@@ -412,13 +412,13 @@ other easy-to-integrate function approximations will lead to improved
 approximate integrals. Simpson's method can be viewed in just this
 way. It replaces $f$ by the parabola going through $(a, f(a))$, $(c,
 f( c))$ and $(b, f(b))$ where $c=(a+b)/2$ is the midpoint between $a$
-and $b$. 
+and $b$.
 
 We compare how accurate we get with this rule for the same `f` as before:
 
 ```
 simpsons_r = [riemann(f, 0, 1, n, method="simpsons") for n in ns];
-[ns 1-left_r 1-trapezoid_r 1-simpsons_r]
+[ns (1).-left_r (1).-trapezoid_r (1).-simpsons_r]
 
 ```
 
@@ -443,7 +443,7 @@ $n^{-1}$.
 
 ### Practice
 
-#### Question 
+#### Question
 
 The trapezoid rule has no error for linear functions and Simpson's
 rule has no error for quadratic functions. Verify the latter by
@@ -459,10 +459,10 @@ How accurate is the approximation? Around
 ```
 choices = [`1e-8`, `1e-10`, `1e-12`, `1e-14`, `1e-16`, `0`];
 ans = 4;
-radioq(choices, ans)
+radioq(choices, ans, keep_order=true)
 ```
 
-#### Question 
+#### Question
 
 Compare the difference between the trapezoid rule and Simpson's rule
 when integrating $\cos(x)$ from $0$ to $\pi/6$. How big is the
@@ -480,7 +480,7 @@ How big is the difference?
 ```
 choices = [`1e-8`, `1e-10`, `1e-12`, `1e-14`, `1e-16`, `0`];
 ans = 2;
-radioq(choices, ans)
+radioq(choices, ans, keep_order=true)
 ```
 
 
@@ -580,7 +580,7 @@ numericq(val, 1e-4)
 Let $f(x) = \sin(100\pi x)/(100\pi x)$. Using $1,000$ points, find the right-Riemann integral over $[0,1]$.
 
 ```
-f(x) = sin(100*pi*x)/(100*pi*x)	
+f(x) = sin(100*pi*x)/(100*pi*x)
 a, b, n = 0, 1, 1000
 val = riemann(f, a, b, n, method="right")
 numericq(val, 1e-5)
@@ -644,17 +644,17 @@ numericq(val[1], 1e-4)
 
 ## Applications
 
-There are many more applications of the integral beyond computing areas under the curve. Here we discuss two: 
+There are many more applications of the integral beyond computing areas under the curve. Here we discuss two:
 
 * finding the volume of a figure with rotational symmetry (a glass in our example) and
-* finding the arc length of a line. 
+* finding the arc length of a line.
 
 In each case one integrates a function related to the one describing the problem. If you keep this straight, the applications are no different than above.
 
 
 ### Volume as a function of radius.
 
-The volume of a solid of revolution about the $y$-axis is illustrated [here](https://www.khanacademy.org/math/integral-calculus/solid_revolution_topic/disc-method/v/disc-method-around-y-axis). 
+The volume of a solid of revolution about the $y$-axis is illustrated [here](https://www.khanacademy.org/math/integral-calculus/solid_revolution_topic/disc-method/v/disc-method-around-y-axis).
 
 
 This figure shows a volume of revolution (a glass) with an emphasis on the radius of the solid. The volume can be determined if the radius is known.
@@ -685,7 +685,7 @@ V(b) = \int_0^b \pi (r(h))^2 dh
 We wish to look at our intuition relating the height of the fluid in
 the vessel compared to the percentage of fluid of the whole. A basic
 question might be: If the vessel is filled half way by height, is the
-volume half of the total, more or less? 
+volume half of the total, more or less?
 
 The answer, of course, depends on the shape of the glass.  That is the shape of the function $r(h)$. Note, if $r(h)$ is a constant -- the glass is a cylinder -- then the half-height mark is also the half-volume mark. Not so in general.
 
@@ -737,7 +737,7 @@ s(h) = 3 + \log(1 + h), \quad 0 \leq h \leq b
 ImageFile("figures/integration/glass-half-full.png")
 ```
 
-One could also consider a fluted one, such as appears in the comparison noted in the article. 
+One could also consider a fluted one, such as appears in the comparison noted in the article.
 
 
 #### Question
@@ -780,7 +780,7 @@ V(b) = \int_0^b \pi r(h)^2 dh = 450.
 
 
 Not to worry, we can use `fzero` from the `Roots` package for
-that. 
+that.
 To solve for when `V(b) = r_vol(b) - 450 = 0` we have
 
 
@@ -921,7 +921,7 @@ l = \int_a^b \sqrt{1 + f'(x)^2} dx
 
 
 
-The formula is from the length of the hypotenuse of a right triangle with lengths $1$ and $f'(x)$, 
+The formula is from the length of the hypotenuse of a right triangle with lengths $1$ and $f'(x)$,
 This image suggests an approximation for the length and why the hypotenuse of some triangle might be involved.
 
 
@@ -954,8 +954,8 @@ Next we look at a more practical problem.
 
 ### Example: the caternary shape
 
-A [caternary shape](http://en.wikipedia.org/wiki/Catenary) is the shape a hanging chain will take 
-as it is suspended between two posts. It appears elsewhere, for example, power wires will also have this shape as they are suspended between towers. 
+A [caternary shape](http://en.wikipedia.org/wiki/Catenary) is the shape a hanging chain will take
+as it is suspended between two posts. It appears elsewhere, for example, power wires will also have this shape as they are suspended between towers.
 A formula for a caternary can be written in terms of the hyperbolic cosine, `cosh` in `julia` or exponentials.
 
 $$~
@@ -982,7 +982,7 @@ quadgk(x -> sqrt(1 + f'(x)^2), -1, 1)
 
 #### Question
 
-The sag in the chain is adjusted through the parameter $a$ -- chains with larger $a$ have less sag. 
+The sag in the chain is adjusted through the parameter $a$ -- chains with larger $a$ have less sag.
 
 Suppose your chain has parameter `a=3` what is the length? (Use `quadgk`)
 
@@ -995,7 +995,7 @@ numericq(val, .001)
 
 #### Question: in the artist studio
 
-This picture of Jasper John's [Near the Lagoon](http://www.artic.edu/aic/collections/artwork/184095) was taken at The Art Institute Chicago. 
+This picture of Jasper John's [Near the Lagoon](http://www.artic.edu/aic/collections/artwork/184095) was taken at The Art Institute Chicago.
 
 
 ```
@@ -1010,7 +1010,7 @@ The museum notes have
 >    the largest and last work, Johns formed catenaries—a term used to
 >    describe the curve assumed by a cord suspended freely from two
 >    points—by tacking ordinary household string to the canvas or its
->    supports. 
+>    supports.
 
 This particular catenary has a certain length. The basic dimensions
 are 78in wide and 118in drop. If our shifted function is
@@ -1059,17 +1059,17 @@ The Verrazano-Narrows
 [bridge](http://observer.com/2012/09/staten-island/s-i-8/) has a span
 of 1298m. Suppose the drop of the main cables is 147 meters over this
 span. Then the cable itself can be modeled as a parabola with
-    
-* $x$-intercepts $a = 1298/2$ and $-a$ and 
+
+* $x$-intercepts $a = 1298/2$ and $-a$ and
 * vertex $(0,b)$ with $b=-147$.
 
-The parabola that fits these three points is 
+The parabola that fits these three points is
 
 $$~
 y = \frac{-b}{a^2}(x^2 - a^2)
 ~$$
 
-Find the arc length of the cable in meters.  
+Find the arc length of the cable in meters.
 
 
 
@@ -1140,7 +1140,7 @@ $$~
 \delta f(x_0) + 2\delta f(x_2) + 2 \delta f(x_3) + \cdots + 2 \delta f(x_{n}) + \delta f(x_{n})
 ~$$
 
-where $\delta = (b-a)/n$. 
+where $\delta = (b-a)/n$.
 
 Whereas for even $n$, Simpson's rule can be written with:
 
@@ -1168,8 +1168,8 @@ a, b, n = 0, 1, 4
 delta = (b-a)/n
 f(x) = x^2
 wts = [1, 2, 2, 2, 1] * delta ## delta * [1, repeat([2],n-1), 1]'
-xs = a + (0:n) * delta
-sum([w * f(x) for (w,x) in zip(ws, xs)])
+xs = a .+ (0:n) * delta
+sum(w * f(x) for (w,x) in zip(wts, xs))
 ```
 
 
@@ -1194,10 +1194,10 @@ implemented almost verbatim:
 
 ```
 using Polynomials
-function lgp(n::Integer) 
+function lgp(n::Integer)
     if n == 0 return Polynomials.Poly([1]) end
     if n == 1 return Polynomials.Poly([0, 1]) end
-    
+
     (2*(n-1) + 1) / n * lgp(1) * lgp(n-1) - (n-1)/n * lgp(n-2)
 end
 ```
@@ -1217,7 +1217,7 @@ The nodes are the roots of the right polynomial. Here we have the
 values for `p4`
 
 ```
-xs = roots(p4)
+xs = Polynomials.roots(p4)
 ```
 
 (The Konrod part of `quadgk` changes the nodes so they can be reused
@@ -1232,7 +1232,7 @@ w_i = \frac{2}{(1 - x_i^2) \cdot(P^{'}_n(x_i)/P_n(1))^2}
 These can be done simply with:
 
 ```
-weights(x) = 2 / ((1 - x^2) * (p4'(x)/p4(1))^2 )
+weights(x) = 2 / ((1 - x^2) * (polyder(p4)(x)/p4(1))^2 )
 ws = [weights(xi) for xi in xs]
 ```
 
@@ -1244,7 +1244,7 @@ this is very close to the answer $4/\pi$ even with just 4 nodes):
 
 ```
 f(x) = cos(pi/2*x)
-sum([w * f(x) for (w,x) in zip(ws, xs)])
+sum(w * f(x) for (w,x) in zip(ws, xs))
 ```
 
 
@@ -1275,22 +1275,22 @@ function adapt(f, a, b, limit)
 
     h = b-a
     c = a + (b - a)/2
- 
+
     a1 = (f(a) + f(b)) * h/2          ## trapezoid
     a2 = (f(a) + 4f(c) + f(b)) * h/6  ## Simpson's parabola
 
-    if isapprox(a1, a2) 
+    if isapprox(a1, a2)
         return(a2)
     end
 
     if limit == 0
-        println("limit reached for this interval [$a, $b]")	
+        println("limit reached for this interval [$a, $b]")
 	return(a2)
     end
 
     adapt(f, a, c, limit - 1) + adapt(f, c, b, limit-1)
 end
-```    
+```
 
 
 Does it work? Let's see it for the area of $f(x) = x^2(1-x)^{10}$
@@ -1311,4 +1311,3 @@ out - beta(2 + 1, 10 + 1)
 be. This function uses two tolerances to test if the valus `x` and `y`
 are approximately the same. These could be changed easily enough so
 that more precise answers can be found.)
-

@@ -3,7 +3,7 @@
 
 ## Introduction
 
-This project explores the relationship between a function, $f(x)$ and its first and second derivatives. 
+This project explores the relationship between a function, $f(x)$ and its first and second derivatives.
 
 The following definitions describe features of functions over an interval:
 
@@ -58,7 +58,7 @@ derivative on *I*.
 ## Graphically Identifying positive, increasing, concave up, critical points, ...
 
 
-We load `MTH229` to provide access to graphing and the `'` notation:
+We load `MTH229` to provide access to graphing, the `'` notation, and the `plotif` function:
 
 ```
 using MTH229
@@ -69,17 +69,11 @@ plotly()
 ```
 
 
-Recall the plotting convention with `NaN` values -- they aren't
-plotted. This is utilized in the `plotif` function from the `MTH229`
-package, that makes it easy for us to highlight when a function is
-positive. This function plots the function $f(x)$
-twice, the second time doing so only *if* $g(x) > 0$.
+The `plotif` function from the `MTH229`
+package makes it easy for us to highlight when a function is
+positive. This function (`plotif(f, g, a, b)`) plots the function $f(x)$
+twice over `[a,b]`, the second time doing so only *if* $g(x) \geq 0$.
 
-```verbatime
-function plotif(f, g, a, b)
-  plot([f, x -> g(x) > 0.0 ? f(x) : NaN], a, b, linewidth=5)
-end
-```
 
 We can plot when a function is positive by using `f` for `g`. For example, when $f(x) = x^3 - 2x - 1/2$ we make the plot
 
@@ -89,10 +83,9 @@ plotif(f, f, -2, 2)
 ```
 
 
-
 In this graph, we estimate graphically that the intervals $(-1.2,
 0.2)$ and $(1.5, 2)$ are where $f$ is positive within this viewing
-windows.
+window.
 
 
 We can do the same with the derivative, then our graph will show when
@@ -108,7 +101,6 @@ $(-2, -0.8)$ and $(0.8, 2)$.
 
 
 And of course, using when the second derivative is positive shows where `f` is concave up:
-
 
 ```
 plotif(f,  f'', -2, 2)
@@ -128,7 +120,7 @@ ans = 2;
 radioq(choices, ans)
 ```
 
-#### Question 
+#### Question
 
 Graphically identify when the function $f(x) = \sqrt{|1 - x^2|}$ is increasing on the interval $[-2, 2]$.
 
@@ -158,7 +150,7 @@ radioq(choices, ans)
 
 
 
-## Relationships  
+## Relationships
 
 Suppose we only know indirect things about a function $f(x)$, how much
 can we say?
@@ -182,15 +174,17 @@ $(0,4)$?
 We make two graphs:
 
 ```
-fp(x) = exp(x)	
+fp(x) = exp(x)
 plotif(fp, fp, 0, 4)
 ```
+
 
 ```
 plotif(fp, fp', 0, 4)
 ```
 
-From the graphs we see that $f'(x)$ is always *positive* and *increasing*. 
+
+From the graphs we see that $f'(x)$ is always *positive* and *increasing*.
 
 From the first fact ($f'(x) > 0$) we know that $f(x)$ is increasing on this interval.
 
@@ -205,7 +199,7 @@ to $f(x)$ and not effect its derivative.
 
 Now suppose we have a different $f(x)$. In this case all we know is
 the second derivative is $f''(x) = x^2 - 2x$. What can we say about
-$f(x)$ on the interval $(-1,3)$$?
+$f(x)$ on the interval $(-1,3)$?
 
 A plot to see where the second derivative is positive will show that this
 $f''(x)$ is positive on $(-1, 0)$ and $(2,3)$:
@@ -231,7 +225,7 @@ You know that $f'(x) = |x|$. Over $[-1,1]$ where if $f(x)$ increasing and where 
 
 ```
 choices=["You don't know -- the derivative of |x| does not exist",
-	 L"f is increasing on $(0,1)$ and concave up on $(-1,1)$",	
+	 L"f is increasing on $(0,1)$ and concave up on $(-1,1)$",
  L"f is increasing on $(-1,1)$ and concave up on $(0,1)$"];
 ans = 2;
 radioq(choices, ans)
@@ -260,7 +254,7 @@ interval $(-\pi/3, \pi/3)$?
 ```
 choices = ["(-pi/3, pi/3)",
 	"(-0.6, 0.6)",
-	"(-pi/3, 0)"];	
+	"(-pi/3, 0)"];
 ans = 2;
 radioq(choices, ans)
 ```
@@ -278,8 +272,8 @@ local extrema:
 
 
 
->  **The first derivative test** 
-> 
+>  **The first derivative test**
+>
 > If $c$ is a critical point *and*
 > $f'(x)$ changes sign at $x=c$, then $(c,f( c))$ will be a local
 > extrema. (If the sign change is from positive to negative, it will
@@ -301,18 +295,18 @@ roughly where:
 
 ```
 f(x) = 2sin(x) + cos(2x)
-plot(D(f), 0, 2pi)
+plot(f', 0, 2pi)
 ```
 
 We see four: one near 0.8, one near 1.5, one near 2.5 and one near
 5. We use `fzeros` to identify:
 
 ```
-cps = fzeros(f', [0, 6])
+cps = fzeros(f', 0, 6)
 ```
 
 Use the first derivative test to classify these values as relative
-maximum or minimum. From the graph of `D(f)` we see at the first one
+maximum or minimum. From the graph of `f'` we see at the first one
 the derivative is changing sign from positive to negative at the first
 one (hence a local maximum), and this alternates as we go along. So we
 have a max, min, max, min which we see when we plot `f`:
@@ -324,13 +318,15 @@ plot(f, 0, 2pi)
 To get the same from the second derivative test, we evaluate $f''(x)$ at these four points:
 
 ```
-map(f'', cps)
+f''.(cps)
 ```
 
-If you wanted something fancy, you could do convert using `sign`:
+(Using the dot broadcasts `f''` over all the values in `cps`.)
+
+If you wanted something fancy, you could convert using `sign`:
 
 ```
-["max", "can't tell", "min"][2 + sign(map(f'', cps))]
+["max", "can't tell", "min"][2 .+ Int.(sign.(f''.(cps)))]
 ```
 
 
@@ -382,6 +378,3 @@ choices = ["0 is  relative minimum, 1 is a relative max",
 ans = 1;
 radioq(choices, ans)
 ```
-
-
-

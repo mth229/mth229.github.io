@@ -197,7 +197,7 @@ powers, functions with other powers are, of course, possible. The `^` operator i
 used in general for powers, and the `sqrt` and `cbrt` offer an
 alternative.
 
-So, this 
+So, this
 
 $$~
 f(x) = \sqrt{x} + x^{1/3} + x^{1/4}
@@ -231,7 +231,7 @@ $$~
 f(x) = \cos(x) - \sin^2(x)
 ~$$
 
-becomes 
+becomes
 
 ```
 f(x) = cos(x) - sin(x)^2
@@ -302,7 +302,8 @@ Can be expressed as
 f(x) = e^(-(1/2)*x^2)
 ```
 
-The value of $e$ is built-in to `Julia`, but $e$ can be inadvertently
+The value of $e$ is built-in to `Julia`, but not immediately available. It is s exposed by the `MTH229` package.
+But $e$ can be inadvertently
 redefined. As such, it is a safer practice to use the `exp` function,
 as in:
 
@@ -368,7 +369,7 @@ $$~
 h(x) = f(x) + g(x).
 ~$$
 
-The former treats $f$ and $f$ as function objects, the latter ties more closely to the concept of a function as a rule that operates on $x$. 
+The former treats $f$ and $f$ as function objects, the latter ties more closely to the concept of a function as a rule that operates on $x$.
 
 With `Julia` the latter representation is more useful for defining combinations of functions. For example, if $f(x) = \sin(x)$ and $g(x) = x^2$, then we can combine these in several ways. The following illustrates several ways to combine the two functions $f$ and $g$:
 
@@ -389,7 +390,7 @@ h(x) = f(g(x))			# f ∘ g or sin(x^2)
 h(x) = g(f(x))			# g ∘ f or (sin(x))^2
 ```
 
-This operation is fundamentally non-commutative, as the above example illustrates. 
+This operation is fundamentally non-commutative, as the above example illustrates.
 
 ### Practice
 
@@ -408,7 +409,7 @@ radioq([
 
 #### Question
 
-Which of these functions will compute 
+Which of these functions will compute
 
 $$~
 \frac{1}{\sqrt{2\pi}} e^{-\frac{1}{2}x^2}?
@@ -482,7 +483,7 @@ radioq([
 
 #### Question
 
-Which of these functions will compute 
+Which of these functions will compute
 
 $$~
 f(x) = \frac{x^2 - 2x}{x^2 - 3x}?
@@ -497,7 +498,7 @@ radioq([
 ```
 
 
-Which of these functions will compute 
+Which of these functions will compute
 
 $$~
 f(x) = e^{-x} \sin(x)?
@@ -579,7 +580,7 @@ example("Hockey-stick functions")
 Here is a different example, where we define a "hockey stick"
 function, a name for functions that are flat then increase linearly after some threshold.
 
-A cell phone plan might cost one \$30 for the first 500 minutes of
+An old-school cell-phone plan might cost \$30 for the first 500 minutes of
 calling and 25 cents per minute thereafter. Represent this as a
 function of the number of minutes used.
 
@@ -620,10 +621,10 @@ want to return floating point values.
 A quick plot will show why the above function is called a "hockey stick" function:
 
 ```
-plot(cell_phone, 0, 1000)	
+plot(cell_phone, 0, 1000)
 ```
 
-When functions that have different rules based on the specific value of $x$ that is input, the 
+When functions that have different rules based on the specific value of $x$ that is input, the
  use "cases" notation is common. For example,
 
 $$~
@@ -658,7 +659,7 @@ are used for comparison, a single one is for assignment.)
 ### The "ternary operator", a simple alternative to if-else-end
 
 One can use the so-called *ternary operator* `a ? b : c` for simple
-`if-else-end` statements as above. 
+`if-else-end` statements as above.
 
 Basically, `a ? b : c` is the same as the more verbose
 
@@ -681,7 +682,7 @@ one-liner:
 cell_phone(x) = x < 500 ? 30.0 : 30.0 + 0.25*(x - 500)
 ```
 
-When `x < 500` the expression right after `?` is evaluated, and if not, the expression after `:` is. 
+When `x < 500` the expression right after `?` is evaluated, and if not, the expression after `:` is.
 
 For mathematical functions, the directness of the ternary operator usually makes it a preferred choice over `if-else-end`.
 
@@ -706,7 +707,7 @@ heavyside(x) = x > 0 ? 1.0 : (x == 0.0 ? 0.0 : -1.0)
 
 
 
-### Practice 
+### Practice
 
 
 
@@ -719,7 +720,7 @@ choices =  ["`f(x) = x`",
 	    "`f(x) = x > 0 ? x : 0.0`",
 	    "`f(x) =   x > 0.0 ? x : -x`",
 		"`f(x) = x > 0.0 ? -x : x`"
-	     ];	   
+	     ];
 ans = 3;
 radioq(choices, ans)
 ```
@@ -911,7 +912,7 @@ example, if the angle were less, would the value of $f$ be smaller or
 larger?
 
 ```
-g(50, theta=pi/8)		## smaller in this case. 
+g(50, theta=pi/8)		## smaller in this case.
 ```
 
 
@@ -988,7 +989,7 @@ function g(x; theta=pi/4)
 end
 ```
 
-For `x` in 20, 25, 30, 35, 40, 45 degrees, what value will maximize 
+For `x` in 20, 25, 30, 35, 40, 45 degrees, what value will maximize
 `g(125, theta=x*pi/180)`?
 
 
@@ -1061,7 +1062,7 @@ $f(x)$ in terms of the parameters $a$, $b$, $c$, and $d$. Here we
 focus on $d$ and $b$ which shift up and right.
 
 
-Let's make a function that takes $f$, some specifications and returns $g$:
+Let's make a function that takes $f$, some specifications, and returns $g$:
 
 ```
 function tform(f; shift_up=0, shift_right=0)
@@ -1084,34 +1085,6 @@ tf(3)
 We can use the output of `tform` directly in a function call, or make
 a specific version of the function, as above, by defining it for
 certain values of its parameters.
-
-
-### Trimming large values in a plot
-
-Here is another example, which is used to replace large or small
-values with `NaN`. (Recall, `NaN` is a floating-point value
-representing ambiguous expressions, such as `0/0`.) This can be useful
-when plotting.
-
-```
-function trim(f; val=10)
-  x -> abs(f(x)) > val ? NaN : f(x)
-end
-```
-
-The ternary operator checks if the function is large in absolute value
-(bigger than `val`) and if so, use `NaN` for a value, otherwise it
-returns $f(x)$. This is used within an anonymous function, so that
-`trim` returns a function object.
-
-To see it in use we have:
-
-```
-f(x) = 1/x
-plot(trim(f), -3, 3)
-```
-
-Without `trim(f)`, this graphic is overwhelmed by the vertical asymptote.
 
 
 
@@ -1157,8 +1130,8 @@ radioq(choices, ans)
 What does this operator do?
 
 ```
-function secant(f, a, b) 
-  m = (f(b) - f(a)) / (b-a)	
+function secant(f, a, b)
+  m = (f(b) - f(a)) / (b-a)
   x -> f(a) - m * (x - a)
 end
 ```
@@ -1190,7 +1163,7 @@ end
 ```
 choices=[
  "It is a mystery",
- "It returns a function whose graph is that of `f` reflected through the \$x\$ axis", 
+ "It returns a function whose graph is that of `f` reflected through the \$x\$ axis",
  "It returns a function whose graph is that of `f` reflected through the \$y\$ axis"]
 ans=2
 radioq(choices, ans)
@@ -1303,7 +1276,7 @@ calculus: `Function`, `Real`, `Integer`, `Rational`, `Complex`, and
 
 Clearly the latter ones should nest, in that an object of type
 `Integer` should also be of type `Real`. This means when we specialize
-a mathematical function, it is enough to specify values of `Real`. 
+a mathematical function, it is enough to specify values of `Real`.
 
 
 ### Generic and anonymous functions
@@ -1344,6 +1317,4 @@ of `Julia`.)
 
 We use the generic function approach in these notes to define our
 named functions, as the basic notation so closely mirrors the standard
-math notation.  
-
-
+math notation.

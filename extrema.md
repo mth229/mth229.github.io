@@ -3,7 +3,7 @@
 ## Introduction
 
 This project discusses a basic application of calculus to answer
-questions of the type: What is the largest value a function can take.
+questions of the type: What is the largest value a function can take?
 
 For example,
 
@@ -209,7 +209,7 @@ A(x) = A(x, y(x))
 
 
 Of course both $x$ and $y$ are non-negative. The latter forces $x$ to
-be no more than $20/(1+\pi/2)$. 
+be no more than $20/(1+\pi/2)$.
 
 This leaves us the calculus problem of finding an absolute maximum of
 a continuous function over the closed interval $[0,
@@ -355,7 +355,7 @@ That is, we have
 
 ```
 l(l1, l2) = l1 + l2
-l1(t) = 8/sin(t)	
+l1(t) = 8/sin(t)
 l2(t) = 5/cos(t)
 ##
 l(t) = l(l1(t), l2(t))		# or simply l(t) = 8/sin(t) + 5/cos(t)
@@ -379,7 +379,7 @@ The minimum occurs between 0.5 and 1.0 radins, we will use a bracketing method:
 x = fzero(l', [0.5, 1.0])
 ```
 
-So the minimum of the function $l$ is 
+So the minimum of the function $l$ is
 
 ```
 l(x)
@@ -433,7 +433,7 @@ t = fzero(A', pi/4, order=16);	## Has issues with order=8 algorithm, tol > 1e-14
 val = t * 180/pi;
 numericq(val, 1e-3)
 ```
- 
+
 #### Question (Thanks https://www.math.ucdavis.edu/~kouba)
 
 A movie screen projects on a wall 20 feet high beginning 10 feet above
@@ -461,7 +461,7 @@ is what we know:
 
 * Ethan likes to run. He can run at 10 miles per hour.
 * He can drive a car -- usually some concept car by BMW -- at 30 miles per hour, but only on the road.
-  
+
 For his mission, he needs to go 10 miles west and 5 miles north. He
 can do this by:
 
@@ -474,7 +474,7 @@ A quick analysis says:
 
 * It would take $(10+5)/30$ hours to just drive
 * It would take $\sqrt{10^2 + 5^2}/10$ hours to just run
-  
+
 Now, if he drives $x$ miles west ($0 < x < 10$) he would run an amount
 given by the hypotenuse of a triangle with lengths $5$ and $10-x$. His
 time driving would be $x/30$ and his time running would be $\sqrt{5^2
@@ -495,13 +495,13 @@ T(x) = x/30 + sqrt(5^2 + (10-x)^2)/10
 ```
 
 ```
-plot(T, 0, 10) 
+plot(T, 0, 10)
 ```
 
 The minimum happens way out near 8. We zoom in a bit:
 
 ```
-plot(T, 7, 9) 
+plot(T, 7, 9)
 ```
 
 It appears to be around 8.3. We now use `fzero` to refine our
@@ -523,7 +523,7 @@ T(x)
 
 #### Questions
 
-A maximum likelihood estimator is a value derived by maximizing a function. For example, if 
+A maximum likelihood estimator is a value derived by maximizing a function. For example, if
 
 ```
 L(t) = t^3 * exp(-3t) * exp(-2t) * exp(-4t) ## 0 <= t <= 10
@@ -571,14 +571,14 @@ f(x) = x * exp(-x^2)
 ```
 
 ```
-plot(f, 0, 100) 
+plot(f, 0, 100)
 ```
 
 Clearly the action is nearer to 1 than 100. We try graphing the
 derivative near that area:
 
 ```
-plot(f', 0, 5) 
+plot(f', 0, 5)
 ```
 
 This shows the value near $0.7$. We use `fzero` starting there:
@@ -587,7 +587,7 @@ This shows the value near $0.7$. We use `fzero` starting there:
 x = fzero(f', 0.7)
 ```
 
-The convergence is quick. The maximum is at 
+The convergence is quick. The maximum is at
 
 ```
 f(x)
@@ -774,7 +774,7 @@ First, lets assume $a=1$ and $L=10$ ($L$ must be at least $\sqrt{1 +
 b^2}$) , then we have:
 
 ```
-a = 1; Len = 10 
+a = 1; Len = 10
 f(x, y, a, b) = sqrt(x^2 + y^2) + sqrt((a-x)^2 + (b-y)^2)
 ```
 
@@ -783,7 +783,7 @@ values for $b$, as long as $L$ is long enough.
 
 ```
 b = 1;				 ## some arbitrary choice for b
-f(x, y) = f(x, y, a, b) 
+f(x, y) = f(x, y, a, b)
 ```
 
 Our values $(x,y)$ must satisfy $f(x,y) = L$ so for a fixed $x$, $y$
@@ -811,7 +811,7 @@ is
 g(0.4)
 ```
 
-And furthermore, we have 
+And furthermore, we have
 
 ```
 f(.4, g(0.4))
@@ -835,7 +835,7 @@ and the equation is reasonably behaved.)
 Okay, now to find the lowest point. This is what we minimize to find
 the resting position of the ring. Again, we turn to `fzero`, but for
 minimization we use the first derivative, as we are finding critical
-points. Here, `D` from the roots package doesn't work without some
+points. Here, `D`  doesn't work without some
 adjustments, so we use a numeric derivative:
 
 ```
@@ -868,6 +868,3 @@ atan(abs(t)/x) - atan((b-t)/(a-x))
 Now, were we lucky and just happened to take $b = 1$ in such a way to
 make this work? Well, no. But convince yourself by doing the above for
 different values of $b$.
-
-
-

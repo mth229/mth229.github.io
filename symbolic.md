@@ -9,7 +9,7 @@ many older approaches to technical computing. Indeed there are. For
 mathematical areas there are three different philosophies for
 computing: symbolic, numeric, and general purpose. The symbolic
 approach is the domain of Computer Algebra Systems (CAS), and is
-exemplified by very comprehensive programs like `Mathematica`, `Maple`
+exemplified by very comprehensive programs like `Mathematica`, `Maple`,
 and the open-source alternative `Sage`.  The numeric approach is the
 domain of tailored programming languages such as `MATLAB` and `R`. A
 general purpose approach would be to leverage a widely used
@@ -19,8 +19,8 @@ use.  The `julia` language is an alternative approach to `MATLAB` or
 
 One strength of `julia` is how well it plays with others. This is
 leveraged in the `SymPy` package for `julia` to provide a symbolic
-math interface through a connection to `Python` and its `SymPy`
-package via julia's `PyCall` package. We see in this project how this
+math interface through a connection to `Python` and its SymPy
+library via `julia`'s `PyCall` package. We see in this project how this
 additional functionality affords an alternative approach to performing
 calculus problems.
 
@@ -29,7 +29,7 @@ calculus problems.
 The `SymPy` package for `julia` is an add on, it is loaded into a session with the command
 
 ```
-using SymPy
+using SymPy  # also loaed with the MTH229 package
 ```
 
 If the package is not already installed, it can be installed through
@@ -67,6 +67,17 @@ x |> typeof
 
 That was painless. The type is `Sym`.
 
+
+
+```
+alert("""
+
+We use the pipeline operator `|>` to compose functions in this project, as it makes the expressions a bit easier to read. That above would be simply `typeof(x)` so there is no advantage in clarity, but there is elsewhere.
+
+""")
+```
+
+
 The `@vars` macro can simplify variable creation:
 
 ```verbatim
@@ -80,14 +91,6 @@ h, y = symbols("h, y", real=true)
 ```
 
 
-
-```
-alert("""
-
-We use the pipeline operator `|>` to compose functions in this project, as it makes the expressions a bit easier to read. That above would be simply `typeof(x)` so there is no advantage in clarity, but there is elsewhere.
-
-""")
-```
 
 
 Most of the typical math functions have been overloaded to work with
@@ -116,7 +119,7 @@ expression for a given value. For example,
 subs(f(x), x, 1)		## set x equal to 1
 ```
 
-Since `julia`'s version `0.4`, we can use parentheses:
+The natural "call" notation for functions can also be used for substitution:
 
 ```
 ex = exp(-x^2/2)  # a symbolic expression, not a function
@@ -173,7 +176,7 @@ One can `factor` polynomials:
 factor(x^2 + 2x + 1)
 ```
 
-`SymPy` will leave terms in factored form. To multiply them out, can
+`SymPy` will leave terms in factored form. To multiply them out can
 be requested through the function `expand`:
 
 ```
@@ -188,7 +191,7 @@ expand( (x+1)*(x+2)*(x+3) )
 
 ### Solving equations
 
-With `SymPy` there are *several* ways to solve an equation. Here we mention `factor`, `polyroots`, `real_roots`, `solve`, *and* `nsolve`.
+With `SymPy` there are *several* ways to solve an equation. Here we mention `factor`, `roots`, `real_roots`, `solve`, *and* `nsolve`.
 
 First for *polynomial* (or rational) functions, we can factor:
 
@@ -201,17 +204,17 @@ factor(p)
 ```
 
 From this we can see clearly the linear terms correspond to roots. The
-`polyroots` function returns a dictionary of roots and their
+`roots` function returns a dictionary of roots and their
 multiplicities.
 
 ```
-polyroots(p)
+roots(p)
 ```
 
-If the multiplicities are not of interest, we can get just the keys via:
+If the multiplicities are not of interest, we can get just the keys different ways, here is one:
 
 ```
-Sym[k for (k,v) in polyroots(p)]
+Sym[k for (k,v) in roots(p)]
 ```
 
 In this case there are two complex roots as well, that `factor` leaves
@@ -225,10 +228,10 @@ factor(q)
 ```
 
 
-However, `polyroots` will work
+However, `roots` will work
 
 ```
-polyroots(q)
+roots(q)
 ```
 
 
@@ -241,7 +244,7 @@ multiplicity.
 
 The `real_roots` function tries to return the real roots (omitting the
 non-real roots). Here we see that it fails for some
-polynomials when `polyroots` does not:
+polynomials when `roots` does not:
 
 ```
 q = x^4 - 8x^2 + 8
@@ -263,7 +266,7 @@ If it isn't clear which of these are real, they can be converted to numeric valu
 
 ```
 as = solve(q)
-map(N, as)			# all are real
+N.(as)			# all are real
 ```
 
 One could also try converting to complex (`complex(as)`) and seeing which have `0.0im` for an imaginary part.
@@ -272,12 +275,14 @@ One could also try converting to complex (`complex(as)`) and seeing which have `
 The `solve` function solves for when an expression is 0. Sometimes, the problem is to find when `f(x) = g(x)`, for example, `2x^2 = exp(x)`. Here we see:
 
 ```
-solve(exp(x) - 2x^2, x)  	# 1.487...
+solve(exp(x) - 2x^2, x)
 ```
 
-This finds only one of two answers. The second can be found with
-`nsolve`, which is a numeric algorithm to find a zero starting with an
-initial guess (which often comes from making a simple plot):
+
+We could also have used `nsolve`, a numeric solver. The second zero
+above can be found with `nsolve`, which is a numeric algorithm to find
+a zero starting with an initial guess (which often comes from making a
+simple plot):
 
 ```
 nsolve(exp(x) - 2x^2, x, 3)	# 2.617...
@@ -288,8 +293,11 @@ Trigonometric functions have infinitely many solutions, with the `sin`
 function `SymPy` solves only within the range $[-90, 90]$ degrees (the range of the `asin` function).
 
 ```
-solve(sin(x)^2 - (1/2)^2) * 180 / pi
+solve(sin(x)^2 - (1//2)^2) * 180 / pi
 ```
+
+SymPy introduced the `solveset` function for such scenarios. The answer now will be an infinite set, suitably described.
+
 
 
 To solve an expression in another variable, we specify it through the second argument:
@@ -304,13 +312,13 @@ solved is a quadratic.  We can then evaluate these two values at a
 point, say $x=1/2$, as before:
 
 ```
-out |> replace(x, 1/2) |> N
+subs.(out, x, 1//2)
 ```
 
 You can even do systems of equations. For this you specify the system and the variables to solve for using a vector:
 
 ```
-x, y = Sym("x", "y")
+@vars x y
 eq1 = x + y -1
 eq2 = x - y - (-1)
 solve([eq1, eq2], [x,y])
@@ -325,8 +333,10 @@ solve([eq1, eq2], [x,y])
 What is the coefficient of $x^3$ in $(x-1)(x-2)(x-3)(x-4)(x-5)$?
 
 ```
-val =coeffs(poly((x-1)*(x-2)*(x-3)*(x-4)*(x-5)))[3] |> N
-numericq(val)
+@vars x
+p = (x-1)*(x-2)*(x-3)*(x-4)*(x-5)
+val = sympy.Poly(p, x).coeffs()[3]
+numericq(N(val))
 ```
 
 ### Question <small>Horner's method</small>
@@ -379,7 +389,7 @@ The Soviet historian I. Y. Depman claimed that in 1486,
 Spanish mathematician Valmes was burned at the stake for claiming to
 have solved the [quartic
 equation](https://en.wikipedia.org/wiki/Quartic_function). Here we
-don't face such consequences. 
+don't face such consequences.
 
 Find the largest root of $x^4 - 10x^3 + 32x^2 - 38x + 15$.
 
@@ -391,10 +401,10 @@ numericq(val)
 
 #### Question
 
-Solve $e^x = x^4$ using `julia`. (You will need to convert to numeric with `N`.)
+Solve $e^x = x^4$ using `SymPy`. (You will need to convert to numeric with `N`.) What is the smallest value?
 
 ```
-val = solve(exp(x) - x^4)[1] |> N;
+val = minimum(N.(solve(exp(x) - x^4)))
 numericq(val, 1e-2)
 ```
 
@@ -404,7 +414,7 @@ Plotting a symbolic expression is done by coercing the expression into
 a function. For simple plots, this happens behind the scenes:
 
 ```
-using Plots; gadfly()
+using Plots
 ex = x^2 - 2x + 4
 plot(ex, -1, 3)          # plot of a symbolic expression
 ```
@@ -426,7 +436,8 @@ f(x) = sqrt(x);
 c = 2;
 fp = diff(f(x));		# diff finds derivative, fp an expression (not function)
 m = fp(x=>c)	        # at c=2
-plot([f(x), f(c) + m * (x - c)], 1, 3)
+plot(f(x), 1, 3)
+plot!(f(c) + m * (x - c))
 ```
 
 ### Practice
@@ -509,7 +520,7 @@ This limit matches the chain rule:
 
 ```
 g(x) = sin(x)
-limit( (f(g(x+h)) - f(g(x)))/h, h, 0) |> replace(x, 1)
+limit( (f(g(x+h)) - f(g(x)))/h, h, 0) |> subs(x, 1)
 ```
 
 
@@ -517,7 +528,7 @@ limit( (f(g(x+h)) - f(g(x)))/h, h, 0) |> replace(x, 1)
 
 #### Question
 
-Find 
+Find
 
 $$~
 \lim_{x \rightarrow 4} \frac{(3 - \sqrt(x + 5))}{(x-4)}
@@ -551,7 +562,7 @@ $$~
 \lim_{x \rightarrow a} \frac{(2a^3x-x^4)^(1/2) - a (a^2x)^(1/3)}{a - (ax^3)^(1/4)}
 ~$$
 
-What did he find (with the help of Bernoulli)?
+What did he find (with the help of a Bernoulli)?
 
 You need to inform `SymPy` that $a > 0$. The following is a good start (though it is complicated enough the output is mis-formatted):
 
@@ -578,7 +589,7 @@ radioq(choices, ans)
 Define a symbolic variable `h` and let $f(x) = \sin(x)$:
 
 ```
-h = Sym("h");
+@vars h
 f(x) = sin(x);
 ```
 
@@ -609,7 +620,7 @@ What is the answer?
 
 ```
 choices = ["1",
-	   "a", 
+	   "a",
 	   "a^2",
 	   "No limit exists"];
 ans = 3;
@@ -619,7 +630,7 @@ radioq(choices, ans, keep_order=true)
 
 #### Question
 
-Let 
+Let
 
 ```
 f(x) = 1/(x^(log(log(log(log((1/x)))))-1))
@@ -650,7 +661,7 @@ radioq(choices, ans)
 
 #### Question
 
-Let 
+Let
 
 ```
 f(x) = log(log(x*exp(x*exp(x)) + 1)) - exp(exp(log(log(x)) + 1/x))
@@ -705,9 +716,9 @@ Here we plot $f(x)$ and it's tangent line at $c=1$:
 
 ```
 f(x) = x^x; c = 1
-m = diff(f(x)) |> replace(x, c);
-fs = [f(x), f(c) + m*(x-c)]
-plot(fs, .5, 1.5)
+m = diff(f(x)) |> subs(x, c);
+plot(f, 0.5, 1.5)
+plot!(f(c) + m*(x-c))
 ```
 
 ### Extrema
@@ -732,7 +743,7 @@ L = Sym("L")
 A = x*y
 A = A(y => L - 2x)
 out = solve(diff(A, x), x)[1]	## solve returns an array, we need its first component
-subs(L - 2x, x, out)		
+subs(L - 2x, x, out)
 ```
 
 This shows that  $y = L/2$. So solve for $x$ we have
@@ -767,14 +778,13 @@ numericq(val)
 
 #### Questions
 
-Find the single critical point of $f(x) = 1/x^2 + x^3$. (Solve, will
-return many answers but only one real one. You can also try
-`nsolve(diff(f(x)), 1)`.)
+Find the single critical point of $f(x) = 1/x^2 + x^3$.
 
 ```
 f(x) = 1/x^2 + x^3
+@vars x
 val = nsolve(diff(f(x)), 1);
-numericq(val, 1e-2)
+numericq(N(val), 1e-2)
 ```
 
 #### Question
@@ -783,8 +793,8 @@ Let $f(x) = \tan(x)$. Newton's method finds the zero of the tangent
 line $f(c) + f'(c)(x-c)$. You can do this with `julia` via:
 
 ```
+@vars c
 f(x) = tan(x)
-c = Sym("c");
 solve(f(c) + diff(f(c)) * (x - c), x)
 ```
 
@@ -826,7 +836,7 @@ standard function is `integrate`.
 One can find general antiderivatives:
 
 ```
-x, a = Sym("x", "a")
+@vars x a
 f(x) = cos(x) - sin(x)
 integrate(f(x), x)
 ```
@@ -855,7 +865,7 @@ By specifying a range to integrate over, the definite integral
 $\int_a^b f(x) dx$ can be found.
 
 ```
-integrate(x^2, (x, 0, 1))                                
+integrate(x^2, (x, 0, 1))
 ```
 
 
@@ -864,15 +874,12 @@ solving with the  resulting symbolic answer from `integrate`:
 
 ```
 f(x) = 4x^3
-b = Sym("b")
+@vars b
 eq = integrate(f(x), (x,  0, b)) - 1/2 * integrate(f(x), (x, 0, 1))
 xs = real_roots(eq, b)
-#
-ispositive(x) = x > 0
-filter(ispositive, xs)
 ```
 
-The equation `eq` is a 4th degree polynomial. It has two real and two complex roots. We used `real_roots` to get the two real ones, and then filtered for the positive one.
+The equation `eq` is a 4th degree polynomial. It has two real and two complex roots. We used `real_roots` to get the two real ones. The positive one is clear.
 
 ### Practice
 
@@ -927,7 +934,9 @@ A graph might be illuminating:
 f(x) = x^2			# simplest parabola
 a,b = -3, 1
 tl(c) = x -> f(c) + 2*c*(x-c)
-plot([f, tl(a), tl(b)], a, b)
+plot(f, a, b)
+plot!(tl(a))
+plot!(tl(b))
 ```
 
 The intersection point is clearly $c=-1 = (a+b)/2$.
@@ -939,15 +948,15 @@ The intersection point is clearly $c=-1 = (a+b)/2$.
 Let's see if we can get this fact using `SymPy`. First we define many variables:
 
 ```
-x, c2, c1, c0, a, b = Sym("x", "c2", "c1", "c0", "a", "b")
+x, c2, c1, c0, a, b =  symbols("x, c2, c1, c0, a, b")
 p = c2*x^2 + c1*x + c0
 ```
 
 Then we create values for the tangent lines at `a` and `b`
 
 ```
-fa, fb = [replace(p, x, c) for c in [a,b]]
-ma, mb = [replace(diff(p, x), x, c) for c in [a,b]]
+fa, fb = [subs(p, x, c) for c in [a,b]]
+ma, mb = [subs(diff(p, x), x, c) for c in [a,b]]
 tla = fa + ma*(x-a)
 tlb = fb + mb*(x-b)
 ```
@@ -956,7 +965,7 @@ Finally, we solve for the intersection:
 
 ```
 solve(tla - tlb, x)
-```	 
+```
 
 
 ### Maximization in two variables
@@ -975,7 +984,7 @@ We code this expression with:
 
 
 ```
-x, theta, v0, grav =  Sym("x", "theta", "v0", "grav")
+x, theta, v0, grav =  symbols("x, theta, v0, grav")
 y = tan(theta) * x - (1//2)*grav*(x / (v0*cos(theta)))^2
 ```
 
@@ -1019,10 +1028,10 @@ We start with the same setup to create the tangent lines as symbolic
 expressions
 
 ```
-x, c2, c1, c0, a, b = Sym("x", "c2", "c1", "c0", "a", "b")
+x, c2, c1, c0, a, b = symbols("x, c2, c1, c0, a, b")
 p = c2*x^2 + c1*x + c0
-fa, fb = [replace(p, x, c) for c in [a,b]]
-ma, mb = [replace(diff(p, x), x, c) for c in [a,b]]
+fa, fb = [subs(p, x, c) for c in [a,b]]
+ma, mb = [subs(diff(p, x), x, c) for c in [a,b]]
 tla = fa + ma*(x-a)
 tlb = fb + mb*(x-b)
 ```
@@ -1071,5 +1080,3 @@ simplify(area_ac + area_cb) |> factor
 We see in fact, that it only depends on the distance (`b-a`) and the
 value of `c2`, the quadratic term, and not the linear or constant
 term.
-
-

@@ -2,14 +2,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8"> 
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 
 
 <link
-  href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
   rel="stylesheet">
 
 <style>
@@ -22,8 +22,8 @@ h6:before {content:"\2742\ ";}
 pre {display: block;}
 </style>
 
-<script src="http://code.jquery.com/jquery.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
 <!-- .julia:before {content: "julia> "} -->
 
@@ -34,7 +34,7 @@ pre {display: block;}
 
 <!-- not TeX-AMS-MML_HTMLorMML-->
 <script type="text/javascript"
-  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">  
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">
 </script>
 <script>
 MathJax.Hub.Config({
@@ -49,18 +49,18 @@ MathJax.Hub.Config({
 
 <script type="text/javascript">
 $( document ).ready(function() {
-  $("h1").each(function(index) { 
+  $("h1").each(function(index) {
        var title = $( this ).text()
        $("#page_title").html("<strong>" + title + "</strong>");
        document.title = title
   });
   $( "h2" ).each(function( index ) {
-    var nm =  $( this ).text();                                    
+    var nm =  $( this ).text();
     var id = $.trim(nm).replace(/ /g,'');
     this.id = id
     $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
   });
-  $('[data-toggle="popover"]').popover();  
+  $('[data-toggle="popover"]').popover();
 });
 </script>
 
@@ -106,8 +106,8 @@ $( document ).ready(function() {
 <h1>Newton's method using julia</h1><h2>Introduction</h2><p>Newton's method is an old method for <em>approximating</em> a zero of a function, $f(x)$:</p>$$~
 f(x) = 0
 ~$$
-<p>Previously we discussed the <em>bisection method</em> which applied for some continuous function $f(x)$ which changed signs between $a$ and $b$, points which bracket a zero. Not only did we need to find these bracketing points – which wasn't hard from a graph, more importantly the actual algorithm is pretty slow.</p><p>If the function $f$ is sufficiently differentiable, then Newton's method may work to find a zero.  Unlike the bisection method which is slow but guaranteed to find a root by the intermediate value theorem, Newton's method is fast (once it is close) but has no such guarantee of converging. In this project, we'll see how to implement the algorithm, try some examples, and then look at what can go wrong.</p><p>The <code>Roots</code> package provides a function <code>newton</code> for easily performing Newton's method, and more usefully we will see that <code>fzero</code> can be used for root finding with an algorithm that is a bit more robust than Newton's method.</p><p>To begin, we load <code>MTH229</code> which loads both <code>Plots</code> and <code>Roots</code>:</p><pre class="sourceCode julia">using MTH229</pre>
-<h2>Basic idea</h2><p>The idea behind Newton's method is simple – <em>linear approximation</em>.  That is, most functions at any given point are well approximated by the tangent line at that point. If we have a good guess $x_n$, then we can improve this guess iteratively by replacing it with the zero, $x_{n+1}$, of the tangent line at $(x_n, f(x_n))$.</p>
+<p>Previously we discussed the <em>bisection method</em> which applied for some continuous function $f(x)$ which changed signs between $a$ and $b$, points which bracket a zero. Not only did we need to find these bracketing points – which wasn't hard from a graph, more importantly the actual algorithm is pretty slow.</p><p>If the function $f$ is sufficiently differentiable, then Newton's method may work to find a zero.  Unlike the bisection method which is slow but guaranteed to find a root by the intermediate value theorem, Newton's method is fast (once it is close) but has no such guarantee of converging. In this project, we'll see how to implement the algorithm, try some examples, and then look at what can go wrong.</p><p>The <code>MTH229</code> package provides a function <code>newton</code> for easily performing Newton's method, utilizing a function from the <code>Roots</code> package. More usefully, we will see that <code>fzero</code>, which we used for bisection, can also be used for root finding with an algorithm that is a bit more robust than Newton's method.</p><p>To begin, we load <code>MTH229</code> which loads both <code>Plots</code> and <code>Roots</code>:</p><pre class="sourceCode julia">using MTH229</pre>
+<h2>Basic idea</h2><p>The idea behind Newton's method is simple – <em>linear approximation</em>. That is, most functions at any given point are well approximated by the tangent line at that point. If we have a good guess $x_n$, then we can improve this guess iteratively by replacing it with the zero, $x_{n+1}$, of the tangent line at $(x_n, f(x_n))$.</p>
 <div class="well well-sm">
 <figure>
 <img src="data:image/gif;base64,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"/>
@@ -125,12 +125,12 @@ x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}.
 <p>Some books write the right-hand side as $x_n - f'(x_n)^{-1} f(x_n)$, a form that generalizes to different settings.</p><p>Like the bisection method, Newton's method is an <em>iterative method</em>. One begins with a (suitable) guess $x_0$. From that the algorithm produces $x_1$ which is used to produce $x_2$, etc. The idea is that one eventually will settle on a value $x_n$ sufficiently close to the desired root.</p><p>Mathematically, the indices indicate that the right hand side is computed and assigned to the left hand side. This is exactly what is done in assignment within <code>julia</code>, so  the above simply becomes:</p><pre class="sourceCode julia">x = x - f(x)/f'(x)</pre>
 <p>Where <code>f&#40;x&#41;</code> is the function and <code>f&#39;&#40;x&#41;</code> its derivative. (In this case found by automatic differentiation.) This line starts with a previously defined value of <code>x</code> and updates it accordingly.</p><p>The updating is continued – by executing the exact same command – until either the algorithm has gotten close enough to an answer (i.e., it has converged) or we have given up on it converging.</p><p>Here is an example to find a zero of the function: $f(x) = x^3 - 2x - 5$.</p><p>A quick graph shows a root near 2:</p><pre class="sourceCode julia">f(x) = x^3 - 2x - 5
 plot(f, -3, 3)</pre>
-    <div id="272dc219-2302-4863-806e-79620181b96f" style="width:600px;height:400px;"></div>
+    <div id="8c30fa64-bed1-47fc-8672-208b4c7763bb" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('272dc219-2302-4863-806e-79620181b96f');
-    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-25.635709910584733,-25.2752634952189,-24.918641893496265,-24.565826245010598,-21.48048079621462,-18.704009465749525,-16.221502335231122,-14.018049486275173,-12.821888071937387,-11.717886633524275,-10.702809172486473,-9.77341969027462,-8.387743453350755,-7.2221834059257555,-6.187241804472453,-5.373519291570978,-4.802015207910328,-4.3857688528474625,-4.094087499654566,-3.943432726457977,-3.9197383525884053,-4.029237975632274,-4.459008253130632,-4.970391284206305,-5.531235351848514,-5.9536036934048155,-6.0712338830842665,-6.074102377142163,-5.947075513164881,-5.67125573467246,-5.203158804741202,-4.525924355769211,-3.7756445658052016,-2.84505285174097,-1.4430870521987686,0.2762368066291616,2.2057029193502498,4.461397417292341,6.518565731893851,8.81070550363337,11.349221720047943,14.145519368674641,14.599472549338003,15.059842668554765,15.526671295662794],"type":"scatter","name":"y1","yaxis":"y","x":[-2.985351271470318,-2.9707025429406357,-2.9560538144109536,-2.941405085881271,-2.805956438658394,-2.670507791435517,-2.53505914421264,-2.399610496989763,-2.3182115057838866,-2.23681251457801,-2.1554135233721334,-2.074014532166257,-1.9363709099358313,-1.7987272877054057,-1.6492077337535487,-1.4996881798016914,-1.3618443762969612,-1.224000572792231,-1.076217447176646,-0.928434321561061,-0.7572130777649336,-0.5859918339688063,-0.2816693633338713,-0.014805980758679935,0.27614673993191674,0.5688286725168725,0.730627324131649,0.8924259757464256,1.0463733101077433,1.2003206444690608,1.360390152768582,1.5204596610681032,1.655204091534587,1.7899485220010707,1.9544561989596276,2.1189638759181846,2.273605944345218,2.4282480127722508,2.552122305603278,2.6759965984343053,2.799870891265332,2.9237451840963593,2.9428088880722694,2.96187259204818,2.98093629602409]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-2.0,-1.0,0.0,1.0,2.0],"visible":true,"ticks":"inside","range":[-2.985351271470318,2.98093629602409],"domain":[0.05100612423447069,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-2","-1","0","1","2"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-20.0,-10.0,0.0,10.0],"visible":true,"ticks":"inside","range":[-25.635709910584733,15.526671295662794],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-20","-10","0","10"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('8c30fa64-bed1-47fc-8672-208b4c7763bb');
+    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[-2.985351271470318,-2.9707025429406357,-2.9560538144109536,-2.941405085881271,-2.805956438658394,-2.670507791435517,-2.53505914421264,-2.399610496989763,-2.3182115057838866,-2.23681251457801,-2.1554135233721334,-2.074014532166257,-1.9363709099358313,-1.7987272877054057,-1.6492077337535487,-1.4996881798016914,-1.3618443762969612,-1.224000572792231,-1.076217447176646,-0.928434321561061,-0.7572130777649336,-0.5859918339688063,-0.2816693633338713,-0.014805980758679935,0.27614673993191674,0.5688286725168725,0.730627324131649,0.8924259757464256,1.0463733101077433,1.2003206444690608,1.360390152768582,1.5204596610681032,1.655204091534587,1.7899485220010707,1.9544561989596276,2.1189638759181846,2.273605944345218,2.4282480127722508,2.552122305603278,2.6759965984343053,2.799870891265332,2.9237451840963593,2.9428088880722694,2.96187259204818,2.98093629602409],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-25.635709910584733,-25.2752634952189,-24.918641893496265,-24.565826245010598,-21.48048079621462,-18.704009465749525,-16.221502335231122,-14.018049486275173,-12.821888071937387,-11.717886633524275,-10.702809172486473,-9.77341969027462,-8.387743453350755,-7.2221834059257555,-6.187241804472453,-5.373519291570978,-4.802015207910328,-4.3857688528474625,-4.094087499654566,-3.943432726457977,-3.9197383525884053,-4.029237975632274,-4.459008253130632,-4.970391284206305,-5.531235351848514,-5.9536036934048155,-6.0712338830842665,-6.074102377142163,-5.947075513164881,-5.67125573467246,-5.203158804741202,-4.525924355769211,-3.7756445658052016,-2.84505285174097,-1.4430870521987686,0.2762368066291616,2.2057029193502498,4.461397417292341,6.518565731893851,8.81070550363337,11.349221720047943,14.145519368674641,14.599472549338003,15.059842668554765,15.526671295662794],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-3.0,-2.0,-1.0,0.0,1.0,2.0,3.0],"visible":true,"ticks":"inside","range":[-3.1643398984951503,3.1599249230489224],"domain":[0.05100612423447069,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-3","-2","-1","0","1","2","3"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-20.0,-10.0,0.0,10.0],"visible":true,"ticks":"inside","range":[-26.87058134677216,16.76154273185022],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-20","-10","0","10"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
-<p>Here we improve the estimate for the root near 2 using Newton's method.  We will need the first derivative, which we denote <code>fp</code></p><pre class="sourceCode julia">fp(x) = 3x^2 - 2
+<p>Here we improve the estimate for the root near 2 using Newton's method. We will need the first derivative, which we denote <code>fp</code></p><pre class="sourceCode julia">fp(x) = 3x^2 - 2
 x = 2				# starting value, x_0
 x = x - f(x)/fp(x)		# new value, x_1
 x, f(x)</pre>
@@ -141,10 +141,10 @@ x, f(x)</pre>
 plot(f, 1, 3, legend=false)
 plot!([x0, x0, x1], [0, f(x0), 0])  # why these values?
 scatter!([x0, x1], [0, 0])</pre>
-    <div id="cd014d82-3a12-4333-87c5-b24a93da48db" style="width:600px;height:400px;"></div>
+    <div id="57013cd9-2083-458e-b00c-c109c382546d" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('cd014d82-3a12-4333-87c5-b24a93da48db');
-    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-5.9793164562822145,-5.671698723651524,-5.376114948744723,-5.054353202784232,-4.624506236068971,-4.149134381859628,-3.549761670367768,-2.7318344803761554,-1.8868337902040913,-1.0492072446967695,-0.027892921576361474,1.1186230827532961,2.532026725588673,4.025633231413934,5.739582256271564,7.314840517696528,8.337965402141403,9.40892798981978,10.460168948963872,11.555377999997123,13.403690106169073,15.370341575297022,15.683723246831825],"type":"scatter","name":"y1","yaxis":"y","x":[1.0195316380395762,1.2001298343367457,1.3086618226112479,1.4004242374315314,1.500103940066103,1.5919998090692564,1.6905218928129797,1.8046693886770646,1.9061102122220428,1.99506467308044,2.092048913310639,2.1896095575056242,2.2974753252488083,2.4001068814896866,2.506819887022701,2.5966495073336904,2.6514853996532093,2.706321291972728,2.7578686481150725,2.8094160042574168,2.8919988661447684,2.97458172803212,2.9872908640160603]},{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0,-1,0],"type":"scatter","name":"y2","yaxis":"y","x":[2.0,2.0,2.1]},{"showlegend":true,"mode":"markers","xaxis":"x","colorbar":{"title":""},"marker":{"symbol":"circle","color":["rgba(62, 164, 78, 1.000)","rgba(62, 164, 78, 1.000)"],"line":{"color":["rgba(0, 0, 0, 1.000)","rgba(0, 0, 0, 1.000)"],"width":1},"size":8},"y":[0,0],"type":"scatter","name":"y3","yaxis":"y","x":[2.0,2.1]}], {"showlegend":false,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[1.0,1.5,2.0,2.5,3.0],"visible":true,"ticks":"inside","range":[0.9604988612602817,3.0463236407953547],"domain":[0.03619130941965587,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["1.0","1.5","2.0","2.5","3.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-5.0,0.0,5.0,10.0,15.0],"visible":true,"ticks":"inside","range":[-6.629207647375636,16.333614437925245],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-5","0","5","10","15"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"width":600});
+    PLOT = document.getElementById('57013cd9-2083-458e-b00c-c109c382546d');
+    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[1.0195316380395762,1.2001298343367457,1.3086618226112479,1.4004242374315314,1.500103940066103,1.5919998090692564,1.6905218928129797,1.8046693886770646,1.9061102122220428,1.99506467308044,2.092048913310639,2.1896095575056242,2.2974753252488083,2.4001068814896866,2.506819887022701,2.5966495073336904,2.6514853996532093,2.706321291972728,2.7578686481150725,2.8094160042574168,2.8919988661447684,2.97458172803212,2.9872908640160603],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-5.9793164562822145,-5.671698723651524,-5.376114948744723,-5.054353202784232,-4.624506236068971,-4.149134381859628,-3.549761670367768,-2.7318344803761554,-1.8868337902040913,-1.0492072446967695,-0.027892921576361474,1.1186230827532961,2.532026725588673,4.025633231413934,5.739582256271564,7.314840517696528,8.337965402141403,9.40892798981978,10.460168948963872,11.555377999997123,13.403690106169073,15.370341575297022,15.683723246831825],"type":"scatter","hoverinfo":"text"},{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null],"x":[2.0,2.0,2.1],"showlegend":true,"mode":"lines","name":"y2","zmin":-0.1,"legendgroup":"y2","zmax":0.1,"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0,-1,0],"type":"scatter","hoverinfo":"text"},{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null],"x":[2.0,2.1],"showlegend":true,"mode":"markers","name":"y3","zmin":-0.1,"legendgroup":"y3","marker":{"symbol":"circle","color":"rgba(62, 164, 78, 1.000)","line":{"color":"rgba(0, 0, 0, 1.000)","width":1},"size":8},"zmax":0.1,"y":[0,0],"type":"scatter","hoverinfo":"text"}], {"showlegend":false,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[1.0,1.5,2.0,2.5,3.0],"visible":true,"ticks":"inside","range":[0.9604988612602817,3.0463236407953547],"domain":[0.03619130941965587,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["1.0","1.5","2.0","2.5","3.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-5.0,0.0,5.0,10.0,15.0],"visible":true,"ticks":"inside","range":[-6.629207647375636,16.333614437925245],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-5","0","5","10","15"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"width":600});
     </script>
 <p>Continuing, though without visualizing the progress, this next step will compute $x_2$:</p><pre class="sourceCode julia">x = x - f(x)/fp(x)
 x, f(x)</pre>
@@ -166,7 +166,7 @@ x, f(x)</pre>
 <pre class="output">
 (2.0945514815423265, -8.881784197001252e-16)</pre>
 
-<p>We see that $x_4=x_5$, so the algorithm has stabilized. We also see that $f(x_4)$ is basically $0$ (Recall, <code>eps&#40;&#41;</code> is the machine precision, or the size of the difference between floating point values at $1.0$ is basically $10^{-16}$, the size of $f(x_4)$.)</p><p>You can see in this case that the convergence happens quickly as soon as the algorithm gets close.</p><p>The approximate root is $x_4$.  It is important to realize that the actual, <em>exact</em>, answer is not likely to be the value computed by Newton's method, which we call <code>xstar</code> at times. In most cases, the true answer will be irrational and <code>xstar</code> a floating point number, which ultimately can never be better than an approximation to an irrational number. </p><p>The above example iterated until it was clear the algorithm does not improve itself, as the values returned did not change. This need not be the case for every problem.</p><p>Rather, we can determine two ways that the number is close enough to the answer:</p><ul>
+<p>We see that $x_4=x_5$, so the algorithm has stabilized. We also see that $f(x_4)$ is basically $0$ (Recall, <code>eps&#40;&#41;</code> is the machine precision, or the size of the difference between floating point values at $1.0$ is basically $10^{-16}$, the size of $f(x_4)$.)</p><p>You can see in this case that the convergence happens quickly as soon as the algorithm gets close.</p><p>The approximate root is $x_4$.  It is important to realize that the actual, <em>exact</em>, answer is not likely to be the value computed by Newton's method, which we call <code>xstar</code> at times. In most cases, the true answer will be irrational and <code>xstar</code> a floating point number, which ultimately can never be better than an approximation to an irrational number.</p><p>The above example iterated until it was clear the algorithm does not improve itself, as the values returned did not change. This need not be the case for every problem.</p><p>Rather, we can determine two ways that the number is close enough to the answer:</p><ul>
 <li><p>The sequence of <code>x</code>'s stop changing by much</p>
 </li>
 <li><p>the values <code>f&#40;x&#41;</code> get close enough to zero.</p>
@@ -184,87 +184,86 @@ x = x - f(x)/f'(x)
 (2.0945514815423265, -8.881784197001252e-16)</pre>
 
 <div class="alert alert-success" role="alert">
+
 <div class="markdown"><p>Newton looked at this same example in 1699 (B.T. Polyak, <em>Newton's method and its use in optimization</em>, European Journal of Operational Research. 02/2007; 181(3):1086-1096.) though his technique was slightly different as he did not use the derivative, <em>per se</em>, but rather an approximation based on the fact that his function was a polynomial (though identical to the derivative). Raphson (1690) proposed the general form, hence the usual name of Newton-Raphson method.</p>
-</div> 
+</div>
+
 </div>
 <hr /><h3>Practice</h3><h4>Question</h4><p>Using Newton's method to find $\sqrt{k}$ (by solving for roots of $f(x) = x^2 - k$) is also referred to as the Babylonian method, due to its origins. The resulting method</p>$$~
 x_{n+1} = \frac{1}{2}(x_n + \frac{k}{x_n})
 ~$$
-<p>is described by the first-century <a href="http://en.wikipedia.org/wiki/Babylonian_method">Greek mathematician Hero of Alexandria</a>.</p><p>Let $k=15$ and $x_0$ be $4$. What is the value of $x_3$? </p><form name='WeaveQuestion' data-id='Ud9PdtWw' data-controltype='numeric'>
+<p>is described by the first-century <a href="http://en.wikipedia.org/wiki/Babylonian_method">Greek mathematician Hero of Alexandria</a>.</p><p>Let $k=15$ and $x_0$ be $4$. What is the value of $x_3$?</p><form name='WeaveQuestion' data-id='K9FYwm5D' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
-
 <div class="input-group">
-<input id="Ud9PdtWw" type="number" class="form-control">
+<input id="K9FYwm5D" type="number" class="form-control">
 
 </div>
   
-<div id='Ud9PdtWw_message'></div>
+<div id='K9FYwm5D_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#Ud9PdtWw').on('change', function() {
+$('#K9FYwm5D').on('change', function() {
   correct = Math.abs(this.value - 3.8729833462074525) <= 0.0001;
 
   if(correct) {
-     $('#Ud9PdtWw_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#K9FYwm5D_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#Ud9PdtWw_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#K9FYwm5D_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>The function $f(x) = \sin(x)$ has derivative $f'(x) = \cos(x)$. Use Newton's method to solve $f(x) = 0$ starting at $3$. Repeat 5 times. What value do you get for <code>x</code>?</p><form name='WeaveQuestion' data-id='XvPNWwmN' data-controltype='numeric'>
+<h4>Question</h4><p>The function $f(x) = \sin(x)$ has derivative $f'(x) = \cos(x)$. Use Newton's method to solve $f(x) = 0$ starting at $3$. Repeat 5 times. What value do you get for <code>x</code>?</p><form name='WeaveQuestion' data-id='iC1l45n0' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
-
 <div class="input-group">
-<input id="XvPNWwmN" type="number" class="form-control">
+<input id="iC1l45n0" type="number" class="form-control">
 
 </div>
   
-<div id='XvPNWwmN_message'></div>
+<div id='iC1l45n0_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#XvPNWwmN').on('change', function() {
+$('#iC1l45n0').on('change', function() {
   correct = Math.abs(this.value - 3.141592653589793) <= 1.0e-14;
 
   if(correct) {
-     $('#XvPNWwmN_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#iC1l45n0_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#XvPNWwmN_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#iC1l45n0_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<p>(This can be used to compute $\pi$ numerically, as the convergence is very fast. Here it takes 4 steps to verify.)</p><h4>Question</h4><p>Let $f(x) = x^2 - 3^x$. This has derivative $2x - 3^x \cdot \log(3)$. Starting with $x_0=0$, what does Newton's method converge on?</p><form name='WeaveQuestion' data-id='sqNtB0zJ' data-controltype='numeric'>
+<p>(This can be used to compute $\pi$ numerically, as the convergence is very fast. Here it takes 4 steps to verify.)</p><h4>Question</h4><p>Let $f(x) = x^2 - 3^x$. This has derivative $2x - 3^x \cdot \log(3)$. Starting with $x_0=0$, what does Newton's method converge on?</p><form name='WeaveQuestion' data-id='a8pdDJ2v' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
-
 <div class="input-group">
-<input id="sqNtB0zJ" type="number" class="form-control">
+<input id="a8pdDJ2v" type="number" class="form-control">
 
 </div>
   
-<div id='sqNtB0zJ_message'></div>
+<div id='a8pdDJ2v_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#sqNtB0zJ').on('change', function() {
+$('#a8pdDJ2v').on('change', function() {
   correct = Math.abs(this.value - -0.6860267245362514) <= 1.0e-14;
 
   if(correct) {
-     $('#sqNtB0zJ_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#a8pdDJ2v_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#sqNtB0zJ_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#a8pdDJ2v_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -275,10 +274,10 @@ $('#sqNtB0zJ').on('change', function() {
 </li>
 <li><p>If the above hasn't happened by $n=100$ the algorithm fails to converge</p>
 </li>
-</ul><p>This isn't perfect, but will be sufficient. (Well, in fact no stopping rule can be perfect, but this one doesn't account for the relative size of the $x_n$s which can be important.) </p><p>The first two steps require a tolerance. We will use <code>1e-14</code> for this. This is about 100 times the machine precision, <code>eps&#40;&#41;</code>, which is sufficient when the answers are moderate in size. This is not very good if the answers are very large.</p><p>A basic algorithm is to repeat a step of Newton's method until the above occurs. We wrap this up in a function for reuse, and employ a <code>while</code> loop to repeat the update step until something happens:</p><pre class="sourceCode julia">function nm(f, fp, x)
+</ul><p>This isn't perfect, but will be sufficient. (Well, in fact no stopping rule can be perfect, but this one doesn't account for the relative size of the $x_n$s which can be important.)</p><p>The first two steps require a tolerance. We will use <code>1e-14</code> for this. This is about 100 times the machine precision, <code>eps&#40;&#41;</code>, which is sufficient when the answers are moderate in size. This is not very good if the answers are very large.</p><p>A basic algorithm is to repeat a step of Newton's method until the above occurs. We wrap this up in a function for reuse, and employ a <code>while</code> loop to repeat the update step until something happens:</p><pre class="sourceCode julia">function nm(f, fp, x)
 	 xnew, xold = x, Inf
 	 fn, fo = f(xnew), Inf
-	 
+
 	 tol = 1e-14
 	 ctr = 1
 
@@ -293,9 +292,9 @@ $('#sqNtB0zJ').on('change', function() {
 	    error("Did not converge in 100 steps")
          else
 	   xnew, ctr
-         end 
+         end
 end
-	 </pre>
+</pre>
 <pre class="output">
 nm (generic function with 1 method)</pre>
 
@@ -305,91 +304,88 @@ xstar, ctr = nm(f, fp, 0)	# takes 6 steps</pre>
 <pre class="output">
 (0.20163967572340466, 6)</pre>
 
-<p>However, the <code>Roots</code> package implements the <code>newton</code> function. So we shall use that. To see the number of steps, the argument <code>verbose&#61;true</code> may be given.</p><hr /><p>We revisit a problem from a previous project, finding zeroes of the function $f(x) = \exp(x) - x^4$. We know from previous work that there are three of them. Let's find one near $x=2$:</p><pre class="sourceCode julia">f(x) = exp(x) - x^4
+<p>However, the <code>MTH229</code> package provides the <code>newton</code> function. So we shall use that in the sequel. To see the number of steps, the argument <code>verbose&#61;true</code> may be given.</p><hr /><p>We revisit a problem from a previous project, finding zeroes of the function $f(x) = \exp(x) - x^4$. We know from previous work that there are three of them. Let's find one near $x=2$:</p><pre class="sourceCode julia">f(x) = exp(x) - x^4
 x = 2
 newton(f, 2)  # newton will use automatic differentiation for the derivative</pre>
-<div class="well well-sm">
-1.4296118247255556</div>
+<pre class="output">
+1.4296118247255556</pre>
 
 <p>It took 8 steps and we are this close:</p><pre class="sourceCode julia">xstar, f(xstar)</pre>
 <pre class="output">
 (0.20163967572340466, 1.2217539869961238)</pre>
 
-<p>In this case, the answer is exact up to floating point round off.</p><h3>Practice</h3><h4>Question</h4><p>Repeat the problem of finding a root of $f(x) = \exp(x) - x^4$ starting at $x=2$. How many steps does it take with the default tolerance used in <code>nm</code>?</p><form name='WeaveQuestion' data-id='wWvk5cf4' data-controltype='numeric'>
+<p>In this case, the answer is exact up to floating point round off.</p><h3>Practice</h3><h4>Question</h4><p>Repeat the problem of finding a root of $f(x) = \exp(x) - x^4$ starting at $x=2$. (<code>newton&#40;f, 2, verbose&#61;true&#41;</code>). How many iterations does it take with the default tolerances?</p><form name='WeaveQuestion' data-id='7dfsmxHm' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
-
 <div class="input-group">
-<input id="wWvk5cf4" type="number" class="form-control">
+<input id="7dfsmxHm" type="number" class="form-control">
 
 </div>
   
-<div id='wWvk5cf4_message'></div>
+<div id='7dfsmxHm_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#wWvk5cf4').on('change', function() {
-  correct = Math.abs(this.value - 8) <= 0.1;
+$('#7dfsmxHm').on('change', function() {
+  correct = Math.abs(this.value - 6) <= 0.1;
 
   if(correct) {
-     $('#wWvk5cf4_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#7dfsmxHm_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#wWvk5cf4_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#7dfsmxHm_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>If we repeat with $f(x) = \exp(x) - x^4$ but start now at $x=8$ where does the algorithm converge?</p><form name='WeaveQuestion' data-id='lqCTeJ8C' data-controltype='numeric'>
+<h4>Question</h4><p>If we repeat with $f(x) = \exp(x) - x^4$ but start now at $x=8$ where does the algorithm converge?</p><form name='WeaveQuestion' data-id='PKQH2rq0' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
-
 <div class="input-group">
-<input id="lqCTeJ8C" type="number" class="form-control">
+<input id="PKQH2rq0" type="number" class="form-control">
 
 </div>
   
-<div id='lqCTeJ8C_message'></div>
+<div id='PKQH2rq0_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#lqCTeJ8C').on('change', function() {
-  correct = Math.abs(this.value - 8.6131694564414) <= 1.0e-6;
+$('#PKQH2rq0').on('change', function() {
+  correct = Math.abs(this.value - NaN) <= 1.0e-6;
 
   if(correct) {
-     $('#lqCTeJ8C_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#PKQH2rq0_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#lqCTeJ8C_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#PKQH2rq0_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Let $f(x) = \sin(x) - \cos(4\cdot x)$.</p><p>Starting at $\pi/8$, solve for the root returned by Newton's method</p><form name='WeaveQuestion' data-id='lvqCsjIR' data-controltype='numeric'>
+<h4>Question</h4><p>Let $f(x) = \sin(x) - \cos(4\cdot x)$.</p><p>Starting at $\pi/8$, solve for the root returned by Newton's method</p><form name='WeaveQuestion' data-id='PGqmilxl' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
-
 <div class="input-group">
-<input id="lvqCsjIR" type="number" class="form-control">
+<input id="PGqmilxl" type="number" class="form-control">
 
 </div>
   
-<div id='lvqCsjIR_message'></div>
+<div id='PGqmilxl_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#lvqCsjIR').on('change', function() {
+$('#PGqmilxl').on('change', function() {
   correct = Math.abs(this.value - 0.3141592653589793) <= 0.001;
 
   if(correct) {
-     $('#lvqCsjIR_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#PGqmilxl_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#lvqCsjIR_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#PGqmilxl_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -413,61 +409,59 @@ x2, f(x2)</pre>
 <p>The last line shows the algorithm has basically converged, as the values agree to $10^{-14}$. We have</p><h3>Using forward differences</h3><p>Recall the forward difference approximation to the derivative:</p>$$~
 f'(x) \approx \frac{f(x + h) - f(x)}{h}
 ~$$
-<p>For some small $h$ (with $h=10^{-8}$ a reasonable choice for many functions). This can be used </p><p>One can also use approximate derivatives based on forward differences in place of $f'(x)$ in the formula. Again, this won't be as fast.</p><p>The update step $x - f(x)/f'(x)$ becomes</p>$$~
+<p>For some small $h$ (with $h=10^{-8}$ a reasonable choice for many functions). This can be used</p><p>One can also use approximate derivatives based on forward differences in place of $f'(x)$ in the formula. Again, this won't be as fast.</p><p>The update step $x - f(x)/f'(x)$ becomes</p>$$~
 x - \frac{h \cdot f(x)}{f(x+h) - f(x)}.
 ~$$
 <p>The issue with this approximation is when the estimated value gets close to the actual root, the value of $h$ becomes too large. Steffenson's method replaces $h$ with $f(x)$, which for values close to a root gets quite small. This improves the convergence rate to be on par with Newton's method. In this case, the update step looks like</p>$$~
 x - \frac{f(x)^2}{f(x+ f(x)) - f(x)}.
 ~$$
-<h3>Problems</h3><h4>Question</h4><p>Use the secant method to find a root to $f(x) = \cos(x) - x^3$ starting with $x_0=1/2$ and $x_1=1$.</p><form name='WeaveQuestion' data-id='JlN1zbD6' data-controltype='numeric'>
+<h3>Problems</h3><h4>Question</h4><p>Use the secant method to find a root to $f(x) = \cos(x) - x^3$ starting with $x_0=1/2$ and $x_1=1$.</p><form name='WeaveQuestion' data-id='wKdyXR4a' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
-
 <div class="input-group">
-<input id="JlN1zbD6" type="number" class="form-control">
+<input id="wKdyXR4a" type="number" class="form-control">
 
 </div>
   
-<div id='JlN1zbD6_message'></div>
+<div id='wKdyXR4a_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#JlN1zbD6').on('change', function() {
-  correct = Math.abs(this.value - 0.8654740331016144) <= 1.0e-10;
+$('#wKdyXR4a').on('change', function() {
+  correct = Math.abs(this.value - 1) <= 1.0e-10;
 
   if(correct) {
-     $('#JlN1zbD6_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#wKdyXR4a_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#JlN1zbD6_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#wKdyXR4a_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Use the secant method to find a root to $f(x) = x^5 + x - 1$ starting with $x_0=1/2$ and $x_1=1$.</p><form name='WeaveQuestion' data-id='oiOZs1HT' data-controltype='numeric'>
+<h4>Question</h4><p>Use the secant method to find a root to $f(x) = x^5 + x - 1$ starting with $x_0=1/2$ and $x_1=1$.</p><form name='WeaveQuestion' data-id='i2f4d0kR' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
-
 <div class="input-group">
-<input id="oiOZs1HT" type="number" class="form-control">
+<input id="i2f4d0kR" type="number" class="form-control">
 
 </div>
   
-<div id='oiOZs1HT_message'></div>
+<div id='i2f4d0kR_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#oiOZs1HT').on('change', function() {
-  correct = Math.abs(this.value - 0.7548776662466927) <= 1.0e-10;
+$('#i2f4d0kR').on('change', function() {
+  correct = Math.abs(this.value - 1) <= 1.0e-10;
 
   if(correct) {
-     $('#oiOZs1HT_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#i2f4d0kR_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#oiOZs1HT_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#i2f4d0kR_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -476,10 +470,10 @@ $('#oiOZs1HT').on('change', function() {
 </li>
 <li><p>when called with a starting point, as in <code>fzero&#40;f, a&#41;</code>, it will use an iterative algorithm to search for a root.</p>
 </li>
-</ul><p>Bracketing methods are guaranteed to converge, but can be slow. The iterative algorithm used by default with <code>fzero</code> tries to speed the convergence up, but if along the way it finds a bracketing interval, that will guarantee convergence. </p><p>The <code>order</code> keyword can be used to specify a higher-order method which converges faster with a good initial guess, but is more sensitive to poor initial guesses. For example, <code>fzero&#40;f, x, order&#61;2&#41;</code> will use Steffensen's method. The default method isn't trying to minimize function calls. If you are trying to find the zero of a function which is costly to compute, it should be avoided.</p><p>We focus on the simplest usage of <code>fzero</code> where an initial guess is supplied and the default order is used:</p><pre class="sourceCode julia">f(x) = x^2 - 2
+</ul><p>Many bracketing methods (like bisection) are guaranteed to converge, but can be slow. The iterative algorithm used by default with <code>fzero</code> tries to speed the convergence up, but if along the way it finds a bracketing interval, that will guarantee convergence.</p><p>We focus on the simplest usage of <code>fzero</code> where an initial guess is supplied and the default order is used. Here is an example to find $-\sqrt{2}$:</p><pre class="sourceCode julia">f(x) = x^2 - 2
 fzero(f, -1)</pre>
-<div class="well well-sm">
--1.414213562373095</div>
+<pre class="output">
+-1.414213562373095</pre>
 
 <h3>Using <code>fzero</code> and a graph to find all roots.</h3><p>Let's look, again, at the task of finding all zeros to the function $e^x - x^4$. We follow a standard approach:</p><ul>
 <li><p>graph the function to roughly identify potential zeros</p>
@@ -488,10 +482,10 @@ fzero(f, -1)</pre>
 </li>
 </ul><p>The following graph suggests, perhaps, there may be $3$ zeros, one near $9$, one near $2$ and one near $-1$.</p><pre class="sourceCode julia">f(x) = exp(x) - x^4
 plot(f, -5,9)</pre>
-    <div id="21d4b6cf-c033-4ffc-944b-b03d3b7d3ba5" style="width:600px;height:400px;"></div>
+    <div id="32bf3ad0-8959-4226-a92b-9afc1d2e6a66" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('21d4b6cf-c033-4ffc-944b-b03d3b7d3ba5');
-    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-608.0772918087122,-591.5070298242472,-575.2777330131781,-559.3846910372821,-490.1451213320584,-427.540802301203,-371.1335640628726,-320.50019580182345,-275.2324446335021,-234.93701427367824,-199.2355634803273,-167.7647042287722,-107.36083325904822,-64.93748347214688,-40.13179993518053,-23.188239330107553,-4.829392243615039,-0.1120478462379344,0.8459868739653739,1.7224270329047453,0.5787064525994619,-7.784659317281205,-18.200065124547432,-34.82152248653748,-59.675319306462555,-94.69842235424127,-119.18029907723755,-147.7481399339665,-180.73491198405105,-218.45214562821278,-258.9864333453773,-304.2592801725844,-354.4243071112035,-409.57128200838235,-540.1197482269292,-690.5923343025709,-829.4574124635383,-974.0748478577966,-1061.739592143841,-1145.7872598513557,-1222.7557180972522,-1288.2508104751,-1313.5467940501476,-1334.43203852065,-1350.1587202459805,-1359.8982347701558,-1362.7334209440533,-1357.6500509911082,-1343.5275172202607,-1319.1286395482407,-1291.2566467508473,-1255.1518443139412,-1209.9865536469442,-1154.8664532371613,-1088.8255357432554,-1010.8206871995635,-919.7258600141863,-814.3258093218783,-693.3093599718513,-555.262168978662,-479.3799504131375,-398.65894562883295,-312.8897858007822,-221.8550886027915,-125.32916188113086,-23.07769642621861,85.14255255881835,199.58409570857202,320.50905189589685,448.189503229567,582.9078631125258,724.9572578412372,816.177211841481,910.3633845933491,1007.5905912787221,1107.9353763992194,1211.4760528009565,1318.2927415769882,1428.467412867125],"type":"scatter","name":"y1","yaxis":"y","x":[-4.965819633430741,-4.931639266861483,-4.897458900292225,-4.8632785337229665,-4.705255111962943,-4.547231690202921,-4.389208268442897,-4.231184846682874,-4.0731614249228505,-3.915138003162827,-3.7571145814028037,-3.5990911596427804,-3.2192292006820233,-2.839367241721266,-2.518198789850273,-2.19703033797928,-1.49927241953728,-0.8560013365152057,-0.16634675030914214,0.632685720739452,1.3427714855543003,1.9654527115630802,2.3048975523687765,2.6443423931744725,2.985804647856921,3.3272669025393693,3.516031996089942,3.7047970896405142,3.8935621831910865,4.082327276741659,4.261932500163196,4.441537723584734,4.6211429470062715,4.800748170427808,5.174243689793357,5.547739209158907,5.86214288024737,6.176546551335832,6.368472174454149,6.560397797572465,6.752323420690781,6.944249043809098,7.0344569170582005,7.124664790307303,7.214872663556406,7.305080536805509,7.3952884100546115,7.485496283303714,7.575704156552817,7.665912029801919,7.738172033953351,7.810432038104784,7.882692042256216,7.954952046407648,8.027212050559081,8.099472054710514,8.171732058861945,8.243992063013378,8.316252067164811,8.388512071316242,8.424642073391958,8.460772075467675,8.496902077543393,8.533032079619108,8.569162081694824,8.605292083770541,8.641422085846258,8.677552087921974,8.71368208999769,8.749812092073405,8.78594209414912,8.822072096224838,8.844313084196735,8.86655407216863,8.888795060140524,8.911036048112418,8.933277036084313,8.95551802405621,8.977759012028105]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-2.5,0.0,2.5,5.0,7.5],"visible":true,"ticks":"inside","range":[-4.965819633430741,8.977759012028105],"domain":[0.08063575386410031,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-2.5","0.0","2.5","5.0","7.5"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-1000.0,-500.0,0.0,500.0,1000.0],"visible":true,"ticks":"inside","range":[-1362.7334209440533,1428.467412867125],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-1000","-500","0","500","1000"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('32bf3ad0-8959-4226-a92b-9afc1d2e6a66');
+    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[-4.965819633430741,-4.931639266861483,-4.897458900292225,-4.8632785337229665,-4.705255111962943,-4.547231690202921,-4.389208268442897,-4.231184846682874,-4.0731614249228505,-3.915138003162827,-3.7571145814028037,-3.5990911596427804,-3.2192292006820233,-2.839367241721266,-2.518198789850273,-2.19703033797928,-1.49927241953728,-0.8560013365152057,-0.16634675030914214,0.632685720739452,1.3427714855543003,1.9654527115630802,2.3048975523687765,2.6443423931744725,2.985804647856921,3.3272669025393693,3.516031996089942,3.7047970896405142,3.8935621831910865,4.082327276741659,4.261932500163196,4.441537723584734,4.6211429470062715,4.800748170427808,5.174243689793357,5.547739209158907,5.86214288024737,6.176546551335832,6.368472174454149,6.560397797572465,6.752323420690781,6.944249043809098,7.0344569170582005,7.124664790307303,7.214872663556406,7.305080536805509,7.3952884100546115,7.485496283303714,7.575704156552817,7.665912029801919,7.738172033953351,7.810432038104784,7.882692042256216,7.954952046407648,8.027212050559081,8.099472054710514,8.171732058861945,8.243992063013378,8.316252067164811,8.388512071316242,8.424642073391958,8.460772075467675,8.496902077543393,8.533032079619108,8.569162081694824,8.605292083770541,8.641422085846258,8.677552087921974,8.71368208999769,8.749812092073405,8.78594209414912,8.822072096224838,8.844313084196735,8.86655407216863,8.888795060140524,8.911036048112418,8.933277036084313,8.95551802405621,8.977759012028105],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-608.0772918087122,-591.5070298242472,-575.2777330131781,-559.3846910372821,-490.1451213320584,-427.540802301203,-371.1335640628726,-320.50019580182345,-275.2324446335021,-234.93701427367824,-199.2355634803273,-167.7647042287722,-107.36083325904822,-64.93748347214688,-40.13179993518053,-23.188239330107553,-4.829392243615039,-0.1120478462379344,0.8459868739653739,1.7224270329047453,0.5787064525994619,-7.784659317281205,-18.200065124547432,-34.82152248653748,-59.675319306462555,-94.69842235424127,-119.18029907723755,-147.7481399339665,-180.73491198405105,-218.45214562821278,-258.9864333453773,-304.2592801725844,-354.4243071112035,-409.57128200838235,-540.1197482269292,-690.5923343025709,-829.4574124635383,-974.0748478577966,-1061.739592143841,-1145.7872598513557,-1222.7557180972522,-1288.2508104751,-1313.5467940501476,-1334.43203852065,-1350.1587202459805,-1359.8982347701558,-1362.7334209440533,-1357.6500509911082,-1343.5275172202607,-1319.1286395482407,-1291.2566467508473,-1255.1518443139412,-1209.9865536469442,-1154.8664532371608,-1088.8255357432554,-1010.8206871995635,-919.7258600141863,-814.3258093218783,-693.3093599718513,-555.262168978662,-479.3799504131375,-398.65894562883295,-312.8897858007822,-221.8550886027915,-125.32916188113086,-23.07769642621861,85.14255255881835,199.58409570857202,320.50905189589685,448.189503229567,582.9078631125258,724.9572578412372,816.177211841481,910.3633845933491,1007.5905912787221,1107.9353763992194,1211.4760528009565,1318.2927415769882,1428.467412867125],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-4.0,-2.0,0.0,2.0,4.0,6.0,8.0],"visible":true,"ticks":"inside","range":[-5.384126992794506,9.396066371391871],"domain":[0.08063575386410031,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-4","-2","0","2","4","6","8"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-1000.0,-500.0,0.0,500.0,1000.0,1500.0],"visible":true,"ticks":"inside","range":[-1446.4694459583886,1512.2034378814603],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-1000","-500","0","500","1000","1500"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
 <p>We can improve these guesses with</p><pre class="sourceCode julia">fzero(f, 9), fzero(f, 2), fzero(f, -1)</pre>
 <pre class="output">
@@ -500,64 +494,68 @@ plot(f, -5,9)</pre>
 <p>The above can be written without repeating <code>fzero</code> by using a comprehension:</p><pre class="sourceCode julia">[fzero(f, x) for x in [9, 2, -1]]</pre>
 <pre class="output">
 3-element Array{Float64,1}:
-  8.61317 
-  1.42961 
- -0.815553</pre>
+  8.6131694564414   
+  1.4296118247255556
+ -0.8155534188089607</pre>
 
 <p>Or even more compactly, using the broadcast notation:</p><pre class="sourceCode julia">fzero.(f, [-1, 2, 9])</pre>
 <pre class="output">
 3-element Array{Float64,1}:
- -0.815553
-  1.42961 
-  8.61317 </pre>
+ -0.8155534188089607
+  1.4296118247255556
+  8.6131694564414   </pre>
 
 <hr /><p>As another illustration, let $f(x) = \cos^2(x^2)$ on $[-1,2]$. Find all the zeros of the derivative of $f(x)$.</p><p>We graph the derivative to identify starting points:</p><pre class="sourceCode julia">f(x) = cos(x^2)^2
 plot(f', -1, 2)</pre>
-    <div id="b41bb084-74fb-46b5-b5b3-4e0abdeac64b" style="width:600px;height:400px;"></div>
+    <div id="67f7860a-b423-42e7-ab71-c802f00163b2" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('b41bb084-74fb-46b5-b5b3-4e0abdeac64b');
-    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[1.82861917131379,1.836599214837022,1.8425887928974007,1.846642999809091,1.8418658967982864,1.8027128616491186,1.7350968430876432,1.6448482545950127,1.4182720106499955,1.1619475967222594,1.0065611705913837,0.8564069031882914,0.7152203837448443,0.5856661042763088,0.3974772863113508,0.2504814236785462,0.13580064365136932,0.06222121535765637,0.02367147000938714,0.005619165603702994,-0.00018326684687543172,-0.03543765429783074,-0.0903541808541151,-0.18327971228202333,-0.3022446052743133,-0.4595703010968991,-0.6745124916293854,-0.9280500561763781,-1.2059191960761155,-1.4789239323882837,-1.613486670904223,-1.7259851297177995,-1.8070879311837753,-1.8468790307660008,-1.84838854656667,-1.8372117891736792,-1.8123330721918924,-1.7727975127255322,-1.7177319082578644,-1.646367043460303,-1.5580612179856146,-1.452324727689395,-1.3235653083204915,-1.1755060691544787,-1.0082953533412597,-0.8223780785837667,-0.6185234473943906,-0.39785000937223913,-0.1618471302654211,0.08760814073257768,0.9933995440395021,1.9023773858134159,2.156372561730102,2.3904329312648116,2.5992171017888492,2.77737299661783,2.9196552274018126,3.0210548072301333,3.0769393803009515,3.08320154094753,3.0407653167768163,2.949261788668576,2.8846336837835995,2.807272172011551,2.717136465323585,2.6142462764280507,2.3706003934481057,2.077802918431311,1.7384438571557634,1.3562842944725932,1.0225843689016099,0.6676814916111582,0.2951607958388357,-0.09092841077698216,-0.8854721122623368,-1.6755826849359834,-2.055043471891893,-2.4162925134880626,-2.753371571614867,-3.0603576513200643,-3.3314655113599914,-3.5611561508384346,-3.7442496872889475,-3.876040782983913,-3.905624670793513,-3.929846243996098,-3.9486048475092392,-3.9618067687012104,-3.969365537228717,-3.9712022190879077,-3.9672457041561606],"type":"scatter","name":"y1","yaxis":"y","x":[-0.9926756357351589,-0.9853512714703179,-0.9780269072054768,-0.9707025429406356,-0.9368403811349164,-0.9029782193291971,-0.8691160575234778,-0.8352538957177585,-0.76752957210632,-0.6998052484948815,-0.6591057528919433,-0.618406257289005,-0.5777067616860667,-0.5370072660831284,-0.46818545496791564,-0.39936364385270284,-0.3246038668767743,-0.2498440899008457,-0.1809221881484806,-0.11200028639611552,0.035782839219469544,0.20700408301559686,0.28308470067433056,0.3591653183330643,0.42588116397686215,0.49259700962066005,0.5653351897933092,0.6380733699659584,0.7112438531121974,0.7844143362584364,0.8248639991621305,0.8653136620658246,0.9057633249695187,0.9462129878732127,0.9654564046683773,0.9846998214635421,1.0039432382587068,1.0231866550538715,1.0424300718490362,1.061673488644201,1.0809169054393657,1.1001603222345304,1.1201690107719706,1.1401776993094108,1.160186387846851,1.180195076384291,1.200203764921731,1.2202124534591712,1.2402211419966114,1.2602298305340516,1.3276020457672935,1.3949742610005353,1.415537720620355,1.4361011802401746,1.4566646398599943,1.477228099479814,1.4977915590996336,1.5183550187194532,1.5389184783392729,1.5594819379590923,1.5788121965124713,1.5981424550658505,1.6078075843425401,1.6174727136192297,1.6271378428959193,1.636802972172609,1.6561332307259882,1.6754634892793672,1.6947937478327462,1.7141240063861254,1.7296082929900038,1.7450925795938823,1.7605768661977605,1.776061152801639,1.8070297260093957,1.8379982992171526,1.8534825858210309,1.8689668724249093,1.8844511590287878,1.899935445632666,1.9154197322365445,1.930904018840423,1.9463883054443012,1.9618725920481797,1.9666385180421573,1.9714044440361347,1.9761703700301123,1.98093629602409,1.9857022220180673,1.990468148012045,1.9952340740060226]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-0.5,0.0,0.5,1.0,1.5],"visible":true,"ticks":"inside","range":[-0.9926756357351589,1.9952340740060226],"domain":[0.03619130941965587,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-0.5","0.0","0.5","1.0","1.5"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-3.0,-2.0,-1.0,0.0,1.0,2.0,3.0],"visible":true,"ticks":"inside","range":[-3.9712022190879077,3.08320154094753],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-3","-2","-1","0","1","2","3"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('67f7860a-b423-42e7-ab71-c802f00163b2');
+    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[-0.9926756357351589,-0.9853512714703179,-0.9780269072054768,-0.9707025429406356,-0.9368403811349164,-0.9029782193291971,-0.8691160575234778,-0.8352538957177585,-0.76752957210632,-0.6998052484948815,-0.6591057528919433,-0.618406257289005,-0.5777067616860667,-0.5370072660831284,-0.46818545496791564,-0.39936364385270284,-0.3246038668767743,-0.2498440899008457,-0.1809221881484806,-0.11200028639611552,0.035782839219469544,0.20700408301559686,0.28308470067433056,0.3591653183330643,0.42588116397686215,0.49259700962066005,0.5653351897933092,0.6380733699659584,0.7112438531121974,0.7844143362584364,0.8248639991621305,0.8653136620658246,0.9057633249695187,0.9462129878732127,0.9654564046683773,0.9846998214635421,1.0039432382587068,1.0231866550538715,1.0424300718490362,1.061673488644201,1.0809169054393657,1.1001603222345304,1.1201690107719706,1.1401776993094108,1.160186387846851,1.180195076384291,1.200203764921731,1.2202124534591712,1.2402211419966114,1.2602298305340516,1.3276020457672935,1.3949742610005353,1.415537720620355,1.4361011802401746,1.4566646398599943,1.477228099479814,1.4977915590996336,1.5183550187194532,1.5389184783392729,1.5594819379590923,1.5788121965124713,1.5981424550658505,1.6078075843425401,1.6174727136192297,1.6271378428959193,1.636802972172609,1.6561332307259882,1.6754634892793672,1.6947937478327462,1.7141240063861254,1.7296082929900038,1.7450925795938823,1.7605768661977605,1.776061152801639,1.8070297260093957,1.8379982992171526,1.8534825858210309,1.8689668724249093,1.8844511590287878,1.899935445632666,1.9154197322365445,1.930904018840423,1.9463883054443012,1.9618725920481797,1.9666385180421573,1.9714044440361347,1.9761703700301123,1.98093629602409,1.9857022220180673,1.990468148012045,1.9952340740060226],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[1.82861917131379,1.836599214837022,1.8425887928974007,1.846642999809091,1.8418658967982864,1.8027128616491186,1.7350968430876432,1.6448482545950127,1.4182720106499955,1.1619475967222594,1.0065611705913837,0.8564069031882914,0.7152203837448443,0.5856661042763088,0.3974772863113508,0.2504814236785462,0.13580064365136932,0.06222121535765637,0.02367147000938714,0.005619165603702994,-0.00018326684687543172,-0.03543765429783074,-0.0903541808541151,-0.18327971228202333,-0.3022446052743133,-0.4595703010968991,-0.6745124916293854,-0.9280500561763781,-1.2059191960761155,-1.4789239323882837,-1.613486670904223,-1.7259851297177995,-1.8070879311837753,-1.8468790307660008,-1.84838854656667,-1.8372117891736792,-1.8123330721918924,-1.7727975127255322,-1.7177319082578644,-1.646367043460303,-1.5580612179856146,-1.452324727689395,-1.3235653083204915,-1.1755060691544787,-1.0082953533412597,-0.8223780785837667,-0.6185234473943906,-0.39785000937223913,-0.1618471302654211,0.08760814073257768,0.9933995440395021,1.9023773858134159,2.156372561730102,2.3904329312648116,2.5992171017888492,2.77737299661783,2.9196552274018126,3.0210548072301333,3.0769393803009515,3.08320154094753,3.0407653167768163,2.949261788668576,2.8846336837835995,2.807272172011551,2.717136465323585,2.6142462764280507,2.3706003934481057,2.077802918431311,1.7384438571557634,1.3562842944725932,1.0225843689016099,0.6676814916111582,0.2951607958388357,-0.09092841077698216,-0.8854721122623368,-1.6755826849359834,-2.055043471891893,-2.4162925134880626,-2.753371571614867,-3.0603576513200643,-3.3314655113599914,-3.5611561508384346,-3.7442496872889475,-3.876040782983913,-3.905624670793513,-3.929846243996098,-3.9486048475092392,-3.9618067687012104,-3.969365537228717,-3.9712022190879077,-3.9672457041561606],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-1.0,0.0,1.0,2.0],"visible":true,"ticks":"inside","range":[-1.0823129270273943,2.084871365298258],"domain":[0.03619130941965587,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-1","0","1","2"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-4.0,-2.0,0.0,2.0],"visible":true,"ticks":"inside","range":[-4.182834331888971,3.294833653748593],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-4","-2","0","2"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
 <p>We see there are 3 potential zeros, one near 0, one near 1.2 and close to 1.7. Here we improve our guesses:</p><pre class="sourceCode julia">xs = fzero.(f', [0, 1.2, 1.7])   # or [fzero(f', x) for x in [0, 1.2, 1.7]]</pre>
 <pre class="output">
 3-element Array{Float64,1}:
- 0.0    
- 1.25331
- 1.77245</pre>
+ 0.0               
+ 1.2533141373155003
+ 1.7724538509055165</pre>
 
 <p>The function values at these points can be found with</p><pre class="sourceCode julia">f.(xs)               # or map(f, xs) or [f(x) for x in xs]</pre>
 <pre class="output">
 3-element Array{Float64,1}:
- 1.0        
- 8.02458e-32
- 1.0        </pre>
+ 1.0                   
+ 2.5860584564030066e-32
+ 1.0                   </pre>
 
-<h3>Practice</h3><h4>Question</h4><p>Let </p>$$~
+<h5>fzeros</h5><p>For such tasks, <code>fzeros</code> also works well. This function looks for all zeros in the interval <code>&#91;a,b&#93;</code>:</p><pre class="sourceCode julia">fzeros(f, -1, 2)</pre>
+<pre class="output">
+1-element Array{Float64,1}:
+ 1.2533141373155003</pre>
+
+<h3>Practice</h3><h4>Question</h4><p>Let</p>$$~
 f(x) = 4x^4 -5x^3 + 4x^2 -20x - 6
 ~$$
-<p>Apply Newton's method with $x_0=0$ using an automatic derivative. What value does it converge to?</p><form name='WeaveQuestion' data-id='uWDbXOrT' data-controltype='numeric'>
+<p>Apply Newton's method with $x_0=0$ using an automatic derivative. What value does it converge to?</p><form name='WeaveQuestion' data-id='7beNoptn' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
-
 <div class="input-group">
-<input id="uWDbXOrT" type="number" class="form-control">
+<input id="7beNoptn" type="number" class="form-control">
 
 </div>
   
-<div id='uWDbXOrT_message'></div>
+<div id='7beNoptn_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#uWDbXOrT').on('change', function() {
+$('#7beNoptn').on('change', function() {
   correct = Math.abs(this.value - -0.27798094871260326) <= 1.0e-10;
 
   if(correct) {
-     $('#uWDbXOrT_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#7beNoptn_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#uWDbXOrT_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#7beNoptn_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -565,91 +563,85 @@ $('#uWDbXOrT').on('change', function() {
 f(x) = x^x - 2
 ~$$
 <p>Can we find a root using Newton's method, where $x > 0$?</p><p>We graph the function to see, using a smallish interval at first:</p><pre class="sourceCode julia">f(x) = x^x - 2
-plot([f, x -> 0], 0, 2)</pre>
-    <div id="9d181d84-da5f-418f-8582-be1fee070342" style="width:600px;height:400px;"></div>
+plot(f, 0, 2)
+plot!(zero)</pre>
+    <div id="fca35d73-c227-4168-8f20-1003b77ac1f3" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('9d181d84-da5f-418f-8582-be1fee070342');
-    Plotly.plot(PLOT, [{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-1.0256521590851686,-1.0441981677665488,-1.0599925380623962,-1.0739907469715302,-1.1248626096999623,-1.1623169880237132,-1.1916898009062442,-1.215411389951789,-1.2509534394835433,-1.2752776524104066,-1.2940658035237824,-1.3042986173625488,-1.307629961986005,-1.3068303851403527,-1.2928706581373655,-1.2668135824958675,-1.2256300170781325,-1.1604370295328987,-1.0854629813087178,-1.004911029376232,-0.8990635923579462,-0.7705755435628407,-0.6886624763200755,-0.5980152128367136,-0.5028398966582088,-0.3980782864703891,-0.2779394958171233,-0.14516034013954426,-0.02258378609970757,0.11083600713281472,0.2899022808940659,0.488687126294582,0.5895770796123165,0.6955906903589404,0.8070049269650217,0.9241130036551355,1.1243810723914347,1.3414423717258797,1.576805708635991,1.832125830699375,1.8733038495872787,1.9150041509175546,1.957233808941623],"type":"scatter","name":"y1","yaxis":"y","x":[0.004882909509894066,0.009765819019788131,0.014648728529682197,0.019531638039576263,0.042106412576722436,0.06468118711386861,0.08725596165101479,0.10983073618816097,0.15498028526245333,0.20012983433674567,0.2543958284739967,0.30866182261124775,0.35454303002138965,0.4004242374315315,0.5001039400661028,0.5919998090692563,0.6905218928129796,0.8046693886770646,0.9061102122220429,0.99506467308044,1.092048913310639,1.1896095575056242,1.2435424413772163,1.2974753252488085,1.3487911033692477,1.4001068814896869,1.453463384256194,1.506819887022701,1.5517346971781958,1.5966495073336904,1.6514853996532093,1.7063212919727282,1.7320949700439003,1.7578686481150725,1.7836423261862446,1.809416004257417,1.8507074352010928,1.8919988661447684,1.933290297088444,1.9745817280321198,1.98093629602409,1.9872908640160598,1.99364543200803]},{"showlegend":true,"mode":"lines","xaxis":"x","colorbar":{"title":""},"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"type":"scatter","name":"y2","yaxis":"y","x":[0.019531638039576263,0.20012983433674567,0.30866182261124775,0.4004242374315315,0.5001039400661028,0.5919998090692563,0.6905218928129796,0.8046693886770646,0.9061102122220429,0.99506467308044,1.092048913310639,1.1896095575056242,1.2974753252488085,1.4001068814896869,1.506819887022701,1.5966495073336904,1.7063212919727282,1.809416004257417,1.9745817280321198]}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.25,0.5,0.75,1.0,1.25,1.5,1.75],"visible":true,"ticks":"inside","range":[0.004882909509894066,1.99364543200803],"domain":[0.0658209390492855,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0.25","0.50","0.75","1.00","1.25","1.50","1.75"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-1.0,-0.5,0.0,0.5,1.0,1.5],"visible":true,"ticks":"inside","range":[-1.307629961986005,1.957233808941623],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-1.0","-0.5","0.0","0.5","1.0","1.5"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x"},"legend":{"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('fca35d73-c227-4168-8f20-1003b77ac1f3');
+    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[0.004882909509894066,0.009765819019788131,0.014648728529682197,0.019531638039576263,0.042106412576722436,0.06468118711386861,0.08725596165101479,0.10983073618816097,0.15498028526245333,0.20012983433674567,0.2543958284739967,0.30866182261124775,0.35454303002138965,0.4004242374315315,0.5001039400661028,0.5919998090692563,0.6905218928129796,0.8046693886770646,0.9061102122220429,0.99506467308044,1.092048913310639,1.1896095575056242,1.2435424413772163,1.2974753252488085,1.3487911033692477,1.4001068814896869,1.453463384256194,1.506819887022701,1.5517346971781958,1.5966495073336904,1.6514853996532093,1.7063212919727282,1.7320949700439003,1.7578686481150725,1.7836423261862446,1.809416004257417,1.8507074352010928,1.8919988661447684,1.933290297088444,1.9745817280321198,1.98093629602409,1.9872908640160598,1.99364543200803],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-1.0256521590851686,-1.0441981677665488,-1.0599925380623962,-1.0739907469715302,-1.1248626096999623,-1.1623169880237132,-1.1916898009062442,-1.215411389951789,-1.2509534394835433,-1.2752776524104066,-1.2940658035237824,-1.3042986173625488,-1.307629961986005,-1.3068303851403527,-1.2928706581373655,-1.2668135824958675,-1.2256300170781325,-1.1604370295328987,-1.0854629813087178,-1.004911029376232,-0.8990635923579462,-0.7705755435628407,-0.6886624763200755,-0.5980152128367136,-0.5028398966582088,-0.3980782864703891,-0.2779394958171233,-0.14516034013954426,-0.02258378609970757,0.11083600713281472,0.2899022808940659,0.488687126294582,0.5895770796123165,0.6955906903589404,0.8070049269650217,0.9241130036551355,1.1243810723914347,1.3414423717258797,1.576805708635991,1.832125830699375,1.8733038495872787,1.9150041509175546,1.957233808941623],"type":"scatter","hoverinfo":"text"},{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[-0.03419275760491264,0.15616571234117058,0.27056321825061513,0.3672848535819243,0.4723516597142232,0.5692139616445342,0.6730605863721423,0.7933770851322389,0.9003001904345665,0.9940621183555965,1.0962877881442676,1.1991210131525216,1.3128162932170322,1.4209944833361172,1.5334747011517305,1.6281590857626385,1.7437579873474096,1.8524243643789537,2.02651632714449],"showlegend":true,"mode":"lines","name":"y2","zmin":-0.1,"legendgroup":"y2","zmax":0.1,"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.0,0.5,1.0,1.5,2.0],"visible":true,"ticks":"inside","range":[-0.09601403014739471,2.088337599686972],"domain":[0.03619130941965587,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0.0","0.5","1.0","1.5","2.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-1.0,0.0,1.0,2.0],"visible":true,"ticks":"inside","range":[-1.4055758751138339,2.0551797220694517],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-1","0","1","2"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
     </script>
-<p>Eyeing this, we pick an initial point, $1$, for Newton's method to the right of the minimum, which appears to be around $x=0.35$.</p><pre class="sourceCode julia">xstar = newton(f, 1);</pre>
-<div class="well well-sm">
-1.5596104694623694</div>
-
-<p>What is the value of <code>xstar</code>?</p><form name='WeaveQuestion' data-id='AdcKVRMh' data-controltype='numeric'>
+<p>Eyeing this, we pick an initial point, $1$, for Newton's method (<code>newton&#40;f, 1&#41;</code>) to the right of the minimum, which appears to be around $x=0.35$.</p><p>What is the value of the approximate zero?</p><form name='WeaveQuestion' data-id='JnQqLbxA' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
-
 <div class="input-group">
-<input id="AdcKVRMh" type="number" class="form-control">
+<input id="JnQqLbxA" type="number" class="form-control">
 
 </div>
   
-<div id='AdcKVRMh_message'></div>
+<div id='JnQqLbxA_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#AdcKVRMh').on('change', function() {
+$('#JnQqLbxA').on('change', function() {
   correct = Math.abs(this.value - 1.5596104694623694) <= 1.0e-8;
 
   if(correct) {
-     $('#AdcKVRMh_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#JnQqLbxA_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#AdcKVRMh_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#JnQqLbxA_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Use <code>fzero</code> to find the one root of <code>x^5 &#43; x - 1</code>. First plot to get an estimate.</p><form name='WeaveQuestion' data-id='BL6XNBQ1' data-controltype='numeric'>
+<h4>Question</h4><p>Use <code>fzero</code> to find the one root of <code>x^5 &#43; x - 1</code>. First plot to get an estimate.</p><form name='WeaveQuestion' data-id='8kHEpIrQ' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
-
 <div class="input-group">
-<input id="BL6XNBQ1" type="number" class="form-control">
+<input id="8kHEpIrQ" type="number" class="form-control">
 
 </div>
   
-<div id='BL6XNBQ1_message'></div>
+<div id='8kHEpIrQ_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#BL6XNBQ1').on('change', function() {
-  correct = Math.abs(this.value - 1.1673039782614185) <= 1.0e-8;
+$('#8kHEpIrQ').on('change', function() {
+  correct = Math.abs(this.value - 1.1673039782614187) <= 1.0e-8;
 
   if(correct) {
-     $('#BL6XNBQ1_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#8kHEpIrQ_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#BL6XNBQ1_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#8kHEpIrQ_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Let $f(x) = 5/\sin(x) + 8/\cos(x)$, Starting at $x=\pi/4$, use <code>fzero</code> to find a root of the derivative of $f(x)$ given by <code>D&#40;f&#41;</code>.</p><form name='WeaveQuestion' data-id='YdApJc50' data-controltype='numeric'>
+<h4>Question</h4><p>Let $f(x) = 5/\sin(x) + 8/\cos(x)$, Starting at $x=\pi/4$, use <code>fzero</code> to find a root of the derivative of $f(x)$ given by <code>D&#40;f&#41;</code>.</p><form name='WeaveQuestion' data-id='XNfptjnv' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
-
 <div class="input-group">
-<input id="YdApJc50" type="number" class="form-control">
+<input id="XNfptjnv" type="number" class="form-control">
 
 </div>
   
-<div id='YdApJc50_message'></div>
+<div id='XNfptjnv_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#YdApJc50').on('change', function() {
+$('#XNfptjnv').on('change', function() {
   correct = Math.abs(this.value - 0.7073827215431158) <= 1.0e-8;
 
   if(correct) {
-     $('#YdApJc50_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#XNfptjnv_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#YdApJc50_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#XNfptjnv_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -657,51 +649,48 @@ $('#YdApJc50').on('change', function() {
 <pre class="output">
 tangent (generic function with 1 method)</pre>
 
-<p>Let $f(x) = x^2 - 3x + 5$. Use <code>fzero</code> to find the intersection point of the tangent line at $1$ and the tangent line at $3$. Where does this happen?</p><p>(Hint, apply <code>fzero</code> to <code>h&#40;x&#41; &#61; tangent&#40;f, 1&#41;&#40;x&#41; -  tangent&#40;f, 3&#41;&#40;x&#41;</code> starting at 1.)</p><form name='WeaveQuestion' data-id='Fujf7QcC' data-controltype='numeric'>
+<p>Let $f(x) = x^2 - 3x + 5$. Use <code>fzero</code> to find the intersection point of the tangent line at $1$ and the tangent line at $3$. Where does this happen?</p><p>(Hint, apply <code>fzero</code> to <code>h&#40;x&#41; &#61; tangent&#40;f, 1&#41;&#40;x&#41; -  tangent&#40;f, 3&#41;&#40;x&#41;</code> starting at 1.)</p><form name='WeaveQuestion' data-id='rzdb8zf2' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
-
 <div class="input-group">
-<input id="Fujf7QcC" type="number" class="form-control">
+<input id="rzdb8zf2" type="number" class="form-control">
 
 </div>
   
-<div id='Fujf7QcC_message'></div>
+<div id='rzdb8zf2_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#Fujf7QcC').on('change', function() {
+$('#rzdb8zf2').on('change', function() {
   correct = Math.abs(this.value - 2.0) <= 1.0e-8;
 
   if(correct) {
-     $('#Fujf7QcC_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#rzdb8zf2_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#Fujf7QcC_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#rzdb8zf2_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h2>Various issues with Newton's method</h2><p>As great as Newton's method is, it won't always work for various reasons, some of which are described in the following. Here is what you need to keep in mind. Newton's method works well if</p><ul>
 <li><p>The zero is a simple root – that is of multiplicity 1</p>
 </li>
-<li>$|f'(x)|$
-<p>is not too small (If the tangent line is nearly flat, the next guess is far from the previous)</p>
+<li><p>The magnitude, $|f'(x)|$, is not too small (If the tangent line is nearly flat, the next guess is far from the previous)</p>
 </li>
-<li>$|f''(x)|$
-<p>is not too big (function doesn't have so much curve that the tangent line is a poor approximation)</p>
+<li><p>The magnitude, $|f''(x)|$, is not too big (function doesn't have so much curve that the tangent line is a poor approximation)</p>
 </li>
 <li><p>The initial guess is not to far from a zero</p>
 </li>
 </ul><p>The above points come from the following formula which you can find in many texts.</p>$$~
 \Delta x_{i+1} = \frac{f' '(\alpha)}{f'(\alpha)}(\Delta x_i)^2 + \text{error}
 ~$$
-<p>which is valid when $f(x)$ satisfies $f(\alpha) = 0$, the third derivative exists near $\alpha$, and $\Delta x_i = x_i - \alpha$ is the error between the zero and the $i$ th estimate.  When the derivative at $\alpha$ is non-zero, the error is basically a constant times $\Delta x_i^2$. This is interpreted as saying there is quadratic convergence in the error, as the next one is related to the previous one squared. </p><p>Now we look at some cases where the above three points do not hold.</p><h3>The initial guess is no where near the end results</h3><p>Let $f(x) = \sin(x) - x/4$ and $x_0 = 2\pi$. This value is deliberately a poor choice:</p><pre class="sourceCode julia">f(x) = sin(x) - x/4
+<p>which is valid when $f(x)$ satisfies $f(\alpha) = 0$, the third derivative exists near $\alpha$, and $\Delta x_i = x_i - \alpha$ is the error between the zero and the $i$ th estimate.  When the derivative at $\alpha$ is non-zero, the error is basically a constant times $\Delta x_i^2$. This is interpreted as saying there is quadratic convergence in the error, as the next one is related to the previous one squared.</p><p>Now we look at some cases where the above three points do not hold.</p><h3>The initial guess is no where near the end results</h3><p>Let $f(x) = \sin(x) - x/4$ and $x_0 = 2\pi$. This value is deliberately a poor choice:</p><pre class="sourceCode julia">f(x) = sin(x) - x/4
 fp(x) = cos(x) - 1/4
 newton(f, fp, 2pi, verbose=true)</pre>
-<div class="well well-sm">
--2.4745767873698292</div>
+<pre class="output">
+-2.4745767873698292</pre>
 
 <p>Though <code>julia</code> makes this happen fast, it will take more than  20 steps before converging and the answer is no where near the guess. This trace might show why</p>
 <div class="well well-sm">
@@ -712,84 +701,74 @@ newton(f, fp, 2pi, verbose=true)</pre>
 </div>
 
 
-<h4>Question</h4><p>When $|f'(x)|$ is too close to $0$, the path can jump alot. In the figure, what was the longest jump?</p><form name="WeaveQuestion" data-id="ZB3Uiuez" data-controltype="radio">
+<h4>Question</h4><p>When $|f'(x)|$ is too close to $0$, the path can jump alot. In the figure, what was the longest jump?</p><form name="WeaveQuestion" data-id="we1VkLxj" data-controltype="radio">
 <div class="form-group ">
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_ZB3Uiuez" value="1"><div class="markdown"><p>From about 0 to -5</p>
+      <input type="radio" name="radio_we1VkLxj" value="1"><div class="markdown"><p>From about 0 to -5</p>
 </div>
     </label>
     </div>
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_ZB3Uiuez" value="2"><div class="markdown"><p>From about 17 to -10</p>
+      <input type="radio" name="radio_we1VkLxj" value="2"><div class="markdown"><p>From about -12 to -3</p>
 </div>
     </label>
     </div>
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_ZB3Uiuez" value="3"><div class="markdown"><p>From about -12 to -3</p>
+      <input type="radio" name="radio_we1VkLxj" value="3"><div class="markdown"><p>From about 17 to -10</p>
 </div>
     </label>
     </div>
-    
 
-
-<div id="ZB3Uiuez_message"></div>
+<div id="we1VkLxj_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_ZB3Uiuez']").on("change", function() {
-  correct = this.value == 2;
+$("input:radio[name='radio_we1VkLxj']").on("change", function() {
+  correct = this.value == 3;
 
   if(correct) {
-     $("#ZB3Uiuez_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#we1VkLxj_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#ZB3Uiuez_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#we1VkLxj_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question</h4><p>The method did find a zero, but the initial guess was nowhere near the final zero. How close was the closest zero to the initial guess?</p><form name="WeaveQuestion" data-id="a6zC18Rx" data-controltype="radio">
+<h4>Question</h4><p>The method did find a zero, but the initial guess was nowhere near the final zero. How close was the closest zero to the initial guess?</p><form name="WeaveQuestion" data-id="865zyQ6I" data-controltype="radio">
 <div class="form-group ">
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_a6zC18Rx" value="1"><div class="markdown"><p><code>2pi</code></p>
+      <input type="radio" name="radio_865zyQ6I" value="1"><div class="markdown"><p><code>2pi</code></p>
 </div>
     </label>
     </div>
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_a6zC18Rx" value="2"><div class="markdown"><p><code>3.8</code></p>
+      <input type="radio" name="radio_865zyQ6I" value="2"><div class="markdown"><p><code>8.75</code></p>
 </div>
     </label>
     </div>
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_a6zC18Rx" value="3"><div class="markdown"><p><code>8.75</code></p>
+      <input type="radio" name="radio_865zyQ6I" value="3"><div class="markdown"><p><code>3.8</code></p>
 </div>
     </label>
     </div>
-    
 
-
-<div id="a6zC18Rx_message"></div>
+<div id="865zyQ6I_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_a6zC18Rx']").on("change", function() {
-  correct = this.value == 2;
+$("input:radio[name='radio_865zyQ6I']").on("change", function() {
+  correct = this.value == 3;
 
   if(correct) {
-     $("#a6zC18Rx_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#865zyQ6I_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#a6zC18Rx_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#865zyQ6I_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -800,7 +779,7 @@ xstar = newton(f, 2)</pre>
 Roots.ConvergenceFailed("Stopped at: xn = -4.398046511104e12")
 </pre>
 
-<p>Still an issue. Why? </p><h4>Question</h4><p>Despite all our care with the derivative, the method did not converge in $200$ steps. Can you see why from this trace?</p>
+<p>Still an issue. Why?</p><h4>Question</h4><p>Despite all our care with the derivative, the method did not converge in $200$ steps. Can you see why from this trace?</p>
 <div class="well well-sm">
 <figure>
 <img src="data:image/gif;base64,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Dz30kO299942ZcoU23777WvUXSnuJUuWZLxGOVIbNGiQ8TsOQgACECgFgX/+85/24IMPmtJFHnPMMU4JkyKyFKTjWWckFLDymL755psuvu3yyy+3Xr162UEHHeS2z6oJVs2kdcNnKrNmzbLGjRtn+opjEIAABHwl8Oqrr5pmuSra/m/IkCFWq1YkDI6+9pPKiiMQCQUshavZ71577eV6oyfFlStXuvymp512Wt491JqK/mUqq1evdk+hmb7jGAQgAIFiCchf5eWXX7aHH37YPez/z//8j+2+++7FVsv1CSYQCQU8YsQIGzZsmAs4HzlypMOt9ZF169a5Y4cffniCh4CuQQACcSagbQC1BaBMzVpKO++886xv375x7hKyB0QgEgr4wAMPtMWLF9uHH36Y1u1LL73U9tlnH/dd2hd8gAAEIBAyAc14ten9/fff7/IyX3jhhda7d++QpaL5OBGIhAIWsIYNG1qfPn2qsNPaif5RIAABCESBgGa8Urzjxo1zileJM9j0PgojEz8ZIqOA44cOiSEAgXIisHnzZps4caLdd999bitAbXov/xUKBAolgAIulBzXQQACZUNg+vTpdvfdd7tcBeeffz5rvGUz8qXtKAq4tHypHQIQiDGBt956y+644w7Teq+cRQcNGhTj3iB61AiggKM2IsgDAQiETkAJfaR4ly5daqeccortt99+ocuEAMkjgAJO3pjSIwhAoEACa9ascdsAzpw500444QS76qqrrHbt2gXWxmUQyE0ABZybD99CAAJlQGD9+vX2t7/9ze1QdOihh7qUuGwAUwYDH3IXUcAhDwDNQwAC4RJ46aWX7M4777SBAwc6R6utt946XIFovWwIoIDLZqjpKAQgkEpgwYIFdtNNN9kWW2xhV155pe2www6pX/MeAiUngAIuOWIagAAEokTg888/dw5W2gBGDlbaApUCgTAIoIDDoE6bEIBA4ASUwerpp592iTR++tOfukxWrPMGPgw0mEIABZwCg7cQgEAyCbz33ns2evRoa9q0qY0dO9Y6dOiQzI7Sq1gRQAHHargQFgIQqAmBb775xpmbp02bZmeccUbW7UprUifnQsAvAuwQ7RdJ6oEABCJF4NVXX7WTTjrJOVlp44Rse4VHSmiEKSsCzIDLarjpLASST0DJNG644QZbvny5825mp6Lkj3lce8gMOK4jh9wQ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91j3YqFewBkrjvBB9Vkm2KZNm/oy46+JAmY/4AjfGIgWawJVTND6Q3/44Ydtxx13tHPOOccmTZrk1tjGjx9vxx9/vMnJZfTo0SYFTYFAGASkdLt06VI2yleM5d29evVqX5Sv6pMCljKPUyEOOE6jhaz5EEhTwIqhPOSQQ+xf//qXzZgxw15//XV74IEHnMJ99NFH7e2333bbnum8/fbbz1auXJlPG5wDgaIIyNSs9b9yLdo+cfny5dapUyffEEgB57sN45lnnul+E3xrvMCKiAMuEByXRZZAmglazh1/+9vfXHxgNon1R3vRRRfZueeeaz/88EO20zgOAV8IKF71/fffd5YXXyqMYSVyNpPHcsOGDX2TPl8T9KxZs2zs2LEuacdf//pX39qnIghAwCxtBiwFrOB8leeee86tOaVCWrx4sZsN65jW4Pz8QUhth/cQEAHt3auUkvI/aNOmTVlC0ZKQQo66d+/ua//zMUGr7f/93/917d533302Z84cX2WgMggUS0DWsT/+8Y9uSUq6a5999rFXX3212GoDuz5NAae2KjN0//79bcqUKe7wPffcY7vuumuFgk4918/3yuOrGEUKBL777ju3g1G+ptIkEtN6d4MGDXxf784nDOnBBx+0f/zjHxVYPWVccSDgN8QBBww8Bs0de+yxdtlll9lHH33kHthfe+01+8lPfmKvvPJKDKSvNANOlfiUU06xv/zlL3biiSfaoEGD7LbbbnPK+NRTT009zZf3cui68MILrUOHDs7JpEWLFm523bt3b7v33nt9aYNK4kFAT7ReadmypUuB6H3m1T8CUsC5nLC+/vpru+CCC9IanD59unPQTDsY4AfigAOEHYOmpk2bZk888UQVSeUzcf7551c5HsUDaWvAmQRUZiE5XSm5fa1aWSfMmS7N+5icPFatWmV///vfXR5fmba19qdYz7PPPtu1f/rpp1db37PPPmsvv/xyxvOmTp1qa9euNbVFiSYBWT8062Vp4z/jo7875V/2O7uXHnilzHLNaDXz1dpz5aIHcJn4/JapcjuZPn/66aduLVy/RRQIvPHGG1khzJ0716Qz8klaoyWuXH8LWRvx4YusCviWW26xK664wu6++27nGS0TtOzr11xzjWl27Gd56aWXnNd1anJ5PZ3vvvvudtNNN9mll17qYFbXpmbqSsSfqWjNS6Ecp512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2Mmer8BDhgyxKVOm5Ht67M7785//7H64Dz300NjJnq/ASR/Du+++27bccks7/vjj80USu/MwQcduyBAYAhCAAASSQAAFnIRRpA8QgAAEIBA7Aijg2A0ZAkMAAhCAQBIIoICTMIr0AQIQgAAEYkcABRy7IUNgCEAAAhBIAgEUcBJGkT5AAAIQgEDsCBCG5POQrV271ho1amT16tXzueboVLdq1SrbdtttoyOQz5J8/vnnLvyhQYMGPtccneo++eQTa9OmTXQE8lmSL7/80hQDvNVWW/lcc3SqS/oYrlu3zrbYYgv3exod6v5KggL2lye1QQACEIAABPIigAk6L0ycBAEIQAACEPCXAArYX57UBgEIQAACEMiLAAo4L0ycBAEIQAACEPCXAArYX57UBgEIQAACEMiLAAo4L0ycBAEIQAACEPCXAArYX57UBgEIQAACEMiLAAo4L0ycBAEIQAACEPCXAArYR57arP7777/3scboVbVp0yZTPykQgEDwBJL+91cOv6Gpdw0KOJVGEe9/+OEHO/roo+36669Pq2WXXXaxjh07Vvy744470r6P04dly5ZZp06d7MMPP6wQW1mj1O/u3btbnz597PXXX6/4Lq5vZs+eXTFe3titWLEirt1Jk3vKlCm25557WpcuXeyII44wjV+SSpLHLul/f+XwG1r5bw0FXJlIAZ/nzJlj++yzj02cODHt6jVr1tjixYvtvffeswULFrh/J598cto5cflwzz332L777murV69OE/m0006zvn372gcffGBjxoyxI4880r799tu0c+L2QT/iBxxwQMWYaezatm0bt25Ukfezzz6z4447zm699VY3XlLC5513XpXz4nwgqWOX9L+/cvgNzfR3hQLORKWGx+677z4766yz7Nhjj027cu7cuTZgwABnsl24cKHLD12nTp20c+LwYcOGDfboo4/a+PHjrVmzZmkiT5gwwX7zm9+4nK1Dhgyx9u3b27Rp09LOidsHjdugQYPs008/dQ8cyiesnLRxL1JOPXv2dA9MypN85pln2pNPPhn3bqXJn8SxK4e/v6T/hqbdpCkfUMApMAp9e/PNN9uwYcOqXK4fg3fffdcGDhxoe+yxh+266672xRdfVDkv6ge0scSLL75o22+/fZqoMl9+99131qJFi4rj2qRBiivOReM2atQoO/DAA61z5842cuTIOHenQvalS5embcDQunVr06YFGsOklCSOXTn8/SX9NzTb3xcKOBsZH45LGZ199tnOlKn1G82kNJNMSpGJvWHDhmnd2XLLLe3f//532rG4fZDVQiY/mdXfeOMNZ1qvbHqPW58kb+Xx0lipfPPNN+41Cf8ldewyjU3l8dQ5Sfj7S+1r0n9DUcCpo53H+1//+tfOlKynUr3PVY4//nj7/e9/707RLPHEE0+MhQKWrOqf/snEnK20atXKvvrqq7Sv9TlO66Wa2Xt9bd68uevLLbfcYnvttZd7379/fxs8eHAiTLWVx0vbvWnLRa/faQMZ0w9JHbtMw1F5PHVO3P7+MvUr9Vhcf0NT+5DrffwWJHP1JoDvLr74Yjv99NNdSy1btszZ4oMPPujMtvKEVpFz0tZbb53zmih8OXny5Ipwqm7dumUVSevBeuJevny5W/vViR999JHzIM56UcS+2H333e0f//iHk6p27dq2fv16u/baa53Z2dsPWDPEOIxbdWi1Pq/x8Yred+jQwfsY+9ckj12mwUnC31+mfqUei+tvaGofcr1nBpyLTobvFJay8847u38KyclVtEZ64YUX2saNG5357/7777fDDjss1yWR+K5fv34VfWzSpElOmRSCdN1115niE5944gmrVauW9erVK+c1UfpS/fPGU/2W0p00aZIzQUvOmTNn2ptvvunWg6MkdyGy7Lfffi6ETN76WvcdPXq0HXXUUYVUFclrkjx22YDH/e8vW7+843H9DfXkr+6VGXB1hIr4/pe//KVNnz7deZ5qvUYhOkn6wRMaWQQOPfRQFx+s2fDdd99t8rCNc7n66qvt/PPPt5tuusl5QWs9uFGjRnHukpO9fv36NnbsWDv88MOtadOmzjojk22SSlLHLtsYJfHvL7WvSf8N3eLHzCOkNUod8RK895xc5ISV1CInpSSYaVPHZ+3atS7sSrP6JBVZK7T+m6S138rjk9Sxq9xP73MS//68vuk1qb+hKODUUeY9BCAAAQhAICACyXq0DwgazUAAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AgjgSWLFliffr0sUWLFjnx7733Xhs2bJht3rw5jt1BZgjEnsAWP/7x8dcX+2GkAxDIj8C5555rCxcutDvuuMP69u1rEyZMsIEDB+Z3MWdBAAK+EkAB+4qTyiAQbQJff/217bjjjtakSRP72c9+ZldffXW0BUY6CCSYACboBA8uXYNAZQINGza0008/3d555x0744wzKn/NZwhAIEACzIADhE1TEAibwBdffGG9evVy/9q0aWP3339/2CLRPgTKlgAz4LIdejpejgTOO+88Gzp0qD3xxBP2yiuvuDXgcuRAnyEQBQJ1oiAEMkAAAqUnMGnSJHvmmWdswYIF1rRpUxs9erSNGDHCmaMbNWpUegFoAQIQSCOACToNBx8gAAEIQAACwRDABB0MZ1qBAAQgAAEIpBFAAafh4AMEIAABCEAgGAIo4GA40woEIAABCEAgjQAKOA0HHyAAAQhAAALBEEABB8OZViAAAQhAAAJpBFDAaTj4AAEIQAACEAiGAAo4GM60AgEIQAACEEgjgAJOw8EHCEAAAhCAQDAEUMDBcKYVCEAAAhCAQBoBFHAaDj5AAAIQgAAEgiGAAg6GM61AAAIQgAAE0giggNNw8AECEIAABCAQDAEUcDCcaQUCEIAABCCQRgAFnIaDDxCAAAQgAIFgCKCAg+FMKxCAAAQgAIE0AijgNBx8gAAEIAABCARDAAUcDGdagQAEIAABCKQR+P8k/B9FAuZTLQAAAABJRU5ErkJggg=="/>
@@ -809,43 +788,38 @@ Roots.ConvergenceFailed("Stopped at: xn = -4.398046511104e12")
 </div>
 
 
-<form name="WeaveQuestion" data-id="HJzSXjhI" data-controltype="radio">
+<form name="WeaveQuestion" data-id="KVKZwn60" data-controltype="radio">
 <div class="form-group ">
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_HJzSXjhI" value="1"><div class="markdown"><p><code>|f&#39;&#39;&#40;x&#41;|</code> gets too big at 0</p>
+      <input type="radio" name="radio_KVKZwn60" value="1"><div class="markdown"><p><code>|f&#39;&#40;x&#41;|</code> gets too small</p>
 </div>
     </label>
     </div>
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_HJzSXjhI" value="2"><div class="markdown"><p>Initial guess is too far from a zero.</p>
+      <input type="radio" name="radio_KVKZwn60" value="2"><div class="markdown"><p><code>|f&#39;&#39;&#40;x&#41;|</code> gets too big at 0</p>
 </div>
     </label>
     </div>
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_HJzSXjhI" value="3"><div class="markdown"><p><code>|f&#39;&#40;x&#41;|</code> gets too small</p>
+      <input type="radio" name="radio_KVKZwn60" value="3"><div class="markdown"><p>Initial guess is too far from a zero.</p>
 </div>
     </label>
     </div>
-    
 
-
-<div id="HJzSXjhI_message"></div>
+<div id="KVKZwn60_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_HJzSXjhI']").on("change", function() {
-  correct = this.value == 1;
+$("input:radio[name='radio_KVKZwn60']").on("change", function() {
+  correct = this.value == 2;
 
   if(correct) {
-     $("#HJzSXjhI_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#KVKZwn60_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#HJzSXjhI_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#KVKZwn60_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -853,173 +827,152 @@ $("input:radio[name='radio_HJzSXjhI']").on("change", function() {
 <h4>Questions <small>Solve by hand</small></h4><p>For $f(x) = x^{1/3}$, simplify the expression by hand:</p>$$~
 x - f(x)/f'(x)
 ~$$
-<p>What do you get?</p><form name="WeaveQuestion" data-id="BI17I56X" data-controltype="radio">
+<p>What do you get?</p><form name="WeaveQuestion" data-id="obKwPHVc" data-controltype="radio">
 <div class="form-group ">
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_BI17I56X" value="1"><div class="markdown"><p><code>x - &#40;1/3&#41;x^&#123;-1/3&#125;</code></p>
+      <input type="radio" name="radio_obKwPHVc" value="1"><div class="markdown"><p><code>x - 3/x</code></p>
 </div>
     </label>
     </div>
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_BI17I56X" value="2"><div class="markdown"><p><code>x - 3/x</code></p>
+      <input type="radio" name="radio_obKwPHVc" value="2"><div class="markdown"><p><code>-2x</code></p>
 </div>
     </label>
     </div>
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_BI17I56X" value="3"><div class="markdown"><p><code>-2x</code></p>
+      <input type="radio" name="radio_obKwPHVc" value="3"><div class="markdown"><p><code>x - &#40;1/3&#41;x^&#123;-1/3&#125;</code></p>
 </div>
     </label>
     </div>
-    
 
-
-<div id="BI17I56X_message"></div>
+<div id="obKwPHVc_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_BI17I56X']").on("change", function() {
-  correct = this.value == 3;
-
-  if(correct) {
-     $("#BI17I56X_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
-  } else {
-     $("#BI17I56X_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
-  }
-});
-
-</script>
-<h4>Question</h4><p>Apply Newton's method to $f(x) = (x-2)^7 \cdot (x-3) \cdot (x-4)$ starting at 1.9981. The algorithm does not converge to 2 – an obvious root. From a plot of $f(x)$ explain why not:</p><form name="WeaveQuestion" data-id="RhK14YnY" data-controltype="radio">
-<div class="form-group ">
-    
-    <div  class="radio"> 
-    <label>
-      <input type="radio" name="radio_RhK14YnY" value="1"><div class="markdown"><p><code>|f&#39;&#39;&#40;x&#41;|</code> gets too big at 0</p>
-</div>
-    </label>
-    </div>
-    
-    <div  class="radio"> 
-    <label>
-      <input type="radio" name="radio_RhK14YnY" value="2"><div class="markdown"><p><code>|f&#39;&#40;x&#41;|</code> gets too small</p>
-</div>
-    </label>
-    </div>
-    
-    <div  class="radio"> 
-    <label>
-      <input type="radio" name="radio_RhK14YnY" value="3"><div class="markdown"><p>Initial guess is to far from a zero.</p>
-</div>
-    </label>
-    </div>
-    
-
-
-<div id="RhK14YnY_message"></div>
-</div>
-</form>
-<script text="text/javascript">
-$("input:radio[name='radio_RhK14YnY']").on("change", function() {
+$("input:radio[name='radio_obKwPHVc']").on("change", function() {
   correct = this.value == 2;
 
   if(correct) {
-     $("#RhK14YnY_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#obKwPHVc_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#RhK14YnY_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#obKwPHVc_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question</h4><p>The function <code>f&#40;x&#41; &#61; atan&#40;x&#41;</code> is a strictly increasing function with one zero, $0$. Yet it can pose problems with Newton's method. For which values of $x$ does Newton's method converge:</p><form name="WeaveQuestion" data-id="Ji14SnC6" data-controltype="radio">
+<h4>Question</h4><p>Apply Newton's method to $f(x) = (x-2)^7 \cdot (x-3) \cdot (x-4)$ starting at 1.9981. The algorithm does not converge to 2 – an obvious root. From a plot of $f(x)$ explain why not:</p><form name="WeaveQuestion" data-id="lQPnD431" data-controltype="radio">
 <div class="form-group ">
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_Ji14SnC6" value="1"><div class="markdown"><p>For each of $1$, $2$ and $\pi$</p>
+      <input type="radio" name="radio_lQPnD431" value="1"><div class="markdown"><p><code>|f&#39;&#40;x&#41;|</code> gets too small</p>
 </div>
     </label>
     </div>
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_Ji14SnC6" value="2"><div class="markdown"><p>For $1$ and $2$ but not $\pi$</p>
+      <input type="radio" name="radio_lQPnD431" value="2"><div class="markdown"><p><code>|f&#39;&#39;&#40;x&#41;|</code> gets too big at 0</p>
 </div>
     </label>
     </div>
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_Ji14SnC6" value="3"><div class="markdown"><p>For $1$ but not $2$ or $\pi$</p>
+      <input type="radio" name="radio_lQPnD431" value="3"><div class="markdown"><p>Initial guess is to far from a zero.</p>
 </div>
     </label>
     </div>
-    
-    <div  class="radio"> 
-    <label>
-      <input type="radio" name="radio_Ji14SnC6" value="4"><div class="markdown"><p>For none of  $1$, $2$ and $\pi$</p>
-</div>
-    </label>
-    </div>
-    
 
-
-<div id="Ji14SnC6_message"></div>
+<div id="lQPnD431_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_Ji14SnC6']").on("change", function() {
+$("input:radio[name='radio_lQPnD431']").on("change", function() {
+  correct = this.value == 1;
+
+  if(correct) {
+     $("#lQPnD431_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+  } else {
+     $("#lQPnD431_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+  }
+});
+
+</script>
+<h4>Question</h4><p>The function <code>f&#40;x&#41; &#61; atan&#40;x&#41;</code> is a strictly increasing function with one zero, $0$. Yet it can pose problems with Newton's method. For which values of $x$ does Newton's method converge:</p><form name="WeaveQuestion" data-id="oyKYnscC" data-controltype="radio">
+<div class="form-group ">
+    <div  class="radio"> 
+    <label>
+      <input type="radio" name="radio_oyKYnscC" value="1"><div class="markdown"><p>For each of $1$, $2$ and $\pi$</p>
+</div>
+    </label>
+    </div>
+    <div  class="radio"> 
+    <label>
+      <input type="radio" name="radio_oyKYnscC" value="2"><div class="markdown"><p>For $1$ and $2$ but not $\pi$</p>
+</div>
+    </label>
+    </div>
+    <div  class="radio"> 
+    <label>
+      <input type="radio" name="radio_oyKYnscC" value="3"><div class="markdown"><p>For $1$ but not $2$ or $\pi$</p>
+</div>
+    </label>
+    </div>
+    <div  class="radio"> 
+    <label>
+      <input type="radio" name="radio_oyKYnscC" value="4"><div class="markdown"><p>For none of  $1$, $2$ and $\pi$</p>
+</div>
+    </label>
+    </div>
+
+<div id="oyKYnscC_message"></div>
+</div>
+</form>
+<script text="text/javascript">
+$("input:radio[name='radio_oyKYnscC']").on("change", function() {
   correct = this.value == 3;
 
   if(correct) {
-     $("#Ji14SnC6_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#oyKYnscC_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#Ji14SnC6_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#oyKYnscC_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h3>Cycles</h3><p>Sometimes, the process can cycle even for reasonable functions.</p><h4>Question</h4><p>Let $f(x) = x^3 - 5x$. Starting with $x_0=1$, compute three steps of Newton's method. What are the terms in the series produced?</p><form name="WeaveQuestion" data-id="Csk5PLSa" data-controltype="radio">
+<h3>Cycles</h3><p>Sometimes, the process can cycle even for reasonable functions.</p><h4>Question</h4><p>Let $f(x) = x^3 - 5x$. Starting with $x_0=1$, compute three steps of Newton's method. What are the terms in the series produced?</p><form name="WeaveQuestion" data-id="Rq0V068J" data-controltype="radio">
 <div class="form-group ">
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_Csk5PLSa" value="1"><div class="markdown"><p>1, -2, -4,  ...</p>
+      <input type="radio" name="radio_Rq0V068J" value="1"><div class="markdown">$1, -2, -4,  ...$
 </div>
     </label>
     </div>
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_Csk5PLSa" value="2"><div class="markdown"><p>-1.0, 1.0, -1.0, ...</p>
+      <input type="radio" name="radio_Rq0V068J" value="2"><div class="markdown">$-1.0, 1.0, -1.0, ...$
 </div>
     </label>
     </div>
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_Csk5PLSa" value="3"><div class="markdown"><p>-1.0, 0.6666666666666667, -0.2850952524822228, ...</p>
+      <input type="radio" name="radio_Rq0V068J" value="3"><div class="markdown">$-1.0, 0.6666666666666667, -0.2850952524822228, ...$
 </div>
     </label>
     </div>
-    
 
-
-<div id="Csk5PLSa_message"></div>
+<div id="Rq0V068J_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_Csk5PLSa']").on("change", function() {
+$("input:radio[name='radio_Rq0V068J']").on("change", function() {
   correct = this.value == 2;
 
   if(correct) {
-     $("#Csk5PLSa_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#Rq0V068J_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#Csk5PLSa_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#Rq0V068J_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -1036,53 +989,48 @@ fp (generic function with 2 methods)</pre>
 x = x - f(x)/fp(x)
 x = x - f(x)/fp(x)
 x = x - f(x)/fp(x)</pre>
-<div class="well well-sm">
--2.0</div>
+<pre class="output">
+-2.0</pre>
 
-<p>Try again with $x=3.0$ What sequence do you get:</p><form name="WeaveQuestion" data-id="kdLErbRm" data-controltype="radio">
+<p>Try again with $x=3.0$ What sequence do you get:</p><form name="WeaveQuestion" data-id="UKLvxsZl" data-controltype="radio">
 <div class="form-group ">
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_kdLErbRm" value="1"><div class="markdown"><p>3, -3.0, 3.0, -3.0, ...</p>
+      <input type="radio" name="radio_UKLvxsZl" value="1"><div class="markdown">$2, -2.0, 2.0, -2.0$
 </div>
     </label>
     </div>
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_kdLErbRm" value="2"><div class="markdown"><p>2, -2.0, 2.0, -2.0</p>
+      <input type="radio" name="radio_UKLvxsZl" value="2"><div class="markdown">$3, 2.0, 1.0, 0.0, -1.0, ...$
 </div>
     </label>
     </div>
-    
     <div  class="radio"> 
     <label>
-      <input type="radio" name="radio_kdLErbRm" value="3"><div class="markdown"><p>3, 2.0, 1.0, 0.0, -1.0, ...</p>
+      <input type="radio" name="radio_UKLvxsZl" value="3"><div class="markdown">$3, -3.0, 3.0, -3.0, ...$
 </div>
     </label>
     </div>
-    
 
-
-<div id="kdLErbRm_message"></div>
+<div id="UKLvxsZl_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_kdLErbRm']").on("change", function() {
-  correct = this.value == 1;
+$("input:radio[name='radio_UKLvxsZl']").on("change", function() {
+  correct = this.value == 3;
 
   if(correct) {
-     $("#kdLErbRm_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#UKLvxsZl_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#kdLErbRm_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#UKLvxsZl_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
 
   </div>
-</div>  
+</div>
 
 </body>
 </html>

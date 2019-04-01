@@ -8,9 +8,8 @@ note(""" For a more thorough introduction, visit [Calculus with Julia](http://ca
 ## Introduction
 
 ```
-note(""" These use version v0.6 of Julia, not v1.0. There are some
-surface level changes that need updating to use under the newer
-See all projects at [https://github.com/mth229/229-projects](https://github.com/mth229/229-projects)version.""")
+note(""" These use version v1.0 of Julia.
+See all projects at [https://github.com/mth229/229-projects](https://github.com/mth229/229-projects)""")
 ```
 
 This is a collection of notes for exploring calculus concepts
@@ -32,26 +31,15 @@ learning `julia` within a mathematical framework.
 
 The notes assume that the
 [MTH229](https://github.com/mth229/MTH229.jl) add-on package is
-installed. In the lab this will be the case. If using `juliabox` then
+installed. In the lab this will be the case. If not, then
 it must be done (once). The process involves:
 
-
-* Clicking on the packages menu item at the top of the juliabox page
-* Click the "Yours" tab of the "Package Builder" window
-* Under "Unregistered Packages", copy and paste the url
-  "`https://github.com/mth229/MTH229.jl`" into the textbox and click
-  the "+" button for Julia version `0.6`.
-* Click the "Start" button and wait.  
-
-
-
-```
-ImageFile("figures/package-builder.png")
+```verbatim
+] add https://github.com/mth229/MTH229.jl
 ```
 
+If you are *unable* to install packages, the functionality (though not the accompanying packages) can be loaded on the fly with the command ` include(download("https://raw.githubusercontent.com/mth229/MTH229.jl/master/src/229.jl"))`.
 
-(For other Julia installations the command
-`Pkg.clone("https://github.com/mth229/MTH229.jl")` should work.)
 
 
 
@@ -60,7 +48,11 @@ ImageFile("figures/package-builder.png")
 Accompanying each set of notes is a "project" that is to be completed
 in the lab time. For the lab machines these are pre-loaded.
 
-For `juliabox` usage, the projects may be copied in all at once. This
+The labs may be accessed without a login or any special privledges through  [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mth229/229-projects/master). (Note: this may be kinda slow, but should work.)
+
+
+
+For `juliabox.com` usage, the projects may be copied in all at once. This
 is completed by:
 
 * Clicking the "Git" menu item at the top of the juliabox page
@@ -83,16 +75,16 @@ using the "upload" button of the file manager.
 
 ## The projects for MTH 229
 
-See all projects at [https://github.com/mth229/229-projects](https://github.com/mth229/229-projects).x
+See all projects at [https://github.com/mth229/229-projects](https://github.com/mth229/229-projects).
 
 
 * [Calculator](http://mth229.github.io/calculator.html)
 
-Basics of types, order of operations, assignment and variables. 
+Basics of types, order of operations, assignment and variables.
 
 <br/>
-An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/01-calculator.ipynb) 
+An assignment for this material:
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/01-calculator.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/01-calculator.ipynb?create=1)
 
 * [Functions](http://mth229.github.io/functions.html)
@@ -101,8 +93,8 @@ Shows how to define and call a function. Technical parts include
 ternary operator, multiple arguments, and return values (tuples).
 
 <br/>
-An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/02-functions.ipynb) 
+An assignment for this material:
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/02-functions.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/02-functions.ipynb?create=1)
 
 
@@ -117,8 +109,8 @@ As well, a discussion about arrays and mapping a function over an
 array is given. This will be useful later on with limits, ...
 
 <br/>
-An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/03-graphics.ipynb) 
+An assignment for this material:
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/03-graphics.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/03-graphics.ipynb?create=1)
 
 
@@ -131,8 +123,8 @@ the bisection method.
 The add-on `Roots` package provides some convenient functionality.
 
 <br/>
-An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/04-zeros.ipynb) 
+An assignment for this material:
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/04-zeros.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/04-zeros.ipynb?create=1)
 
 * [Limits](http://mth229.github.io/limits.html)
@@ -142,8 +134,8 @@ Basics of limits.
 Discussion on floating point representation and potential issues (subtracting like-sized objects!)
 
 <br/>
-An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/05-limits.ipynb) 
+An assignment for this material:
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/05-limits.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/05-limits.ipynb?create=1)
 
 * [Derivatives](http://mth229.github.io/derivatives.html)
@@ -155,8 +147,8 @@ We end with a brief discussion on automatic differentiation, as
 implemented in the `ForwardDiff` add-on package.
 
 <br/>
-An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/06-derivatives.ipynb) 
+An assignment for this material:
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/06-derivatives.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/06-derivatives.ipynb?create=1)
 
 
@@ -166,8 +158,8 @@ A look at the relationship between a function and its first and second
 derivatives.
 
 <br/>
-An assignment for this material: 
-[ipynb](http://mth229.github.io/229-projects/07-first_second_derivatives.ipynb) 
+An assignment for this material:
+[ipynb](http://mth229.github.io/229-projects/07-first_second_derivatives.ipynb)
 [view](http://nbviewer.ipython.org/url/mth229.github.io/229-projects/07-first_second_derivatives.ipynb?create=1)
 
 * [Newton's method](http://mth229.github.io/newton.html)
@@ -181,8 +173,8 @@ Discusses iterative algorithms, approximation, some analysis.
 The `fzero` function of the `Roots` package is discussed.
 
 <br/>
-An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/08-newton.ipynb) 
+An assignment for this material:
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/08-newton.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/08-newton.ipynb?create=1)
 
 
@@ -191,8 +183,8 @@ An assignment for this material:
 A project on minimization and maximization. Some standard applied problems are presented.
 
 <br/>
-An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/09-extrema.ipynb) 
+An assignment for this material:
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/09-extrema.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/09-extrema.ipynb?create=1)
 
 * [Integration](http://mth229.github.io/integration.html)
@@ -202,8 +194,8 @@ trapezoid, Simpson's, and the `quaggk` function. Applications to volumes
 of solids of revolution.
 
 <br/>
-An assignment for this material: 
-[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/10-integration.ipynb) 
+An assignment for this material:
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/10-integration.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/10-integration.ipynb?create=1)
 
 
@@ -216,45 +208,45 @@ See the projects at [https://github.com/mth229/232-projects](https://github.com/
 Discusses how to do some symbolic math in `julia` through the `SymPy` package.
 
 
-An assignment for this material: 
-[ipynb](http://mth229.github.io/232-projects/symbolic.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/232-projects/symbolic.ipynb?create=1)
+An assignment for this material:
+[ipynb]((https://raw.githubusercontent.com/mth229/232-projects/symbolic.ipynb)
+[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/232-projects/symbolic.ipynb?create=1)
 
 
 * Applications of the integral: area between two curves, volume of solids of revolution, other volumes
 
 
 <br/>
-An assignment for this material: 
-[ipynb](http://mth229.github.io/232-projects/integral-applications.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/232-projects/integral-applications.ipynb?create=1)
+An assignment for this material:
+[ipynb](https://raw.githubusercontent.com/mth229/232-projects/integral-applications.ipynb)
+[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/232-projects/integral-applications.ipynb?create=1)
 
 
 * Techniques of integration: substitution, integration by parts, partial fractions
 
 
 <br/>
-An assignment for this material: 
-[ipynb](http://mth229.github.io/232-projects/integral-techniques.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/232-projects/integral-techniques.ipynb?create=1)
+An assignment for this material:
+[ipynb]((https://raw.githubusercontent.com/mth229/232-projects/integral-techniques.ipynb)
+[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/232-projects/integral-techniques.ipynb?create=1)
 
 
 * Taylor polynomials
 
 
 <br/>
-An assignment for this material: 
-[ipynb](http://mth229.github.io/232-projects/taylor-polynomials.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/232-projects/taylor-polynomials.ipynb?create=1)
+An assignment for this material:
+[ipynb]((https://raw.githubusercontent.com/mth229/232-projects/taylor-polynomials.ipynb)
+[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/232-projects/taylor-polynomials.ipynb?create=1)
 
 
 * Parametric equations and polar coordinates
 
 
 <br/>
-An assignment for this material: 
-[ipynb](http://mth229.github.io/232-projects/polar-coordinates.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/232-projects/polar-coordinates.ipynb?create=1)
+An assignment for this material:
+[ipynb]((https://raw.githubusercontent.com/mth229/232-projects/polar-coordinates.ipynb)
+[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/232-projects/polar-coordinates.ipynb?create=1)
 
 
 ### Calculus III material
@@ -262,14 +254,10 @@ An assignment for this material:
 
 * Vectors and vector-valued functions, $f: R -> R^n$
 
-Read some notes on this material:
-[ipynb](http://mth229.github.io/233-projects/vectors.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/233-projects/vectors.ipynb?create=1)
-
 <br/>
 An assignment for this material:
-[ipynb](http://mth229.github.io/233-projects/vectors-project.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/233-projects/vectors-project.ipynb?create=1)
+[ipynb]((https://raw.githubusercontent.com/mth229/233-projects/vectors-project.ipynb)
+[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/vectors-project.ipynb?create=1)
 
 
 
@@ -277,28 +265,28 @@ An assignment for this material:
 * Functions of several variables, $f:R^n -> R$.
 
 
-Read some notes on this material:
-[ipynb](http://mth229.github.io/233-projects/multivariable.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/233-projects/multivariable.ipynb?create=1)
 
 <br/>
 An assignment for this material:
-[ipynb](http://mth229.github.io/233-projects/multivariable-project.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/233-projects/multivariable-project.ipynb?create=1)
+[ipynb]((https://raw.githubusercontent.com/mth229/233-projects/multivariable-project.ipynb)
+[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/multivariable-project.ipynb?create=1)
 
 
 * Double and triple integration.
 
 
-Read some notes on this material:
-[ipynb](http://mth229.github.io/233-projects/double-triple-integrals.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/233-projects/double-triple-integrals.ipynb?create=1)
+<br/>
+An assignment for this material:
+[ipynb]((https://raw.githubusercontent.com/mth229/233-projects/double-triple-integrals-project.ipynb)
+[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/double-triple-integrals-project.ipynb?create=1)
+
+* Surface integrals
+
 
 <br/>
 An assignment for this material:
-[ipynb](http://mth229.github.io/233-projects/double-triple-integrals-project.ipynb) 
-[view](http://nbviewer.ipython.org/url/mth229.github.io/233-projects/double-triple-integrals-project.ipynb?create=1)
-
+[ipynb]((https://raw.githubusercontent.com/mth229/233-projects/surface-integrals.ipynb)
+[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/surface-integrals.ipynb?create=1)
 
 
 ## Basic ideas
@@ -317,7 +305,7 @@ action(function_object, args...)
 
 For example, the notes use:
 
-* `plot(f, a, b)` to plot `f` over `[a,b]` 
+* `plot(f, a, b)` to plot `f` over `[a,b]`
 * `plot([f,g], a, b)` to plot both `f` and `g` over the interval `[a,b]`
 * `fzeros(f)` to find the real roots of a polynomial function `f` (from `Roots`)
 * `fzero(f, a, b)` to find a root inside the bracketing interval `[a,b]` (from `Roots`)
@@ -348,7 +336,7 @@ With just this basic set of actions, akin to buttons on the calculator, a rich v
 * A tutorial in `IJulia` format by Isaiah Norton is  [here](http://nbviewer.ipython.org/github/JuliaX/JuliaTutorial/blob/master/JuliaTutorial.ipynb?create=1), with the original file found [here](https://github.com/JuliaX/JuliaTutorial/blob/master/JuliaTutorial.ipynb).
 
 
-Before starting out with `Julia` it must be available. 
+Before starting out with `Julia` it must be available.
 
 We recommend taking advantage of the free web service at
 [juliabox.com](juliabox.com), but `Julia` can be easily installed on a local
@@ -383,15 +371,13 @@ pro within the terminal:
 
 ```verbatim
                _
-   _       _ _(_)_     |  A fresh approach to technical computing
-  (_)     | (_) (_)    |  Documentation: https://docs.julialang.org
-   _ _   _| |_  __ _   |  Type "?help" for help.
+   _       _ _(_)_     |  Documentation: https://docs.julialang.org
+  (_)     | (_) (_)    |
+   _ _   _| |_  __ _   |  Type "?" for help, "]?" for Pkg help.
   | | | | | | |/ _` |  |
-  | | |_| | | | (_| |  |  Version 0.6.2 (2017-12-13 18:08 UTC)
- _/ |\__'_|_|_|\__'_|  |  Official http://julialang.org/ release
-|__/                   |  x86_64-apple-darwin14.5.0
- 
-julia> 
+  | | |_| | | | (_| |  |  Version 1.1.0 (2019-01-21)
+ _/ |\__'_|_|_|\__'_|  |  Official https://julialang.org/ release
+|__/                   |
 ```
 
 
@@ -412,7 +398,7 @@ If you get `4`, you are able to use `julia`.
 One command that the notes assume you have typed is the one to install the add-on `MTH229` package. If you haven't done so, try this:
 
 ```verbatim
-Pkg.clone("https://github.com/mth229/MTH229.jl")
+] add https://github.com/mth229/MTH229.jl
 ```
 
 This may take a while to complete.
@@ -431,7 +417,7 @@ help are available.
 ImageFile("figures/projects/ijulia.png")
 ```
 
-The above graphic is from the main web page for `julia`
+The above graphic was grabbed from the main web page for `julia`
 (julialang.com) and shows the `IJulia` notebook with some graphics
 provided by the `Gadfly` package.
 
@@ -446,8 +432,7 @@ Pkg.add("IJulia")
 alert(""" The above commands form the basics of
 `julia`'s package system. Like most computer languages, `julia` can be
 extended by user-contributed packages. The complete list of available
-packages is kept on the computer you are using `julia` at. This list
-is updated by the command `Pkg.update()`. New packages are made
+packages is kept on the computer you are using `julia` at.  New packages are made
 available for use by installing or `add`ing them to your system via
 `Pkg.add`. Adding packages will automatically install any dependent
 packages. As well, external libraries *should* also be installed for
@@ -515,7 +500,7 @@ So, to make a plot using `Plots`, the sequence might go like:
 using Plots
 plotly()
 f(x) = x^2 - 2x
-plot(f, -2, 1)			
+plot(f, -2, 1)
 ```
 
 (The command `using MTH229` will load the `Plots` package for you.)

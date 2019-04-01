@@ -24,8 +24,8 @@ Newton's method is fast (once it is close) but has no such guarantee
 of converging. In this project, we'll see how to implement the
 algorithm, try some examples, and then look at what can go wrong.
 
-The `Roots` package provides a function `newton` for easily performing
-Newton's method, and more usefully we will see that `fzero` can be
+The `MTH229` package provides a function `newton` for easily performing
+Newton's method, utilizing a function from the `Roots` package. More usefully, we will see that `fzero`, which we used for bisection, can also be
 used for root finding with an algorithm that is a bit more robust than
 Newton's method.
 
@@ -42,7 +42,7 @@ plotly()
 
 ## Basic idea
 
-The idea behind Newton's method is simple -- *linear approximation*. 
+The idea behind Newton's method is simple -- *linear approximation*.
 That is, most functions at any given point are well
 approximated by the tangent line at that point. If we have a good
 guess $x_n$, then we can improve this guess iteratively by replacing
@@ -110,7 +110,7 @@ f(x) = x^3 - 2x - 5
 plot(f, -3, 3)
 ```
 
-Here we improve the estimate for the root near 2 using Newton's method. 
+Here we improve the estimate for the root near 2 using Newton's method.
 We will need the first derivative, which we denote `fp`
 
 ```
@@ -174,7 +174,7 @@ actual, *exact*, answer is not likely to be the value computed by Newton's
 method, which we call `xstar` at times. In most cases, the true answer
 will be irrational and `xstar` a floating point number, which
 ultimately can never be better than an approximation to an irrational
-number. 
+number.
 
 
 The above example iterated until it was clear the algorithm does not
@@ -252,7 +252,7 @@ is described by the first-century [Greek mathematician Hero of
 Alexandria](http://en.wikipedia.org/wiki/Babylonian_method).
 
 
-Let $k=15$ and $x_0$ be $4$. What is the value of $x_3$? 
+Let $k=15$ and $x_0$ be $4$. What is the value of $x_3$?
 
 
 ```
@@ -304,7 +304,7 @@ algorithm has converged. We shall use the following:
 * If the value of $|f(x_n)| < tol$ the algorithm has converged
 * If the above hasn't happened by $n=100$ the algorithm fails to converge
 
-This isn't perfect, but will be sufficient. (Well, in fact no stopping rule can be perfect, but this one doesn't account for the relative size of the $x_n$s which can be important.) 
+This isn't perfect, but will be sufficient. (Well, in fact no stopping rule can be perfect, but this one doesn't account for the relative size of the $x_n$s which can be important.)
 
 
 The first two steps require a tolerance. We will use `1e-14` for
@@ -321,7 +321,7 @@ above occurs. We wrap this up in a function for reuse, and employ a
 function nm(f, fp, x)
 	 xnew, xold = x, Inf
 	 fn, fo = f(xnew), Inf
-	 
+
 	 tol = 1e-14
 	 ctr = 1
 
@@ -336,9 +336,9 @@ function nm(f, fp, x)
 	    error("Did not converge in 100 steps")
          else
 	   xnew, ctr
-         end 
+         end
 end
-	 
+
 ```
 
 Here we use the `nm` function to find a zero of this polynomial:
@@ -349,7 +349,7 @@ fp(x) = 3x^2 - 5
 xstar, ctr = nm(f, fp, 0)	# takes 6 steps
 ```
 
-However, the `Roots` package implements the `newton` function. So we shall use that. To see the number of steps, the argument `verbose=true` may be given.
+However, the `MTH229` package provides the `newton` function. So we shall use that in the sequel. To see the number of steps, the argument `verbose=true` may be given.
 
 ----
 
@@ -378,16 +378,16 @@ In this case, the answer is exact up to floating point round off.
 #### Question
 
 Repeat the problem of finding a root of $f(x) = \exp(x) - x^4$
-starting at $x=2$. How many steps does it take with the default
-tolerance used in `nm`?
+starting at $x=2$. (`newton(f, 2, verbose=true)`). How many iterations does it take with the default
+tolerances?
 
 
 
 ```
-f(x) = exp(x) - x^4;
-fp(x) = exp(x) - 4x^3;
-xstar, ctr = nm(f, fp, 2);
-numericq(ctr, 1e-1)
+#f(x) = exp(x) - x^4;
+#fp(x) = exp(x) - 4x^3;
+#xstar, ctr = nm(f, fp, 2);
+numericq(6, 1e-1)
 ```
 
 #### Question
@@ -479,7 +479,7 @@ $$~
 f'(x) \approx \frac{f(x + h) - f(x)}{h}
 ~$$
 
-For some small $h$ (with $h=10^{-8}$ a reasonable choice for many functions). This can be used 
+For some small $h$ (with $h=10^{-8}$ a reasonable choice for many functions). This can be used
 
 One can also use approximate derivatives based on forward differences
 in place of $f'(x)$ in the formula. Again, this won't be as fast.
@@ -545,20 +545,14 @@ The `fzero` function has two interfaces:
 * when called with a bracketing interval, as in `fzero(f, [a,b])`, it will use a bisection method to find a root.
 * when called with a starting point, as in `fzero(f, a)`, it will use an iterative algorithm to search for a root.
 
-Bracketing methods are guaranteed to converge, but can be slow. The
-iterative algorithm used by default with `fzero` tries to speed the
-convergence up, but if along the way it finds a bracketing interval,
-that will guarantee convergence. 
-
-The `order` keyword can be used to specify a higher-order method which
-converges faster with a good initial guess, but is more sensitive to
-poor initial guesses. For example, `fzero(f, x, order=2)` will use
-Steffensen's method. The default method isn't trying to minimize
-function calls. If you are trying to find the zero of a function which
-is costly to compute, it should be avoided.
+Many bracketing methods (like bisection) are guaranteed to converge,
+but can be slow. The iterative algorithm used by default with `fzero`
+tries to speed the convergence up, but if along the way it finds a
+bracketing interval, that will guarantee convergence.
 
 
-We focus on the simplest usage of `fzero` where an initial guess is supplied and the default order is used:
+
+We focus on the simplest usage of `fzero` where an initial guess is supplied and the default order is used. Here is an example to find $-\sqrt{2}$:
 
 ```
 f(x) = x^2 - 2
@@ -626,12 +620,22 @@ f.(xs)               # or map(f, xs) or [f(x) for x in xs]
 ```
 
 
+##### fzeros
+
+For such tasks, `fzeros` also works well. This function looks for all zeros in the interval `[a,b]`:
+
+```
+fzeros(f, -1, 2)
+```
+
+
+
 
 ### Practice
 
 #### Question
 
-Let 
+Let
 
 $$~
 f(x) = 4x^4 -5x^3 + 4x^2 -20x - 6
@@ -661,19 +665,17 @@ We graph the function to see, using a smallish interval at first:
 
 ```
 f(x) = x^x - 2
-plot([f, x -> 0], 0, 2)
+plot(f, 0, 2)
+plot!(zero)
 ```
 
-Eyeing this, we pick an initial point, $1$, for Newton's method to the
+Eyeing this, we pick an initial point, $1$, for Newton's method (`newton(f, 1)`) to the
 right of the minimum, which appears to be around $x=0.35$.
 
-```
-xstar = newton(f, 1);
-```
-
-What is the value of `xstar`?
+What is the value of the approximate zero?
 
 ```
+xstar = newton(f, 1)
 numericq(xstar, 1e-8)
 ```
 
@@ -731,11 +733,11 @@ you need to keep in mind. Newton's method works well if
 
 * The zero is a simple root -- that is of multiplicity 1
 
-* $|f'(x)|$ is not too small (If the tangent line is nearly flat, the
-  next guess is far from the previous)
+* The magnitude, $|f'(x)|$, is not too small (If the tangent line is
+  nearly flat, the next guess is far from the previous)
 
-* $|f''(x)|$ is not too big (function doesn't have so much curve
-  that the tangent line is a poor approximation)
+* The magnitude, $|f''(x)|$, is not too big (function doesn't have so
+  much curve that the tangent line is a poor approximation)
 
 * The initial guess is not to far from a zero
 
@@ -752,7 +754,7 @@ derivative exists near $\alpha$, and $\Delta x_i = x_i -
 \alpha$ is the error between the zero and the $i$ th estimate.  When the derivative at $\alpha$ is non-zero, the
 error is basically a constant times $\Delta x_i^2$. This is
 interpreted as saying there is quadratic convergence in the error, as
-the next one is related to the previous one squared. 
+the next one is related to the previous one squared.
 
 Now we look at some cases where the above three points do not hold.
 
@@ -791,11 +793,11 @@ ans = 1;
 radioq(choices, ans)
 ```
 
-#### Question 
+#### Question
 
 The method did find a zero, but the initial guess was nowhere near the
 final zero. How close was the closest zero to the initial guess?
- 
+
 ```
 choices = ["`8.75`", "`2pi`", "`3.8`"];
 ans = 3;
@@ -820,7 +822,7 @@ f(x) = cbrt(x)
 xstar = newton(f, 2)
 ```
 
-Still an issue. Why? 
+Still an issue. Why?
 
 #### Question
 
@@ -842,7 +844,7 @@ choices = ["`|f'(x)|` gets too small",
 	     "Initial guess is too far from a zero."
 	    ];
 ans = 2;
-radioq(choices, ans)
+radioq(choices, ans, keep_order=true)
 ```
 
 
@@ -880,7 +882,7 @@ choices = ["`|f'(x)|` gets too small",
 	     "Initial guess is to far from a zero."
 	    ];
 ans = 1;
-radioq(choices, ans)
+radioq(choices, ans, keep_order=true)
 ```
 
 #### Question
@@ -911,9 +913,9 @@ Let $f(x) = x^3 - 5x$. Starting with $x_0=1$, compute three steps of
 Newton's method. What are the terms in the series produced?
 
 ```
-choices = ["1, -2, -4,  ...",
-	   "-1.0, 1.0, -1.0, ...",
-	   "-1.0, 0.6666666666666667, -0.2850952524822228, ..."
+choices = [L"1, -2, -4,  ...",
+	   L"-1.0, 1.0, -1.0, ...",
+	   L"-1.0, 0.6666666666666667, -0.2850952524822228, ..."
 	  ];
 ans = 2;
 radioq(choices, ans)
@@ -954,13 +956,10 @@ Try again with $x=3.0$ What sequence do you get:
 
 
 ```
-choices = ["3, -3.0, 3.0, -3.0, ...",
-	     "2, -2.0, 2.0, -2.0",
-	     "3, 2.0, 1.0, 0.0, -1.0, ..."
+choices = [L"3, -3.0, 3.0, -3.0, ...",
+	     L"2, -2.0, 2.0, -2.0",
+	     L"3, 2.0, 1.0, 0.0, -1.0, ..."
 	     ];
 ans = 1;
 radioq(choices, ans)
 ```
-
-
-

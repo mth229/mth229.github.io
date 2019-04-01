@@ -19,7 +19,7 @@ $$~
 f(x) = 0.
 ~$$
 
-for an arbitrary $f$ has no well-defined process.  
+for an arbitrary $f$ has no well-defined process.
 
 A related problem is to find one (or all) solutions to an equation of
 this type:
@@ -33,21 +33,21 @@ f(x) - g(x)$ and solve for when $h(x)$ is $0$.
 
 
 Here we discuss a few different elementary means to do find zeros with
-`Julia`, leaving some others for a later time. 
+`Julia`, leaving some others for a later time.
 
 
 We will use the add-on packages `Roots` and `PolynomialZeros`, which
-provide implementations of a few zero- and root-finding algorithms. These are loaded with the `MTH229` package:
+provide implementations of a few zero- and root-finding algorithms.
 
 ```
-using MTH229    # loads the Roots package
+using MTH229    # loads the Roots package not PolynomialZeros
 ```
 
 ```nocode, noout
 plotly()
 ```
 
-	
+
 ## Zeros of a polynomial
 
 Univariate polynomials are algebraic expessions involving an
@@ -75,11 +75,11 @@ for the roots with:
 ```
 a = 2; b = 3; c = -2
 discr = b^2 - 4*a*c
-(-b + sqrt(discr))/(2a), (-b - sqrt(discr))/(2a) 
+(-b + sqrt(discr))/(2a), (-b - sqrt(discr))/(2a)
 ```
 
 
-If you wanted to write a function to do this, it would be 
+If you wanted to write a function to do this, it would be
 straightforward, save the detail of needing to make a negative number
 complex in order to take its square root:
 
@@ -133,7 +133,7 @@ f(x) = x^2 + x - 1
 poly_roots(f)
 ```
 
-(The `PolynomialZeros` package is not in the `MTH229` package.)
+(The `PolynomialZeros` package is not in the `MTH229` package. It may need to be installed before using, e.g.: `using Pkg; Pkg.add("PolynomialZeros")`)
 
 That is, the command to find the roots of the polynomial $f(x)$ is simply
 `poly_roots` and the the function is called just by passing in the function name (or an anonymous function).
@@ -233,7 +233,7 @@ numericq(val, 1e-3)
 Use the `Over.R` specification to find the largest real root of the polynomial $x^3 - x - 17$
 
 ```
-zs = fzeros(x -> x^2 - x - 17);
+zs = fzeros(x -> x^2 - x - 17,-100, 100);
 val = maximum(zs)
 numericq(val, 1e-3)
 ```
@@ -241,7 +241,7 @@ numericq(val, 1e-3)
 
 #### Question
 
-[The rule of signs of Descartes](http://en.wikipedia.org/wiki/Descartes_rule_of_signs) 
+[The rule of signs of Descartes](http://en.wikipedia.org/wiki/Descartes_rule_of_signs)
 is a simple means to give an upper bound on the number of positive real
 roots a polynomial has. One counts the number of sign changes amongst
 the polynomials coefficients. Suppose this is $k$, then the number of
@@ -274,14 +274,14 @@ radioq(choices, ans)
 
 The number of possible *negative*, real roots can also be found from
 Descartes' rule. Instead of looking at the sign changes of $f(x)$, one
-must look at the sign changes of $g(x) = f(-x)$. 
+must look at the sign changes of $g(x) = f(-x)$.
 
 If $f(x) = x^5 - x +1$ we have $g(x) = -x^5 +x + 1$ (just change the
 signs of the coefficients of the odd powers). Then $g(x)$ has one sign
 change. This means there is one *negative* real root. What is it?
 
 ```
-val = fzeros(x -> x^5 - x +1)[1]
+val = fzeros(x -> x^5 - x +1, -5, 5)[1]
 numericq(val, 1e-2)
 ```
 
@@ -339,7 +339,7 @@ and $\gamma$ a resistance, which we take to be $1$. With this, we have
 the following `Julia` definition (with a slight reworking of $\gamma$):
 
 ```
-function y(x; theta=pi/4, g=32, v0=200, gamma=1) 
+function y(x; theta=pi/4, g=32, v0=200, gamma=1)
 	 a = gamma * v0 * cos(theta)
 	 (g/a + tan(theta)) * x + g/gamma^2 * log((a-gamma^2 * x)/a)
 end
@@ -361,7 +361,7 @@ Well, we haven't even seen the peak yet. Better to do a little spade
 work first. This is a quadratic equation, so we can use the `poly_roots` function:
 
 ```
-poly_roots(j, Over.R) 
+poly_roots(j, Over.R)
 ```
 
 
@@ -391,7 +391,7 @@ We try on the reduced interval avoiding
 the obvious *asymptote* at `b`  by subtracting $1$:
 
 ```
-plot(y, 0, b - 1) 
+plot(y, 0, b - 1)
 ```
 
 
@@ -403,7 +403,8 @@ plot(y, 135, 141)
 
 
 ```
-plot([y, x -> 0], 140, 141)
+plot(y, 140, 141)
+plot!(zero)
 ```
 
 The answer is approximately $140.7$
@@ -414,15 +415,8 @@ day indeed.
 
 ```
 b = 140.7
-plot([j, u -> u < b ? y(u) : NaN] , 0, 1250)
-```
-
-```
-alert("""
-The last two plots used *anonymous* functions to plot. Again, they can
-be a bit more confusing to read, but they allow us to compose multiple
-operations at once quite easily.
-""")
+plot(j , 0, 1250)
+plot!(y, 0, b)
 ```
 
 
@@ -456,7 +450,7 @@ Assuming this is a realistic problem and an average American household might pro
 
 ```
 plot([plan1, plan2], 10, 20)
-```	      
+```
 
 
 We can see the intersection point is around 14 and that if a family
@@ -519,6 +513,7 @@ roots. Which of the following values is one of them? Try to solve this
 graphically.
 
 ```
+using Random
 rts =[-2, -1, 3];
 x = rts[randperm(3)[1]];
 choices = round.([x, -5 + 10*rand(2)], 3, 10);
@@ -532,7 +527,7 @@ radioq(choices, ans)
 Let $y(x)$ be defined as above to model the flight of an arrow. If $\gamma=1/2$ when will the arrow strike the ground after launch?
 
 ```
-function y(x; theta=pi/4, g=-32, v0=200, gamma=1) 
+function y(x; theta=pi/4, g=-32, v0=200, gamma=1)
 	 a = gamma * v0 * cos(theta)
 	 (g/a + tan(theta)) * x - g/gamma^2 * log((a-gamma^2 * x)/a)
 end
@@ -556,7 +551,7 @@ hill(x) = x > 100 ? 2.0*(x-100) : 0.0
 By solving `y(x) = hill(x)` solve for how far the arrow will fly before hitting the hill.
 
 ```
-function y(x; theta=pi/4, g=-32, v0=200, gamma=1) 
+function y(x; theta=pi/4, g=-32, v0=200, gamma=1)
 	 a = gamma * v0 * cos(theta)
 	 (g/a + tan(theta)) * x - g/gamma^2 * log((a-gamma^2 * x)/a)
 end
@@ -594,7 +589,7 @@ and $b$ *bracket* a root.)  This observation is due to Bolzano.
 
 The bisection algorithm utilizes Bolzano's observation. It is a simple *iterative* procedure for finding
 such a value $c$ when we have a continuous function and a bracketing
-interval.  
+interval.
 
 ```
 alert(L"""
@@ -697,13 +692,13 @@ function bisection (f::Function, a, b)
     end
 
     c = a + (b-a) / 2
-    
+
     while a < c < b
         if f(c) == 0.0
 	  break
         end
         ## update step
-	if f(a) * f(c) < 0 
+	if f(a) * f(c) < 0
 	   a, b = a, c
 	else
 	   a, b = c, b
@@ -775,7 +770,7 @@ zero, then
 * use the bisection method to find the zero to many decimal points.
 
 Here we illustrate with the problem of finding all intersection points
-of $e^x = x^4$ over the interval $[0,10]$. 
+of $e^x = x^4$ over the interval $[0,10]$.
 
 
 
@@ -798,7 +793,7 @@ shows these are good choices to use. For example, between $8$ and $9$
 we have:
 
 ```
-plot(f, 8, 9)     
+plot(f, 8, 9)
 ```
 
 So we find the values of the zero in the bracketed region $[8,9]$:
@@ -830,9 +825,10 @@ fzero(f, 0, 1)
 ```
 
 
-The `fzero` function is actually an interface to various
-root-finding algorithms. When called as above -- with two intial
-starting points -- it uses a bracketing approach as discussed here.
+The `fzero` function is actually an interface to various root-finding
+algorithms. When called as above -- with two intial starting points --
+it uses a bracketing approach as discussed here, though with a
+different notion of the midpoint.
 
 ### Problems
 
@@ -911,12 +907,12 @@ the two zeros of this function. The peak time is related to a zero of
 a function given by `D(f)`, which for now we'll take as a mystery
 function, but later will be known as the derivative.
 
-Let $v_0= 390$. The three times in question can be found from the zeros of `f` and `D(f)`. What are they?
+Let $v_0= 390$. The three times in question can be found from the zeros of `f` and `f'`. What are they?
 
 ```
-choices = ["(0.0, 12.1875, 24.375)",
-	"(-4.9731, 0.0, 4.9731)",
-	"(0.0, 625.0, 1250.0)"]
+choices = [L"(0.0, 12.1875, 24.375)",
+	L"(-4.9731, 0.0, 4.9731)",
+	L"(0.0, 625.0, 1250.0)"]
 ans = 1
 radioq(choices, ans)
 ```
@@ -950,9 +946,9 @@ ground.
 t0 = 0.0
 tf = fzero(h, 10, 20)
 ta = fzero(D(h), t0, tf)
-choices = ["(0, 13.187, 30.0)",
-	"(0, 32.0, 390.0)",
-	"(0, 2.579, 13.187)"]
+choices = [L"(0, 13.187, 30.0)",
+	L"(0, 32.0, 390.0)",
+	L"(0, 2.579, 13.187)"]
 ans = 3
 radioq(choices, ans)
 ```
