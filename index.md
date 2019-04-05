@@ -87,6 +87,8 @@ An assignment for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/01-calculator.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/01-calculator.ipynb?create=1)
 
+----
+
 * [Functions](http://mth229.github.io/functions.html)
 
 Shows how to define and call a function. Technical parts include
@@ -97,6 +99,7 @@ An assignment for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/02-functions.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/02-functions.ipynb?create=1)
 
+----
 
 * [Graphing](http://mth229.github.io/graphing.html)
 
@@ -113,6 +116,7 @@ An assignment for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/03-graphics.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/03-graphics.ipynb?create=1)
 
+----
 
 * [Zeros](http://mth229.github.io/zeros.html)
 
@@ -127,6 +131,8 @@ An assignment for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/04-zeros.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/04-zeros.ipynb?create=1)
 
+----
+
 * [Limits](http://mth229.github.io/limits.html)
 
 Basics of limits.
@@ -137,6 +143,8 @@ Discussion on floating point representation and potential issues (subtracting li
 An assignment for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/05-limits.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/05-limits.ipynb?create=1)
+
+----
 
 * [Derivatives](http://mth229.github.io/derivatives.html)
 
@@ -151,6 +159,7 @@ An assignment for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/06-derivatives.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/06-derivatives.ipynb?create=1)
 
+----
 
 * [First and second derivatives](http://mth229.github.io/first-second-derivatives.html)
 
@@ -161,6 +170,8 @@ derivatives.
 An assignment for this material:
 [ipynb](http://mth229.github.io/229-projects/07-first_second_derivatives.ipynb)
 [view](http://nbviewer.ipython.org/url/mth229.github.io/229-projects/07-first_second_derivatives.ipynb?create=1)
+
+----
 
 * [Newton's method](http://mth229.github.io/newton.html)
 
@@ -177,6 +188,7 @@ An assignment for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/08-newton.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/08-newton.ipynb?create=1)
 
+----
 
 * [Extrema](http://mth229.github.io/extrema.html)
 
@@ -186,6 +198,8 @@ A project on minimization and maximization. Some standard applied problems are p
 An assignment for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/09-extrema.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/09-extrema.ipynb?create=1)
+
+----
 
 * [Integration](http://mth229.github.io/integration.html)
 
@@ -201,7 +215,7 @@ An assignment for this material:
 
 ### Calculus II material
 
-See the projects at [https://github.com/mth229/232-projects](https://github.com/mth229/232-projects).
+See the projects at [https://github.com/mth229/232-projects](https://github.com/mth229/232-projects). They can be used through Launch [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mth229/232-projects/master)
 
 * [Symbolic](http://mth229.github.io/symbolic.html)
 
@@ -209,44 +223,48 @@ Discusses how to do some symbolic math in `julia` through the `SymPy` package.
 
 
 An assignment for this material:
-[ipynb]((https://raw.githubusercontent.com/mth229/232-projects/symbolic.ipynb)
-[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/232-projects/symbolic.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/232-projects/master/01-symbolic.ipynb)
+[view](http://nbviewer.ipython.org/github/mth229/232-projects/blob/master/01-symbolic.ipynb?create=1)
 
+----
 
 * Applications of the integral: area between two curves, volume of solids of revolution, other volumes
 
 
 <br/>
 An assignment for this material:
-[ipynb](https://raw.githubusercontent.com/mth229/232-projects/integral-applications.ipynb)
-[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/232-projects/integral-applications.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/232-projects/master/02-integral-applications.ipynb)
+[view](http://nbviewer.ipython.org/github/mth229/232-projects/blob/master/02-integral-applications.ipynb?create=1)
 
+----
 
 * Techniques of integration: substitution, integration by parts, partial fractions
 
 
 <br/>
 An assignment for this material:
-[ipynb](https://raw.githubusercontent.com/mth229/232-projects/integral-techniques.ipynb)
-[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/232-projects/integral-techniques.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/232-projects/master/03-integral-techniques.ipynb)
+[view](http://nbviewer.ipython.org/github/mth229/232-projects/blob/master/03-integral-techniques.ipynb?create=1)
 
+----
 
 * Taylor polynomials
 
 
 <br/>
 An assignment for this material:
-[ipynb](https://raw.githubusercontent.com/mth229/232-projects/taylor-polynomials.ipynb)
-[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/232-projects/taylor-polynomials.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/232-projects/master/04-taylor-polynomials.ipynb)
+[view](http://nbviewer.ipython.org/github/mth229/232-projects/blob/master/04-taylor-polynomials.ipynb?create=1)
 
+----
 
 * Parametric equations and polar coordinates
 
 
 <br/>
 An assignment for this material:
-[ipynb](https://raw.githubusercontent.com/mth229/232-projects/polar-coordinates.ipynb)
-[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/232-projects/polar-coordinates.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/232-projects/master/05-polar-coordinates.ipynb)
+[view](http://nbviewer.ipython.org/github/mth229/232-projects/blob/master/05-polar-coordinates.ipynb?create=1)
 
 
 ### Calculus III material
@@ -256,34 +274,37 @@ These are all located [here](https://github.com/mth229/233-projects) and can be 
 
 * Vectors and vector-valued functions, $f: R -> R^n$.
 
-[Notes](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/01-vectors.ipynb?create=1)
+[Notes](http://nbviewer.ipython.org/github/mth229/233-projects/blob/master/01-vectors.ipynb?create=1)
+
 
 <br/>
 An assignment for this material:
-[ipynb](https://raw.githubusercontent.com/mth229/233-projects/02-vectors_project.ipynb)
-[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/02-vectors_project.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/233-projects/master/02-vectors_project.ipynb)
+[view](http://nbviewer.ipython.org/github/mth229/233-projects/blob/master/02-vectors_project.ipynb?create=1)
 
-
+----
 
 
 * Functions of several variables, $f:R^n -> R$.
+[Notes](http://nbviewer.ipython.org/github/mth229/233-projects/blob/master/03-multivariable.ipynb?create=1)
 
-[Notes](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/03-multivariable.ipynb?create=1)
 
 <br/>
 An assignment for this material:
-[ipynb](https://raw.githubusercontent.com/mth229/233-projects/04-multivariable_project.ipynb)
-[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/04-multivariable_project.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/233-projects/master/04-multivariable_project.ipynb)
+[view](http://nbviewer.ipython.org/github/mth229/233-projects/blob/master/04-multivariable_project.ipynb?create=1)
 
+----
 
 * Double and triple integration.
 
-[Notes](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/05-double_triple_integrals.ipynb?create=1)
+[Notes](http://nbviewer.ipython.org/github/mth229/233-projects/blob/master/05-double_triple_integrals.ipynb?create=1)
+
 
 <br/>
 An assignment for this material:
-[ipynb](https://raw.githubusercontent.com/mth229/233-projects/06-double_triple_integrals-project.ipynb)
-[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/06-double_triple_integrals_project.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/233-projects/master/06-double_triple_integrals_project.ipynb)
+[view](http://nbviewer.ipython.org/github/mth229/233-projects/blob/master/06-double_triple_integrals_project.ipynb?create=1)
 
 
 ## Basic ideas
@@ -302,7 +323,7 @@ action(function_object, args...)
 
 For example, the notes use:
 
-* `plot(f, a, b)` to plot `f` over `[a,b]`
+* `plot(f, a, b)` to plot `f` over `[a,b]`; `plot!(g)` to add a curve
 * `plot([f,g], a, b)` to plot both `f` and `g` over the interval `[a,b]`
 * `fzeros(f)` to find the real roots of a polynomial function `f` (from `Roots`)
 * `fzero(f, a, b)` to find a root inside the bracketing interval `[a,b]` (from `Roots`)
