@@ -227,7 +227,7 @@ An assignment for this material:
 
 <br/>
 An assignment for this material:
-[ipynb]((https://raw.githubusercontent.com/mth229/232-projects/integral-techniques.ipynb)
+[ipynb](https://raw.githubusercontent.com/mth229/232-projects/integral-techniques.ipynb)
 [view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/232-projects/integral-techniques.ipynb?create=1)
 
 
@@ -236,7 +236,7 @@ An assignment for this material:
 
 <br/>
 An assignment for this material:
-[ipynb]((https://raw.githubusercontent.com/mth229/232-projects/taylor-polynomials.ipynb)
+[ipynb](https://raw.githubusercontent.com/mth229/232-projects/taylor-polynomials.ipynb)
 [view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/232-projects/taylor-polynomials.ipynb?create=1)
 
 
@@ -245,48 +245,45 @@ An assignment for this material:
 
 <br/>
 An assignment for this material:
-[ipynb]((https://raw.githubusercontent.com/mth229/232-projects/polar-coordinates.ipynb)
+[ipynb](https://raw.githubusercontent.com/mth229/232-projects/polar-coordinates.ipynb)
 [view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/232-projects/polar-coordinates.ipynb?create=1)
 
 
 ### Calculus III material
 
 
-* Vectors and vector-valued functions, $f: R -> R^n$
+These are all located [here](https://github.com/mth229/233-projects) and can be run through [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mth229/233-projects/master).
+
+* Vectors and vector-valued functions, $f: R -> R^n$.
+
+[Notes](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/01-vectors.ipynb?create=1)
 
 <br/>
 An assignment for this material:
-[ipynb]((https://raw.githubusercontent.com/mth229/233-projects/vectors-project.ipynb)
-[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/vectors-project.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/233-projects/02-vectors_project.ipynb)
+[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/02-vectors_project.ipynb?create=1)
 
 
 
 
 * Functions of several variables, $f:R^n -> R$.
 
-
+[Notes](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/03-multivariable.ipynb?create=1)
 
 <br/>
 An assignment for this material:
-[ipynb]((https://raw.githubusercontent.com/mth229/233-projects/multivariable-project.ipynb)
-[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/multivariable-project.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/233-projects/04-multivariable_project.ipynb)
+[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/04-multivariable_project.ipynb?create=1)
 
 
 * Double and triple integration.
 
+[Notes](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/05-double_triple_integrals.ipynb?create=1)
 
 <br/>
 An assignment for this material:
-[ipynb]((https://raw.githubusercontent.com/mth229/233-projects/double-triple-integrals-project.ipynb)
-[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/double-triple-integrals-project.ipynb?create=1)
-
-* Surface integrals
-
-
-<br/>
-An assignment for this material:
-[ipynb]((https://raw.githubusercontent.com/mth229/233-projects/surface-integrals.ipynb)
-[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/surface-integrals.ipynb?create=1)
+[ipynb](https://raw.githubusercontent.com/mth229/233-projects/06-double_triple_integrals-project.ipynb)
+[view](http://nbviewer.ipython.org/url/mth229.github.io/mth229/233-projects/06-double_triple_integrals_project.ipynb?create=1)
 
 
 ## Basic ideas
