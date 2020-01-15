@@ -13,7 +13,7 @@ See all projects at [https://github.com/mth229/229-projects](https://github.com/
 ```
 
 This is a collection of notes for exploring calculus concepts
-with the `Julia` programming language, as is done with MTH229 at the College of Staten Island.
+with the `Julia` programming language, as is done with MTH 229 at the College of Staten Island.
 
 
 These  notes are broken into different sections, where most all sections
@@ -27,12 +27,15 @@ The notes mostly follow topics of a standard first-semester
 calculus course after some background material is presented for
 learning `julia` within a mathematical framework.
 
+Each topic is followed by a project. At CSI, these projects are completed during computer labs.
+
+
 ### The MTH229 package
 
 The notes assume that the
 [MTH229](https://github.com/mth229/MTH229.jl) add-on package is
-installed. In the lab this will be the case. If not, then
-it must be done (once). The process involves:
+installed. At CSI, this is the case in the labs. If Julia is not being used on the lab computers, then
+this package must be installed (once). The process involves issuing this command:
 
 ```verbatim
 ] add https://github.com/mth229/MTH229.jl
@@ -40,42 +43,95 @@ it must be done (once). The process involves:
 
 If you are *unable* to install packages, the functionality (though not the accompanying packages) can be loaded on the fly with the command ` include(download("https://raw.githubusercontent.com/mth229/MTH229.jl/master/src/229.jl"))`.
 
+(The package `CalculusWithJulia` can mostly substitute for `MTH229` and can be installed directly, as it is registered.)
+
+
+### How to use `Julia` in MTH 229
+
+
+Using `Julia` to complete the projects of MTH 229 can be done in several ways. The following lists four possible maners in order of ease of setup:
+
+##### Using the image in the lab:
+
+In the computer labs in 1S, the desktop images have julia installed along with the packages. Simply click on the icon and  wait. If things work to plan, a small terminal screen will appear  with many  lines of commands.  After a few moments, a  browser  tab should open with a listing of  projects. Click on your project  and proceed. Your work will be erased  when you log off.
+
+##### Using binder to run the projects  remotely:
+
+The website  `mybinder.org` allows `julia` and the  projects to be run for  free over the internet. Clicking the binder buttons below (e.g., [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mth229/229-projects/master) _) will redirect you. The start up  is slow so you must be patient. You can read the  projects while binder  activates. Your  work  will  be  erased when you log off.
+
+##### Using `cocalc.com`:
+
+The website [cocalc.com](www.cocalc.com) provides hosted access to `julia` and other programming languages. Though it can  be  used for free, this is not recommended. Rather, a 14 dollar/4 month subscription is. To  proceed, you  should  email Professor Verzani,   who  will add you to  a   "class." This will allow   you to   enroll at the  reduced rate,  and copy the   project  files over  for  use. Using   `cocalc` will require you to install  a  `Julia` package.  Directions are in the file `00-getting-started.ipynb`.
+
+##### Installing `Julia` on a personal laptop or computer.
+
+This is not terribly difficult, but does involve a few additional steps:
+
+a) install `Julia` from [julialang.org/](https://julialang.org/downloads/). This will install like any other software for you system
+
+b) open `Julia`. This will open a *terminal*, we will now add packages to make interactive usage more comfortable. First, run these two commands by copying over, being mindful of capitalizations, then entering:
+
+```verbatim
+using Pkg
+Pkg.add("IJulia")
+```
+
+Then run this command:
+
+```verbatim
+Pkg.add("https://github.com/mth229/MTH229.jl.git")
+```
+
+Then run these two commands:
+
+```verbatim
+using IJulia
+notebook()
+```
+
+These last two commands should cause a browser tab to open to a list of files. When doing this again, only the last two commands are needed (the packages do not need to be added more than once).
+
+c) The projects need to be copied over. Go to [github.com/mth229/229-projects](https://github.com/mth229/229-projects). Select the "Clone or download" button and then use the "Download ZIP" option. Unzip these files in the directory that is listed in the browser tab above.
+
+
+
+----
+
+This table covers pros and cons for the four approaches above:
+
+```verbatim
+                         Using Lab       Binder   CoCalc    Local Installation
+Setup ease                  ✓              ✓        ×              ×
+
+Speed                       ✓              ×        ✓              ✓
+
+Persistence of work         ×              ×        ✓              ✓
+
+Free                        ✓              ✓       $14             ✓
+
+Use at home                 ×              ✓        ✓              ✓
+```
+
+
+
+
 
 
 
 ### The projects
 
 Accompanying each set of notes is a "project" that is to be completed
-in the lab time. For the lab machines these are pre-loaded.
+in the lab time. At CSI, on the lab machines these are pre-loaded.
 
-The labs may be accessed without a login or any special privledges through  [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mth229/229-projects/master). (Note: this may be kinda slow, but should work.)
-
-
-
-For `juliabox.com` usage, the projects may be copied in all at once. This
-is completed by:
-
-* Clicking the "Git" menu item at the top of the juliabox page
-* Copying and pasting the "Git Clone URL": "`https://github.com/mth229/229-projects.git`" into the text box
-* Clicking the "+" button to the right (accepting the defaults for the
-other two text boxes.)
-* Waiting for it too happen
-
-If all goes to plan, a "folder" titled "229-projects" will contain the
-projects for your usage.
-
-
-```
-ImageFile("figures/sync-dialog.png")
-```
-
-Otherwise, each project individually comes as an "`ipynb`" file. These
-can be downloaded from this page, and then "uploaded" into juliabox
-using the "upload" button of the file manager.
+Otherwise, each project individually comes as an "`ipynb`" file.
 
 ## The projects for MTH 229
 
 See all projects at [https://github.com/mth229/229-projects](https://github.com/mth229/229-projects).
+
+
+The labs may be accessed without a login or any special privledges through  [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mth229/229-projects/master). (Note: this may be kinda slow, but should work.)
+
 
 
 * [Calculator](http://mth229.github.io/calculator.html)
@@ -323,12 +379,13 @@ action(function_object, args...)
 
 For example, the notes use:
 
-* `plot(f, a, b)` to plot `f` over `[a,b]`; `plot!(g)` to add a curve
+* `plot(f, a, b)` to plot `f` over `[a,b]`; `plot!(g)` to add a curve (using `Plots`)
 * `plot([f,g], a, b)` to plot both `f` and `g` over the interval `[a,b]`
-* `fzeros(f)` to find the real roots of a polynomial function `f` (from `Roots`)
-* `fzero(f, a, b)` to find a root inside the bracketing interval `[a,b]` (from `Roots`)
+* `fzero(f, a, b)` to find a zero inside the bracketing interval `[a,b]` (from `Roots`)
+* `fzeros(f, a, b)` to find all the real zeros of a function `f` in `[a,b]` (from `Roots`)
 * `limit(f, c)` to find the limit of `f` at `c` (from `SymPy`)
-* `f'` or `D(f)` to return a function that computes the derivative of `f` (from the `Roots` package)
+* `f'`  to return a function that computes the derivative of `f` (from the `ForwardDiff` package)
+* `diff(f)` to find a symbolic derivative of `f` (from `SymPy`)
 * `fzero(f, a)` to search for a zero of `f` starting at `a`
 * `quadgk(f, a, b)` to find the numeric integral of `f` over `(a,b)`
   (from the `QuadGK` package)
@@ -353,24 +410,6 @@ With just this basic set of actions, akin to buttons on the calculator, a rich v
 
 * A tutorial in `IJulia` format by Isaiah Norton is  [here](http://nbviewer.ipython.org/github/JuliaX/JuliaTutorial/blob/master/JuliaTutorial.ipynb?create=1), with the original file found [here](https://github.com/JuliaX/JuliaTutorial/blob/master/JuliaTutorial.ipynb).
 
-
-Before starting out with `Julia` it must be available.
-
-We recommend taking advantage of the free web service at
-[juliabox.com](juliabox.com), but `Julia` can be easily installed on a local
-computer, as described in the following.
-
-
-### Downloading `julia`
-
-In order to get started with `Julia` it needs to be installed. If this
-is not done already, you have a bit of work to do to get `julia` and the notebook interface provided by `IJulia`.
-
-First to install `julia` you can download a copy or install it from
-source. Likely a download is easiest. Official releases are available
-from [julialang.org](http://julialang.org/). Download the latest
-released version. Installation is hopefully similar to what you do for
-other software on your system.
 
 
 ### Starting `julia`
@@ -416,7 +455,8 @@ If you get `4`, you are able to use `julia`.
 One command that the notes assume you have typed is the one to install the add-on `MTH229` package. If you haven't done so, try this:
 
 ```verbatim
-] add https://github.com/mth229/MTH229.jl
+using Pkg
+Pkg.add("https://github.com/mth229/MTH229.jl")
 ```
 
 This may take a while to complete.
@@ -489,7 +529,7 @@ package:
 * Call `Pkg.udpate()` to update the currently installed external
   packages and to update the list of available packages to
   install. Though this command can be a bit slow, it is a good idea to
-  run it periodically.
+  run it periodically. You must first load the `Pkg` module with the command `using Pkg`.
 
 * To add a new package, call `Pkg.add("package_name")`, where you have
   to put the appropriate package name in. For example, the command
