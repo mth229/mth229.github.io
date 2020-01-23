@@ -79,7 +79,7 @@ Pkg.add("IJulia")
 Then run this command:
 
 ```verbatim
-Pkg.add("https://github.com/mth229/MTH229.jl.git")
+Pkg.add(PackageSpec(url="https://github.com/mth229/MTH229.jl.git"))
 ```
 
 Then run these two commands:
