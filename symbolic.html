@@ -20,6 +20,12 @@ body { padding-top: 60px; }
 h5:before {content:"\2746\ ";}
 h6:before {content:"\2742\ ";}
 pre {display: block;}
+th, td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+tr:hover {background-color: #f5f5f5;}
 </style>
 
 <script src="https://code.jquery.com/jquery.js"></script>
@@ -104,15 +110,14 @@ $( document ).ready(function() {
 <div class="container-fluid">
   <div class="span10 offset1">
 <h1>Symbolic math with julia</h1><h2>Introduction</h2><p>The <code>julia</code> language bills itself as "fresh approach to technical computing." By saying "fresh" the implication is that there exists many older approaches to technical computing. Indeed there are. For mathematical areas there are three different philosophies for computing: symbolic, numeric, and general purpose. The symbolic approach is the domain of Computer Algebra Systems (CAS), and is exemplified by very comprehensive programs like <code>Mathematica</code>, <code>Maple</code>, and the open-source alternative <code>Sage</code>.  The numeric approach is the domain of tailored programming languages such as <code>MATLAB</code> and <code>R</code>. A general purpose approach would be to leverage a widely used programming language, such as <code>Python</code> or <code>Haskell</code>, for a specific use.  The <code>julia</code> language is an alternative approach to <code>MATLAB</code> or <code>R</code> for numerical computation.</p><p>One strength of <code>julia</code> is how well it plays with others. This is leveraged in the <code>SymPy</code> package for <code>julia</code> to provide a symbolic math interface through a connection to <code>Python</code> and its SymPy library via <code>julia</code>'s <code>PyCall</code> package. We see in this project how this additional functionality affords an alternative approach to performing calculus problems.</p><p>The <code>SymPy</code> package for <code>julia</code> is an add on, it is loaded into a session with the command</p><pre class="sourceCode julia">using SymPy  # also loaed with the MTH229 package</pre>
-<p>If the package is not already installed, it can be installed through the command</p><pre class="sourceCode julia">Pkg.add("SymPy")</pre>
-<p>The package itself requires a version of <code>Python</code> that works with <code>julia</code>'s <code>PyCall</code> package <em>and</em> a version of sympy installed for <code>Python</code>.</p><h2>About</h2><p>The <code>SymPy</code> program extends <code>julia</code> by providing a type for <em>symbolic expressions</em>. Such an expression is encapsulated by a symbolic variable <code>x</code> instantiated through:</p><pre class="sourceCode julia">using SymPy
+<p>This is also loaded with the <code>MTH229</code> package.</p><h2>About</h2><p>The <code>SymPy</code> program extends <code>julia</code> by providing a type for <em>symbolic expressions</em>. Such an expression is encapsulated by a symbolic variable <code>x</code> instantiated through:</p><pre class="sourceCode julia">using SymPy
 x = Sym("x")</pre>
 <div class="well well-sm">
 \begin{equation*}x\end{equation*}</div>
 
 <p>The "x" on the right-hand side is a character argument to the <code>Sym</code> constructor which returns a symbolic object stored as <code>x</code>:</p><pre class="sourceCode julia">x |> typeof</pre>
 <pre class="output">
-SymPy.Sym</pre>
+Sym</pre>
 
 <p>That was painless. The type is <code>Sym</code>.</p><div class="alert alert-success" role="alert">
 
@@ -121,13 +126,13 @@ SymPy.Sym</pre>
 
 </div>
 <p>The <code>@vars</code> macro can simplify variable creation:</p><pre class="sourceCode julia">@vars a b c</pre>
-<p>The <code>symbols</code> function can place assumptions on the created variables and create more than one at a time:</p><pre class="sourceCode julia">h, y = symbols("h, y", real=true)</pre>
+<p>The <code>symbols</code> function or <code>@vars</code> can place assumptions on the created variables and create more than one at a time:</p><pre class="sourceCode julia">h, y = symbols("h, y", real=true)</pre>
 <pre class="output">
 (h, y)</pre>
 
 <p>Most of the typical math functions have been overloaded to work with these symbolic expressions: the functions accept a symbolic expression and return a newly computed one. For example, the expression <code>x^2 -2x &#43;2</code> when evaluated becomes a new symbolic expression:</p><pre class="sourceCode julia">x^2 - 2x + 2 |> typeof</pre>
 <pre class="output">
-SymPy.Sym</pre>
+Sym</pre>
 
 <p>Similarly, when working with mathematical functions a symbolic expression is returned:</p><pre class="sourceCode julia">f(x) = exp(-x^2/2)             ## a julia function
 f(x)                           ## takes a symbolic object and returns a new one</pre>
@@ -157,7 +162,7 @@ ex(1)</pre>
 
 <p>However, not everything is as simplified as possible. The <code>simplify</code> function can be called to (sometimes) go further:</p><pre class="sourceCode julia">sin(x)^2 + cos(x)^2		# not simplified</pre>
 <div class="well well-sm">
-\begin{equation*}\sin^{2}{\left (x \right )} + \cos^{2}{\left (x \right )}\end{equation*}</div>
+\begin{equation*}\sin^{2}{\left(x \right)} + \cos^{2}{\left(x \right)}\end{equation*}</div>
 
 <pre class="sourceCode julia">simplify(sin(x)^2 + cos(x)^2)	# 1</pre>
 <div class="well well-sm">
@@ -179,7 +184,7 @@ ex(1)</pre>
 <div class="well well-sm">
 \begin{equation*}\left(x - 3\right) \left(x - 2\right) \left(x - 1\right) \left(x^{2} + x + 1\right)\end{equation*}</div>
 
-<p>From this we can see clearly the linear terms correspond to roots. The <code>roots</code> function returns a dictionary of roots and their multiplicities.</p><pre class="sourceCode julia">roots(p)</pre>
+<p>From this we can see clearly the linear terms correspond to roots. The <code>roots</code> function returns a dictionary of roots and their multiplicities. The <code>roots</code> function is not <em>exported</em>, so needs to be qualified with the <code>sympy</code> module:</p><pre class="sourceCode julia">sympy.roots(p)</pre>
 <pre class="output">
 Dict{Any,Any} with 5 entries:
   1 => 1
@@ -188,7 +193,7 @@ Dict{Any,Any} with 5 entries:
   -1/2 + sqrt(3)*I/2 => 1
   2 => 1</pre>
 
-<p>If the multiplicities are not of interest, we can get just the keys different ways, here is one:</p><pre class="sourceCode julia">Sym[k for (k,v) in roots(p)]</pre>
+<p>If the multiplicities are not of interest, we can get just the keys different ways, here is one:</p><pre class="sourceCode julia">[k for (k,v) in sympy.roots(p)]</pre>
 <div class="well well-sm">
 \[ \left[ \begin{array}{r}1\\- \frac{1}{2} - \frac{\sqrt{3} i}{2}\\3\\- \frac{1}{2} + \frac{\sqrt{3} i}{2}\\2\end{array} \right] \]</div>
 
@@ -197,20 +202,20 @@ factor(q)</pre>
 <div class="well well-sm">
 \begin{equation*}x^{2} - 8 x + 8\end{equation*}</div>
 
-<p>However, <code>roots</code> will work</p><pre class="sourceCode julia">roots(q)</pre>
+<p>However, <code>roots</code> will work</p><pre class="sourceCode julia">sympy.roots(q)</pre>
 <pre class="output">
 Dict{Any,Any} with 2 entries:
   2*sqrt(2) + 4 => 1
-  -2*sqrt(2) + 4 => 1</pre>
+  4 - 2*sqrt(2) => 1</pre>
 
 <p>The basic theorem is that for each linear factor over the complex numbers there corresponds a root and vice versa after accounting for multiplicity.</p><p>The <code>real_roots</code> function tries to return the real roots (omitting the non-real roots). Here we see that it fails for some polynomials when <code>roots</code> does not:</p><pre class="sourceCode julia">q = x^4 - 8x^2 + 8
-real_roots(q)			# should find 4</pre>
+sympy.real_roots(q)			# should find 4</pre>
 <div class="well well-sm">
 \[ \left[ \begin{array}{r}\operatorname{CRootOf} {\left(x^{4} - 8 x^{2} + 8, 0\right)}\\\operatorname{CRootOf} {\left(x^{4} - 8 x^{2} + 8, 1\right)}\\\operatorname{CRootOf} {\left(x^{4} - 8 x^{2} + 8, 2\right)}\\\operatorname{CRootOf} {\left(x^{4} - 8 x^{2} + 8, 3\right)}\end{array} \right] \]</div>
 
-<p>("Fails" is unfair, the above does actually find the roots, just not symbolically. Just call <code>N</code> on the output to get numeric approximations, as with <code>N&#40;real_roots&#40;q&#41;&#41;</code>.)</p><p>The <code>solve</code> function is used to solve an equation of the type <code>expr &#61; 0</code> for a variable. The above <code>q</code> can be solved:</p><pre class="sourceCode julia">solve(q)</pre>
+<p>("Fails" is unfair, the above does actually find the roots, just not symbolically. Just call <code>N</code> on the output to get numeric approximations, as with <code>N&#40;sympy.real_roots&#40;q&#41;&#41;</code>.)</p><p>The <code>solve</code> function is used to solve an equation of the type <code>expr &#61; 0</code> for a variable. The above <code>q</code> can be solved:</p><pre class="sourceCode julia">solve(q)</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}- \sqrt{- 2 \sqrt{2} + 4}\\\sqrt{- 2 \sqrt{2} + 4}\\- \sqrt{2 \sqrt{2} + 4}\\\sqrt{2 \sqrt{2} + 4}\end{array} \right] \]</div>
+\[ \left[ \begin{array}{r}- \sqrt{4 - 2 \sqrt{2}}\\\sqrt{4 - 2 \sqrt{2}}\\- \sqrt{2 \sqrt{2} + 4}\\\sqrt{2 \sqrt{2} + 4}\end{array} \right] \]</div>
 
 <p>If it isn't clear which of these are real, they can be converted to numeric values via <code>N</code>:</p><pre class="sourceCode julia">as = solve(q)
 N.(as)			# all are real</pre>
@@ -223,9 +228,9 @@ N.(as)			# all are real</pre>
 
 <p>One could also try converting to complex (<code>complex&#40;as&#41;</code>) and seeing which have <code>0.0im</code> for an imaginary part.</p><p>The <code>solve</code> function solves for when an expression is 0. Sometimes, the problem is to find when <code>f&#40;x&#41; &#61; g&#40;x&#41;</code>, for example, <code>2x^2 &#61; exp&#40;x&#41;</code>. Here we see:</p><pre class="sourceCode julia">solve(exp(x) - 2x^2, x)</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}- 2 \operatorname{LambertW}{\left (- \frac{\sqrt{2}}{4} \right )}\\- 2 \operatorname{LambertW}{\left (- \frac{\sqrt{2}}{4},-1 \right )}\end{array} \right] \]</div>
+\[ \left[ \begin{array}{r}- 2 W\left(- \frac{\sqrt{2}}{4}\right)\\- 2 W\left(\frac{\sqrt{2}}{4}\right)\\- 2 W_{-1}\left(- \frac{\sqrt{2}}{4}\right)\end{array} \right] \]</div>
 
-<p>We could also have used <code>nsolve</code>, a numeric solver. The second zero above can be found with <code>nsolve</code>, which is a numeric algorithm to find a zero starting with an initial guess (which often comes from making a simple plot):</p><pre class="sourceCode julia">nsolve(exp(x) - 2x^2, x, 3)	# 2.617...</pre>
+<p>We could also have used <code>nsolve</code>, a numeric solver. The second zero above can be found with <code>nsolve</code>, which is a numeric algorithm to find a zero starting with an initial guess (which often comes from making a simple plot):</p><pre class="sourceCode julia">sympy.nsolve(exp(x) - 2x^2, x, 3)	# 2.617...</pre>
 <div class="well well-sm">
 \begin{equation*}2.617866613066812769178978059143202817320274359410482919210508161040370325332\end{equation*}</div>
 
@@ -235,9 +240,9 @@ N.(as)			# all are real</pre>
 
 <p>SymPy introduced the <code>solveset</code> function for such scenarios. The answer now will be an infinite set, suitably described.</p><p>To solve an expression in another variable, we specify it through the second argument:</p><pre class="sourceCode julia">out = solve(x^2 + y^2 - 1, y)</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}- \sqrt{- x^{2} + 1}\\\sqrt{- x^{2} + 1}\end{array} \right] \]</div>
+\[ \left[ \begin{array}{r}- \sqrt{1 - x^{2}}\\\sqrt{1 - x^{2}}\end{array} \right] \]</div>
 
-<p>This returns a vector of two symbolic answers, as the expression being solved is a quadratic.  We can then evaluate these two values at a point, say $x=1/2$, as before:</p><pre class="sourceCode julia">subs.(out, x, 1//2)</pre>
+<p>This returns a vector of two symbolic answers, as the expression being solved is a quadratic.  We can then evaluate these two values at a point, say $x=1/2$, as before:</p><pre class="sourceCode julia">subs.(out, x => 1//2)</pre>
 <div class="well well-sm">
 \[ \left[ \begin{array}{r}- \frac{\sqrt{3}}{2}\\\frac{\sqrt{3}}{2}\end{array} \right] \]</div>
 
@@ -250,89 +255,89 @@ Dict{Any,Any} with 2 entries:
   x => 0
   y => 1</pre>
 
-<h3>Practice</h3><h4>Question</h4><p>What is the coefficient of $x^3$ in $(x-1)(x-2)(x-3)(x-4)(x-5)$?</p><form name='WeaveQuestion' data-id='GGxi7EVC' data-controltype='numeric'>
+<h3>Practice</h3><h4>Question</h4><p>What is the coefficient of $x^3$ in $(x-1)(x-2)(x-3)(x-4)(x-5)$?</p><form name='WeaveQuestion' data-id='vZ7LbsmN' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="GGxi7EVC" type="number" class="form-control">
+<input id="vZ7LbsmN" type="number" class="form-control">
 
 </div>
-  
-<div id='GGxi7EVC_message'></div>
+
+<div id='vZ7LbsmN_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#GGxi7EVC').on('change', function() {
+$('#vZ7LbsmN').on('change', function() {
   correct = Math.abs(this.value - 85) <= 0;
 
   if(correct) {
-     $('#GGxi7EVC_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#vZ7LbsmN_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#GGxi7EVC_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#vZ7LbsmN_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h3>Question <small>Horner's method</small></h3><p>Expand $(((1x + 2)x + 3)x + 4)$. What do you get?</p><form name="WeaveQuestion" data-id="XutK3u3L" data-controltype="radio">
+<h3>Question <small>Horner's method</small></h3><p>Expand $(((1x + 2)x + 3)x + 4)$. What do you get?</p><form name="WeaveQuestion" data-id="hoBzwxmN" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_XutK3u3L" value="1"><div class="markdown"><p>(1+2+3+4)x</p>
+      <input type="radio" name="radio_hoBzwxmN" value="1"><div class="markdown"><p>(1+2+3+4)x</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_XutK3u3L" value="2"><div class="markdown"><p>1x^3 + 2x^2 + 3x + 4</p>
+      <input type="radio" name="radio_hoBzwxmN" value="2"><div class="markdown"><p>1x^3 + 2x^2 + 3x + 4</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_XutK3u3L" value="3"><div class="markdown"><p>4x^3 + 3x^2 + 2x + 1</p>
+      <input type="radio" name="radio_hoBzwxmN" value="3"><div class="markdown"><p>4x^3 + 3x^2 + 2x + 1</p>
 </div>
     </label>
     </div>
 
-<div id="XutK3u3L_message"></div>
+<div id="hoBzwxmN_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_XutK3u3L']").on("change", function() {
+$("input:radio[name='radio_hoBzwxmN']").on("change", function() {
   correct = this.value == 2;
 
   if(correct) {
-     $("#XutK3u3L_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#hoBzwxmN_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#XutK3u3L_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#hoBzwxmN_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<p>(Horner's method is an alternate way of evaluating $a_n x^n + a_{n-1}x^{n-1} + \cdots a_1 x + a_0$ expressed in terms of the coefficients, which are 1,2,3,4 in the example.)</p><h4>Question</h4><p>Find the largest root of $x^3 - 6x^2 + 11x - 6$.</p><form name='WeaveQuestion' data-id='WzGxfMOT' data-controltype='numeric'>
+<p>(Horner's method is an alternate way of evaluating $a_n x^n + a_{n-1}x^{n-1} + \cdots a_1 x + a_0$ expressed in terms of the coefficients, which are 1,2,3,4 in the example.)</p><h4>Question</h4><p>Find the largest root of $x^3 - 6x^2 + 11x - 6$.</p><form name='WeaveQuestion' data-id='tqcBZNzG' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="WzGxfMOT" type="number" class="form-control">
+<input id="tqcBZNzG" type="number" class="form-control">
 
 </div>
-  
-<div id='WzGxfMOT_message'></div>
+
+<div id='tqcBZNzG_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#WzGxfMOT').on('change', function() {
+$('#tqcBZNzG').on('change', function() {
   correct = Math.abs(this.value - 3) <= 0.01;
 
   if(correct) {
-     $('#WzGxfMOT_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#tqcBZNzG_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#WzGxfMOT_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#tqcBZNzG_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -345,106 +350,666 @@ $('#WzGxfMOT').on('change', function() {
 </div>
 
 
-<p>Solve for $x$ using <code>solve&#40;x^2 - &#40;3^2 &#43; 4^2&#41;&#41;</code> not the picture. What do you get</p><form name="WeaveQuestion" data-id="iaxfvPPn" data-controltype="radio">
+<p>Solve for $x$ using <code>solve&#40;x^2 - &#40;3^2 &#43; 4^2&#41;&#41;</code> not the picture. What do you get</p><form name="WeaveQuestion" data-id="hQ1mjDsY" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_iaxfvPPn" value="1"><div class="markdown"><p>The value 5</p>
+      <input type="radio" name="radio_hQ1mjDsY" value="1"><div class="markdown"><p>The value 5</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_iaxfvPPn" value="2"><div class="markdown"><p>Same as the picture</p>
+      <input type="radio" name="radio_hQ1mjDsY" value="2"><div class="markdown"><p>Same as the picture</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_iaxfvPPn" value="3"><div class="markdown"><p>two answers -5 and 5</p>
+      <input type="radio" name="radio_hQ1mjDsY" value="3"><div class="markdown"><p>two answers -5 and 5</p>
 </div>
     </label>
     </div>
 
-<div id="iaxfvPPn_message"></div>
+<div id="hQ1mjDsY_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_iaxfvPPn']").on("change", function() {
+$("input:radio[name='radio_hQ1mjDsY']").on("change", function() {
   correct = this.value == 3;
 
   if(correct) {
-     $("#iaxfvPPn_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#hQ1mjDsY_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#iaxfvPPn_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#hQ1mjDsY_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question</h4><p>The Soviet historian I. Y. Depman claimed that in 1486, Spanish mathematician Valmes was burned at the stake for claiming to have solved the <a href="https://en.wikipedia.org/wiki/Quartic_function">quartic equation</a>. Here we don't face such consequences.</p><p>Find the largest root of $x^4 - 10x^3 + 32x^2 - 38x + 15$.</p><form name='WeaveQuestion' data-id='1AfClJHN' data-controltype='numeric'>
+<h4>Question</h4><p>The Soviet historian I. Y. Depman claimed that in 1486, Spanish mathematician Valmes was burned at the stake for claiming to have solved the <a href="https://en.wikipedia.org/wiki/Quartic_function">quartic equation</a>. Here we don't face such consequences.</p><p>Find the largest root of $x^4 - 10x^3 + 32x^2 - 38x + 15$.</p><form name='WeaveQuestion' data-id='PzM6Gd51' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="1AfClJHN" type="number" class="form-control">
+<input id="PzM6Gd51" type="number" class="form-control">
 
 </div>
-  
-<div id='1AfClJHN_message'></div>
+
+<div id='PzM6Gd51_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#1AfClJHN').on('change', function() {
+$('#PzM6Gd51').on('change', function() {
   correct = Math.abs(this.value - 5) <= 0;
 
   if(correct) {
-     $('#1AfClJHN_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#PzM6Gd51_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#1AfClJHN_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#PzM6Gd51_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Solve $e^x = x^4$ using <code>SymPy</code>. (You will need to convert to numeric with <code>N</code>.) What is the smallest value?</p><form name='WeaveQuestion' data-id='1fGWBYSR' data-controltype='numeric'>
+<h4>Question</h4><p>Solve $e^x = x^4$ using <code>SymPy</code>. (You will need to convert to numeric with <code>N</code>.) What is the smallest value?</p><form name='WeaveQuestion' data-id='Tw3TknQe' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="1fGWBYSR" type="number" class="form-control">
+<input id="Tw3TknQe" type="number" class="form-control">
 
 </div>
-  
-<div id='1fGWBYSR_message'></div>
+
+<div id='Tw3TknQe_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#1fGWBYSR').on('change', function() {
-  correct = Math.abs(this.value - 1.42961182472555561227524441622361901326636222030404817451048179435868561038458) <= 0.01;
+$('#Tw3TknQe').on('change', function() {
+  correct = Math.abs(this.value - -0.8155534188089606577727273253085594805974099088406385398936250403272774562683745) <= 0.01;
 
   if(correct) {
-     $('#1fGWBYSR_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#Tw3TknQe_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#1fGWBYSR_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#Tw3TknQe_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h2>Graphing expressions</h2><p>Plotting a symbolic expression is done by coercing the expression into a function. For simple plots, this happens behind the scenes:</p><pre class="sourceCode julia">using Plots
 ex = x^2 - 2x + 4
 plot(ex, -1, 3)          # plot of a symbolic expression</pre>
-    <div id="640b07ee-5221-481a-bd1e-12870ebe309f" style="width:600px;height:400px;"></div>
+    <div id="3c39accd-bf58-4886-8670-04412f0046ac" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('640b07ee-5221-481a-bd1e-12870ebe309f');
-    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[-0.9804683619604238,-0.9609367239208474,-0.7803385276236781,-0.5997403313265086,-0.49120834305200656,-0.3826763547775045,-0.2909139399572208,-0.19915152513693707,0.0002078801322057279,0.18399961813851265,0.282521701882236,0.3810437856259594,0.49519128149004427,0.6093387773541291,0.8122204244440858,0.99012934616088,1.1840978266212778,1.3792191150112483,1.4870848827544327,1.5949506504976172,1.6975822067384956,1.800213762979374,2.013639774045402,2.1932990146673808,2.3029707993064186,2.4126425839454564,2.515737296230145,2.618832008514834,2.783997732289537,2.9491634560642397,2.9745817280321196],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[6.922254932726204,6.845272835221426,6.169605272941246,5.559169127672647,5.223702322387911,4.911793902060808,4.6664588003758745,4.437964380238243,3.9995842829497383,3.6658566231980934,3.514775108269963,3.3831067953122433,3.2548318422836635,3.152616190879167,3.035261168995959,3.0000974298072114,3.0338920097666784,3.143807137189914,3.2372516830078992,3.353966276527538,3.486620935158149,3.6403420664616095,4.027465591526814,4.423962538406142,4.697732903845207,4.995559069976096,5.297459551183071,5.620617071792172,6.182647908814211,6.799238178456291,6.898973000678312],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-1.0,0.0,1.0,2.0,3.0],"visible":true,"ticks":"inside","range":[-1.0991198646602,3.093233230731896],"domain":[0.02137649460484106,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-1","0","1","2","3"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[3.0,4.0,5.0,6.0,7.0],"visible":true,"ticks":"inside","range":[2.8824327047196414,7.039919657813774],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["3","4","5","6","7"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('3c39accd-bf58-4886-8670-04412f0046ac');
+    Plotly.plot(PLOT, [
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            -1.0,
+            -0.9804683619604238,
+            -0.9609367239208474,
+            -0.7803385276236781,
+            -0.5997403313265086,
+            -0.49120834305200656,
+            -0.3826763547775045,
+            -0.2909139399572208,
+            -0.19915152513693707,
+            -0.09947182250236566,
+            0.0002078801322057279,
+            0.0921037491353592,
+            0.18399961813851265,
+            0.282521701882236,
+            0.3810437856259594,
+            0.49519128149004427,
+            0.6093387773541291,
+            0.7107796008991074,
+            0.8122204244440858,
+            0.9011748853024829,
+            0.99012934616088,
+            1.0871135863910788,
+            1.1840978266212778,
+            1.281658470816263,
+            1.3792191150112483,
+            1.4870848827544327,
+            1.5949506504976172,
+            1.6975822067384956,
+            1.800213762979374,
+            1.9069267685123878,
+            2.013639774045402,
+            2.1034693943563916,
+            2.1932990146673808,
+            2.3029707993064186,
+            2.4126425839454564,
+            2.515737296230145,
+            2.618832008514834,
+            2.783997732289537,
+            2.9491634560642397,
+            2.9745817280321196,
+            3.0
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y1",
+        "zmin": -0.1,
+        "legendgroup": "y1",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(0, 154, 250, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            7.0,
+            6.922254932726204,
+            6.845272835221426,
+            6.169605272941246,
+            5.559169127672647,
+            5.223702322387911,
+            4.911793902060808,
+            4.6664588003758745,
+            4.437964380238243,
+            4.208838288476674,
+            3.9995842829497383,
+            3.824275602334071,
+            3.6658566231980934,
+            3.514775108269963,
+            3.3831067953122433,
+            3.2548318422836635,
+            3.152616190879167,
+            3.0836484392560797,
+            3.035261168995959,
+            3.009766403294977,
+            3.0000974298072114,
+            3.0075887769339156,
+            3.0338920097666784,
+            3.079331494182556,
+            3.143807137189914,
+            3.2372516830078992,
+            3.353966276527538,
+            3.486620935158149,
+            3.6403420664616095,
+            3.8225161634443223,
+            4.027465591526814,
+            4.217644704281263,
+            4.423962538406142,
+            4.697732903845207,
+            4.995559069976096,
+            5.297459551183071,
+            5.620617071792172,
+            6.182647908814211,
+            6.799238178456291,
+            6.898973000678312,
+            7.0
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    }
+]
+, {
+    "showlegend": true,
+    "xaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            -1.0,
+            0.0,
+            1.0,
+            2.0,
+            3.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            -1.12,
+            3.12
+        ],
+        "domain": [
+            0.02137649460484106,
+            0.9934383202099737
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "-1",
+            "0",
+            "1",
+            "2",
+            "3"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "y1"
+    },
+    "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "annotations": [],
+    "height": 400,
+    "margin": {
+        "l": 0,
+        "b": 20,
+        "r": 0,
+        "t": 20
+    },
+    "plot_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "yaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            3.0,
+            4.0,
+            5.0,
+            6.0,
+            7.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            2.8801003527014277,
+            7.119997077105784
+        ],
+        "domain": [
+            0.03762029746281716,
+            0.9901574803149606
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "x1"
+    },
+    "legend": {
+        "tracegroupgap": 0,
+        "bordercolor": "rgba(0, 0, 0, 1.000)",
+        "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "font": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "y": 1.0,
+        "x": 1.0
+    },
+    "width": 600
+}
+);
     </script>
 <p>This is similar to how functions can be used as well. The following is similar, but different:</p><pre class="sourceCode julia">f(x) = x^2 - 2x + 4
 plot(f, -1, 3)           # plot of a function object</pre>
-    <div id="1cce6b95-ea4c-4413-9def-a121ad771cef" style="width:600px;height:400px;"></div>
+    <div id="e16ebc91-f8c7-4f3a-91a8-1697c2290570" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('1cce6b95-ea4c-4413-9def-a121ad771cef');
-    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[-0.9804683619604238,-0.9609367239208474,-0.7803385276236781,-0.5997403313265086,-0.49120834305200656,-0.3826763547775045,-0.2909139399572208,-0.19915152513693707,0.0002078801322057279,0.18399961813851265,0.282521701882236,0.3810437856259594,0.49519128149004427,0.6093387773541291,0.8122204244440858,0.99012934616088,1.1840978266212778,1.3792191150112483,1.4870848827544327,1.5949506504976172,1.6975822067384956,1.800213762979374,2.013639774045402,2.1932990146673808,2.3029707993064186,2.4126425839454564,2.515737296230145,2.618832008514834,2.783997732289537,2.9491634560642397,2.9745817280321196],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[6.922254932726204,6.845272835221426,6.169605272941245,5.559169127672647,5.223702322387911,4.911793902060808,4.666458800375875,4.437964380238242,3.999584282949738,3.6658566231980934,3.514775108269963,3.3831067953122433,3.2548318422836635,3.152616190879167,3.035261168995959,3.000097429807212,3.033892009766678,3.1438071371899143,3.2372516830078997,3.353966276527538,3.486620935158149,3.6403420664616095,4.027465591526814,4.423962538406141,4.697732903845207,4.995559069976096,5.297459551183071,5.6206170717921715,6.18264790881421,6.799238178456291,6.898973000678312],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-1.0,0.0,1.0,2.0,3.0],"visible":true,"ticks":"inside","range":[-1.0991198646602,3.093233230731896],"domain":[0.02137649460484106,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-1","0","1","2","3"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[3.0,4.0,5.0,6.0,7.0],"visible":true,"ticks":"inside","range":[2.882432704719642,7.039919657813774],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["3","4","5","6","7"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('e16ebc91-f8c7-4f3a-91a8-1697c2290570');
+    Plotly.plot(PLOT, [
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            -1.0,
+            -0.9804683619604238,
+            -0.9609367239208474,
+            -0.7803385276236781,
+            -0.5997403313265086,
+            -0.49120834305200656,
+            -0.3826763547775045,
+            -0.2909139399572208,
+            -0.19915152513693707,
+            -0.09947182250236566,
+            0.0002078801322057279,
+            0.0921037491353592,
+            0.18399961813851265,
+            0.282521701882236,
+            0.3810437856259594,
+            0.49519128149004427,
+            0.6093387773541291,
+            0.7107796008991074,
+            0.8122204244440858,
+            0.9011748853024829,
+            0.99012934616088,
+            1.0871135863910788,
+            1.1840978266212778,
+            1.281658470816263,
+            1.3792191150112483,
+            1.4870848827544327,
+            1.5949506504976172,
+            1.6975822067384956,
+            1.800213762979374,
+            1.9069267685123878,
+            2.013639774045402,
+            2.1034693943563916,
+            2.1932990146673808,
+            2.3029707993064186,
+            2.4126425839454564,
+            2.515737296230145,
+            2.618832008514834,
+            2.783997732289537,
+            2.9491634560642397,
+            2.9745817280321196,
+            3.0
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y1",
+        "zmin": -0.1,
+        "legendgroup": "y1",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(0, 154, 250, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            7.0,
+            6.922254932726204,
+            6.845272835221426,
+            6.169605272941245,
+            5.559169127672647,
+            5.223702322387911,
+            4.911793902060808,
+            4.666458800375875,
+            4.437964380238242,
+            4.208838288476674,
+            3.999584282949738,
+            3.8242756023340707,
+            3.6658566231980934,
+            3.514775108269963,
+            3.3831067953122433,
+            3.2548318422836635,
+            3.152616190879167,
+            3.0836484392560797,
+            3.035261168995959,
+            3.0097664032949774,
+            3.000097429807212,
+            3.007588776933916,
+            3.033892009766678,
+            3.079331494182556,
+            3.1438071371899143,
+            3.2372516830078997,
+            3.353966276527538,
+            3.486620935158149,
+            3.6403420664616095,
+            3.8225161634443223,
+            4.027465591526814,
+            4.217644704281262,
+            4.423962538406141,
+            4.697732903845207,
+            4.995559069976096,
+            5.297459551183071,
+            5.6206170717921715,
+            6.18264790881421,
+            6.799238178456291,
+            6.898973000678312,
+            7.0
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    }
+]
+, {
+    "showlegend": true,
+    "xaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            -1.0,
+            0.0,
+            1.0,
+            2.0,
+            3.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            -1.12,
+            3.12
+        ],
+        "domain": [
+            0.02137649460484106,
+            0.9934383202099737
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "-1",
+            "0",
+            "1",
+            "2",
+            "3"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "y1"
+    },
+    "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "annotations": [],
+    "height": 400,
+    "margin": {
+        "l": 0,
+        "b": 20,
+        "r": 0,
+        "t": 20
+    },
+    "plot_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "yaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            3.0,
+            4.0,
+            5.0,
+            6.0,
+            7.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            2.880100352701428,
+            7.119997077105784
+        ],
+        "domain": [
+            0.03762029746281716,
+            0.9901574803149606
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "x1"
+    },
+    "legend": {
+        "tracegroupgap": 0,
+        "bordercolor": "rgba(0, 0, 0, 1.000)",
+        "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "font": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "y": 1.0,
+        "x": 1.0
+    },
+    "width": 600
+}
+);
     </script>
 <p>Graphing more than one expression at a time is, of course, possible. For example, to graph a function and its tangent line at a point we can do this.</p><pre class="sourceCode julia">f(x) = sqrt(x);
 c = 2;
@@ -452,33 +1017,343 @@ fp = diff(f(x));		# diff finds derivative, fp an expression (not function)
 m = fp(x=>c)	        # at c=2
 plot(f(x), 1, 3)
 plot!(f(c) + m * (x - c))</pre>
-    <div id="cb2d4ec3-2d77-4c8b-bf3b-739647497a8b" style="width:600px;height:400px;"></div>
+    <div id="7ef2e83f-36fb-4e60-8d85-fbaeb1263a0d" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('cb2d4ec3-2d77-4c8b-bf3b-739647497a8b');
-    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[1.0195316380395762,1.2001298343367457,1.3086618226112479,1.4004242374315314,1.500103940066103,1.5919998090692564,1.6905218928129797,1.8046693886770646,1.9061102122220428,1.99506467308044,2.092048913310639,2.1896095575056242,2.2974753252488083,2.4001068814896866,2.506819887022701,2.5966495073336904,2.706321291972728,2.8094160042574168,2.97458172803212],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[1.0097185934900754,1.0955043744032908,1.1439675793532122,1.1833952160759869,1.2247873040108241,1.2617447479856043,1.3002007125105646,1.3433798378258714,1.3806195030572481,1.41246758301932,1.4463916873760851,1.479732934520829,1.5157424996511804,1.5492278339513808,1.5832939989220893,1.6114122710633956,1.6450900558853088,1.6761312610465258,1.724697575817894],"type":"scatter","hoverinfo":"text"},{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[0.9811183606144969,1.1682499761738312,1.2807082770986928,1.375790339295427,1.479076109446686,1.5742964537379018,1.676382726343294,1.7946596845358904,1.89977028687217,1.991942813026587,2.092435608249239,2.193525659742201,2.305293638576918,2.4116380502072636,2.5222115638747318,2.6152909097294192,2.7289302409163625,2.835754563977228,3.006895413435819],"showlegend":true,"mode":"lines","name":"y2","zmin":-0.1,"legendgroup":"y2","zmax":0.1,"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[1.0539845041551172,1.120145521323317,1.1599055349156604,1.1935221203899162,1.2300391546269316,1.2637046302045498,1.2997975780172153,1.3416147976152668,1.3787770074585597,1.411364916600001,1.4468944850811651,1.4826352155417506,1.5221511634185219,1.5597495907210774,1.5988432313880225,1.6317517497091512,1.671929320555047,1.7096974221710473,1.7702048497661451],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[1.0,1.5,2.0,2.5,3.0],"visible":true,"ticks":"inside","range":[0.9203450490298573,3.0676687250204586],"domain":[0.05100612423447069,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["1.0","1.5","2.0","2.5","3.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[1.0,1.2000000000000002,1.4000000000000001,1.6],"visible":true,"ticks":"inside","range":[0.9869040058017934,1.7930194374544273],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["1.0","1.2","1.4","1.6"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('7ef2e83f-36fb-4e60-8d85-fbaeb1263a0d');
+    Plotly.plot(PLOT, [
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            1.0,
+            1.0195316380395762,
+            1.2001298343367457,
+            1.3086618226112479,
+            1.4004242374315314,
+            1.500103940066103,
+            1.5919998090692564,
+            1.6905218928129797,
+            1.8046693886770646,
+            1.9061102122220428,
+            1.99506467308044,
+            2.092048913310639,
+            2.1896095575056242,
+            2.2974753252488083,
+            2.4001068814896866,
+            2.506819887022701,
+            2.5966495073336904,
+            2.706321291972728,
+            2.8094160042574168,
+            2.97458172803212,
+            3.0
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y1",
+        "zmin": -0.1,
+        "legendgroup": "y1",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(0, 154, 250, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            1.0,
+            1.0097185934900754,
+            1.0955043744032908,
+            1.1439675793532122,
+            1.1833952160759869,
+            1.2247873040108241,
+            1.2617447479856043,
+            1.3002007125105646,
+            1.3433798378258714,
+            1.3806195030572481,
+            1.41246758301932,
+            1.4463916873760851,
+            1.479732934520829,
+            1.5157424996511804,
+            1.5492278339513808,
+            1.5832939989220893,
+            1.6114122710633956,
+            1.6450900558853088,
+            1.6761312610465258,
+            1.724697575817894,
+            1.7320508075688772
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    },
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            0.94,
+            0.9607035363219507,
+            1.1521376243969503,
+            1.2671815319679227,
+            1.3644496916774234,
+            1.470110176470069,
+            1.5675197976134119,
+            1.6719532063817584,
+            1.7929495519976886,
+            1.9004768249553654,
+            1.9947685534652664,
+            2.0975718481092773,
+            2.200986130955962,
+            2.315323844763737,
+            2.424113294379068,
+            2.537229080244063,
+            2.632448477773712,
+            2.748700569491092,
+            2.857980964512862,
+            3.033056631714047,
+            3.06
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y2",
+        "zmin": -0.1,
+        "legendgroup": "y2",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(227, 111, 71, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            1.039446968344225,
+            1.0467667738081217,
+            1.114448944722169,
+            1.1551231083109856,
+            1.1895125959730477,
+            1.2268692186232166,
+            1.2613087204548517,
+            1.2982315062161138,
+            1.3410101744580216,
+            1.3790268063934568,
+            1.4123639667130325,
+            1.448710420098582,
+            1.4852728904347992,
+            1.5256973768242215,
+            1.564160255596498,
+            1.6041527252186896,
+            1.6378178660655458,
+            1.6789191872557856,
+            1.7175556414411048,
+            1.7794542371904634,
+            1.7889801564019654
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    }
+]
+, {
+    "showlegend": true,
+    "xaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            1.0,
+            1.5,
+            2.0,
+            2.5,
+            3.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            0.8764,
+            3.1236
+        ],
+        "domain": [
+            0.05100612423447069,
+            0.9934383202099737
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "1.0",
+            "1.5",
+            "2.0",
+            "2.5",
+            "3.0"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "y1"
+    },
+    "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "annotations": [],
+    "height": 400,
+    "margin": {
+        "l": 0,
+        "b": 20,
+        "r": 0,
+        "t": 20
+    },
+    "plot_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "yaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            1.0,
+            1.2000000000000002,
+            1.4000000000000001,
+            1.6,
+            1.8
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            0.9763305953079411,
+            1.8126495610940243
+        ],
+        "domain": [
+            0.03762029746281716,
+            0.9901574803149606
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "1.0",
+            "1.2",
+            "1.4",
+            "1.6",
+            "1.8"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "x1"
+    },
+    "legend": {
+        "tracegroupgap": 0,
+        "bordercolor": "rgba(0, 0, 0, 1.000)",
+        "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "font": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "y": 1.0,
+        "x": 1.0
+    },
+    "width": 600
+}
+);
     </script>
-<h3>Practice</h3><h4>Question</h4><p>Plot the expression <code>x^4 - 3x^3 &#43; 3x^2 - 3x &#43;2</code> over $[-1, 3]$. How many real roots are there?</p><form name='WeaveQuestion' data-id='tXjg0OXS' data-controltype='numeric'>
+<h3>Practice</h3><h4>Question</h4><p>Plot the expression <code>x^4 - 3x^3 &#43; 3x^2 - 3x &#43;2</code> over $[-1, 3]$. How many real roots are there?</p><form name='WeaveQuestion' data-id='ZONCN6K0' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="tXjg0OXS" type="number" class="form-control">
+<input id="ZONCN6K0" type="number" class="form-control">
 
 </div>
-  
-<div id='tXjg0OXS_message'></div>
+
+<div id='ZONCN6K0_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#tXjg0OXS').on('change', function() {
+$('#ZONCN6K0').on('change', function() {
   correct = Math.abs(this.value - 2) <= 0;
 
   if(correct) {
-     $('#tXjg0OXS_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#ZONCN6K0_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#tXjg0OXS_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#ZONCN6K0_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -502,7 +1377,7 @@ limit((1 - lambda *x)^(1/x), x, 0)</pre>
 <div class="well well-sm">
 \begin{equation*}0\end{equation*}</div>
 
-<p>We can even compute derivatives using limits. Here we do so symbolically:</p><pre class="sourceCode julia">h = Sym("h")
+<p>We can even compute derivatives using limits. Here we do so symbolically:</p><pre class="sourceCode julia">@vars h
 f(x) = x^10
 limit( (f(x+h) - f(x))/h, h, 0)</pre>
 <div class="well well-sm">
@@ -521,113 +1396,113 @@ limit(central_4th_difference(f, x, h), h, 0)</pre>
 <p>This limit matches the chain rule:</p><pre class="sourceCode julia">g(x) = sin(x)
 limit( (f(g(x+h)) - f(g(x)))/h, h, 0) |> subs(x, 1)</pre>
 <div class="well well-sm">
-\begin{equation*}10 \sin^{9}{\left (1 \right )} \cos{\left (1 \right )}\end{equation*}</div>
+\begin{equation*}10 \sin^{9}{\left(1 \right)} \cos{\left(1 \right)}\end{equation*}</div>
 
 <h3>Practice</h3><h4>Question</h4><p>Find</p>$$~
 \lim_{x \rightarrow 4} \frac{(3 - \sqrt(x + 5))}{(x-4)}
 ~$$
-<form name='WeaveQuestion' data-id='NIuz7w0g' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='qs6UVC2D' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="NIuz7w0g" type="number" class="form-control">
+<input id="qs6UVC2D" type="number" class="form-control">
 
 </div>
-  
-<div id='NIuz7w0g_message'></div>
+
+<div id='qs6UVC2D_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#NIuz7w0g').on('change', function() {
+$('#qs6UVC2D').on('change', function() {
   correct = Math.abs(this.value - -0.16666666666666666) <= 0.001;
 
   if(correct) {
-     $('#NIuz7w0g_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#qs6UVC2D_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#NIuz7w0g_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#qs6UVC2D_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h4>Question</h4><p>Compute</p>$$~
 \lim_{x \rightarrow 1} \frac{x^{1/4} - 1}{x^{1/3} - 1}.
 ~$$
-<form name='WeaveQuestion' data-id='FsxQdQeX' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='o3NhYX3l' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="FsxQdQeX" type="number" class="form-control">
+<input id="o3NhYX3l" type="number" class="form-control">
 
 </div>
-  
-<div id='FsxQdQeX_message'></div>
+
+<div id='o3NhYX3l_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#FsxQdQeX').on('change', function() {
+$('#o3NhYX3l').on('change', function() {
   correct = Math.abs(this.value - 0.75) <= 0.001;
 
   if(correct) {
-     $('#FsxQdQeX_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#o3NhYX3l_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#FsxQdQeX_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#o3NhYX3l_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h4>Question</h4><p>At <a href="http://mathoverflow.net/questions/51685/how-did-bernoulli-prove-lh&#37;C3&#37;B4pitals-rule">math overflow</a> we learn that L'Hopital was motivated by the following limit:</p>$$~
-\lim_{x \rightarrow a} \frac{(2a^3x-x^4)^(1/2) - a (a^2x)^(1/3)}{a - (ax^3)^(1/4)}
+\lim_{x \rightarrow a} \frac{(2a^3x-x^4)^{1/2} - a (a^2x)^{1/3}}{a - (ax^3)^{1/4}}
 ~$$
-<p>What did he find (with the help of a Bernoulli)?</p><p>You need to inform <code>SymPy</code> that $a > 0$. The following is a good start (though it is complicated enough the output is mis-formatted):</p><pre class="sourceCode julia">x = Sym("x")
-a = symbols("a", positive=true)
+<p>What did he find (with the help of a Bernoulli)?</p><p>You need to inform <code>SymPy</code> that $a > 0$. The following is a good start:</p><pre class="sourceCode julia">@vars x
+@vars a positive=true
 top = (2a^3*x-x^4)^(1//2) - a *(a^2*x)^(1//3) # rationals are converted exactly to SymPy
 bottom =  a - (a*x^3)^(1//4)
 ex = top/bottom</pre>
 <div class="well well-sm">
 \begin{equation*}\frac{- a^{\frac{5}{3}} \sqrt[3]{x} + \sqrt{2 a^{3} x - x^{4}}}{- \sqrt[4]{a} \sqrt[4]{x^{3}} + a}\end{equation*}</div>
 
-<p>Now find the limit.</p><form name="WeaveQuestion" data-id="qDa8ws5Y" data-controltype="radio">
+<p>Now find the limit.</p><form name="WeaveQuestion" data-id="pwYskO6y" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_qDa8ws5Y" value="1"><div class="markdown"><p>Does not exist</p>
+      <input type="radio" name="radio_pwYskO6y" value="1"><div class="markdown">$0$
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_qDa8ws5Y" value="2"><div class="markdown">$16a/9$
+      <input type="radio" name="radio_pwYskO6y" value="2"><div class="markdown">$9\sqrt{a}$
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_qDa8ws5Y" value="3"><div class="markdown">$9\sqrt{a}$
+      <input type="radio" name="radio_pwYskO6y" value="3"><div class="markdown">$16a/9$
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_qDa8ws5Y" value="4"><div class="markdown">$0$
+      <input type="radio" name="radio_pwYskO6y" value="4"><div class="markdown"><p>Does not exist</p>
 </div>
     </label>
     </div>
 
-<div id="qDa8ws5Y_message"></div>
+<div id="pwYskO6y_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_qDa8ws5Y']").on("change", function() {
-  correct = this.value == 2;
+$("input:radio[name='radio_pwYskO6y']").on("change", function() {
+  correct = this.value == 3;
 
   if(correct) {
-     $("#qDa8ws5Y_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#pwYskO6y_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#qDa8ws5Y_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#pwYskO6y_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -640,38 +1515,38 @@ f (generic function with 1 method)</pre>
 <p>Compute the following:</p>$$~
 \lim_{h->0} \frac{f(x+h) - 2f(x) + f(x-h)}{h^2}
 ~$$
-<p>Based on your answer, what do you think the above expression finds for any <code>f</code>?</p><form name="WeaveQuestion" data-id="wrHWmK1w" data-controltype="radio">
+<p>Based on your answer, what do you think the above expression finds for any <code>f</code>?</p><form name="WeaveQuestion" data-id="CGShYniO" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_wrHWmK1w" value="1"><div class="markdown"><p><code>f&#39;&#40;x&#41;</code></p>
+      <input type="radio" name="radio_CGShYniO" value="1"><div class="markdown"><p><code>f&#39;&#40;x&#41;</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_wrHWmK1w" value="2"><div class="markdown"><p><code>f&#39;&#39;&#40;x&#41;</code></p>
+      <input type="radio" name="radio_CGShYniO" value="2"><div class="markdown"><p><code>f&#39;&#39;&#40;x&#41;</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_wrHWmK1w" value="3"><div class="markdown"><p><code>f&#39;&#39;&#39;&#40;x&#41;</code></p>
+      <input type="radio" name="radio_CGShYniO" value="3"><div class="markdown"><p><code>f&#39;&#39;&#39;&#40;x&#41;</code></p>
 </div>
     </label>
     </div>
 
-<div id="wrHWmK1w_message"></div>
+<div id="CGShYniO_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_wrHWmK1w']").on("change", function() {
+$("input:radio[name='radio_CGShYniO']").on("change", function() {
   correct = this.value == 2;
 
   if(correct) {
-     $("#wrHWmK1w_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#CGShYniO_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#wrHWmK1w_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#CGShYniO_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -679,44 +1554,44 @@ $("input:radio[name='radio_wrHWmK1w']").on("change", function() {
 <h4>Question</h4><p>Define a symbolic quantity <code>a</code>. Compute the limit</p>$$~
 \lim_{x \rightarrow 0} \frac{\cos(ax) - 1}{\cos(x) - 1}
 ~$$
-<p>What is the answer?</p><form name="WeaveQuestion" data-id="qroVW2x3" data-controltype="radio">
+<p>What is the answer?</p><form name="WeaveQuestion" data-id="0rLjIwDo" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_qroVW2x3" value="1"><div class="markdown"><p>1</p>
+      <input type="radio" name="radio_0rLjIwDo" value="1"><div class="markdown"><p>1</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_qroVW2x3" value="2"><div class="markdown"><p>a</p>
+      <input type="radio" name="radio_0rLjIwDo" value="2"><div class="markdown"><p>a</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_qroVW2x3" value="3"><div class="markdown"><p>a^2</p>
+      <input type="radio" name="radio_0rLjIwDo" value="3"><div class="markdown"><p>a^2</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_qroVW2x3" value="4"><div class="markdown"><p>No limit exists</p>
+      <input type="radio" name="radio_0rLjIwDo" value="4"><div class="markdown"><p>No limit exists</p>
 </div>
     </label>
     </div>
 
-<div id="qroVW2x3_message"></div>
+<div id="0rLjIwDo_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_qroVW2x3']").on("change", function() {
+$("input:radio[name='radio_0rLjIwDo']").on("change", function() {
   correct = this.value == 3;
 
   if(correct) {
-     $("#qroVW2x3_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#0rLjIwDo_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#qroVW2x3_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#0rLjIwDo_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -730,54 +1605,54 @@ fxs = map(f, xs);
 [xs fxs]</pre>
 <pre class="output">
 9×2 Array{Float64,2}:
- 0.010000000000000002    0.000191087007486009 
- 0.0010000000000000002   5.60274947776528e-5  
+ 0.010000000000000002    0.000191087007486009
+ 0.0010000000000000002   5.60274947776528e-5
  0.00010000000000000002  1.2464663061530679e-5
  1.0000000000000003e-5   2.7321447178155326e-6
- 1.0000000000000004e-6   6.146316238971241e-7 
+ 1.0000000000000004e-6   6.146316238971241e-7
  1.0000000000000004e-7   1.4298053954169993e-7
  1.0000000000000005e-8   3.4385814272678787e-8
- 1.0000000000000005e-9   8.52991892929208e-9  
+ 1.0000000000000005e-9   8.52991892929208e-9
  1.0000000000000006e-10  2.1768694181535853e-9</pre>
 
-<p>It looks like the limit is $0$. What does <code>limit</code> compute for the <em>real</em> answer?</p><form name="WeaveQuestion" data-id="sATZe1VT" data-controltype="radio">
+<p>It looks like the limit is $0$. What does <code>limit</code> compute for the <em>real</em> answer?</p><form name="WeaveQuestion" data-id="hZfxb9Dl" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_sATZe1VT" value="1"><div class="markdown"><p><code>Inf</code></p>
+      <input type="radio" name="radio_hZfxb9Dl" value="1"><div class="markdown"><p><code>1</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_sATZe1VT" value="2"><div class="markdown"><p><code>0</code></p>
+      <input type="radio" name="radio_hZfxb9Dl" value="2"><div class="markdown"><p><code>0</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_sATZe1VT" value="3"><div class="markdown"><p><code>1</code></p>
+      <input type="radio" name="radio_hZfxb9Dl" value="3"><div class="markdown"><p><code>e &#61; 2.7182818284590455</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_sATZe1VT" value="4"><div class="markdown"><p><code>e &#61; 2.7182818284590455</code></p>
+      <input type="radio" name="radio_hZfxb9Dl" value="4"><div class="markdown"><p><code>Inf</code></p>
 </div>
     </label>
     </div>
 
-<div id="sATZe1VT_message"></div>
+<div id="hZfxb9Dl_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_sATZe1VT']").on("change", function() {
-  correct = this.value == 1;
+$("input:radio[name='radio_hZfxb9Dl']").on("change", function() {
+  correct = this.value == 4;
 
   if(correct) {
-     $("#sATZe1VT_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#hZfxb9Dl_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#sATZe1VT_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#hZfxb9Dl_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -786,28 +1661,28 @@ $("input:radio[name='radio_sATZe1VT']").on("change", function() {
 <pre class="output">
 f (generic function with 1 method)</pre>
 
-<p>This function has a limit at $\infty$. It can't be found numerically though (well, not easily). You can verify this by trying to evaluate the function at $10$, let alone for really large values. However, it can be computed symbolically. What is the answer?</p><form name='WeaveQuestion' data-id='GeU6Mh89' data-controltype='numeric'>
+<p>This function has a limit at $\infty$. It can't be found numerically though (well, not easily). You can verify this by trying to evaluate the function at $10$, let alone for really large values. However, it can be computed symbolically. What is the answer?</p><form name='WeaveQuestion' data-id='JdylB8w4' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="GeU6Mh89" type="number" class="form-control">
+<input id="JdylB8w4" type="number" class="form-control">
 
 </div>
-  
-<div id='GeU6Mh89_message'></div>
+
+<div id='JdylB8w4_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#GeU6Mh89').on('change', function() {
+$('#JdylB8w4').on('change', function() {
   correct = Math.abs(this.value - 0) <= 1.0e-8;
 
   if(correct) {
-     $('#GeU6Mh89_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#JdylB8w4_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#GeU6Mh89_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#JdylB8w4_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -826,28 +1701,582 @@ diff(f(x))		       ## not f, but the symbolic expression f(x)</pre>
 
 <p>Here we find and plot the derivative of $x^x$ avoiding the asymptote at $x=0$.</p><pre class="sourceCode julia">f(x) = x^x
 plot(diff(f(x)), 1/10, 2)</pre>
-    <div id="3130620d-e201-440d-8dc3-892422a27a7c" style="width:600px;height:400px;"></div>
+    <div id="b2d16cc7-c26e-4ad0-8ffd-05fcdf8511a7" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('3130620d-e201-440d-8dc3-892422a27a7c');
-    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[0.10463876403439937,0.10927752806879873,0.11391629210319809,0.11855505613759745,0.16144712775817516,0.2043391993787529,0.24723127099933062,0.29012334261990835,0.34167603705029687,0.3932287314806854,0.4368158785203201,0.4804030255599549,0.5750987430627976,0.6623998186157936,0.7559957981723308,0.8644359192432113,0.9608047016109407,1.045311439426418,1.137446467645107,1.230129079630343,1.332601558986368,1.4301015374152026,1.4807902150433843,1.531478892671566,1.574147962319286,1.6168170319670059,1.668911129670549,1.721005227374092,1.769975215709319,1.8189452040445462,1.8581720634410381,1.89739892283753,1.936625782234022,1.975852641630514,1.9818894812228853,1.9879263208152569,1.9939631604076284],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-0.9927512690814337,-0.9530226909663353,-0.9153039333176854,-0.8794272051430108,-0.613540564707753,-0.42504594951147995,-0.28133125806037507,-0.16582624471091137,-0.05119719345534388,0.04616501057415453,0.11961614731869574,0.18764731932733236,0.3250335444263125,0.4476840390956539,0.5829923339125594,0.7532360589821288,0.9238344657110802,1.093828450730358,1.306862875792399,1.5574032535170006,1.8871190233637982,2.2646899863661365,2.490485552927229,2.7395823368872696,2.9693259314873592,3.219311237265108,3.5548581846267657,3.927557641675184,4.315811141009099,4.745087208885262,5.121697298654907,5.530315533164967,5.973872381676866,6.455577986215799,6.533317407622909,6.612056506737441,6.69180898077738],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.5,1.0,1.5,2.0],"visible":true,"ticks":"inside","range":[0.0479590321432025,2.0506428922988253],"domain":[0.02137649460484106,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0.5","1.0","1.5","2.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.0,2.0,4.0,6.0],"visible":true,"ticks":"inside","range":[-1.223288076577198,6.9223457882731445],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0","2","4","6"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('b2d16cc7-c26e-4ad0-8ffd-05fcdf8511a7');
+    Plotly.plot(PLOT, [
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            0.1,
+            0.11855505613759745,
+            0.29012334261990835,
+            0.3932287314806854,
+            0.4804030255599549,
+            0.5750987430627976,
+            0.6623998186157936,
+            0.7559957981723308,
+            0.8644359192432113,
+            0.9608047016109407,
+            1.045311439426418,
+            1.137446467645107,
+            1.230129079630343,
+            1.332601558986368,
+            1.4301015374152026,
+            1.531478892671566,
+            1.6168170319670059,
+            1.668911129670549,
+            1.721005227374092,
+            1.769975215709319,
+            1.8189452040445462,
+            1.8581720634410381,
+            1.89739892283753,
+            1.936625782234022,
+            1.975852641630514,
+            1.9818894812228853,
+            1.9879263208152569,
+            1.9939631604076284,
+            2.0
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y1",
+        "zmin": -0.1,
+        "legendgroup": "y1",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(0, 154, 250, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            -1.0346801174961242,
+            -0.8794272051430108,
+            -0.16582624471091137,
+            0.04616501057415453,
+            0.18764731932733236,
+            0.3250335444263125,
+            0.4476840390956539,
+            0.5829923339125594,
+            0.7532360589821288,
+            0.9238344657110802,
+            1.093828450730358,
+            1.306862875792399,
+            1.5574032535170006,
+            1.8871190233637982,
+            2.2646899863661365,
+            2.7395823368872696,
+            3.219311237265108,
+            3.5548581846267657,
+            3.927557641675184,
+            4.315811141009099,
+            4.745087208885262,
+            5.121697298654907,
+            5.530315533164967,
+            5.973872381676866,
+            6.455577986215799,
+            6.533317407622909,
+            6.612056506737441,
+            6.69180898077738,
+            6.772588722239782
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    }
+]
+, {
+    "showlegend": true,
+    "xaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            0.5,
+            1.0,
+            1.5,
+            2.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            0.04300000000000001,
+            2.057
+        ],
+        "domain": [
+            0.02137649460484106,
+            0.9934383202099737
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "0.5",
+            "1.0",
+            "1.5",
+            "2.0"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "y1"
+    },
+    "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "annotations": [],
+    "height": 400,
+    "margin": {
+        "l": 0,
+        "b": 20,
+        "r": 0,
+        "t": 20
+    },
+    "plot_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "yaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            0.0,
+            2.0,
+            4.0,
+            6.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            -1.2688981826882013,
+            7.0068067874318585
+        ],
+        "domain": [
+            0.03762029746281716,
+            0.9901574803149606
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "0",
+            "2",
+            "4",
+            "6"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "x1"
+    },
+    "legend": {
+        "tracegroupgap": 0,
+        "bordercolor": "rgba(0, 0, 0, 1.000)",
+        "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "font": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "y": 1.0,
+        "x": 1.0
+    },
+    "width": 600
+}
+);
     </script>
 <p>Here we plot $f(x)$ and it's tangent line at $c=1$:</p><pre class="sourceCode julia">f(x) = x^x; c = 1
 m = diff(f(x)) |> subs(x, c);
 plot(f, 0.5, 1.5)
 plot!(f(c) + m*(x-c))</pre>
-    <div id="e65a4697-b9d2-4fa4-9463-08653f9493c5" style="width:600px;height:400px;"></div>
+    <div id="22f764bd-404d-4b57-8dc7-5769e98bf3b5" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('e65a4697-b9d2-4fa4-9463-08653f9493c5');
-    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[0.5097658190197881,0.6000649171683728,0.6543309113056239,0.7002121187157657,0.7500519700330515,0.7959999045346282,0.8452609464064899,0.9023346943385323,0.9530551061110214,0.99753233654022,1.0460244566553194,1.0948047787528121,1.1487376626244041,1.2000534407448433,1.2534099435113506,1.2983247536668452,1.353160645986364,1.4047080021287084,1.48729086401606],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0.7092961314106968,0.7360452987500216,0.7576533874663178,0.779162255933977,0.8059572856493814,0.8339245704475967,0.8675373423326724,0.9114370686725436,0.9552088008059504,0.997538418402274,1.0481929665132337,1.104246394917587,1.172675819439444,1.2446433879283874,1.3272444307906708,1.4034869976863265,1.505694219360258,1.6118154504834212,1.804691040439711],"type":"scatter","hoverinfo":"text"},{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[0.49055918030724843,0.5841249880869156,0.6403541385493464,0.6878951696477135,0.739538054723343,0.7871482268689509,0.838191363171647,0.8973298422679452,0.949885143436085,0.9959714065132935,1.0462178041246195,1.0967628298711005,1.152646819288459,1.2058190251036318,1.2611057819373659,1.3076454548647096,1.3644651204581812,1.417877281988614,1.5034477067179095],"showlegend":true,"mode":"lines","name":"y2","zmin":-0.1,"legendgroup":"y2","zmax":0.1,"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0.49055918030724843,0.5841249880869156,0.6403541385493464,0.6878951696477135,0.739538054723343,0.7871482268689509,0.838191363171647,0.8973298422679452,0.949885143436085,0.9959714065132935,1.0462178041246195,1.0967628298711005,1.152646819288459,1.2058190251036318,1.2611057819373659,1.3076454548647096,1.3644651204581812,1.417877281988614,1.5034477067179095],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.6000000000000001,0.8,1.0,1.2000000000000002,1.4000000000000001],"visible":true,"ticks":"inside","range":[0.4601725245149286,1.5338343625102293],"domain":[0.05100612423447069,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0.6","0.8","1.0","1.2","1.4"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.6000000000000001,0.8,1.0,1.2000000000000002,1.4000000000000001,1.6,1.8],"visible":true,"ticks":"inside","range":[0.45113522450327453,1.844114996243685],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0.6","0.8","1.0","1.2","1.4","1.6","1.8"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('22f764bd-404d-4b57-8dc7-5769e98bf3b5');
+    Plotly.plot(PLOT, [
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            0.5,
+            0.5097658190197881,
+            0.6000649171683728,
+            0.6543309113056239,
+            0.7002121187157657,
+            0.7500519700330515,
+            0.7959999045346282,
+            0.8452609464064899,
+            0.9023346943385323,
+            0.9530551061110214,
+            0.99753233654022,
+            1.0460244566553194,
+            1.0948047787528121,
+            1.1487376626244041,
+            1.2000534407448433,
+            1.2534099435113506,
+            1.2983247536668452,
+            1.353160645986364,
+            1.4047080021287084,
+            1.48729086401606,
+            1.5
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y1",
+        "zmin": -0.1,
+        "legendgroup": "y1",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(0, 154, 250, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            0.7071067811865476,
+            0.7092961314106968,
+            0.7360452987500216,
+            0.7576533874663178,
+            0.779162255933977,
+            0.8059572856493814,
+            0.8339245704475967,
+            0.8675373423326724,
+            0.9114370686725436,
+            0.9552088008059504,
+            0.997538418402274,
+            1.0481929665132337,
+            1.104246394917587,
+            1.172675819439444,
+            1.2446433879283874,
+            1.3272444307906708,
+            1.4034869976863265,
+            1.505694219360258,
+            1.6118154504834212,
+            1.804691040439711,
+            1.8371173070873836
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    },
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            0.47,
+            0.48035176816097536,
+            0.5760688121984752,
+            0.6335907659839614,
+            0.6822248458387117,
+            0.7350550882350345,
+            0.7837598988067059,
+            0.8359766031908792,
+            0.8964747759988443,
+            0.9502384124776827,
+            0.9973842767326332,
+            1.0487859240546387,
+            1.100493065477981,
+            1.1576619223818685,
+            1.212056647189534,
+            1.2686145401220315,
+            1.316224238886856,
+            1.374350284745546,
+            1.428990482256431,
+            1.5165283158570235,
+            1.53
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y2",
+        "zmin": -0.1,
+        "legendgroup": "y2",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(227, 111, 71, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            0.47,
+            0.48035176816097536,
+            0.5760688121984752,
+            0.6335907659839614,
+            0.6822248458387117,
+            0.7350550882350345,
+            0.7837598988067059,
+            0.8359766031908792,
+            0.8964747759988443,
+            0.9502384124776827,
+            0.9973842767326332,
+            1.0487859240546387,
+            1.100493065477981,
+            1.1576619223818685,
+            1.212056647189534,
+            1.2686145401220315,
+            1.316224238886856,
+            1.374350284745546,
+            1.428990482256431,
+            1.5165283158570235,
+            1.53
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    }
+]
+, {
+    "showlegend": true,
+    "xaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            0.6000000000000001,
+            0.8,
+            1.0,
+            1.2000000000000002,
+            1.4000000000000001
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            0.4382,
+            1.5618
+        ],
+        "domain": [
+            0.05100612423447069,
+            0.9934383202099737
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "0.6",
+            "0.8",
+            "1.0",
+            "1.2",
+            "1.4"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "y1"
+    },
+    "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "annotations": [],
+    "height": 400,
+    "margin": {
+        "l": 0,
+        "b": 20,
+        "r": 0,
+        "t": 20
+    },
+    "plot_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "yaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            0.6000000000000001,
+            0.8,
+            1.0,
+            1.2000000000000002,
+            1.4000000000000001,
+            1.6,
+            1.8
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            0.42898648078737844,
+            1.8781308263000052
+        ],
+        "domain": [
+            0.03762029746281716,
+            0.9901574803149606
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "0.6",
+            "0.8",
+            "1.0",
+            "1.2",
+            "1.4",
+            "1.6",
+            "1.8"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "x1"
+    },
+    "legend": {
+        "tracegroupgap": 0,
+        "bordercolor": "rgba(0, 0, 0, 1.000)",
+        "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "font": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "y": 1.0,
+        "x": 1.0
+    },
+    "width": 600
+}
+);
     </script>
 <h3>Extrema</h3><p>We can combine <code>solve</code> with <code>diff</code> to find extrema of a differentiable function over a closed interval, by locating the critical points where $f'(x) = 0$.</p><p>For example, consider the problem enclosing the maximum amount of area with 3 sides of a rectangle where the length of the 3 sides is fixed.</p><p>For this, we have</p>$$~
 L = 2x + y, \quad A = xy, \quad\text{or}\quad A(x) = x \cdot (L-2x)
 ~$$
-<p>We can solve this with $L$ as a symbolic value, by looking at critical points of $A$ or when $A'(x) = 0$:</p><pre class="sourceCode julia">L = Sym("L")
+<p>We can solve this with $L$ as a symbolic value, by looking at critical points of $A$ or when $A'(x) = 0$:</p><pre class="sourceCode julia">@vars L
 A = x*y
 A = A(y => L - 2x)
 out = solve(diff(A, x), x)[1]	## solve returns an array, we need its first component
-subs(L - 2x, x, out)</pre>
+subs(L - 2x, x => out)</pre>
 <div class="well well-sm">
 \begin{equation*}\frac{L}{2}\end{equation*}</div>
 
@@ -855,95 +2284,89 @@ subs(L - 2x, x, out)</pre>
 <div class="well well-sm">
 \[ \left[ \begin{array}{r}\frac{L}{4}\end{array} \right] \]</div>
 
-<h3>Practice</h3><p>Find the derivative of $\tan^{-1}(x)$. What do you get?</p><form name="WeaveQuestion" data-id="6A6SKjpj" data-controltype="radio">
+<h3>Practice</h3><p>Find the derivative of $\tan^{-1}(x)$. What do you get?</p><form name="WeaveQuestion" data-id="93EC2byn" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_6A6SKjpj" value="1"><div class="markdown"><p><code>e &#61; 2.7182818284590455</code></p>
+      <input type="radio" name="radio_93EC2byn" value="1"><div class="markdown">$\frac{1}{x^{2} + 1}$
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_6A6SKjpj" value="2"><div class="markdown"><p><code>Inf</code></p>
+      <input type="radio" name="radio_93EC2byn" value="2"><div class="markdown">$\frac{1}{\sqrt{1 - x^{2}}}$
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_6A6SKjpj" value="3"><div class="markdown"><p><code>1</code></p>
-</div>
-    </label>
-    </div>
-    <div  class="radio"> 
-    <label>
-      <input type="radio" name="radio_6A6SKjpj" value="4"><div class="markdown"><p><code>0</code></p>
+      <input type="radio" name="radio_93EC2byn" value="3"><div class="markdown">$\frac{1}{x}$
 </div>
     </label>
     </div>
 
-<div id="6A6SKjpj_message"></div>
+<div id="93EC2byn_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_6A6SKjpj']").on("change", function() {
-  correct = this.value == 3;
+$("input:radio[name='radio_93EC2byn']").on("change", function() {
+  correct = this.value == 1;
 
   if(correct) {
-     $("#6A6SKjpj_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#93EC2byn_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#6A6SKjpj_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#93EC2byn_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Questions</h4><p>Let $f(x) = \exp(-\cos(x))$. Evaluate $f'(3)$. (You'll need to <code>subs</code>titute 3 for <code>x</code> and convert to floating point.)</p><form name='WeaveQuestion' data-id='jYGTqmC4' data-controltype='numeric'>
+<h4>Questions</h4><p>Let $f(x) = \exp(-\cos(x))$. Evaluate $f'(3)$. (You'll need to <code>subs</code>titute 3 for <code>x</code> and convert to floating point.)</p><form name='WeaveQuestion' data-id='Z061QqQI' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="jYGTqmC4" type="number" class="form-control">
+<input id="Z061QqQI" type="number" class="form-control">
 
 </div>
-  
-<div id='jYGTqmC4_message'></div>
+
+<div id='Z061QqQI_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#jYGTqmC4').on('change', function() {
+$('#Z061QqQI').on('change', function() {
   correct = Math.abs(this.value - 0.3797841807457766324319619290395706689950768584935908050136628093384225996266999) <= 0.001;
 
   if(correct) {
-     $('#jYGTqmC4_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#Z061QqQI_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#jYGTqmC4_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#Z061QqQI_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Questions</h4><p>Find the single critical point of $f(x) = 1/x^2 + x^3$.</p><form name='WeaveQuestion' data-id='TUNt8APO' data-controltype='numeric'>
+<h4>Questions</h4><p>Find the single critical point of $f(x) = 1/x^2 + x^3$.</p><form name='WeaveQuestion' data-id='wXzpGuN7' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="TUNt8APO" type="number" class="form-control">
+<input id="wXzpGuN7" type="number" class="form-control">
 
 </div>
-  
-<div id='TUNt8APO_message'></div>
+
+<div id='wXzpGuN7_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#TUNt8APO').on('change', function() {
+$('#wXzpGuN7').on('change', function() {
   correct = Math.abs(this.value - 0.9221079114817277656701705309291930146705850859540336029625316749125970624956978) <= 0.01;
 
   if(correct) {
-     $('#TUNt8APO_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#wXzpGuN7_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#TUNt8APO_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#wXzpGuN7_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -951,58 +2374,58 @@ $('#TUNt8APO').on('change', function() {
 f(x) = tan(x)
 solve(f(c) + diff(f(c)) * (x - c), x)</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}c - \frac{\sin{\left (2 c \right )}}{2}\end{array} \right] \]</div>
+\[ \left[ \begin{array}{r}c - \frac{\sin{\left(2 c \right)}}{2}\end{array} \right] \]</div>
 
-<p>What do you get when $c = \pi/4$?</p><form name='WeaveQuestion' data-id='OHSKQNKV' data-controltype='numeric'>
+<p>What do you get when $c = \pi/4$?</p><form name='WeaveQuestion' data-id='veHRXrgf' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="OHSKQNKV" type="number" class="form-control">
+<input id="veHRXrgf" type="number" class="form-control">
 
 </div>
-  
-<div id='OHSKQNKV_message'></div>
+
+<div id='veHRXrgf_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#OHSKQNKV').on('change', function() {
+$('#veHRXrgf').on('change', function() {
   correct = Math.abs(this.value - 0.2853981633974483) <= 0.001;
 
   if(correct) {
-     $('#OHSKQNKV_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#veHRXrgf_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#OHSKQNKV_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#veHRXrgf_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h4>Question</h4><p>You have a 12-inch wide rectangular piece of metal that you will fold into three 4 inch strips in a symmetric manner. Let $\theta$ be the amount each wing is folded up ($\theta \in [0, 90^\circ]$). What value of $\theta$ will produce the larges cross sectional area?</p><p>The area as a function of $\theta$ is that of two right triangles with hypotenuse $4$ and height given by $h/4 = \sin(\theta)$ and base given by $b/4 = \cos(\theta)$. The total area then is:</p>$$~
 A(\theta) = 2 \cdot (1/2) \cdot 4\sin(\theta) \cdot 4 \cos(\theta) + 4 \cdot 4\sin(\theta)
 ~$$
-<p>In degrees, what angle maximizes the area?</p><form name='WeaveQuestion' data-id='hCMpwXFr' data-controltype='numeric'>
+<p>In degrees, what angle maximizes the area?</p><form name='WeaveQuestion' data-id='FDSDyZ8y' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="hCMpwXFr" type="number" class="form-control">
+<input id="FDSDyZ8y" type="number" class="form-control">
 
 </div>
-  
-<div id='hCMpwXFr_message'></div>
+
+<div id='FDSDyZ8y_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#hCMpwXFr').on('change', function() {
+$('#FDSDyZ8y').on('change', function() {
   correct = Math.abs(this.value - 49.6569) <= 0.01;
 
   if(correct) {
-     $('#hCMpwXFr_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#FDSDyZ8y_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#hCMpwXFr_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#FDSDyZ8y_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -1010,11 +2433,11 @@ $('#hCMpwXFr').on('change', function() {
 f(x) = cos(x) - sin(x)
 integrate(f(x), x)</pre>
 <div class="well well-sm">
-\begin{equation*}\sin{\left (x \right )} + \cos{\left (x \right )}\end{equation*}</div>
+\begin{equation*}\sin{\left(x \right)} + \cos{\left(x \right)}\end{equation*}</div>
 
 <p>One can parameterize an integral using a constant:</p><pre class="sourceCode julia">integrate(1/cos(x + a), x)</pre>
 <div class="well well-sm">
-\begin{equation*}- \log{\left (\tan{\left (\frac{a}{2} + \frac{x}{2} \right )} - 1 \right )} + \log{\left (\tan{\left (\frac{a}{2} + \frac{x}{2} \right )} + 1 \right )}\end{equation*}</div>
+\begin{equation*}- \log{\left(\tan{\left(\frac{a}{2} + \frac{x}{2} \right)} - 1 \right)} + \log{\left(\tan{\left(\frac{a}{2} + \frac{x}{2} \right)} + 1 \right)}\end{equation*}</div>
 
 <p>Integrate can do many of the integrals thrown at it.</p><pre class="sourceCode julia">integrate(x^3 * (1-x)^4, x)</pre>
 <div class="well well-sm">
@@ -1022,7 +2445,7 @@ integrate(f(x), x)</pre>
 
 <pre class="sourceCode julia">integrate(x/(x^2+1), x)</pre>
 <div class="well well-sm">
-\begin{equation*}\frac{\log{\left (x^{2} + 1 \right )}}{2}\end{equation*}</div>
+\begin{equation*}\frac{\log{\left(x^{2} + 1 \right)}}{2}\end{equation*}</div>
 
 <h3>Definite integrals</h3><p>By specifying a range to integrate over, the definite integral $\int_a^b f(x) dx$ can be found.</p><pre class="sourceCode julia">integrate(x^2, (x, 0, 1))</pre>
 <div class="well well-sm">
@@ -1031,109 +2454,109 @@ integrate(f(x), x)</pre>
 <p>More interestingly, we can find the median value of an integral by solving with the  resulting symbolic answer from <code>integrate</code>:</p><pre class="sourceCode julia">f(x) = 4x^3
 @vars b
 eq = integrate(f(x), (x,  0, b)) - 1/2 * integrate(f(x), (x, 0, 1))
-xs = real_roots(eq, b)</pre>
+xs = sympy.real_roots(eq, b)</pre>
 <div class="well well-sm">
 \[ \left[ \begin{array}{r}- \frac{2^{\frac{3}{4}}}{2}\\\frac{2^{\frac{3}{4}}}{2}\end{array} \right] \]</div>
 
-<p>The equation <code>eq</code> is a 4th degree polynomial. It has two real and two complex roots. We used <code>real_roots</code> to get the two real ones. The positive one is clear.</p><h3>Practice</h3><h4>Question</h4><p>Integrate $f(x) = 2/(x \cdot \log(x))$. What do you get:</p><form name="WeaveQuestion" data-id="ZrK7rXCT" data-controltype="radio">
+<p>The equation <code>eq</code> is a 4th degree polynomial. It has two real and two complex roots. We used <code>real_roots</code> to get the two real ones. The positive one is clear.</p><h3>Practice</h3><h4>Question</h4><p>Integrate $f(x) = 2/(x \cdot \log(x))$. What do you get:</p><form name="WeaveQuestion" data-id="IMsoDEHe" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_ZrK7rXCT" value="1"><div class="markdown"><p><code>0</code></p>
+      <input type="radio" name="radio_IMsoDEHe" value="1"><div class="markdown">$3 \log{\left(x \right)}$
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_ZrK7rXCT" value="2"><div class="markdown"><p><code>1</code></p>
+      <input type="radio" name="radio_IMsoDEHe" value="2"><div class="markdown">$\frac{3 \log{\left(x \right)}^{2}}{2}$
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_ZrK7rXCT" value="3"><div class="markdown"><p><code>e &#61; 2.7182818284590455</code></p>
+      <input type="radio" name="radio_IMsoDEHe" value="3"><div class="markdown">$\log{\left(\log{\left(x \right)} \right)}$
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_ZrK7rXCT" value="4"><div class="markdown"><p><code>Inf</code></p>
+      <input type="radio" name="radio_IMsoDEHe" value="4"><div class="markdown">$3 \log{\left(\log{\left(x \right)} \right)}$
 </div>
     </label>
     </div>
 
-<div id="ZrK7rXCT_message"></div>
+<div id="IMsoDEHe_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_ZrK7rXCT']").on("change", function() {
+$("input:radio[name='radio_IMsoDEHe']").on("change", function() {
   correct = this.value == 3;
 
   if(correct) {
-     $("#ZrK7rXCT_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#IMsoDEHe_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#ZrK7rXCT_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#IMsoDEHe_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question</h4><p>Integrate $f(x) = (2x+5)(x^2 + 5x)^7$ from $0$ to $1$.</p><form name='WeaveQuestion' data-id='Ezggmhfb' data-controltype='numeric'>
+<h4>Question</h4><p>Integrate $f(x) = (2x+5)(x^2 + 5x)^7$ from $0$ to $1$.</p><form name='WeaveQuestion' data-id='orbYaXXq' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="Ezggmhfb" type="number" class="form-control">
+<input id="orbYaXXq" type="number" class="form-control">
 
 </div>
-  
-<div id='Ezggmhfb_message'></div>
+
+<div id='orbYaXXq_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#Ezggmhfb').on('change', function() {
+$('#orbYaXXq').on('change', function() {
   correct = Math.abs(this.value - 209952.0) <= 0.001;
 
   if(correct) {
-     $('#Ezggmhfb_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#orbYaXXq_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#Ezggmhfb_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#orbYaXXq_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Questions</h4><p>Integrate <code>f&#40;x&#41; &#61; sqrt&#40;4 - sqrt&#40;x&#41;&#41;</code> over $[0,9]$. What value do you get? Does it make any sense?</p><form name="WeaveQuestion" data-id="ojQj0OnW" data-controltype="radio">
+<h4>Questions</h4><p>Integrate <code>f&#40;x&#41; &#61; sqrt&#40;4 - sqrt&#40;x&#41;&#41;</code> over $[0,9]$. What value do you get? Does it make any sense?</p><form name="WeaveQuestion" data-id="KcrHpk8z" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_ojQj0OnW" value="1"><div class="markdown"><p>-8.884, and no it makes no sense as f(x) > 0, but the integral is negative</p>
+      <input type="radio" name="radio_KcrHpk8z" value="1"><div class="markdown"><p>Inf, and yes it makes sense as the vertical asymptote at 0 makes this a problem integral.</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_ojQj0OnW" value="2"><div class="markdown"><p>Inf, and yes it makes sense as the vertical asymptote at 0 makes this a problem integral.</p>
+      <input type="radio" name="radio_KcrHpk8z" value="2"><div class="markdown"><p>-8.884, and no it makes no sense as f(x) > 0, but the integral is negative</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_ojQj0OnW" value="3"><div class="markdown"><p>12.5333, and yes it makes sense.</p>
+      <input type="radio" name="radio_KcrHpk8z" value="3"><div class="markdown"><p>12.5333, and yes it makes sense.</p>
 </div>
     </label>
     </div>
 
-<div id="ojQj0OnW_message"></div>
+<div id="KcrHpk8z_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_ojQj0OnW']").on("change", function() {
-  correct = this.value == 1;
+$("input:radio[name='radio_KcrHpk8z']").on("change", function() {
+  correct = this.value == 2;
 
   if(correct) {
-     $("#ojQj0OnW_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#KcrHpk8z_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#ojQj0OnW_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#KcrHpk8z_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -1144,12 +2567,414 @@ tl(c) = x -> f(c) + 2*c*(x-c)
 plot(f, a, b)
 plot!(tl(a))
 plot!(tl(b))</pre>
-    <div id="ce863f03-8ff8-4678-9fc6-10a717011175" style="width:600px;height:400px;"></div>
+    <div id="0d47969a-64e0-44db-b290-c27ca7fe0471" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('ce863f03-8ff8-4678-9fc6-10a717011175');
-    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[-2.9609367239208475,-2.5997403313265086,-2.3826763547775043,-2.199151525136937,-1.9997921198677944,-1.8160003818614874,-1.6189562143740408,-1.3906612226458708,-1.1877795755559142,-1.00987065383912,-0.8159021733787222,-0.6207808849887516,-0.40504934950238297,-0.19978623702062615,0.013639774045402136,0.19329901466738048,0.41264258394545644,0.618832008514834,0.9491634560642397],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[8.767146283063122,6.758649790325665,5.677146611615815,4.836267430512117,3.9991685226853266,3.297857386921068,2.621019224060325,1.933938636170908,1.4108203201077876,1.0198387374854518,0.6656963565241224,0.3853689071674177,0.1640649755323036,0.039914540502861806,0.00018604343600962575,0.03736450907138017,0.17027390208518306,0.3829530547625036,0.9009112663278118],"type":"scatter","hoverinfo":"text"},{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[-3.0377632787710063,-2.6635000476523376,-2.4385834458026143,-2.248419321409146,-2.041847781106628,-1.8514070925241968,-1.6472345473134122,-1.4106806309282196,-1.2004594262556603,-1.016114373946826,-0.8151287835015226,-0.612948680515598,-0.38941272284616496,-0.17672389958547263,0.04442312774946309,0.2305818194588382,0.4578604818327239,0.6715091279544563,1.0137908268716378],"showlegend":true,"mode":"lines","name":"y2","zmin":-0.1,"legendgroup":"y2","zmax":0.1,"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[9.226579672626038,6.981000285914026,5.631500674815686,4.490515928454877,3.251086686639768,2.1084425551451806,0.883407283880473,-0.5359162144306815,-1.7972434424660388,-2.9033137563190436,-4.109227298990863,-5.3223079169064125,-6.663523662923012,-7.939656602487162,-9.26653876649678,-10.38349091675303,-11.747162890996343,-13.029054767726738,-15.082744961229828],"type":"scatter","hoverinfo":"text"},{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[-3.117369153147025,-2.7295663703969146,-2.4965130623727423,-2.299469456463076,-2.085424870980158,-1.888094695743956,-1.67653589271313,-1.4314242722891415,-1.2135979901790246,-1.022583970292809,-0.8143274150485429,-0.604833133923756,-0.373210417019913,-0.15282724640011383,0.07632011691704345,0.2692133874160767,0.5047142071596252,0.7260919237179766,1.0807561928415197],"showlegend":true,"mode":"lines","name":"y3","zmin":-0.1,"legendgroup":"y3","zmax":0.1,"line":{"color":"rgba(62, 164, 78, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-7.23473830629405,-6.459132740793829,-5.993026124745485,-5.598938912926152,-5.170849741960316,-4.776189391487912,-4.35307178542626,-3.8628485445782825,-3.427195980358049,-3.0451679405856176,-2.628654830097086,-2.209666267847512,-1.7464208340398262,-1.3056544928002278,-0.8473597661659131,-0.4615732251678466,0.009428414319250455,0.4521838474359532,1.1615123856830394],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-3.0,-2.0,-1.0,0.0,1.0],"visible":true,"ticks":"inside","range":[-3.2433129135266814,1.206699953221176],"domain":[0.05100612423447069,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-3","-2","-1","0","1"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-15.0,-10.0,-5.0,0.0,5.0],"visible":true,"ticks":"inside","range":[-15.812024700245503,9.955859411641713],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-15","-10","-5","0","5"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('0d47969a-64e0-44db-b290-c27ca7fe0471');
+    Plotly.plot(PLOT, [
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            -3.0,
+            -2.9609367239208475,
+            -2.5997403313265086,
+            -2.3826763547775043,
+            -2.199151525136937,
+            -1.9997921198677944,
+            -1.8160003818614874,
+            -1.6189562143740408,
+            -1.3906612226458708,
+            -1.1877795755559142,
+            -1.00987065383912,
+            -0.8159021733787222,
+            -0.6207808849887516,
+            -0.40504934950238297,
+            -0.19978623702062615,
+            0.013639774045402136,
+            0.19329901466738048,
+            0.41264258394545644,
+            0.618832008514834,
+            0.9491634560642397,
+            1.0
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y1",
+        "zmin": -0.1,
+        "legendgroup": "y1",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(0, 154, 250, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            9.0,
+            8.767146283063122,
+            6.758649790325665,
+            5.677146611615815,
+            4.836267430512117,
+            3.9991685226853266,
+            3.297857386921068,
+            2.621019224060325,
+            1.933938636170908,
+            1.4108203201077876,
+            1.0198387374854518,
+            0.6656963565241224,
+            0.3853689071674177,
+            0.1640649755323036,
+            0.039914540502861806,
+            0.00018604343600962575,
+            0.03736450907138017,
+            0.17027390208518306,
+            0.3829530547625036,
+            0.9009112663278118,
+            1.0
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    },
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            -3.12,
+            -3.0785929273560986,
+            -2.6957247512060993,
+            -2.4656369360641546,
+            -2.2711006166451533,
+            -2.059779647059862,
+            -1.8649604047731767,
+            -1.656093587236483,
+            -1.414100896004623,
+            -1.199046350089269,
+            -1.0104628930694672,
+            -0.8048563037814456,
+            -0.5980277380880766,
+            -0.3693523104725259,
+            -0.15177341124186372,
+            0.07445816048812626,
+            0.2648969555474233,
+            0.4974011389821838,
+            0.715961929025724,
+            1.0661132634280943,
+            1.12
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y2",
+        "zmin": -0.1,
+        "legendgroup": "y2",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(227, 111, 71, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            9.72,
+            9.471557564136592,
+            7.174348507236596,
+            5.793821616384927,
+            4.62660369987092,
+            3.3586778823591716,
+            2.1897624286390602,
+            0.9365615234188986,
+            -0.5153946239722611,
+            -1.8057218994643858,
+            -2.9372226415831975,
+            -4.170862177311328,
+            -5.41183357147154,
+            -6.783886137164844,
+            -8.08935953254882,
+            -9.446748962928758,
+            -10.58938173328454,
+            -11.984406833893104,
+            -13.295771574154344,
+            -15.396679580568566,
+            -15.719999999999999
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    },
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            -3.2472000000000003,
+            -3.203308502997465,
+            -2.7974682362784655,
+            -2.5535751522280044,
+            -2.3473666536438627,
+            -2.1233664258834537,
+            -1.9168580290595674,
+            -1.695459202470672,
+            -1.4389469497649006,
+            -1.2109891310946252,
+            -1.0110906666536352,
+            -0.7931476820083323,
+            -0.5739094023733614,
+            -0.33151344910087754,
+            -0.10087981591637556,
+            0.13892565011741384,
+            0.3407907728802687,
+            0.5872452073211148,
+            0.8189196447672675,
+            1.1900800592337797,
+            1.2472
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y3",
+        "zmin": -0.1,
+        "legendgroup": "y3",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(62, 164, 78, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            -7.494400000000001,
+            -7.40661700599493,
+            -6.594936472556931,
+            -6.107150304456009,
+            -5.694733307287725,
+            -5.246732851766907,
+            -4.833716058119135,
+            -4.390918404941344,
+            -3.877893899529801,
+            -3.421978262189251,
+            -3.0221813333072705,
+            -2.5862953640166646,
+            -2.1478188047467226,
+            -1.663026898201755,
+            -1.201759631832751,
+            -0.7221486997651723,
+            -0.3184184542394626,
+            0.1744904146422297,
+            0.6378392895345351,
+            1.3801601184675594,
+            1.4944000000000002
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    }
+]
+, {
+    "showlegend": true,
+    "xaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            -3.0,
+            -2.0,
+            -1.0,
+            0.0,
+            1.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            -3.382032,
+            1.3820320000000001
+        ],
+        "domain": [
+            0.05100612423447069,
+            0.9934383202099737
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "-3",
+            "-2",
+            "-1",
+            "0",
+            "1"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "y1"
+    },
+    "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "annotations": [],
+    "height": 400,
+    "margin": {
+        "l": 0,
+        "b": 20,
+        "r": 0,
+        "t": 20
+    },
+    "plot_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "yaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            -15.0,
+            -10.0,
+            -5.0,
+            0.0,
+            5.0,
+            10.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            -16.4832,
+            10.4832
+        ],
+        "domain": [
+            0.03762029746281716,
+            0.9901574803149606
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "-15",
+            "-10",
+            "-5",
+            "0",
+            "5",
+            "10"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "x1"
+    },
+    "legend": {
+        "tracegroupgap": 0,
+        "bordercolor": "rgba(0, 0, 0, 1.000)",
+        "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "font": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "y": 1.0,
+        "x": 1.0
+    },
+    "width": 600
+}
+);
     </script>
-<p>The intersection point is clearly $c=-1 = (a+b)/2$.</p><p>Let's see if we can get this fact using <code>SymPy</code>. First we define many variables:</p><pre class="sourceCode julia">x, c2, c1, c0, a, b =  symbols("x, c2, c1, c0, a, b")
+<p>The intersection point is clearly $c=-1 = (a+b)/2$.</p><p>Let's see if we can get this fact using <code>SymPy</code>. First we define many variables:</p><pre class="sourceCode julia">@vars x c2 c1 c0 a b
 p = c2*x^2 + c1*x + c0</pre>
 <div class="well well-sm">
 \begin{equation*}c_{0} + c_{1} x + c_{2} x^{2}\end{equation*}</div>
@@ -1171,15 +2996,15 @@ y(x) = \tan(\theta) x - (1/2) \cdot g(\frac{x}{v_0 \cos\theta})^2.
 <p>This is valid for $\theta \in [0,\pi/2]$ and for $x \in [0, x^*]$, where $x^*$ is when the projectile returns to ground, that is $y(x*) = 0$.</p><p>We code this expression with:</p><pre class="sourceCode julia">x, theta, v0, grav =  symbols("x, theta, v0, grav")
 y = tan(theta) * x - (1//2)*grav*(x / (v0*cos(theta)))^2</pre>
 <div class="well well-sm">
-\begin{equation*}- \frac{grav x^{2}}{2 v_{0}^{2} \cos^{2}{\left (\theta \right )}} + x \tan{\left (\theta \right )}\end{equation*}</div>
+\begin{equation*}- \frac{grav x^{2}}{2 v_{0}^{2} \cos^{2}{\left(\theta \right)}} + x \tan{\left(\theta \right)}\end{equation*}</div>
 
 <p>The use of the rational value for $1/2$ (the <code>1//2</code>) is needed, as this will convert to a symbolic value of $1/2$, and not a floating point value of $0.5$.</p><p>First we need to solve when <code>y&#40;x&#41;&#61;0</code>:</p><pre class="sourceCode julia">xs = solve(y, x)</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}0\\\frac{v_{0}^{2} \sin{\left (2 \theta \right )}}{grav}\end{array} \right] \]</div>
+\[ \left[ \begin{array}{r}0\\\frac{v_{0}^{2} \sin{\left(2 \theta \right)}}{grav}\end{array} \right] \]</div>
 
 <p>There are, of course, two values. The first is 0, the starting point. We want the latter:</p><pre class="sourceCode julia">xstar = xs[2]</pre>
 <div class="well well-sm">
-\begin{equation*}\frac{v_{0}^{2} \sin{\left (2 \theta \right )}}{grav}\end{equation*}</div>
+\begin{equation*}\frac{v_{0}^{2} \sin{\left(2 \theta \right)}}{grav}\end{equation*}</div>
 
 <p>Now, we want to find the critical point for <code>xstar</code>. We take the derivative with respect to <code>theta</code> and solve for when that is 0:</p><pre class="sourceCode julia">solve(diff(xstar, theta), theta)</pre>
 <div class="well well-sm">

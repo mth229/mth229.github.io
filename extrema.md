@@ -94,8 +94,9 @@ existence of extrema (a continuous function on a closed
 interval). Rather than solve analytically by taking a derivative, we
 simply graph to find the value:
 
-```noout
+```
 using MTH229
+using Plots
 ```
 
 ```nocode, noout

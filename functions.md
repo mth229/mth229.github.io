@@ -10,12 +10,21 @@ how to graph functions with `Julia`.
 For basic things creating a new function and plotting it is as familiar as this:
 
 ```nocode,noout
+using MTH229
 using Plots
 plotly()
 ```
 
+We begin by loading some packages:
+
+```noeval
+using MTH229
+using SimplePlots
 ```
-using MTH229			# loads the plot function from `Plots`
+
+Then we define a function and plot it:
+
+```
 f(x) = sin(3x^2 - 2x^3)
 plot(f, 0, pi)
 ```

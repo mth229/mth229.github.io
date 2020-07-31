@@ -29,10 +29,11 @@ Newton's method, utilizing a function from the `Roots` package. More usefully, w
 used for root finding with an algorithm that is a bit more robust than
 Newton's method.
 
-To begin, we load `MTH229` which loads both `Plots` and `Roots`:
+To begin, we load `MTH229` and `Plots`. In the background this loads `Roots`:
 
 ```
 using MTH229
+using Plots
 ```
 
 ```nocode, noout
@@ -693,11 +694,11 @@ numericq(xstar, 1e-8)
 
 #### Question
 
-Let $f(x) = 5/\sin(x) + 8/\cos(x)$, Starting at $x=\pi/4$, use `fzero` to find a root of the derivative of $f(x)$ given by `D(f)`.
+Let $f(x) = 5/\sin(x) + 8/\cos(x)$, Starting at $x=\pi/4$, use `fzero` to find a root of the derivative of $f(x)$ given by `f'`.
 
 ```
 f(x) = 5/sin(x) + 8/cos(x)
-xstar = fzero(D(f), pi/4)
+xstar = fzero(f', pi/4)
 numericq(xstar, 1e-8)
 ```
 
@@ -706,7 +707,7 @@ numericq(xstar, 1e-8)
 The tangent line of `f` at `c` can be computed by
 
 ```
-tangent(f, c) = x -> f(c) + D(f)(c) * (x - c)
+tangent(f, c) = x -> f(c) + f'(c) * (x - c)
 ```
 
 Let $f(x) = x^2 - 3x + 5$. Use `fzero` to find the intersection point
@@ -715,7 +716,7 @@ of the tangent line at $1$ and the tangent line at $3$. Where does this happen?
 (Hint, apply `fzero` to `h(x) = tangent(f, 1)(x) -  tangent(f, 3)(x)` starting at 1.)
 
 ```
-tangent(f, c) = x -> f(c) + D(f)(c) * (x - c)
+tangent(f, c) = x -> f(c) + f'(c) * (x - c)
 f(x) = x^2 - 3x + 5
 h1(x) = tangent(f, 1)(x) - tangent(f, 3)(x)
 xstar = fzero(h1, 1)

@@ -40,7 +40,8 @@ We will use the add-on packages `Roots` and `PolynomialZeros`, which
 provide implementations of a few zero- and root-finding algorithms.
 
 ```
-using MTH229    # loads the Roots package not PolynomialZeros
+using MTH229    
+using Plots
 ```
 
 ```nocode, noout
@@ -116,176 +117,6 @@ degree polynomial. There are still facts known about such polynomials.
 For example, the *Fundamental theorem of algebra* states that every
 real-valued polynomial of degree $n$ will have $n$ roots, where we count complex
 roots and multiplicities.
-
-How to find these roots is then often left to numeric methods though. In `Julia` there
-is an add-on package that will do this work for us. We make use of the
-`PolynomialZeros` pacakge, which provides an interface to a few
-different packages for finding roots of a polynomial.
-
-Rather than write the quadratic polynomial in terms of its
-coefficients alone, we can pass in a quadratic function, as follows:
-
-
-
-```
-using PolynomialZeros
-f(x) = x^2 + x - 1
-poly_roots(f)
-```
-
-(The `PolynomialZeros` package is not in the `MTH229` package. It may need to be installed before using, e.g.: `using Pkg; Pkg.add("PolynomialZeros")`)
-
-That is, the command to find the roots of the polynomial $f(x)$ is simply
-`poly_roots` and the the function is called just by passing in the function name (or an anonymous function).
-
-
-By default, the values returned by `poly_roots` are complex numbers,
-even if they could be real valules. This is because the fundamental
-theorem of algebra only guarantees $n$ roots for an $n$th degree
-polynomial if complex values are considered.
-
-
-
-That was so easy, we'll do it again. What are the roots of the
-polynomial $f(x) = -16x^2 + 32x + 6$?
-
-```
-f(x) = -16x^2 + 32x + 6
-poly_roots(f)
-```
-
-As can be seen, $f$ has two real roots. This next polynomial has none:
-
-```
-f(x) = x^2 + x + 1
-poly_roots(f)
-```
-
-### Real roots
-
-These are examples of the general template **action(function_object,
-args...)** for performing some action on a function. In this case, the
-action is to find the roots of a function which specifies a polynomial function
-and the additional *args...* are not necessary--if only complex values
-are desired.
-
-
-For some problems only the possible real roots are desired. While one
-can filter out the real from the complex in the answers above, numeric
-instabilities can lead to answers where real roots are returned as
-complex numbers. Other algorithms can do a better job for this more
-specific task.
-
-Setting the domain to be `Over.R` instructs `poly_roots` to look for just real
-roots for polynomials with real coefficients.
-
-The following polynomial has both real roots and complex roots, but we
-will find only the real ones:
-
-```
-f(x) = (x^2 + x + 1) * (x^2 + x - 1)
-poly_roots(f, Over.R)
-```
-
-Compare this to the search over all complex numbers too:
-
-```
-poly_roots(f)
-```
-
-When looking over the reals, the algorithm needs to know if the
-polynomial has any double roots. A polynomial without a double root is
-called *square free*. This is assumed by default. Pass in
-`square_free=false` if that is not the case:
-
-```
-f(x) = x^2 * (x-3)
-poly_roots(f, Over.R, square_free=false)
-```
-
-### Practice
-
-#### Question
-
-Find all roots of the function $f(x) = x^4 - 4x^2 -4x + 2$. Are they all real numbers?
-
-```
-choices = ["Yes, the are all real", "No, some are real, some are complex", "No, none are real"]
-ans = 2
-radioq(choices, ans)
-```
-
-
-#### Question
-
-Use the `Over.R` specification to find the largest real root of the
-polynomial $x^2 + x - 5$
-
-
-```
-p = poly_roots(x -> x^2 + x - 5, Over.R)
-val = maximum(p);
-numericq(val, 1e-3)
-```
-
-#### Question
-
-Use the `Over.R` specification to find the largest real root of the polynomial $x^3 - x - 17$
-
-```
-zs = fzeros(x -> x^2 - x - 17,-100, 100);
-val = maximum(zs)
-numericq(val, 1e-3)
-```
-
-
-#### Question
-
-[The rule of signs of Descartes](http://en.wikipedia.org/wiki/Descartes_rule_of_signs)
-is a simple means to give an upper bound on the number of positive real
-roots a polynomial has. One counts the number of sign changes amongst
-the polynomials coefficients. Suppose this is $k$, then the number of
-*positive* real roots (counting multiplicities) is one of $k$, $k-2$,
-$k-4$, ... . In particular if $k$ is odd, there must be at least one
-real root.
-
-For example, the polynomial $x^3 -x^2 -x - 1$ has signs `+ - - -`, so
-there is just one sign change. This implies there must be exactly one *positive*
-real root, which is found with:
-
-```
-f(x) = x^3 -x^2 -x - 1
-poly_roots(f, Over.R)
-```
-
-
-
-
-For the polynomial $f(x) = x^5 -x + 1$ has potentially 2 *positive*, real roots? Are there $0$ or $2$ positive, real roots?
-
-```
-choices = ["zero", "two"]
-ans = 1
-radioq(choices, ans)
-```
-
-
-#### Question
-
-The number of possible *negative*, real roots can also be found from
-Descartes' rule. Instead of looking at the sign changes of $f(x)$, one
-must look at the sign changes of $g(x) = f(-x)$.
-
-If $f(x) = x^5 - x +1$ we have $g(x) = -x^5 +x + 1$ (just change the
-signs of the coefficients of the odd powers). Then $g(x)$ has one sign
-change. This means there is one *negative* real root. What is it?
-
-```
-val = fzeros(x -> x^5 - x +1, -5, 5)[1]
-numericq(val, 1e-2)
-```
-
-
 
 
 
@@ -978,3 +809,173 @@ fzeros(f, -1, 1)
 ```
 
 That being said, `fzeros` can miss zeros, so a graph is always suggested to verify the zeros are exhausted.
+
+
+
+## Polynomials of higher degrees
+
+For Polynomials of higher degree, there are some specific methods that can be used to identify the roots.
+We will demonstrate the methods from the `SymPy` package. These work on symbolic expressions. These will be described in more detail later, but for now, we have to make a *symbolic* variable, `x` to proceed:
+
+```
+x = symbols("x")
+```
+
+The two functions we discuss are `sympy.roots` and `sympy.real_roots`.
+
+First consider the quadratic equation below. We can identify the real roots of algebraic type with:
+
+
+```
+f(x) = x^2 + x - 1
+sympy.real_roots(f(x))
+```
+
+
+
+That was so easy, we'll do it again. What are the roots of the
+polynomial $f(x) = -16x^2 + 32x + 6$?
+
+```
+f(x) = -16x^2 + 32x + 6
+sympy.real_roots(f(x))
+```
+
+As can be seen, $f$ has two real roots. This next polynomial has none:
+
+```
+f(x) = x^2 + x + 1
+sympy.real_roots(f(x))
+```
+
+### All algebraic roots
+
+These are examples of the general template **action(function_object,
+args...)** for performing some action on a function. In this case, the
+action is to find the roots of a function which specifies a polynomial function
+and the additional *args...* are not necessary--if only complex values
+are desired.
+
+
+For some problems only the possible real roots are desired. 
+
+The following polynomial has both real roots and complex roots. The real one are
+
+```
+f(x) = (x^2 + x + 1) * (x^2 + x - 1)
+sympy.real_roots(f(x))
+```
+
+Compare to
+
+```
+sympy.roots(f(x))
+``` 
+
+The word "algebraic" was used, as some problems have answers, but not readily expressible ones. For example, `x^5 -x - 1`:
+
+```
+f(x) = x^5 - x - 1
+sympy.roots(f(x))
+```
+
+However, the `solve` function (which solves `f(x)=0`) does hint at answers:
+
+```
+sympy.solve(f(x))
+```
+
+These can be revealed, but converting them to numeric with `N`:
+
+```
+N.(sympy.solve(f(x)))
+```
+
+
+
+### Practice
+
+#### Question
+
+Find all roots of the function $f(x) = x^4 - 4x^2 -4x + 2$. Are they all real numbers?
+
+```
+choices = ["Yes, the are all real", "No, some are real, some are complex", "No, none are real"]
+ans = 2
+radioq(choices, ans)
+```
+
+
+#### Question
+
+Find the largest real root of the
+polynomial $x^2 + x - 5$
+
+
+```
+@vars x
+p = N.(sympy.real_roots(x^2 + x - 5))
+val = maximum(p);
+numericq(val, 1e-3)
+```
+
+#### Question
+
+Find the largest real root of the polynomial $x^3 - x - 17$
+
+```
+@vars x
+zs = N.(sympy.real_roots(x^2 - x - 17))
+val = maximum(zs)
+numericq(val, 1e-3)
+```
+
+
+#### Question
+
+[The rule of signs of Descartes](http://en.wikipedia.org/wiki/Descartes_rule_of_signs)
+is a simple means to give an upper bound on the number of positive real
+roots a polynomial has. One counts the number of sign changes amongst
+the polynomials coefficients. Suppose this is $k$, then the number of
+*positive* real roots (counting multiplicities) is one of $k$, $k-2$,
+$k-4$, ... . In particular if $k$ is odd, there must be at least one
+real root.
+
+For example, the polynomial $x^3 -x^2 -x - 1$ has signs `+ - - -`, so
+there is just one sign change. This implies there must be exactly one *positive*
+real root, which is identifyied with:
+
+```
+f(x) = x^3 -x^2 -x - 1
+N.(sympy.real_roots(f(x)))
+```
+
+
+
+
+For the polynomial $f(x) = x^5 -x + 1$ has potentially 2 *positive*, real roots? Are there $0$ or $2$ positive, real roots?
+
+```
+choices = ["zero", "two"]
+ans = 1
+radioq(choices, ans)
+```
+
+
+#### Question
+
+The number of possible *negative*, real roots can also be found from
+Descartes' rule. Instead of looking at the sign changes of $f(x)$, one
+must look at the sign changes of $g(x) = f(-x)$.
+
+If $f(x) = x^5 - x +1$ we have $g(x) = -x^5 +x + 1$ (just change the
+signs of the coefficients of the odd powers). Then $g(x)$ has one sign
+change. This means there is one *negative* real root. What is it?
+
+```
+val = fzeros(x -> x^5 - x +1, -5, 5)[1]
+numericq(val, 1e-2)
+```
+
+
+

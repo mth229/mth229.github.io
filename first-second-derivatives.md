@@ -62,6 +62,7 @@ We load `MTH229` to provide access to graphing, the `'` notation, and the `ploti
 
 ```
 using MTH229
+using Plots
 ```
 
 ```nocode, noout

@@ -20,6 +20,12 @@ body { padding-top: 60px; }
 h5:before {content:"\2746\ ";}
 h6:before {content:"\2742\ ";}
 pre {display: block;}
+th, td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+tr:hover {background-color: #f5f5f5;}
 </style>
 
 <script src="https://code.jquery.com/jquery.js"></script>
@@ -106,7 +112,8 @@ $( document ).ready(function() {
 <h1>Newton's method using julia</h1><h2>Introduction</h2><p>Newton's method is an old method for <em>approximating</em> a zero of a function, $f(x)$:</p>$$~
 f(x) = 0
 ~$$
-<p>Previously we discussed the <em>bisection method</em> which applied for some continuous function $f(x)$ which changed signs between $a$ and $b$, points which bracket a zero. Not only did we need to find these bracketing points – which wasn't hard from a graph, more importantly the actual algorithm is pretty slow.</p><p>If the function $f$ is sufficiently differentiable, then Newton's method may work to find a zero.  Unlike the bisection method which is slow but guaranteed to find a root by the intermediate value theorem, Newton's method is fast (once it is close) but has no such guarantee of converging. In this project, we'll see how to implement the algorithm, try some examples, and then look at what can go wrong.</p><p>The <code>MTH229</code> package provides a function <code>newton</code> for easily performing Newton's method, utilizing a function from the <code>Roots</code> package. More usefully, we will see that <code>fzero</code>, which we used for bisection, can also be used for root finding with an algorithm that is a bit more robust than Newton's method.</p><p>To begin, we load <code>MTH229</code> which loads both <code>Plots</code> and <code>Roots</code>:</p><pre class="sourceCode julia">using MTH229</pre>
+<p>Previously we discussed the <em>bisection method</em> which applied for some continuous function $f(x)$ which changed signs between $a$ and $b$, points which bracket a zero. Not only did we need to find these bracketing points – which wasn't hard from a graph, more importantly the actual algorithm is pretty slow.</p><p>If the function $f$ is sufficiently differentiable, then Newton's method may work to find a zero.  Unlike the bisection method which is slow but guaranteed to find a root by the intermediate value theorem, Newton's method is fast (once it is close) but has no such guarantee of converging. In this project, we'll see how to implement the algorithm, try some examples, and then look at what can go wrong.</p><p>The <code>MTH229</code> package provides a function <code>newton</code> for easily performing Newton's method, utilizing a function from the <code>Roots</code> package. More usefully, we will see that <code>fzero</code>, which we used for bisection, can also be used for root finding with an algorithm that is a bit more robust than Newton's method.</p><p>To begin, we load <code>MTH229</code> and <code>Plots</code>. In the background this loads <code>Roots</code>:</p><pre class="sourceCode julia">using MTH229
+using Plots</pre>
 <h2>Basic idea</h2><p>The idea behind Newton's method is simple – <em>linear approximation</em>. That is, most functions at any given point are well approximated by the tangent line at that point. If we have a good guess $x_n$, then we can improve this guess iteratively by replacing it with the zero, $x_{n+1}$, of the tangent line at $(x_n, f(x_n))$.</p>
 <div class="well well-sm">
 <figure>
@@ -125,10 +132,292 @@ x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}.
 <p>Some books write the right-hand side as $x_n - f'(x_n)^{-1} f(x_n)$, a form that generalizes to different settings.</p><p>Like the bisection method, Newton's method is an <em>iterative method</em>. One begins with a (suitable) guess $x_0$. From that the algorithm produces $x_1$ which is used to produce $x_2$, etc. The idea is that one eventually will settle on a value $x_n$ sufficiently close to the desired root.</p><p>Mathematically, the indices indicate that the right hand side is computed and assigned to the left hand side. This is exactly what is done in assignment within <code>julia</code>, so  the above simply becomes:</p><pre class="sourceCode julia">x = x - f(x)/f'(x)</pre>
 <p>Where <code>f&#40;x&#41;</code> is the function and <code>f&#39;&#40;x&#41;</code> its derivative. (In this case found by automatic differentiation.) This line starts with a previously defined value of <code>x</code> and updates it accordingly.</p><p>The updating is continued – by executing the exact same command – until either the algorithm has gotten close enough to an answer (i.e., it has converged) or we have given up on it converging.</p><p>Here is an example to find a zero of the function: $f(x) = x^3 - 2x - 5$.</p><p>A quick graph shows a root near 2:</p><pre class="sourceCode julia">f(x) = x^3 - 2x - 5
 plot(f, -3, 3)</pre>
-    <div id="8c30fa64-bed1-47fc-8672-208b4c7763bb" style="width:600px;height:400px;"></div>
+    <div id="41aa7ddc-1204-4974-86d9-62ed99a8a6c7" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('8c30fa64-bed1-47fc-8672-208b4c7763bb');
-    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[-2.985351271470318,-2.9707025429406357,-2.9560538144109536,-2.941405085881271,-2.805956438658394,-2.670507791435517,-2.53505914421264,-2.399610496989763,-2.3182115057838866,-2.23681251457801,-2.1554135233721334,-2.074014532166257,-1.9363709099358313,-1.7987272877054057,-1.6492077337535487,-1.4996881798016914,-1.3618443762969612,-1.224000572792231,-1.076217447176646,-0.928434321561061,-0.7572130777649336,-0.5859918339688063,-0.2816693633338713,-0.014805980758679935,0.27614673993191674,0.5688286725168725,0.730627324131649,0.8924259757464256,1.0463733101077433,1.2003206444690608,1.360390152768582,1.5204596610681032,1.655204091534587,1.7899485220010707,1.9544561989596276,2.1189638759181846,2.273605944345218,2.4282480127722508,2.552122305603278,2.6759965984343053,2.799870891265332,2.9237451840963593,2.9428088880722694,2.96187259204818,2.98093629602409],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-25.635709910584733,-25.2752634952189,-24.918641893496265,-24.565826245010598,-21.48048079621462,-18.704009465749525,-16.221502335231122,-14.018049486275173,-12.821888071937387,-11.717886633524275,-10.702809172486473,-9.77341969027462,-8.387743453350755,-7.2221834059257555,-6.187241804472453,-5.373519291570978,-4.802015207910328,-4.3857688528474625,-4.094087499654566,-3.943432726457977,-3.9197383525884053,-4.029237975632274,-4.459008253130632,-4.970391284206305,-5.531235351848514,-5.9536036934048155,-6.0712338830842665,-6.074102377142163,-5.947075513164881,-5.67125573467246,-5.203158804741202,-4.525924355769211,-3.7756445658052016,-2.84505285174097,-1.4430870521987686,0.2762368066291616,2.2057029193502498,4.461397417292341,6.518565731893851,8.81070550363337,11.349221720047943,14.145519368674641,14.599472549338003,15.059842668554765,15.526671295662794],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-3.0,-2.0,-1.0,0.0,1.0,2.0,3.0],"visible":true,"ticks":"inside","range":[-3.1643398984951503,3.1599249230489224],"domain":[0.05100612423447069,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-3","-2","-1","0","1","2","3"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-20.0,-10.0,0.0,10.0],"visible":true,"ticks":"inside","range":[-26.87058134677216,16.76154273185022],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-20","-10","0","10"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('41aa7ddc-1204-4974-86d9-62ed99a8a6c7');
+    Plotly.plot(PLOT, [
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            -3.0,
+            -2.985351271470318,
+            -2.9707025429406357,
+            -2.9560538144109536,
+            -2.941405085881271,
+            -2.805956438658394,
+            -2.670507791435517,
+            -2.53505914421264,
+            -2.399610496989763,
+            -2.23681251457801,
+            -2.074014532166257,
+            -1.9363709099358313,
+            -1.7987272877054057,
+            -1.6492077337535487,
+            -1.4996881798016914,
+            -1.3618443762969612,
+            -1.224000572792231,
+            -0.928434321561061,
+            -0.5859918339688063,
+            -0.2816693633338713,
+            -0.014805980758679935,
+            0.27614673993191674,
+            0.5688286725168725,
+            0.8924259757464256,
+            1.2003206444690608,
+            1.360390152768582,
+            1.5204596610681032,
+            1.655204091534587,
+            1.7899485220010707,
+            1.9544561989596276,
+            2.1189638759181846,
+            2.273605944345218,
+            2.4282480127722508,
+            2.552122305603278,
+            2.6759965984343053,
+            2.799870891265332,
+            2.9237451840963593,
+            2.9428088880722694,
+            2.96187259204818,
+            2.98093629602409,
+            3.0
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y1",
+        "zmin": -0.1,
+        "legendgroup": "y1",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(0, 154, 250, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            -26.0,
+            -25.635709910584733,
+            -25.2752634952189,
+            -24.918641893496265,
+            -24.565826245010598,
+            -21.48048079621462,
+            -18.704009465749525,
+            -16.221502335231122,
+            -14.018049486275173,
+            -11.717886633524275,
+            -9.77341969027462,
+            -8.387743453350755,
+            -7.2221834059257555,
+            -6.187241804472453,
+            -5.373519291570978,
+            -4.802015207910328,
+            -4.3857688528474625,
+            -3.943432726457977,
+            -4.029237975632274,
+            -4.459008253130632,
+            -4.970391284206305,
+            -5.531235351848514,
+            -5.9536036934048155,
+            -6.074102377142163,
+            -5.67125573467246,
+            -5.203158804741202,
+            -4.525924355769211,
+            -3.7756445658052016,
+            -2.84505285174097,
+            -1.4430870521987686,
+            0.2762368066291616,
+            2.2057029193502498,
+            4.461397417292341,
+            6.518565731893851,
+            8.81070550363337,
+            11.349221720047943,
+            14.145519368674641,
+            14.599472549338003,
+            15.059842668554765,
+            15.526671295662794,
+            16.0
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    }
+]
+, {
+    "showlegend": true,
+    "xaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            -3.0,
+            -2.0,
+            -1.0,
+            0.0,
+            1.0,
+            2.0,
+            3.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            -3.18,
+            3.18
+        ],
+        "domain": [
+            0.05100612423447069,
+            0.9934383202099737
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "-3",
+            "-2",
+            "-1",
+            "0",
+            "1",
+            "2",
+            "3"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "y1"
+    },
+    "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "annotations": [],
+    "height": 400,
+    "margin": {
+        "l": 0,
+        "b": 20,
+        "r": 0,
+        "t": 20
+    },
+    "plot_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "yaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            -20.0,
+            -10.0,
+            0.0,
+            10.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            -27.26,
+            17.26
+        ],
+        "domain": [
+            0.03762029746281716,
+            0.9901574803149606
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "-20",
+            "-10",
+            "0",
+            "10"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "x1"
+    },
+    "legend": {
+        "tracegroupgap": 0,
+        "bordercolor": "rgba(0, 0, 0, 1.000)",
+        "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "font": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "y": 1.0,
+        "x": 1.0
+    },
+    "width": 600
+}
+);
     </script>
 <p>Here we improve the estimate for the root near 2 using Newton's method. We will need the first derivative, which we denote <code>fp</code></p><pre class="sourceCode julia">fp(x) = 3x^2 - 2
 x = 2				# starting value, x_0
@@ -141,10 +430,290 @@ x, f(x)</pre>
 plot(f, 1, 3, legend=false)
 plot!([x0, x0, x1], [0, f(x0), 0])  # why these values?
 scatter!([x0, x1], [0, 0])</pre>
-    <div id="57013cd9-2083-458e-b00c-c109c382546d" style="width:600px;height:400px;"></div>
+    <div id="f3e6a0cd-e6dc-4c95-aadd-1cedb9578626" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('57013cd9-2083-458e-b00c-c109c382546d');
-    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[1.0195316380395762,1.2001298343367457,1.3086618226112479,1.4004242374315314,1.500103940066103,1.5919998090692564,1.6905218928129797,1.8046693886770646,1.9061102122220428,1.99506467308044,2.092048913310639,2.1896095575056242,2.2974753252488083,2.4001068814896866,2.506819887022701,2.5966495073336904,2.6514853996532093,2.706321291972728,2.7578686481150725,2.8094160042574168,2.8919988661447684,2.97458172803212,2.9872908640160603],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-5.9793164562822145,-5.671698723651524,-5.376114948744723,-5.054353202784232,-4.624506236068971,-4.149134381859628,-3.549761670367768,-2.7318344803761554,-1.8868337902040913,-1.0492072446967695,-0.027892921576361474,1.1186230827532961,2.532026725588673,4.025633231413934,5.739582256271564,7.314840517696528,8.337965402141403,9.40892798981978,10.460168948963872,11.555377999997123,13.403690106169073,15.370341575297022,15.683723246831825],"type":"scatter","hoverinfo":"text"},{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null],"x":[2.0,2.0,2.1],"showlegend":true,"mode":"lines","name":"y2","zmin":-0.1,"legendgroup":"y2","zmax":0.1,"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0,-1,0],"type":"scatter","hoverinfo":"text"},{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null],"x":[2.0,2.1],"showlegend":true,"mode":"markers","name":"y3","zmin":-0.1,"legendgroup":"y3","marker":{"symbol":"circle","color":"rgba(62, 164, 78, 1.000)","line":{"color":"rgba(0, 0, 0, 1.000)","width":1},"size":8},"zmax":0.1,"y":[0,0],"type":"scatter","hoverinfo":"text"}], {"showlegend":false,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[1.0,1.5,2.0,2.5,3.0],"visible":true,"ticks":"inside","range":[0.9604988612602817,3.0463236407953547],"domain":[0.03619130941965587,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["1.0","1.5","2.0","2.5","3.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-5.0,0.0,5.0,10.0,15.0],"visible":true,"ticks":"inside","range":[-6.629207647375636,16.333614437925245],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-5","0","5","10","15"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"width":600});
+    PLOT = document.getElementById('f3e6a0cd-e6dc-4c95-aadd-1cedb9578626');
+    Plotly.plot(PLOT, [
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            1.0,
+            1.0195316380395762,
+            1.2001298343367457,
+            1.3086618226112479,
+            1.4004242374315314,
+            1.500103940066103,
+            1.5919998090692564,
+            1.6905218928129797,
+            1.8046693886770646,
+            1.9061102122220428,
+            1.99506467308044,
+            2.092048913310639,
+            2.1896095575056242,
+            2.2974753252488083,
+            2.4001068814896866,
+            2.506819887022701,
+            2.5966495073336904,
+            2.706321291972728,
+            2.8094160042574168,
+            2.97458172803212,
+            3.0
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y1",
+        "zmin": -0.1,
+        "legendgroup": "y1",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(0, 154, 250, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            -6.0,
+            -5.9793164562822145,
+            -5.671698723651524,
+            -5.376114948744723,
+            -5.054353202784232,
+            -4.624506236068971,
+            -4.149134381859628,
+            -3.549761670367768,
+            -2.7318344803761554,
+            -1.8868337902040913,
+            -1.0492072446967695,
+            -0.027892921576361474,
+            1.1186230827532961,
+            2.532026725588673,
+            4.025633231413934,
+            5.739582256271564,
+            7.314840517696528,
+            9.40892798981978,
+            11.555377999997123,
+            15.370341575297022,
+            16.0
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    },
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null
+        ],
+        "x": [
+            2.0,
+            2.0,
+            2.1
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y2",
+        "zmin": -0.1,
+        "legendgroup": "y2",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(227, 111, 71, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            0.0,
+            -1.0,
+            0.0
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    },
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null
+        ],
+        "x": [
+            2.0,
+            2.1
+        ],
+        "showlegend": true,
+        "mode": "markers",
+        "name": "y3",
+        "zmin": -0.1,
+        "legendgroup": "y3",
+        "marker": {
+            "symbol": "circle",
+            "color": "rgba(62, 164, 78, 1.000)",
+            "line": {
+                "color": "rgba(0, 0, 0, 1.000)",
+                "width": 1
+            },
+            "size": 8
+        },
+        "zmax": 0.1,
+        "y": [
+            0.0,
+            0.0
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    }
+]
+, {
+    "showlegend": false,
+    "xaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            1.0,
+            1.5,
+            2.0,
+            2.5,
+            3.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            0.94,
+            3.06
+        ],
+        "domain": [
+            0.03619130941965587,
+            0.9934383202099738
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "1.0",
+            "1.5",
+            "2.0",
+            "2.5",
+            "3.0"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "y1"
+    },
+    "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "annotations": [],
+    "height": 400,
+    "margin": {
+        "l": 0,
+        "b": 20,
+        "r": 0,
+        "t": 20
+    },
+    "plot_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "yaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            -5.0,
+            0.0,
+            5.0,
+            10.0,
+            15.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            -6.66,
+            16.66
+        ],
+        "domain": [
+            0.03762029746281716,
+            0.9901574803149606
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "-5",
+            "0",
+            "5",
+            "10",
+            "15"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "x1"
+    },
+    "width": 600
+}
+);
     </script>
 <p>Continuing, though without visualizing the progress, this next step will compute $x_2$:</p><pre class="sourceCode julia">x = x - f(x)/fp(x)
 x, f(x)</pre>
@@ -192,78 +761,78 @@ x = x - f(x)/f'(x)
 <hr /><h3>Practice</h3><h4>Question</h4><p>Using Newton's method to find $\sqrt{k}$ (by solving for roots of $f(x) = x^2 - k$) is also referred to as the Babylonian method, due to its origins. The resulting method</p>$$~
 x_{n+1} = \frac{1}{2}(x_n + \frac{k}{x_n})
 ~$$
-<p>is described by the first-century <a href="http://en.wikipedia.org/wiki/Babylonian_method">Greek mathematician Hero of Alexandria</a>.</p><p>Let $k=15$ and $x_0$ be $4$. What is the value of $x_3$?</p><form name='WeaveQuestion' data-id='K9FYwm5D' data-controltype='numeric'>
+<p>is described by the first-century <a href="http://en.wikipedia.org/wiki/Babylonian_method">Greek mathematician Hero of Alexandria</a>.</p><p>Let $k=15$ and $x_0$ be $4$. What is the value of $x_3$?</p><form name='WeaveQuestion' data-id='Udp7EpQp' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="K9FYwm5D" type="number" class="form-control">
+<input id="Udp7EpQp" type="number" class="form-control">
 
 </div>
-  
-<div id='K9FYwm5D_message'></div>
+
+<div id='Udp7EpQp_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#K9FYwm5D').on('change', function() {
+$('#Udp7EpQp').on('change', function() {
   correct = Math.abs(this.value - 3.8729833462074525) <= 0.0001;
 
   if(correct) {
-     $('#K9FYwm5D_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#Udp7EpQp_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#K9FYwm5D_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#Udp7EpQp_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>The function $f(x) = \sin(x)$ has derivative $f'(x) = \cos(x)$. Use Newton's method to solve $f(x) = 0$ starting at $3$. Repeat 5 times. What value do you get for <code>x</code>?</p><form name='WeaveQuestion' data-id='iC1l45n0' data-controltype='numeric'>
+<h4>Question</h4><p>The function $f(x) = \sin(x)$ has derivative $f'(x) = \cos(x)$. Use Newton's method to solve $f(x) = 0$ starting at $3$. Repeat 5 times. What value do you get for <code>x</code>?</p><form name='WeaveQuestion' data-id='y1gTYCrN' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="iC1l45n0" type="number" class="form-control">
+<input id="y1gTYCrN" type="number" class="form-control">
 
 </div>
-  
-<div id='iC1l45n0_message'></div>
+
+<div id='y1gTYCrN_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#iC1l45n0').on('change', function() {
+$('#y1gTYCrN').on('change', function() {
   correct = Math.abs(this.value - 3.141592653589793) <= 1.0e-14;
 
   if(correct) {
-     $('#iC1l45n0_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#y1gTYCrN_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#iC1l45n0_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#y1gTYCrN_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<p>(This can be used to compute $\pi$ numerically, as the convergence is very fast. Here it takes 4 steps to verify.)</p><h4>Question</h4><p>Let $f(x) = x^2 - 3^x$. This has derivative $2x - 3^x \cdot \log(3)$. Starting with $x_0=0$, what does Newton's method converge on?</p><form name='WeaveQuestion' data-id='a8pdDJ2v' data-controltype='numeric'>
+<p>(This can be used to compute $\pi$ numerically, as the convergence is very fast. Here it takes 4 steps to verify.)</p><h4>Question</h4><p>Let $f(x) = x^2 - 3^x$. This has derivative $2x - 3^x \cdot \log(3)$. Starting with $x_0=0$, what does Newton's method converge on?</p><form name='WeaveQuestion' data-id='UaiS3BN1' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="a8pdDJ2v" type="number" class="form-control">
+<input id="UaiS3BN1" type="number" class="form-control">
 
 </div>
-  
-<div id='a8pdDJ2v_message'></div>
+
+<div id='UaiS3BN1_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#a8pdDJ2v').on('change', function() {
+$('#UaiS3BN1').on('change', function() {
   correct = Math.abs(this.value - -0.6860267245362514) <= 1.0e-14;
 
   if(correct) {
-     $('#a8pdDJ2v_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#UaiS3BN1_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#a8pdDJ2v_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#UaiS3BN1_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -314,78 +883,78 @@ newton(f, 2)  # newton will use automatic differentiation for the derivative</pr
 <pre class="output">
 (0.20163967572340466, 1.2217539869961238)</pre>
 
-<p>In this case, the answer is exact up to floating point round off.</p><h3>Practice</h3><h4>Question</h4><p>Repeat the problem of finding a root of $f(x) = \exp(x) - x^4$ starting at $x=2$. (<code>newton&#40;f, 2, verbose&#61;true&#41;</code>). How many iterations does it take with the default tolerances?</p><form name='WeaveQuestion' data-id='7dfsmxHm' data-controltype='numeric'>
+<p>In this case, the answer is exact up to floating point round off.</p><h3>Practice</h3><h4>Question</h4><p>Repeat the problem of finding a root of $f(x) = \exp(x) - x^4$ starting at $x=2$. (<code>newton&#40;f, 2, verbose&#61;true&#41;</code>). How many iterations does it take with the default tolerances?</p><form name='WeaveQuestion' data-id='XHeNlGDR' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="7dfsmxHm" type="number" class="form-control">
+<input id="XHeNlGDR" type="number" class="form-control">
 
 </div>
-  
-<div id='7dfsmxHm_message'></div>
+
+<div id='XHeNlGDR_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#7dfsmxHm').on('change', function() {
+$('#XHeNlGDR').on('change', function() {
   correct = Math.abs(this.value - 6) <= 0.1;
 
   if(correct) {
-     $('#7dfsmxHm_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#XHeNlGDR_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#7dfsmxHm_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#XHeNlGDR_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>If we repeat with $f(x) = \exp(x) - x^4$ but start now at $x=8$ where does the algorithm converge?</p><form name='WeaveQuestion' data-id='PKQH2rq0' data-controltype='numeric'>
+<h4>Question</h4><p>If we repeat with $f(x) = \exp(x) - x^4$ but start now at $x=8$ where does the algorithm converge?</p><form name='WeaveQuestion' data-id='f67646WO' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="PKQH2rq0" type="number" class="form-control">
+<input id="f67646WO" type="number" class="form-control">
 
 </div>
-  
-<div id='PKQH2rq0_message'></div>
+
+<div id='f67646WO_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#PKQH2rq0').on('change', function() {
+$('#f67646WO').on('change', function() {
   correct = Math.abs(this.value - NaN) <= 1.0e-6;
 
   if(correct) {
-     $('#PKQH2rq0_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#f67646WO_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#PKQH2rq0_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#f67646WO_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Let $f(x) = \sin(x) - \cos(4\cdot x)$.</p><p>Starting at $\pi/8$, solve for the root returned by Newton's method</p><form name='WeaveQuestion' data-id='PGqmilxl' data-controltype='numeric'>
+<h4>Question</h4><p>Let $f(x) = \sin(x) - \cos(4\cdot x)$.</p><p>Starting at $\pi/8$, solve for the root returned by Newton's method</p><form name='WeaveQuestion' data-id='JTUlcEsT' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="PGqmilxl" type="number" class="form-control">
+<input id="JTUlcEsT" type="number" class="form-control">
 
 </div>
-  
-<div id='PGqmilxl_message'></div>
+
+<div id='JTUlcEsT_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#PGqmilxl').on('change', function() {
+$('#JTUlcEsT').on('change', function() {
   correct = Math.abs(this.value - 0.3141592653589793) <= 0.001;
 
   if(correct) {
-     $('#PGqmilxl_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#JTUlcEsT_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#PGqmilxl_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#JTUlcEsT_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -415,53 +984,53 @@ x - \frac{h \cdot f(x)}{f(x+h) - f(x)}.
 <p>The issue with this approximation is when the estimated value gets close to the actual root, the value of $h$ becomes too large. Steffenson's method replaces $h$ with $f(x)$, which for values close to a root gets quite small. This improves the convergence rate to be on par with Newton's method. In this case, the update step looks like</p>$$~
 x - \frac{f(x)^2}{f(x+ f(x)) - f(x)}.
 ~$$
-<h3>Problems</h3><h4>Question</h4><p>Use the secant method to find a root to $f(x) = \cos(x) - x^3$ starting with $x_0=1/2$ and $x_1=1$.</p><form name='WeaveQuestion' data-id='wKdyXR4a' data-controltype='numeric'>
+<h3>Problems</h3><h4>Question</h4><p>Use the secant method to find a root to $f(x) = \cos(x) - x^3$ starting with $x_0=1/2$ and $x_1=1$.</p><form name='WeaveQuestion' data-id='HtFNHl7r' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="wKdyXR4a" type="number" class="form-control">
+<input id="HtFNHl7r" type="number" class="form-control">
 
 </div>
-  
-<div id='wKdyXR4a_message'></div>
+
+<div id='HtFNHl7r_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#wKdyXR4a').on('change', function() {
+$('#HtFNHl7r').on('change', function() {
   correct = Math.abs(this.value - 1) <= 1.0e-10;
 
   if(correct) {
-     $('#wKdyXR4a_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#HtFNHl7r_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#wKdyXR4a_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#HtFNHl7r_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Use the secant method to find a root to $f(x) = x^5 + x - 1$ starting with $x_0=1/2$ and $x_1=1$.</p><form name='WeaveQuestion' data-id='i2f4d0kR' data-controltype='numeric'>
+<h4>Question</h4><p>Use the secant method to find a root to $f(x) = x^5 + x - 1$ starting with $x_0=1/2$ and $x_1=1$.</p><form name='WeaveQuestion' data-id='fp8HnoP9' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="i2f4d0kR" type="number" class="form-control">
+<input id="fp8HnoP9" type="number" class="form-control">
 
 </div>
-  
-<div id='i2f4d0kR_message'></div>
+
+<div id='fp8HnoP9_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#i2f4d0kR').on('change', function() {
+$('#fp8HnoP9').on('change', function() {
   correct = Math.abs(this.value - 1) <= 1.0e-10;
 
   if(correct) {
-     $('#i2f4d0kR_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#fp8HnoP9_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#i2f4d0kR_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#fp8HnoP9_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -482,10 +1051,350 @@ fzero(f, -1)</pre>
 </li>
 </ul><p>The following graph suggests, perhaps, there may be $3$ zeros, one near $9$, one near $2$ and one near $-1$.</p><pre class="sourceCode julia">f(x) = exp(x) - x^4
 plot(f, -5,9)</pre>
-    <div id="32bf3ad0-8959-4226-a92b-9afc1d2e6a66" style="width:600px;height:400px;"></div>
+    <div id="ff305b2d-00a1-4291-b844-30b12cd8164c" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('32bf3ad0-8959-4226-a92b-9afc1d2e6a66');
-    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[-4.965819633430741,-4.931639266861483,-4.897458900292225,-4.8632785337229665,-4.705255111962943,-4.547231690202921,-4.389208268442897,-4.231184846682874,-4.0731614249228505,-3.915138003162827,-3.7571145814028037,-3.5990911596427804,-3.2192292006820233,-2.839367241721266,-2.518198789850273,-2.19703033797928,-1.49927241953728,-0.8560013365152057,-0.16634675030914214,0.632685720739452,1.3427714855543003,1.9654527115630802,2.3048975523687765,2.6443423931744725,2.985804647856921,3.3272669025393693,3.516031996089942,3.7047970896405142,3.8935621831910865,4.082327276741659,4.261932500163196,4.441537723584734,4.6211429470062715,4.800748170427808,5.174243689793357,5.547739209158907,5.86214288024737,6.176546551335832,6.368472174454149,6.560397797572465,6.752323420690781,6.944249043809098,7.0344569170582005,7.124664790307303,7.214872663556406,7.305080536805509,7.3952884100546115,7.485496283303714,7.575704156552817,7.665912029801919,7.738172033953351,7.810432038104784,7.882692042256216,7.954952046407648,8.027212050559081,8.099472054710514,8.171732058861945,8.243992063013378,8.316252067164811,8.388512071316242,8.424642073391958,8.460772075467675,8.496902077543393,8.533032079619108,8.569162081694824,8.605292083770541,8.641422085846258,8.677552087921974,8.71368208999769,8.749812092073405,8.78594209414912,8.822072096224838,8.844313084196735,8.86655407216863,8.888795060140524,8.911036048112418,8.933277036084313,8.95551802405621,8.977759012028105],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-608.0772918087122,-591.5070298242472,-575.2777330131781,-559.3846910372821,-490.1451213320584,-427.540802301203,-371.1335640628726,-320.50019580182345,-275.2324446335021,-234.93701427367824,-199.2355634803273,-167.7647042287722,-107.36083325904822,-64.93748347214688,-40.13179993518053,-23.188239330107553,-4.829392243615039,-0.1120478462379344,0.8459868739653739,1.7224270329047453,0.5787064525994619,-7.784659317281205,-18.200065124547432,-34.82152248653748,-59.675319306462555,-94.69842235424127,-119.18029907723755,-147.7481399339665,-180.73491198405105,-218.45214562821278,-258.9864333453773,-304.2592801725844,-354.4243071112035,-409.57128200838235,-540.1197482269292,-690.5923343025709,-829.4574124635383,-974.0748478577966,-1061.739592143841,-1145.7872598513557,-1222.7557180972522,-1288.2508104751,-1313.5467940501476,-1334.43203852065,-1350.1587202459805,-1359.8982347701558,-1362.7334209440533,-1357.6500509911082,-1343.5275172202607,-1319.1286395482407,-1291.2566467508473,-1255.1518443139412,-1209.9865536469442,-1154.8664532371608,-1088.8255357432554,-1010.8206871995635,-919.7258600141863,-814.3258093218783,-693.3093599718513,-555.262168978662,-479.3799504131375,-398.65894562883295,-312.8897858007822,-221.8550886027915,-125.32916188113086,-23.07769642621861,85.14255255881835,199.58409570857202,320.50905189589685,448.189503229567,582.9078631125258,724.9572578412372,816.177211841481,910.3633845933491,1007.5905912787221,1107.9353763992194,1211.4760528009565,1318.2927415769882,1428.467412867125],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-4.0,-2.0,0.0,2.0,4.0,6.0,8.0],"visible":true,"ticks":"inside","range":[-5.384126992794506,9.396066371391871],"domain":[0.08063575386410031,0.9934383202099737],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-4","-2","0","2","4","6","8"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-1000.0,-500.0,0.0,500.0,1000.0,1500.0],"visible":true,"ticks":"inside","range":[-1446.4694459583886,1512.2034378814603],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-1000","-500","0","500","1000","1500"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('ff305b2d-00a1-4291-b844-30b12cd8164c');
+    Plotly.plot(PLOT, [
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            -5.0,
+            -4.965819633430741,
+            -4.931639266861483,
+            -4.897458900292225,
+            -4.8632785337229665,
+            -4.547231690202921,
+            -4.231184846682874,
+            -3.915138003162827,
+            -3.5990911596427804,
+            -3.2192292006820233,
+            -2.839367241721266,
+            -2.518198789850273,
+            -2.19703033797928,
+            -1.49927241953728,
+            -0.8560013365152057,
+            -0.16634675030914214,
+            0.632685720739452,
+            1.3427714855543003,
+            1.9654527115630802,
+            2.6443423931744725,
+            3.3272669025393693,
+            3.7047970896405142,
+            4.082327276741659,
+            4.441537723584734,
+            4.800748170427808,
+            5.174243689793357,
+            5.547739209158907,
+            5.86214288024737,
+            6.176546551335832,
+            6.560397797572465,
+            6.944249043809098,
+            7.124664790307303,
+            7.305080536805509,
+            7.3952884100546115,
+            7.485496283303714,
+            7.575704156552817,
+            7.665912029801919,
+            7.810432038104784,
+            7.954952046407648,
+            8.027212050559081,
+            8.099472054710514,
+            8.171732058861945,
+            8.243992063013378,
+            8.316252067164811,
+            8.388512071316242,
+            8.460772075467675,
+            8.533032079619108,
+            8.605292083770541,
+            8.677552087921974,
+            8.749812092073405,
+            8.822072096224838,
+            8.844313084196735,
+            8.86655407216863,
+            8.888795060140524,
+            8.911036048112418,
+            8.933277036084313,
+            8.95551802405621,
+            8.977759012028105,
+            9.0
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y1",
+        "zmin": -0.1,
+        "legendgroup": "y1",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(0, 154, 250, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            -624.9932620530009,
+            -608.0772918087122,
+            -591.5070298242472,
+            -575.2777330131781,
+            -559.3846910372821,
+            -427.540802301203,
+            -320.50019580182345,
+            -234.93701427367824,
+            -167.7647042287722,
+            -107.36083325904822,
+            -64.93748347214688,
+            -40.13179993518053,
+            -23.188239330107553,
+            -4.829392243615039,
+            -0.1120478462379344,
+            0.8459868739653739,
+            1.7224270329047453,
+            0.5787064525994619,
+            -7.784659317281205,
+            -34.82152248653748,
+            -94.69842235424127,
+            -147.7481399339665,
+            -218.45214562821278,
+            -304.2592801725844,
+            -409.57128200838235,
+            -540.1197482269292,
+            -690.5923343025709,
+            -829.4574124635383,
+            -974.0748478577966,
+            -1145.7872598513557,
+            -1288.2508104751,
+            -1334.43203852065,
+            -1359.8982347701558,
+            -1362.7334209440533,
+            -1357.6500509911082,
+            -1343.5275172202607,
+            -1319.1286395482407,
+            -1255.1518443139412,
+            -1154.8664532371608,
+            -1088.8255357432554,
+            -1010.8206871995635,
+            -919.7258600141863,
+            -814.3258093218783,
+            -693.3093599718513,
+            -555.262168978662,
+            -398.65894562883295,
+            -221.8550886027915,
+            -23.07769642621861,
+            199.58409570857202,
+            448.189503229567,
+            724.9572578412372,
+            816.177211841481,
+            910.3633845933491,
+            1007.5905912787221,
+            1107.9353763992194,
+            1211.4760528009565,
+            1318.2927415769882,
+            1428.467412867125,
+            1542.0839275753842
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    }
+]
+, {
+    "showlegend": true,
+    "xaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            -4.0,
+            -2.0,
+            0.0,
+            2.0,
+            4.0,
+            6.0,
+            8.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            -5.42,
+            9.42
+        ],
+        "domain": [
+            0.08063575386410031,
+            0.9934383202099737
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "-4",
+            "-2",
+            "0",
+            "2",
+            "4",
+            "6",
+            "8"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "y1"
+    },
+    "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "annotations": [],
+    "height": 400,
+    "margin": {
+        "l": 0,
+        "b": 20,
+        "r": 0,
+        "t": 20
+    },
+    "plot_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "yaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            -1000.0,
+            -500.0,
+            0.0,
+            500.0,
+            1000.0,
+            1500.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            -1449.8779413996363,
+            1629.2284480309672
+        ],
+        "domain": [
+            0.03762029746281716,
+            0.9901574803149606
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "-1000",
+            "-500",
+            "0",
+            "500",
+            "1000",
+            "1500"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "x1"
+    },
+    "legend": {
+        "tracegroupgap": 0,
+        "bordercolor": "rgba(0, 0, 0, 1.000)",
+        "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "font": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "y": 1.0,
+        "x": 1.0
+    },
+    "width": 600
+}
+);
     </script>
 <p>We can improve these guesses with</p><pre class="sourceCode julia">fzero(f, 9), fzero(f, 2), fzero(f, -1)</pre>
 <pre class="output">
@@ -494,7 +1403,7 @@ plot(f, -5,9)</pre>
 <p>The above can be written without repeating <code>fzero</code> by using a comprehension:</p><pre class="sourceCode julia">[fzero(f, x) for x in [9, 2, -1]]</pre>
 <pre class="output">
 3-element Array{Float64,1}:
-  8.6131694564414   
+  8.6131694564414
   1.4296118247255556
  -0.8155534188089607</pre>
 
@@ -503,28 +1412,376 @@ plot(f, -5,9)</pre>
 3-element Array{Float64,1}:
  -0.8155534188089607
   1.4296118247255556
-  8.6131694564414   </pre>
+  8.6131694564414</pre>
 
 <hr /><p>As another illustration, let $f(x) = \cos^2(x^2)$ on $[-1,2]$. Find all the zeros of the derivative of $f(x)$.</p><p>We graph the derivative to identify starting points:</p><pre class="sourceCode julia">f(x) = cos(x^2)^2
 plot(f', -1, 2)</pre>
-    <div id="67f7860a-b423-42e7-ab71-c802f00163b2" style="width:600px;height:400px;"></div>
+    <div id="d55c1f7e-e151-42b8-ac07-525fe5f696be" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('67f7860a-b423-42e7-ab71-c802f00163b2');
-    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[-0.9926756357351589,-0.9853512714703179,-0.9780269072054768,-0.9707025429406356,-0.9368403811349164,-0.9029782193291971,-0.8691160575234778,-0.8352538957177585,-0.76752957210632,-0.6998052484948815,-0.6591057528919433,-0.618406257289005,-0.5777067616860667,-0.5370072660831284,-0.46818545496791564,-0.39936364385270284,-0.3246038668767743,-0.2498440899008457,-0.1809221881484806,-0.11200028639611552,0.035782839219469544,0.20700408301559686,0.28308470067433056,0.3591653183330643,0.42588116397686215,0.49259700962066005,0.5653351897933092,0.6380733699659584,0.7112438531121974,0.7844143362584364,0.8248639991621305,0.8653136620658246,0.9057633249695187,0.9462129878732127,0.9654564046683773,0.9846998214635421,1.0039432382587068,1.0231866550538715,1.0424300718490362,1.061673488644201,1.0809169054393657,1.1001603222345304,1.1201690107719706,1.1401776993094108,1.160186387846851,1.180195076384291,1.200203764921731,1.2202124534591712,1.2402211419966114,1.2602298305340516,1.3276020457672935,1.3949742610005353,1.415537720620355,1.4361011802401746,1.4566646398599943,1.477228099479814,1.4977915590996336,1.5183550187194532,1.5389184783392729,1.5594819379590923,1.5788121965124713,1.5981424550658505,1.6078075843425401,1.6174727136192297,1.6271378428959193,1.636802972172609,1.6561332307259882,1.6754634892793672,1.6947937478327462,1.7141240063861254,1.7296082929900038,1.7450925795938823,1.7605768661977605,1.776061152801639,1.8070297260093957,1.8379982992171526,1.8534825858210309,1.8689668724249093,1.8844511590287878,1.899935445632666,1.9154197322365445,1.930904018840423,1.9463883054443012,1.9618725920481797,1.9666385180421573,1.9714044440361347,1.9761703700301123,1.98093629602409,1.9857022220180673,1.990468148012045,1.9952340740060226],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[1.82861917131379,1.836599214837022,1.8425887928974007,1.846642999809091,1.8418658967982864,1.8027128616491186,1.7350968430876432,1.6448482545950127,1.4182720106499955,1.1619475967222594,1.0065611705913837,0.8564069031882914,0.7152203837448443,0.5856661042763088,0.3974772863113508,0.2504814236785462,0.13580064365136932,0.06222121535765637,0.02367147000938714,0.005619165603702994,-0.00018326684687543172,-0.03543765429783074,-0.0903541808541151,-0.18327971228202333,-0.3022446052743133,-0.4595703010968991,-0.6745124916293854,-0.9280500561763781,-1.2059191960761155,-1.4789239323882837,-1.613486670904223,-1.7259851297177995,-1.8070879311837753,-1.8468790307660008,-1.84838854656667,-1.8372117891736792,-1.8123330721918924,-1.7727975127255322,-1.7177319082578644,-1.646367043460303,-1.5580612179856146,-1.452324727689395,-1.3235653083204915,-1.1755060691544787,-1.0082953533412597,-0.8223780785837667,-0.6185234473943906,-0.39785000937223913,-0.1618471302654211,0.08760814073257768,0.9933995440395021,1.9023773858134159,2.156372561730102,2.3904329312648116,2.5992171017888492,2.77737299661783,2.9196552274018126,3.0210548072301333,3.0769393803009515,3.08320154094753,3.0407653167768163,2.949261788668576,2.8846336837835995,2.807272172011551,2.717136465323585,2.6142462764280507,2.3706003934481057,2.077802918431311,1.7384438571557634,1.3562842944725932,1.0225843689016099,0.6676814916111582,0.2951607958388357,-0.09092841077698216,-0.8854721122623368,-1.6755826849359834,-2.055043471891893,-2.4162925134880626,-2.753371571614867,-3.0603576513200643,-3.3314655113599914,-3.5611561508384346,-3.7442496872889475,-3.876040782983913,-3.905624670793513,-3.929846243996098,-3.9486048475092392,-3.9618067687012104,-3.969365537228717,-3.9712022190879077,-3.9672457041561606],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-1.0,0.0,1.0,2.0],"visible":true,"ticks":"inside","range":[-1.0823129270273943,2.084871365298258],"domain":[0.03619130941965587,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-1","0","1","2"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-4.0,-2.0,0.0,2.0],"visible":true,"ticks":"inside","range":[-4.182834331888971,3.294833653748593],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-4","-2","0","2"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('d55c1f7e-e151-42b8-ac07-525fe5f696be');
+    Plotly.plot(PLOT, [
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            -1.0,
+            -0.9707025429406356,
+            -0.6998052484948815,
+            -0.618406257289005,
+            -0.5370072660831284,
+            -0.46818545496791564,
+            -0.39936364385270284,
+            -0.3246038668767743,
+            -0.2498440899008457,
+            -0.1809221881484806,
+            -0.11200028639611552,
+            0.035782839219469544,
+            0.20700408301559686,
+            0.28308470067433056,
+            0.3591653183330643,
+            0.42588116397686215,
+            0.49259700962066005,
+            0.6380733699659584,
+            0.7844143362584364,
+            0.8248639991621305,
+            0.8653136620658246,
+            0.9057633249695187,
+            0.9462129878732127,
+            0.9846998214635421,
+            1.0231866550538715,
+            1.061673488644201,
+            1.1001603222345304,
+            1.1401776993094108,
+            1.180195076384291,
+            1.2202124534591712,
+            1.2602298305340516,
+            1.3276020457672935,
+            1.3949742610005353,
+            1.415537720620355,
+            1.4361011802401746,
+            1.4566646398599943,
+            1.477228099479814,
+            1.4977915590996336,
+            1.5183550187194532,
+            1.5389184783392729,
+            1.5594819379590923,
+            1.5788121965124713,
+            1.5981424550658505,
+            1.6174727136192297,
+            1.636802972172609,
+            1.6561332307259882,
+            1.6754634892793672,
+            1.6947937478327462,
+            1.7141240063861254,
+            1.7450925795938823,
+            1.776061152801639,
+            1.8070297260093957,
+            1.8379982992171526,
+            1.8534825858210309,
+            1.8689668724249093,
+            1.8844511590287878,
+            1.899935445632666,
+            1.9154197322365445,
+            1.930904018840423,
+            1.9463883054443012,
+            1.9618725920481797,
+            1.9714044440361347,
+            1.98093629602409,
+            1.990468148012045,
+            2.0
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y1",
+        "zmin": -0.1,
+        "legendgroup": "y1",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(0, 154, 250, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            1.8185948536513636,
+            1.846642999809091,
+            1.1619475967222594,
+            0.8564069031882914,
+            0.5856661042763088,
+            0.3974772863113508,
+            0.2504814236785462,
+            0.13580064365136932,
+            0.06222121535765637,
+            0.02367147000938714,
+            0.005619165603702994,
+            -0.00018326684687543172,
+            -0.03543765429783074,
+            -0.0903541808541151,
+            -0.18327971228202333,
+            -0.3022446052743133,
+            -0.4595703010968991,
+            -0.9280500561763781,
+            -1.4789239323882837,
+            -1.613486670904223,
+            -1.7259851297177995,
+            -1.8070879311837753,
+            -1.8468790307660008,
+            -1.8372117891736792,
+            -1.7727975127255322,
+            -1.646367043460303,
+            -1.452324727689395,
+            -1.1755060691544787,
+            -0.8223780785837667,
+            -0.39785000937223913,
+            0.08760814073257768,
+            0.9933995440395021,
+            1.9023773858134159,
+            2.156372561730102,
+            2.3904329312648116,
+            2.5992171017888492,
+            2.77737299661783,
+            2.9196552274018126,
+            3.0210548072301333,
+            3.0769393803009515,
+            3.08320154094753,
+            3.0407653167768163,
+            2.949261788668576,
+            2.807272172011551,
+            2.6142462764280507,
+            2.3706003934481057,
+            2.077802918431311,
+            1.7384438571557634,
+            1.3562842944725932,
+            0.6676814916111582,
+            -0.09092841077698216,
+            -0.8854721122623368,
+            -1.6755826849359834,
+            -2.055043471891893,
+            -2.4162925134880626,
+            -2.753371571614867,
+            -3.0603576513200643,
+            -3.3314655113599914,
+            -3.5611561508384346,
+            -3.7442496872889475,
+            -3.876040782983913,
+            -3.929846243996098,
+            -3.9618067687012104,
+            -3.9712022190879077,
+            -3.957432986493527
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    }
+]
+, {
+    "showlegend": true,
+    "xaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            -1.0,
+            0.0,
+            1.0,
+            2.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            -1.09,
+            2.09
+        ],
+        "domain": [
+            0.03619130941965587,
+            0.9934383202099738
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "-1",
+            "0",
+            "1",
+            "2"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "y1"
+    },
+    "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "annotations": [],
+    "height": 400,
+    "margin": {
+        "l": 0,
+        "b": 20,
+        "r": 0,
+        "t": 20
+    },
+    "plot_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "yaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            -4.0,
+            -2.0,
+            0.0,
+            2.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            -4.182834331888971,
+            3.294833653748593
+        ],
+        "domain": [
+            0.03762029746281716,
+            0.9901574803149606
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "-4",
+            "-2",
+            "0",
+            "2"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "x1"
+    },
+    "legend": {
+        "tracegroupgap": 0,
+        "bordercolor": "rgba(0, 0, 0, 1.000)",
+        "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "font": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "y": 1.0,
+        "x": 1.0
+    },
+    "width": 600
+}
+);
     </script>
 <p>We see there are 3 potential zeros, one near 0, one near 1.2 and close to 1.7. Here we improve our guesses:</p><pre class="sourceCode julia">xs = fzero.(f', [0, 1.2, 1.7])   # or [fzero(f', x) for x in [0, 1.2, 1.7]]</pre>
 <pre class="output">
 3-element Array{Float64,1}:
- 0.0               
+ 0.0
  1.2533141373155003
- 1.7724538509055165</pre>
+ 1.772453850905516</pre>
 
 <p>The function values at these points can be found with</p><pre class="sourceCode julia">f.(xs)               # or map(f, xs) or [f(x) for x in xs]</pre>
 <pre class="output">
 3-element Array{Float64,1}:
- 1.0                   
+ 1.0
  2.5860584564030066e-32
- 1.0                   </pre>
+ 1.0</pre>
 
 <h5>fzeros</h5><p>For such tasks, <code>fzeros</code> also works well. This function looks for all zeros in the interval <code>&#91;a,b&#93;</code>:</p><pre class="sourceCode julia">fzeros(f, -1, 2)</pre>
 <pre class="output">
@@ -534,28 +1791,28 @@ plot(f', -1, 2)</pre>
 <h3>Practice</h3><h4>Question</h4><p>Let</p>$$~
 f(x) = 4x^4 -5x^3 + 4x^2 -20x - 6
 ~$$
-<p>Apply Newton's method with $x_0=0$ using an automatic derivative. What value does it converge to?</p><form name='WeaveQuestion' data-id='7beNoptn' data-controltype='numeric'>
+<p>Apply Newton's method with $x_0=0$ using an automatic derivative. What value does it converge to?</p><form name='WeaveQuestion' data-id='UXBlIkrN' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="7beNoptn" type="number" class="form-control">
+<input id="UXBlIkrN" type="number" class="form-control">
 
 </div>
-  
-<div id='7beNoptn_message'></div>
+
+<div id='UXBlIkrN_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#7beNoptn').on('change', function() {
+$('#UXBlIkrN').on('change', function() {
   correct = Math.abs(this.value - -0.27798094871260326) <= 1.0e-10;
 
   if(correct) {
-     $('#7beNoptn_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#UXBlIkrN_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#7beNoptn_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#UXBlIkrN_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -565,112 +1822,474 @@ f(x) = x^x - 2
 <p>Can we find a root using Newton's method, where $x > 0$?</p><p>We graph the function to see, using a smallish interval at first:</p><pre class="sourceCode julia">f(x) = x^x - 2
 plot(f, 0, 2)
 plot!(zero)</pre>
-    <div id="fca35d73-c227-4168-8f20-1003b77ac1f3" style="width:600px;height:400px;"></div>
+    <div id="f94b4eb6-5cc0-4e6c-801b-839bb100053b" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('fca35d73-c227-4168-8f20-1003b77ac1f3');
-    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[0.004882909509894066,0.009765819019788131,0.014648728529682197,0.019531638039576263,0.042106412576722436,0.06468118711386861,0.08725596165101479,0.10983073618816097,0.15498028526245333,0.20012983433674567,0.2543958284739967,0.30866182261124775,0.35454303002138965,0.4004242374315315,0.5001039400661028,0.5919998090692563,0.6905218928129796,0.8046693886770646,0.9061102122220429,0.99506467308044,1.092048913310639,1.1896095575056242,1.2435424413772163,1.2974753252488085,1.3487911033692477,1.4001068814896869,1.453463384256194,1.506819887022701,1.5517346971781958,1.5966495073336904,1.6514853996532093,1.7063212919727282,1.7320949700439003,1.7578686481150725,1.7836423261862446,1.809416004257417,1.8507074352010928,1.8919988661447684,1.933290297088444,1.9745817280321198,1.98093629602409,1.9872908640160598,1.99364543200803],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[-1.0256521590851686,-1.0441981677665488,-1.0599925380623962,-1.0739907469715302,-1.1248626096999623,-1.1623169880237132,-1.1916898009062442,-1.215411389951789,-1.2509534394835433,-1.2752776524104066,-1.2940658035237824,-1.3042986173625488,-1.307629961986005,-1.3068303851403527,-1.2928706581373655,-1.2668135824958675,-1.2256300170781325,-1.1604370295328987,-1.0854629813087178,-1.004911029376232,-0.8990635923579462,-0.7705755435628407,-0.6886624763200755,-0.5980152128367136,-0.5028398966582088,-0.3980782864703891,-0.2779394958171233,-0.14516034013954426,-0.02258378609970757,0.11083600713281472,0.2899022808940659,0.488687126294582,0.5895770796123165,0.6955906903589404,0.8070049269650217,0.9241130036551355,1.1243810723914347,1.3414423717258797,1.576805708635991,1.832125830699375,1.8733038495872787,1.9150041509175546,1.957233808941623],"type":"scatter","hoverinfo":"text"},{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[-0.03419275760491264,0.15616571234117058,0.27056321825061513,0.3672848535819243,0.4723516597142232,0.5692139616445342,0.6730605863721423,0.7933770851322389,0.9003001904345665,0.9940621183555965,1.0962877881442676,1.1991210131525216,1.3128162932170322,1.4209944833361172,1.5334747011517305,1.6281590857626385,1.7437579873474096,1.8524243643789537,2.02651632714449],"showlegend":true,"mode":"lines","name":"y2","zmin":-0.1,"legendgroup":"y2","zmax":0.1,"line":{"color":"rgba(227, 111, 71, 1.000)","shape":"linear","dash":"solid","width":1},"y":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.0,0.5,1.0,1.5,2.0],"visible":true,"ticks":"inside","range":[-0.09601403014739471,2.088337599686972],"domain":[0.03619130941965587,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0.0","0.5","1.0","1.5","2.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-1.0,0.0,1.0,2.0],"visible":true,"ticks":"inside","range":[-1.4055758751138339,2.0551797220694517],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-1","0","1","2"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('f94b4eb6-5cc0-4e6c-801b-839bb100053b');
+    Plotly.plot(PLOT, [
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            0.0,
+            0.004882909509894066,
+            0.009765819019788131,
+            0.014648728529682197,
+            0.019531638039576263,
+            0.06468118711386861,
+            0.10983073618816097,
+            0.15498028526245333,
+            0.20012983433674567,
+            0.2543958284739967,
+            0.30866182261124775,
+            0.35454303002138965,
+            0.4004242374315315,
+            0.5001039400661028,
+            0.5919998090692563,
+            0.6905218928129796,
+            0.8046693886770646,
+            0.9061102122220429,
+            0.99506467308044,
+            1.092048913310639,
+            1.1896095575056242,
+            1.2974753252488085,
+            1.4001068814896869,
+            1.453463384256194,
+            1.506819887022701,
+            1.5517346971781958,
+            1.5966495073336904,
+            1.6514853996532093,
+            1.7063212919727282,
+            1.7578686481150725,
+            1.809416004257417,
+            1.8507074352010928,
+            1.8919988661447684,
+            1.933290297088444,
+            1.9745817280321198,
+            1.98093629602409,
+            1.9872908640160598,
+            1.99364543200803,
+            2.0
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y1",
+        "zmin": -0.1,
+        "legendgroup": "y1",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(0, 154, 250, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            -1.0,
+            -1.0256521590851686,
+            -1.0441981677665488,
+            -1.0599925380623962,
+            -1.0739907469715302,
+            -1.1623169880237132,
+            -1.215411389951789,
+            -1.2509534394835433,
+            -1.2752776524104066,
+            -1.2940658035237824,
+            -1.3042986173625488,
+            -1.307629961986005,
+            -1.3068303851403527,
+            -1.2928706581373655,
+            -1.2668135824958675,
+            -1.2256300170781325,
+            -1.1604370295328987,
+            -1.0854629813087178,
+            -1.004911029376232,
+            -0.8990635923579462,
+            -0.7705755435628407,
+            -0.5980152128367136,
+            -0.3980782864703891,
+            -0.2779394958171233,
+            -0.14516034013954426,
+            -0.02258378609970757,
+            0.11083600713281472,
+            0.2899022808940659,
+            0.488687126294582,
+            0.6955906903589404,
+            0.9241130036551355,
+            1.1243810723914347,
+            1.3414423717258797,
+            1.576805708635991,
+            1.832125830699375,
+            1.8733038495872787,
+            1.9150041509175546,
+            1.957233808941623,
+            2.0
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    },
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            -0.06,
+            -0.03929646367804916,
+            0.1521376243969504,
+            0.2671815319679226,
+            0.36444969167742336,
+            0.47011017647006903,
+            0.5675197976134116,
+            0.6719532063817585,
+            0.7929495519976885,
+            0.9004768249553655,
+            0.9947685534652664,
+            1.0975718481092773,
+            1.2009861309559615,
+            1.3153238447637372,
+            1.424113294379068,
+            1.5372290802440631,
+            1.6324484777737116,
+            1.748700569491092,
+            1.857980964512862,
+            2.033056631714047,
+            2.06
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y2",
+        "zmin": -0.1,
+        "legendgroup": "y2",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(227, 111, 71, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    }
+]
+, {
+    "showlegend": true,
+    "xaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            0.0,
+            0.5,
+            1.0,
+            1.5,
+            2.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            -0.1236,
+            2.1236
+        ],
+        "domain": [
+            0.03619130941965587,
+            0.9934383202099738
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "0.0",
+            "0.5",
+            "1.0",
+            "1.5",
+            "2.0"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "y1"
+    },
+    "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "annotations": [],
+    "height": 400,
+    "margin": {
+        "l": 0,
+        "b": 20,
+        "r": 0,
+        "t": 20
+    },
+    "plot_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "yaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            -1.0,
+            0.0,
+            1.0,
+            2.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            -1.4068588608455852,
+            2.09922889885958
+        ],
+        "domain": [
+            0.03762029746281716,
+            0.9901574803149606
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "-1",
+            "0",
+            "1",
+            "2"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "x1"
+    },
+    "legend": {
+        "tracegroupgap": 0,
+        "bordercolor": "rgba(0, 0, 0, 1.000)",
+        "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "font": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "y": 1.0,
+        "x": 1.0
+    },
+    "width": 600
+}
+);
     </script>
-<p>Eyeing this, we pick an initial point, $1$, for Newton's method (<code>newton&#40;f, 1&#41;</code>) to the right of the minimum, which appears to be around $x=0.35$.</p><p>What is the value of the approximate zero?</p><form name='WeaveQuestion' data-id='JnQqLbxA' data-controltype='numeric'>
+<p>Eyeing this, we pick an initial point, $1$, for Newton's method (<code>newton&#40;f, 1&#41;</code>) to the right of the minimum, which appears to be around $x=0.35$.</p><p>What is the value of the approximate zero?</p><form name='WeaveQuestion' data-id='p4NP3DJC' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="JnQqLbxA" type="number" class="form-control">
+<input id="p4NP3DJC" type="number" class="form-control">
 
 </div>
-  
-<div id='JnQqLbxA_message'></div>
+
+<div id='p4NP3DJC_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#JnQqLbxA').on('change', function() {
+$('#p4NP3DJC').on('change', function() {
   correct = Math.abs(this.value - 1.5596104694623694) <= 1.0e-8;
 
   if(correct) {
-     $('#JnQqLbxA_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#p4NP3DJC_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#JnQqLbxA_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#p4NP3DJC_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Use <code>fzero</code> to find the one root of <code>x^5 &#43; x - 1</code>. First plot to get an estimate.</p><form name='WeaveQuestion' data-id='8kHEpIrQ' data-controltype='numeric'>
+<h4>Question</h4><p>Use <code>fzero</code> to find the one root of <code>x^5 &#43; x - 1</code>. First plot to get an estimate.</p><form name='WeaveQuestion' data-id='IvfZNW98' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="8kHEpIrQ" type="number" class="form-control">
+<input id="IvfZNW98" type="number" class="form-control">
 
 </div>
-  
-<div id='8kHEpIrQ_message'></div>
+
+<div id='IvfZNW98_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#8kHEpIrQ').on('change', function() {
+$('#IvfZNW98').on('change', function() {
   correct = Math.abs(this.value - 1.1673039782614187) <= 1.0e-8;
 
   if(correct) {
-     $('#8kHEpIrQ_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#IvfZNW98_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#8kHEpIrQ_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#IvfZNW98_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Let $f(x) = 5/\sin(x) + 8/\cos(x)$, Starting at $x=\pi/4$, use <code>fzero</code> to find a root of the derivative of $f(x)$ given by <code>D&#40;f&#41;</code>.</p><form name='WeaveQuestion' data-id='XNfptjnv' data-controltype='numeric'>
+<h4>Question</h4><p>Let $f(x) = 5/\sin(x) + 8/\cos(x)$, Starting at $x=\pi/4$, use <code>fzero</code> to find a root of the derivative of $f(x)$ given by <code>f&#39;</code>.</p><form name='WeaveQuestion' data-id='nbMFxddj' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="XNfptjnv" type="number" class="form-control">
+<input id="nbMFxddj" type="number" class="form-control">
 
 </div>
-  
-<div id='XNfptjnv_message'></div>
+
+<div id='nbMFxddj_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#XNfptjnv').on('change', function() {
+$('#nbMFxddj').on('change', function() {
   correct = Math.abs(this.value - 0.7073827215431158) <= 1.0e-8;
 
   if(correct) {
-     $('#XNfptjnv_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#nbMFxddj_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#XNfptjnv_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#nbMFxddj_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>The tangent line of <code>f</code> at <code>c</code> can be computed by</p><pre class="sourceCode julia">tangent(f, c) = x -> f(c) + D(f)(c) * (x - c)</pre>
+<h4>Question</h4><p>The tangent line of <code>f</code> at <code>c</code> can be computed by</p><pre class="sourceCode julia">tangent(f, c) = x -> f(c) + f'(c) * (x - c)</pre>
 <pre class="output">
 tangent (generic function with 1 method)</pre>
 
-<p>Let $f(x) = x^2 - 3x + 5$. Use <code>fzero</code> to find the intersection point of the tangent line at $1$ and the tangent line at $3$. Where does this happen?</p><p>(Hint, apply <code>fzero</code> to <code>h&#40;x&#41; &#61; tangent&#40;f, 1&#41;&#40;x&#41; -  tangent&#40;f, 3&#41;&#40;x&#41;</code> starting at 1.)</p><form name='WeaveQuestion' data-id='rzdb8zf2' data-controltype='numeric'>
+<p>Let $f(x) = x^2 - 3x + 5$. Use <code>fzero</code> to find the intersection point of the tangent line at $1$ and the tangent line at $3$. Where does this happen?</p><p>(Hint, apply <code>fzero</code> to <code>h&#40;x&#41; &#61; tangent&#40;f, 1&#41;&#40;x&#41; -  tangent&#40;f, 3&#41;&#40;x&#41;</code> starting at 1.)</p><form name='WeaveQuestion' data-id='jzZtVZFe' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="rzdb8zf2" type="number" class="form-control">
+<input id="jzZtVZFe" type="number" class="form-control">
 
 </div>
-  
-<div id='rzdb8zf2_message'></div>
+
+<div id='jzZtVZFe_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#rzdb8zf2').on('change', function() {
+$('#jzZtVZFe').on('change', function() {
   correct = Math.abs(this.value - 2.0) <= 1.0e-8;
 
   if(correct) {
-     $('#rzdb8zf2_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#jzZtVZFe_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#rzdb8zf2_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#jzZtVZFe_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -701,74 +2320,74 @@ newton(f, fp, 2pi, verbose=true)</pre>
 </div>
 
 
-<h4>Question</h4><p>When $|f'(x)|$ is too close to $0$, the path can jump alot. In the figure, what was the longest jump?</p><form name="WeaveQuestion" data-id="we1VkLxj" data-controltype="radio">
+<h4>Question</h4><p>When $|f'(x)|$ is too close to $0$, the path can jump alot. In the figure, what was the longest jump?</p><form name="WeaveQuestion" data-id="vwZrBX7w" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_we1VkLxj" value="1"><div class="markdown"><p>From about 0 to -5</p>
+      <input type="radio" name="radio_vwZrBX7w" value="1"><div class="markdown"><p>From about 0 to -5</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_we1VkLxj" value="2"><div class="markdown"><p>From about -12 to -3</p>
+      <input type="radio" name="radio_vwZrBX7w" value="2"><div class="markdown"><p>From about 17 to -10</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_we1VkLxj" value="3"><div class="markdown"><p>From about 17 to -10</p>
+      <input type="radio" name="radio_vwZrBX7w" value="3"><div class="markdown"><p>From about -12 to -3</p>
 </div>
     </label>
     </div>
 
-<div id="we1VkLxj_message"></div>
+<div id="vwZrBX7w_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_we1VkLxj']").on("change", function() {
-  correct = this.value == 3;
+$("input:radio[name='radio_vwZrBX7w']").on("change", function() {
+  correct = this.value == 2;
 
   if(correct) {
-     $("#we1VkLxj_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#vwZrBX7w_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#we1VkLxj_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#vwZrBX7w_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question</h4><p>The method did find a zero, but the initial guess was nowhere near the final zero. How close was the closest zero to the initial guess?</p><form name="WeaveQuestion" data-id="865zyQ6I" data-controltype="radio">
+<h4>Question</h4><p>The method did find a zero, but the initial guess was nowhere near the final zero. How close was the closest zero to the initial guess?</p><form name="WeaveQuestion" data-id="JOheAW84" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_865zyQ6I" value="1"><div class="markdown"><p><code>2pi</code></p>
+      <input type="radio" name="radio_JOheAW84" value="1"><div class="markdown"><p><code>2pi</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_865zyQ6I" value="2"><div class="markdown"><p><code>8.75</code></p>
+      <input type="radio" name="radio_JOheAW84" value="2"><div class="markdown"><p><code>3.8</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_865zyQ6I" value="3"><div class="markdown"><p><code>3.8</code></p>
+      <input type="radio" name="radio_JOheAW84" value="3"><div class="markdown"><p><code>8.75</code></p>
 </div>
     </label>
     </div>
 
-<div id="865zyQ6I_message"></div>
+<div id="JOheAW84_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_865zyQ6I']").on("change", function() {
-  correct = this.value == 3;
+$("input:radio[name='radio_JOheAW84']").on("change", function() {
+  correct = this.value == 2;
 
   if(correct) {
-     $("#865zyQ6I_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#JOheAW84_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#865zyQ6I_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#JOheAW84_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -776,7 +2395,7 @@ $("input:radio[name='radio_865zyQ6I']").on("change", function() {
 <h3>Function has a poor shape</h3><p>Let $f(x) = x^{1/3}$. We know the root is 0. Let's see what happens if we use Newton's method. We have to be careful though as <code>julia</code> thinks that cube roots of negative numbers (via <code>x^&#40;1/3&#41;</code> are <code>NaN</code>, not a number. (You can avoid this, by making your number complex, e.g. <code>x &#43; 0*im</code>, but then the real answer is not given as an answer. It is just one of three and not the chosen one.)</p><p>So we define our function using <code>julia</code>'s <code>cbrt</code> function, which works as we desire for negative numbers, as follows:</p><pre class="sourceCode julia">f(x) = cbrt(x)
 xstar = newton(f, 2)</pre>
 <pre class="output">
-Roots.ConvergenceFailed("Stopped at: xn = -4.398046511104e12")
+Roots.ConvergenceFailed("Stopped at: xn = -4.398046511104e12. Too many steps taken. ")
 </pre>
 
 <p>Still an issue. Why?</p><h4>Question</h4><p>Despite all our care with the derivative, the method did not converge in $200$ steps. Can you see why from this trace?</p>
@@ -788,38 +2407,38 @@ Roots.ConvergenceFailed("Stopped at: xn = -4.398046511104e12")
 </div>
 
 
-<form name="WeaveQuestion" data-id="KVKZwn60" data-controltype="radio">
+<form name="WeaveQuestion" data-id="XX5H8i3p" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_KVKZwn60" value="1"><div class="markdown"><p><code>|f&#39;&#40;x&#41;|</code> gets too small</p>
+      <input type="radio" name="radio_XX5H8i3p" value="1"><div class="markdown"><p><code>|f&#39;&#40;x&#41;|</code> gets too small</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_KVKZwn60" value="2"><div class="markdown"><p><code>|f&#39;&#39;&#40;x&#41;|</code> gets too big at 0</p>
+      <input type="radio" name="radio_XX5H8i3p" value="2"><div class="markdown"><p><code>|f&#39;&#39;&#40;x&#41;|</code> gets too big at 0</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_KVKZwn60" value="3"><div class="markdown"><p>Initial guess is too far from a zero.</p>
+      <input type="radio" name="radio_XX5H8i3p" value="3"><div class="markdown"><p>Initial guess is too far from a zero.</p>
 </div>
     </label>
     </div>
 
-<div id="KVKZwn60_message"></div>
+<div id="XX5H8i3p_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_KVKZwn60']").on("change", function() {
+$("input:radio[name='radio_XX5H8i3p']").on("change", function() {
   correct = this.value == 2;
 
   if(correct) {
-     $("#KVKZwn60_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#XX5H8i3p_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#KVKZwn60_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#XX5H8i3p_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -827,152 +2446,152 @@ $("input:radio[name='radio_KVKZwn60']").on("change", function() {
 <h4>Questions <small>Solve by hand</small></h4><p>For $f(x) = x^{1/3}$, simplify the expression by hand:</p>$$~
 x - f(x)/f'(x)
 ~$$
-<p>What do you get?</p><form name="WeaveQuestion" data-id="obKwPHVc" data-controltype="radio">
+<p>What do you get?</p><form name="WeaveQuestion" data-id="gPPPe2Vz" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_obKwPHVc" value="1"><div class="markdown"><p><code>x - 3/x</code></p>
+      <input type="radio" name="radio_gPPPe2Vz" value="1"><div class="markdown"><p><code>x - &#40;1/3&#41;x^&#123;-1/3&#125;</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_obKwPHVc" value="2"><div class="markdown"><p><code>-2x</code></p>
+      <input type="radio" name="radio_gPPPe2Vz" value="2"><div class="markdown"><p><code>x - 3/x</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_obKwPHVc" value="3"><div class="markdown"><p><code>x - &#40;1/3&#41;x^&#123;-1/3&#125;</code></p>
+      <input type="radio" name="radio_gPPPe2Vz" value="3"><div class="markdown"><p><code>-2x</code></p>
 </div>
     </label>
     </div>
 
-<div id="obKwPHVc_message"></div>
+<div id="gPPPe2Vz_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_obKwPHVc']").on("change", function() {
-  correct = this.value == 2;
-
-  if(correct) {
-     $("#obKwPHVc_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
-  } else {
-     $("#obKwPHVc_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
-  }
-});
-
-</script>
-<h4>Question</h4><p>Apply Newton's method to $f(x) = (x-2)^7 \cdot (x-3) \cdot (x-4)$ starting at 1.9981. The algorithm does not converge to 2 – an obvious root. From a plot of $f(x)$ explain why not:</p><form name="WeaveQuestion" data-id="lQPnD431" data-controltype="radio">
-<div class="form-group ">
-    <div  class="radio"> 
-    <label>
-      <input type="radio" name="radio_lQPnD431" value="1"><div class="markdown"><p><code>|f&#39;&#40;x&#41;|</code> gets too small</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio"> 
-    <label>
-      <input type="radio" name="radio_lQPnD431" value="2"><div class="markdown"><p><code>|f&#39;&#39;&#40;x&#41;|</code> gets too big at 0</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio"> 
-    <label>
-      <input type="radio" name="radio_lQPnD431" value="3"><div class="markdown"><p>Initial guess is to far from a zero.</p>
-</div>
-    </label>
-    </div>
-
-<div id="lQPnD431_message"></div>
-</div>
-</form>
-<script text="text/javascript">
-$("input:radio[name='radio_lQPnD431']").on("change", function() {
-  correct = this.value == 1;
-
-  if(correct) {
-     $("#lQPnD431_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
-  } else {
-     $("#lQPnD431_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
-  }
-});
-
-</script>
-<h4>Question</h4><p>The function <code>f&#40;x&#41; &#61; atan&#40;x&#41;</code> is a strictly increasing function with one zero, $0$. Yet it can pose problems with Newton's method. For which values of $x$ does Newton's method converge:</p><form name="WeaveQuestion" data-id="oyKYnscC" data-controltype="radio">
-<div class="form-group ">
-    <div  class="radio"> 
-    <label>
-      <input type="radio" name="radio_oyKYnscC" value="1"><div class="markdown"><p>For each of $1$, $2$ and $\pi$</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio"> 
-    <label>
-      <input type="radio" name="radio_oyKYnscC" value="2"><div class="markdown"><p>For $1$ and $2$ but not $\pi$</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio"> 
-    <label>
-      <input type="radio" name="radio_oyKYnscC" value="3"><div class="markdown"><p>For $1$ but not $2$ or $\pi$</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio"> 
-    <label>
-      <input type="radio" name="radio_oyKYnscC" value="4"><div class="markdown"><p>For none of  $1$, $2$ and $\pi$</p>
-</div>
-    </label>
-    </div>
-
-<div id="oyKYnscC_message"></div>
-</div>
-</form>
-<script text="text/javascript">
-$("input:radio[name='radio_oyKYnscC']").on("change", function() {
+$("input:radio[name='radio_gPPPe2Vz']").on("change", function() {
   correct = this.value == 3;
 
   if(correct) {
-     $("#oyKYnscC_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#gPPPe2Vz_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#oyKYnscC_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#gPPPe2Vz_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h3>Cycles</h3><p>Sometimes, the process can cycle even for reasonable functions.</p><h4>Question</h4><p>Let $f(x) = x^3 - 5x$. Starting with $x_0=1$, compute three steps of Newton's method. What are the terms in the series produced?</p><form name="WeaveQuestion" data-id="Rq0V068J" data-controltype="radio">
+<h4>Question</h4><p>Apply Newton's method to $f(x) = (x-2)^7 \cdot (x-3) \cdot (x-4)$ starting at 1.9981. The algorithm does not converge to 2 – an obvious root. From a plot of $f(x)$ explain why not:</p><form name="WeaveQuestion" data-id="WJT2t0sM" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_Rq0V068J" value="1"><div class="markdown">$1, -2, -4,  ...$
+      <input type="radio" name="radio_WJT2t0sM" value="1"><div class="markdown"><p><code>|f&#39;&#40;x&#41;|</code> gets too small</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_Rq0V068J" value="2"><div class="markdown">$-1.0, 1.0, -1.0, ...$
+      <input type="radio" name="radio_WJT2t0sM" value="2"><div class="markdown"><p><code>|f&#39;&#39;&#40;x&#41;|</code> gets too big at 0</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_Rq0V068J" value="3"><div class="markdown">$-1.0, 0.6666666666666667, -0.2850952524822228, ...$
+      <input type="radio" name="radio_WJT2t0sM" value="3"><div class="markdown"><p>Initial guess is to far from a zero.</p>
 </div>
     </label>
     </div>
 
-<div id="Rq0V068J_message"></div>
+<div id="WJT2t0sM_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_Rq0V068J']").on("change", function() {
-  correct = this.value == 2;
+$("input:radio[name='radio_WJT2t0sM']").on("change", function() {
+  correct = this.value == 1;
 
   if(correct) {
-     $("#Rq0V068J_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#WJT2t0sM_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#Rq0V068J_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#WJT2t0sM_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+  }
+});
+
+</script>
+<h4>Question</h4><p>The function <code>f&#40;x&#41; &#61; atan&#40;x&#41;</code> is a strictly increasing function with one zero, $0$. Yet it can pose problems with Newton's method. For which values of $x$ does Newton's method converge:</p><form name="WeaveQuestion" data-id="CT2Quvxw" data-controltype="radio">
+<div class="form-group ">
+    <div  class="radio">
+    <label>
+      <input type="radio" name="radio_CT2Quvxw" value="1"><div class="markdown"><p>For each of $1$, $2$ and $\pi$</p>
+</div>
+    </label>
+    </div>
+    <div  class="radio">
+    <label>
+      <input type="radio" name="radio_CT2Quvxw" value="2"><div class="markdown"><p>For $1$ and $2$ but not $\pi$</p>
+</div>
+    </label>
+    </div>
+    <div  class="radio">
+    <label>
+      <input type="radio" name="radio_CT2Quvxw" value="3"><div class="markdown"><p>For $1$ but not $2$ or $\pi$</p>
+</div>
+    </label>
+    </div>
+    <div  class="radio">
+    <label>
+      <input type="radio" name="radio_CT2Quvxw" value="4"><div class="markdown"><p>For none of  $1$, $2$ and $\pi$</p>
+</div>
+    </label>
+    </div>
+
+<div id="CT2Quvxw_message"></div>
+</div>
+</form>
+<script text="text/javascript">
+$("input:radio[name='radio_CT2Quvxw']").on("change", function() {
+  correct = this.value == 3;
+
+  if(correct) {
+     $("#CT2Quvxw_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+  } else {
+     $("#CT2Quvxw_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+  }
+});
+
+</script>
+<h3>Cycles</h3><p>Sometimes, the process can cycle even for reasonable functions.</p><h4>Question</h4><p>Let $f(x) = x^3 - 5x$. Starting with $x_0=1$, compute three steps of Newton's method. What are the terms in the series produced?</p><form name="WeaveQuestion" data-id="QHdhwFqy" data-controltype="radio">
+<div class="form-group ">
+    <div  class="radio">
+    <label>
+      <input type="radio" name="radio_QHdhwFqy" value="1"><div class="markdown">$1, -2, -4,  ...$
+</div>
+    </label>
+    </div>
+    <div  class="radio">
+    <label>
+      <input type="radio" name="radio_QHdhwFqy" value="2"><div class="markdown">$-1.0, 0.6666666666666667, -0.2850952524822228, ...$
+</div>
+    </label>
+    </div>
+    <div  class="radio">
+    <label>
+      <input type="radio" name="radio_QHdhwFqy" value="3"><div class="markdown">$-1.0, 1.0, -1.0, ...$
+</div>
+    </label>
+    </div>
+
+<div id="QHdhwFqy_message"></div>
+</div>
+</form>
+<script text="text/javascript">
+$("input:radio[name='radio_QHdhwFqy']").on("change", function() {
+  correct = this.value == 3;
+
+  if(correct) {
+     $("#QHdhwFqy_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+  } else {
+     $("#QHdhwFqy_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -992,38 +2611,38 @@ x = x - f(x)/fp(x)</pre>
 <pre class="output">
 -2.0</pre>
 
-<p>Try again with $x=3.0$ What sequence do you get:</p><form name="WeaveQuestion" data-id="UKLvxsZl" data-controltype="radio">
+<p>Try again with $x=3.0$ What sequence do you get:</p><form name="WeaveQuestion" data-id="vN7qC5H6" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_UKLvxsZl" value="1"><div class="markdown">$2, -2.0, 2.0, -2.0$
+      <input type="radio" name="radio_vN7qC5H6" value="1"><div class="markdown">$3, 2.0, 1.0, 0.0, -1.0, ...$
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_UKLvxsZl" value="2"><div class="markdown">$3, 2.0, 1.0, 0.0, -1.0, ...$
+      <input type="radio" name="radio_vN7qC5H6" value="2"><div class="markdown">$3, -3.0, 3.0, -3.0, ...$
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_UKLvxsZl" value="3"><div class="markdown">$3, -3.0, 3.0, -3.0, ...$
+      <input type="radio" name="radio_vN7qC5H6" value="3"><div class="markdown">$2, -2.0, 2.0, -2.0$
 </div>
     </label>
     </div>
 
-<div id="UKLvxsZl_message"></div>
+<div id="vN7qC5H6_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_UKLvxsZl']").on("change", function() {
-  correct = this.value == 3;
+$("input:radio[name='radio_vN7qC5H6']").on("change", function() {
+  correct = this.value == 2;
 
   if(correct) {
-     $("#UKLvxsZl_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#vN7qC5H6_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#UKLvxsZl_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#vN7qC5H6_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 

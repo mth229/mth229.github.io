@@ -20,6 +20,12 @@ body { padding-top: 60px; }
 h5:before {content:"\2746\ ";}
 h6:before {content:"\2742\ ";}
 pre {display: block;}
+th, td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+tr:hover {background-color: #f5f5f5;}
 </style>
 
 <script src="https://code.jquery.com/jquery.js"></script>
@@ -109,15 +115,16 @@ $( document ).ready(function() {
 <p>Computing this area is <em>often</em> made easier with the Fundamental Theorem of Calculus which states in one form that one can compute a definite integral through knowledge of an antiderivative. In particular, if $F(x)$ is an antiderivative for $f(x)$, a continuous function, then</p>$$~
 \int_a^b f(x) dx = F(b) - F(a).
 ~$$
-<p>This is great as long as some antiderivative is known. There are several different techniques for finding antiderivatives. The <code>integrate</code> function in the <code>SymPy</code> package can do many of them:</p><pre class="sourceCode julia">using MTH229  # loads Plots and SymPy
-f(x) = x^3 - cos(x) + x*log(x)
+<p>This is great as long as some antiderivative is known. There are several different techniques for finding antiderivatives. The <code>integrate</code> function in the <code>SymPy</code> package can do many of them:</p><pre class="sourceCode julia">using MTH229
+using Plots</pre>
+<pre class="sourceCode julia">f(x) = x^3 - cos(x) + x*log(x)
 integrate(f)</pre>
 <div class="well well-sm">
-\begin{equation*}\frac{x^{4}}{4} + \frac{x^{2} \log{\left (x \right )}}{2} - \frac{x^{2}}{4} - \sin{\left (x \right )}\end{equation*}</div>
+\begin{equation*}\frac{x^{4}}{4} + \frac{x^{2} \log{\left(x \right)}}{2} - \frac{x^{2}}{4} - \sin{\left(x \right)}\end{equation*}</div>
 
 <p>To find the definite integral, say from $1$ to $10$ we have:</p><pre class="sourceCode julia">integrate(f, 1, 10)</pre>
 <div class="well well-sm">
-\begin{equation*}- \sin{\left (10 \right )} + \sin{\left (1 \right )} + 50 \log{\left (10 \right )} + 2475\end{equation*}</div>
+\begin{equation*}- \sin{\left(10 \right)} + \sin{\left(1 \right)} + 50 \log{\left(10 \right)} + 2475\end{equation*}</div>
 
 <p>If all functions had antiderivatives that could be found symbolically, there wouldn't be much more to say.  However, it is a fact of life that not all nice functions will have an antiderivative in a convenient form. A test for such functions is provided in <a href="http://en.wikipedia.org/wiki/Risch_algorithm">Risch's algorithm</a>. In cases where no workable antiderivative is available, the above approach is of no help. Rather, to find the area one can turn to numeric approximations that progressively get better as more approximations are taken.</p><p>One such approximation is given by the familiar Riemann sums, which we will look at here. However, the problem of trying to find the area of geometric figures did not start with Riemann some 150 years ago, indeed it has a much longer history.  In the time of Pythagorus the idea of calculating area was one of being able to construct a square of equal area to a figure. This was known as <em>quadrature</em>.  Finding such answers for figures bounded by curves was difficult, though <a href="http://en.wikipedia.org/wiki/The_Quadrature_of_the_Parabola">Archimedes</a> effectively computed the area under $f(x) = x^2$ about 2,000 years before Riemann sums using triangles, not rectangles to approximate the area.  By medieval Europe, the term <em>quadrature</em> evolved to be the computation of an area by any means. For example, <a href="http://en.wikipedia.org/wiki/Quadrature_&#40;mathematics&#41;">Galileo and Roberval</a> found the area bounded by a cycloid arch. Along the way, other approximations were used.  We will see those due to Simpson and Gauss, both predating Riemann.</p><h2>Riemann sums</h2><p>In 1854 Riemann was the first to give a rigorous definition of the integral of a continuous function on a closed interval, the problem we wish to solve here, using the concept of a <em>Riemann sum</em>. A Riemann sum is one of the simplest to understand approximations to the area under a curve. The basic idea is that the interval $[a,b]$ is partitioned through points $a = x_0 < x_1 < \cdots x_n = b$ and the area under $f(x)$ between $x_i$ and $x_{i+1}$ is approximated by a rectangle with the base $x_{i+1} - x_i$ and height given by $f(x_i^*)$, where $x_i^*$ is some point in the interval $[x_i, x_{i+1}]$. Typical choices are the left point or the right point of the interval, or the $x$ value which minizes or maximizes $f$ over the interval. The figure shows these four choices for some sample function. For a <em>Riemann integrable</em> function, such as a continuous function on $[a,b]$, any of the choices will yield the same value as the partition's mesh shrinks to $0$.</p>
 <div class="well well-sm">
@@ -147,26 +154,26 @@ xs = a .+ (0:n) * delta</pre>
 fx = map(f, xs)</pre>
 <pre class="output">
 6-element Array{Float64,1}:
- 1.0               
+ 1.0
  1.9599999999999997
- 3.24              
- 4.840000000000001 
- 6.760000000000001 
- 9.0               </pre>
+ 3.24
+ 4.840000000000001
+ 6.760000000000001
+ 9.0</pre>
 
 <p>Now to add the numbers up. For this task, the <code>sum</code> function is available</p><pre class="sourceCode julia">sum(fx)</pre>
 <pre class="output">
 26.8</pre>
 
-<p>Okay, just one subtlety, we really only want the points</p><pre class="sourceCode julia">[ a .+ (0:n-1) * delta ]'</pre>
+<p>Okay, just one subtlety, we really only want the points</p><pre class="sourceCode julia">[ a .+ (0:n-1) * delta ]</pre>
 <pre class="output">
-1×1 LinearAlgebra.Adjoint{LinearAlgebra.Adjoint{Float64,StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}}},Array{StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}},1}}:
- [1.0 1.4 1.8 2.2 2.6]</pre>
+1-element Array{StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}},1}:
+ 1.0:0.4:2.6</pre>
 
-<p>for the left Riemann sum and the points</p><pre class="sourceCode julia">[ a .+ (1:n) * delta ]'</pre>
+<p>for the left Riemann sum and the points</p><pre class="sourceCode julia">[ a .+ (1:n) * delta ]</pre>
 <pre class="output">
-1×1 LinearAlgebra.Adjoint{LinearAlgebra.Adjoint{Float64,StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}}},Array{StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}},1}}:
- [1.4 1.8 2.2 2.6 3.0]</pre>
+1-element Array{StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}},1}:
+ 1.4:0.4:3.0</pre>
 
 <p>for the right.</p><p>Putting this together, here are commands to approximate the area under the curve $f(x)=x^2$ using 10 left Riemann sums:</p><pre class="sourceCode julia">f(x) = x^2
 a, b, n = 1, 3, 10;		   ## note n=10
@@ -182,130 +189,130 @@ F(b) - F(a)</pre>
 <pre class="output">
 8.666666666666666</pre>
 
-<p>Boy, not too close. We need a better approximation of course. This can be achieved by using larger values for <code>n</code>.</p><h3>Practice</h3><h4>Question</h4><p>Repeat with n=100</p><p>For the same problem, let $n=100$. What do you get?</p><form name='WeaveQuestion' data-id='gX74wiOM' data-controltype='numeric'>
+<p>Boy, not too close. We need a better approximation of course. This can be achieved by using larger values for <code>n</code>.</p><h3>Practice</h3><h4>Question</h4><p>Repeat with n=100</p><p>For the same problem, let $n=100$. What do you get?</p><form name='WeaveQuestion' data-id='Q5OKfRKR' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="gX74wiOM" type="number" class="form-control">
+<input id="Q5OKfRKR" type="number" class="form-control">
 
 </div>
-  
-<div id='gX74wiOM_message'></div>
+
+<div id='Q5OKfRKR_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#gX74wiOM').on('change', function() {
+$('#Q5OKfRKR').on('change', function() {
   correct = Math.abs(this.value - 8.5868) <= 0.0001;
 
   if(correct) {
-     $('#gX74wiOM_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#Q5OKfRKR_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#gX74wiOM_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#Q5OKfRKR_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Repeat with n=1,000</p><p>For the same problem, let $n=1000$. What do you get?</p><form name='WeaveQuestion' data-id='JEuBtDnl' data-controltype='numeric'>
+<h4>Question</h4><p>Repeat with n=1,000</p><p>For the same problem, let $n=1000$. What do you get?</p><form name='WeaveQuestion' data-id='yMA5qut3' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="JEuBtDnl" type="number" class="form-control">
+<input id="yMA5qut3" type="number" class="form-control">
 
 </div>
-  
-<div id='JEuBtDnl_message'></div>
+
+<div id='yMA5qut3_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#JEuBtDnl').on('change', function() {
+$('#yMA5qut3').on('change', function() {
   correct = Math.abs(this.value - 8.658668) <= 0.0001;
 
   if(correct) {
-     $('#JEuBtDnl_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#yMA5qut3_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#JEuBtDnl_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#yMA5qut3_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Repeat with n=10,000</p><p>For the same problem, let $n=10,000$. is the difference between the answer and the actual answer within $0.001$?</p><form name="WeaveQuestion" data-id="aMQUURmc" data-controltype="radio">
+<h4>Question</h4><p>Repeat with n=10,000</p><p>For the same problem, let $n=10,000$. is the difference between the answer and the actual answer within $0.001$?</p><form name="WeaveQuestion" data-id="3htRDXDA" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio inline"> 
+    <div  class="radio inline">
     <label>
-      <input type="radio" name="radio_aMQUURmc" value="1"><div class="markdown"><p>true</p>
+      <input type="radio" name="radio_3htRDXDA" value="1"><div class="markdown"><p>true</p>
 </div>
     </label>
     </div>
-    <div  class="radio inline"> 
+    <div  class="radio inline">
     <label>
-      <input type="radio" name="radio_aMQUURmc" value="2"><div class="markdown"><p>false</p>
+      <input type="radio" name="radio_3htRDXDA" value="2"><div class="markdown"><p>false</p>
 </div>
     </label>
     </div>
 
-<div id="aMQUURmc_message"></div>
+<div id="3htRDXDA_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_aMQUURmc']").on("change", function() {
+$("input:radio[name='radio_3htRDXDA']").on("change", function() {
   correct = this.value == 1;
 
   if(correct) {
-     $("#aMQUURmc_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#3htRDXDA_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#aMQUURmc_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#3htRDXDA_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question</h4><p>How big should n be? (Strang)</p><p>Let $f(x) = (10 + \cos(2\pi x))^{-1}$. For the integral over $[0,1]$, the known answer is $1/\sqrt{99}$. How big must $n$ be so that the error in the Riemann sum is less than $10^{-8}$?</p><form name="WeaveQuestion" data-id="nVTwF2HA" data-controltype="radio">
+<h4>Question</h4><p>How big should n be? (Strang)</p><p>Let $f(x) = (10 + \cos(2\pi x))^{-1}$. For the integral over $[0,1]$, the known answer is $1/\sqrt{99}$. How big must $n$ be so that the error in the Riemann sum is less than $10^{-8}$?</p><form name="WeaveQuestion" data-id="mKEPawDt" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_nVTwF2HA" value="1"><div class="markdown"><p>1000</p>
+      <input type="radio" name="radio_mKEPawDt" value="1"><div class="markdown"><p>10</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_nVTwF2HA" value="2"><div class="markdown"><p>10000</p>
+      <input type="radio" name="radio_mKEPawDt" value="2"><div class="markdown"><p>10000</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_nVTwF2HA" value="3"><div class="markdown"><p>5</p>
+      <input type="radio" name="radio_mKEPawDt" value="3"><div class="markdown"><p>1000</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_nVTwF2HA" value="4"><div class="markdown"><p>100</p>
+      <input type="radio" name="radio_mKEPawDt" value="4"><div class="markdown"><p>5</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_nVTwF2HA" value="5"><div class="markdown"><p>10</p>
+      <input type="radio" name="radio_mKEPawDt" value="5"><div class="markdown"><p>100</p>
 </div>
     </label>
     </div>
 
-<div id="nVTwF2HA_message"></div>
+<div id="mKEPawDt_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_nVTwF2HA']").on("change", function() {
-  correct = this.value == 5;
+$("input:radio[name='radio_mKEPawDt']").on("change", function() {
+  correct = this.value == 1;
 
   if(correct) {
-     $("#nVTwF2HA_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#mKEPawDt_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#nVTwF2HA_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#mKEPawDt_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -349,7 +356,7 @@ riemann(f, 0, 3, 10_000)</pre>
 <p>How big should the number of intervals be? More intervals will give better answers, but unlike Newton's method we have no stopping criteria.  For this problem, we look at various values based on <code>n</code>:</p><pre class="sourceCode julia">[riemann(f, 0, 3, n) for n in [100, 1000, 10000, 100000]]   ## or use 10.^(2:5)</pre>
 <pre class="output">
 4-element Array{Float64,1}:
- 0.87120914389715  
+ 0.87120914389715
  0.8847075328188856
  0.8860573667654386
  0.8861923501106127</pre>
@@ -360,59 +367,59 @@ ys = [riemann(f, 0, 2, n, method="right") - riemann(f, 0, 2, n, method="left") f
 [ns ys]</pre>
 <pre class="output">
 5×2 Array{Float64,2}:
-     10.0  1.2778112197861304   
-    100.0  0.12778112197861358  
-   1000.0  0.012778112197861624 
+     10.0  1.2778112197861304
+    100.0  0.12778112197861358
+   1000.0  0.012778112197861624
   10000.0  0.0012778112197855407
  100000.0  0.0001277811219777547</pre>
 
-<p>Since these are also the minimum and maximum Riemann sums, the above gives a bound on the error in the approximations. We can see it converges quite slowly, in that there are quite a few computations needed to get even a modest bound. ($100,000$ for $0.00013$).</p><h3>Practice</h3><h4>Question</h4><p>Compute the integral of $e^{-x^2}$ over $[0,1]$ using a right Riemann sum with $n=1000$. What is your answer?</p><form name='WeaveQuestion' data-id='fPESVRfA' data-controltype='numeric'>
+<p>Since these are also the minimum and maximum Riemann sums, the above gives a bound on the error in the approximations. We can see it converges quite slowly, in that there are quite a few computations needed to get even a modest bound. ($100,000$ for $0.00013$).</p><h3>Practice</h3><h4>Question</h4><p>Compute the integral of $e^{-x^2}$ over $[0,1]$ using a right Riemann sum with $n=1000$. What is your answer?</p><form name='WeaveQuestion' data-id='HaPsd0e1' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="fPESVRfA" type="number" class="form-control">
+<input id="HaPsd0e1" type="number" class="form-control">
 
 </div>
-  
-<div id='fPESVRfA_message'></div>
+
+<div id='HaPsd0e1_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#fPESVRfA').on('change', function() {
+$('#HaPsd0e1').on('change', function() {
   correct = Math.abs(this.value - 0.7467925261713533) <= 1.0e-8;
 
   if(correct) {
-     $('#fPESVRfA_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#HaPsd0e1_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#fPESVRfA_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#HaPsd0e1_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Compute the integral of $(1 + \cos(x)^2)^(1/2)$ over the interval $[0, \pi]$ using a right Riemann sum with $n=10,000$. What is your answer?</p><form name='WeaveQuestion' data-id='k73JV7cv' data-controltype='numeric'>
+<h4>Question</h4><p>Compute the integral of $(1 + \cos(x)^2)^(1/2)$ over the interval $[0, \pi]$ using a right Riemann sum with $n=10,000$. What is your answer?</p><form name='WeaveQuestion' data-id='qQzC2vbi' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="k73JV7cv" type="number" class="form-control">
+<input id="qQzC2vbi" type="number" class="form-control">
 
 </div>
-  
-<div id='k73JV7cv_message'></div>
+
+<div id='qQzC2vbi_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#k73JV7cv').on('change', function() {
+$('#qQzC2vbi').on('change', function() {
   correct = Math.abs(this.value - 3.820197789027712) <= 1.0e-8;
 
   if(correct) {
-     $('#k73JV7cv_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#qQzC2vbi_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#k73JV7cv_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#qQzC2vbi_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -425,40 +432,40 @@ f(x) = exp(x)
  12.778112197861358
  12.778112197861624
  12.778112197855407
- 12.77811219777547 </pre>
+ 12.77811219777547</pre>
 
-<p>This shows what?</p><form name="WeaveQuestion" data-id="L01mLt59" data-controltype="radio">
+<p>This shows what?</p><form name="WeaveQuestion" data-id="Qy0vabNx" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_L01mLt59" value="1"><div class="markdown"><p>That it is constant says the difference between right and left Riemann sums never goes to 0</p>
+      <input type="radio" name="radio_Qy0vabNx" value="1"><div class="markdown"><p>That it is constant says the difference between right and left Riemann sums never goes to 0</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_L01mLt59" value="2"><div class="markdown"><p>That it is constant says the difference between right and left Riemann sums goes to 0 like 1/n</p>
+      <input type="radio" name="radio_Qy0vabNx" value="2"><div class="markdown"><p>That it is constant says the difference between right and left Riemann sums is constant.</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_L01mLt59" value="3"><div class="markdown"><p>That it is constant says the difference between right and left Riemann sums is constant.</p>
+      <input type="radio" name="radio_Qy0vabNx" value="3"><div class="markdown"><p>That it is constant says the difference between right and left Riemann sums goes to 0 like 1/n</p>
 </div>
     </label>
     </div>
 
-<div id="L01mLt59_message"></div>
+<div id="Qy0vabNx_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_L01mLt59']").on("change", function() {
-  correct = this.value == 2;
+$("input:radio[name='radio_Qy0vabNx']").on("change", function() {
+  correct = this.value == 3;
 
   if(correct) {
-     $("#L01mLt59_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#Qy0vabNx_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#L01mLt59_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#Qy0vabNx_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -481,10 +488,10 @@ trapezoid_r = [riemann(f, 0, 1, n, method="trapezoid") for n in ns];
 [ns (1).-left_r (1).-trapezoid_r]</pre>
 <pre class="output">
 5×3 Array{Float64,2}:
-     10.0  -0.26664999999999983     -0.016650000000000054 
+     10.0  -0.26664999999999983     -0.016650000000000054
     100.0  -0.025166664999999977    -0.0001666650000000658
-   1000.0  -0.002501666666500091    -1.666666499922087e-6 
-  10000.0  -0.00025001666666657485  -1.666666671340522e-8 
+   1000.0  -0.002501666666500091    -1.666666499922087e-6
+  10000.0  -0.00025001666666657485  -1.666666671340522e-8
  100000.0  -2.5000166666844237e-5   -1.666666804567285e-10</pre>
 
 <p>One can see that the errors are much smaller for the trapezoid method.</p><h3>Simpson's rule</h3><p>The trapezoid rule can be viewed as a simple linear approximation to the function $f(x)$ over the subinterval $[a, b]$. That is, replace the function with the secant line between these two values and integrate the replacement. With this viewpoint, it is possible that other easy-to-integrate function approximations will lead to improved approximate integrals. Simpson's method can be viewed in just this way. It replaces $f$ by the parabola going through $(a, f(a))$, $(c, f( c))$ and $(b, f(b))$ where $c=(a+b)/2$ is the midpoint between $a$ and $b$.</p><p>We compare how accurate we get with this rule for the same <code>f</code> as before:</p><pre class="sourceCode julia">simpsons_r = [riemann(f, 0, 1, n, method="simpsons") for n in ns];
@@ -492,11 +499,11 @@ trapezoid_r = [riemann(f, 0, 1, n, method="trapezoid") for n in ns];
 </pre>
 <pre class="output">
 5×4 Array{Float64,2}:
-     10.0  -0.26664999999999983     -0.016650000000000054   -4.1666666663608964e-6 
+     10.0  -0.26664999999999983     -0.016650000000000054   -4.1666666663608964e-6
     100.0  -0.025166664999999977    -0.0001666650000000658  -4.1666670114182125e-10
    1000.0  -0.002501666666500091    -1.666666499922087e-6   -4.1522341120980855e-14
-  10000.0  -0.00025001666666657485  -1.666666671340522e-8    0.0                   
- 100000.0  -2.5000166666844237e-5   -1.666666804567285e-10   0.0                   </pre>
+  10000.0  -0.00025001666666657485  -1.666666671340522e-8    0.0
+ 100000.0  -2.5000166666844237e-5   -1.666666804567285e-10   0.0</pre>
 
 <p>As can be seen, for this function approximating with a parabola is much quicker to converge. That is, $n$ can be smaller yet the same accuracy is maintained. (Of course, there are more computations involved for each, so the number of operations needed may or may not be fewer, that would require some analysis.)</p><h3>Error</h3><p>It can be shown that the <a href="http://en.wikipedia.org/wiki/Simpson&#37;27s_rule#Error">error for Simpson's method</a> is bounded by</p>$$~
 \frac{1}{90}\frac{1}{2^5} M (b-a)^5 \frac{1}{n^4},
@@ -506,56 +513,56 @@ riemann(f, 0, 10, 100, method="simpsons") - (F(10) - F(0));</pre>
 <pre class="output">
 0.0</pre>
 
-<p>How accurate is the approximation? Around</p><form name="WeaveQuestion" data-id="SdNl2Tf4" data-controltype="radio">
+<p>How accurate is the approximation? Around</p><form name="WeaveQuestion" data-id="Jkm7pwUI" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_SdNl2Tf4" value="1"><div class="markdown"><p><code>1e-8</code></p>
+      <input type="radio" name="radio_Jkm7pwUI" value="1"><div class="markdown"><p><code>1e-8</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_SdNl2Tf4" value="2"><div class="markdown"><p><code>1e-10</code></p>
+      <input type="radio" name="radio_Jkm7pwUI" value="2"><div class="markdown"><p><code>1e-10</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_SdNl2Tf4" value="3"><div class="markdown"><p><code>1e-12</code></p>
+      <input type="radio" name="radio_Jkm7pwUI" value="3"><div class="markdown"><p><code>1e-12</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_SdNl2Tf4" value="4"><div class="markdown"><p><code>1e-14</code></p>
+      <input type="radio" name="radio_Jkm7pwUI" value="4"><div class="markdown"><p><code>1e-14</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_SdNl2Tf4" value="5"><div class="markdown"><p><code>1e-16</code></p>
+      <input type="radio" name="radio_Jkm7pwUI" value="5"><div class="markdown"><p><code>1e-16</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_SdNl2Tf4" value="6"><div class="markdown"><p><code>0</code></p>
+      <input type="radio" name="radio_Jkm7pwUI" value="6"><div class="markdown"><p><code>0</code></p>
 </div>
     </label>
     </div>
 
-<div id="SdNl2Tf4_message"></div>
+<div id="Jkm7pwUI_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_SdNl2Tf4']").on("change", function() {
+$("input:radio[name='radio_Jkm7pwUI']").on("change", function() {
   correct = this.value == 4;
 
   if(correct) {
-     $("#SdNl2Tf4_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#Jkm7pwUI_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#SdNl2Tf4_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#Jkm7pwUI_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -565,82 +572,82 @@ riemann(cos, a, b, n, method="trapezoid") - riemann(cos, a, b, n, method="simpso
 <pre class="output">
 -1.1423156864864836e-10</pre>
 
-<p>How big is the difference?</p><form name="WeaveQuestion" data-id="pQfDXxyr" data-controltype="radio">
+<p>How big is the difference?</p><form name="WeaveQuestion" data-id="vRIA7gD4" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_pQfDXxyr" value="1"><div class="markdown"><p><code>1e-8</code></p>
+      <input type="radio" name="radio_vRIA7gD4" value="1"><div class="markdown"><p><code>1e-8</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_pQfDXxyr" value="2"><div class="markdown"><p><code>1e-10</code></p>
+      <input type="radio" name="radio_vRIA7gD4" value="2"><div class="markdown"><p><code>1e-10</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_pQfDXxyr" value="3"><div class="markdown"><p><code>1e-12</code></p>
+      <input type="radio" name="radio_vRIA7gD4" value="3"><div class="markdown"><p><code>1e-12</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_pQfDXxyr" value="4"><div class="markdown"><p><code>1e-14</code></p>
+      <input type="radio" name="radio_vRIA7gD4" value="4"><div class="markdown"><p><code>1e-14</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_pQfDXxyr" value="5"><div class="markdown"><p><code>1e-16</code></p>
+      <input type="radio" name="radio_vRIA7gD4" value="5"><div class="markdown"><p><code>1e-16</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_pQfDXxyr" value="6"><div class="markdown"><p><code>0</code></p>
+      <input type="radio" name="radio_vRIA7gD4" value="6"><div class="markdown"><p><code>0</code></p>
 </div>
     </label>
     </div>
 
-<div id="pQfDXxyr_message"></div>
+<div id="vRIA7gD4_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_pQfDXxyr']").on("change", function() {
+$("input:radio[name='radio_vRIA7gD4']").on("change", function() {
   correct = this.value == 2;
 
   if(correct) {
-     $("#pQfDXxyr_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#vRIA7gD4_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#pQfDXxyr_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#vRIA7gD4_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question ....</h4><p>Using Simpson's rule and <code>n&#61;1000</code> compute the integral of $f(x) = 1/(1+x^2)$ between $0$ and $1$.</p><form name='WeaveQuestion' data-id='pCqm9hRC' data-controltype='numeric'>
+<h4>Question ....</h4><p>Using Simpson's rule and <code>n&#61;1000</code> compute the integral of $f(x) = 1/(1+x^2)$ between $0$ and $1$.</p><form name='WeaveQuestion' data-id='Lungudq0' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="pCqm9hRC" type="number" class="form-control">
+<input id="Lungudq0" type="number" class="form-control">
 
 </div>
-  
-<div id='pCqm9hRC_message'></div>
+
+<div id='Lungudq0_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#pCqm9hRC').on('change', function() {
+$('#Lungudq0').on('change', function() {
   correct = Math.abs(this.value - 0.7853981633974482) <= 1.0e-5;
 
   if(correct) {
-     $('#pCqm9hRC_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#Lungudq0_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#pCqm9hRC_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#Lungudq0_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -662,78 +669,78 @@ $('#pCqm9hRC').on('change', function() {
 </div>
 
 </div>
-<h3>Practice</h3><h4>Question Use quadgk</h4><p>Let $f(x) = \exp(-4 \cdot  |x-1/2|)$. Find the integral over $[0,1]$ using <code>quadgk</code>:</p><form name='WeaveQuestion' data-id='TIbI8f9P' data-controltype='numeric'>
+<h3>Practice</h3><h4>Question Use quadgk</h4><p>Let $f(x) = \exp(-4 \cdot  |x-1/2|)$. Find the integral over $[0,1]$ using <code>quadgk</code>:</p><form name='WeaveQuestion' data-id='Uk0s21UJ' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="TIbI8f9P" type="number" class="form-control">
+<input id="Uk0s21UJ" type="number" class="form-control">
 
 </div>
-  
-<div id='TIbI8f9P_message'></div>
+
+<div id='Uk0s21UJ_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#TIbI8f9P').on('change', function() {
+$('#Uk0s21UJ').on('change', function() {
   correct = Math.abs(this.value - 0.4323323583816937) <= 1.0e-5;
 
   if(correct) {
-     $('#TIbI8f9P_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#Uk0s21UJ_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#TIbI8f9P_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#Uk0s21UJ_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question Use quadgk</h4><p>Let $f(x) = \sin(100\pi x)/(\pi x)$. Find the integral over $[0,1]$ using <code>quadgk</code>:</p><form name='WeaveQuestion' data-id='rjSfduJE' data-controltype='numeric'>
+<h4>Question Use quadgk</h4><p>Let $f(x) = \sin(100\pi x)/(\pi x)$. Find the integral over $[0,1]$ using <code>quadgk</code>:</p><form name='WeaveQuestion' data-id='OW77FrpO' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="rjSfduJE" type="number" class="form-control">
+<input id="OW77FrpO" type="number" class="form-control">
 
 </div>
-  
-<div id='rjSfduJE_message'></div>
+
+<div id='OW77FrpO_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#rjSfduJE').on('change', function() {
+$('#OW77FrpO').on('change', function() {
   correct = Math.abs(this.value - 0.49898680869304557) <= 0.0001;
 
   if(correct) {
-     $('#rjSfduJE_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#OW77FrpO_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#rjSfduJE_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#OW77FrpO_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question Use quadgk</h4><p>Let $f(x) = \sin(100\pi x)/(100\pi x)$. Using $1,000$ points, find the right-Riemann integral over $[0,1]$.</p><form name='WeaveQuestion' data-id='8RPoZ7HV' data-controltype='numeric'>
+<h4>Question Use quadgk</h4><p>Let $f(x) = \sin(100\pi x)/(100\pi x)$. Using $1,000$ points, find the right-Riemann integral over $[0,1]$.</p><form name='WeaveQuestion' data-id='p4oy2YvU' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="8RPoZ7HV" type="number" class="form-control">
+<input id="p4oy2YvU" type="number" class="form-control">
 
 </div>
-  
-<div id='8RPoZ7HV_message'></div>
+
+<div id='p4oy2YvU_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#8RPoZ7HV').on('change', function() {
+$('#p4oy2YvU').on('change', function() {
   correct = Math.abs(this.value - 0.004489951557656145) <= 1.0e-5;
 
   if(correct) {
-     $('#8RPoZ7HV_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#p4oy2YvU_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#8RPoZ7HV_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#p4oy2YvU_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -742,64 +749,64 @@ quadgk(f, 0, 1)[1] - riemann(f, 0, 1, 100_000);</pre>
 <pre class="output">
 2.5000083332393785e-6</pre>
 
-<form name="WeaveQuestion" data-id="3TrEkjA0" data-controltype="radio">
+<form name="WeaveQuestion" data-id="cugBK81F" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_3TrEkjA0" value="1"><div class="markdown"><p>Roughly <code>1e-12</code></p>
+      <input type="radio" name="radio_cugBK81F" value="1"><div class="markdown"><p>Roughly <code>1e-4</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_3TrEkjA0" value="2"><div class="markdown"><p>Roughly <code>1e-6</code></p>
+      <input type="radio" name="radio_cugBK81F" value="2"><div class="markdown"><p>Roughly <code>1e-12</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_3TrEkjA0" value="3"><div class="markdown"><p>Roughly <code>1e-4</code></p>
+      <input type="radio" name="radio_cugBK81F" value="3"><div class="markdown"><p>Roughly <code>1e-6</code></p>
 </div>
     </label>
     </div>
 
-<div id="3TrEkjA0_message"></div>
+<div id="cugBK81F_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_3TrEkjA0']").on("change", function() {
-  correct = this.value == 2;
+$("input:radio[name='radio_cugBK81F']").on("change", function() {
+  correct = this.value == 3;
 
   if(correct) {
-     $("#3TrEkjA0_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#cugBK81F_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#3TrEkjA0_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#cugBK81F_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question</h4><p>The <code>quadgk</code> function allows you to specify issues where there are troubles. For example, we know that $f(x) = \sin(x)/x$ has an issue at 0. Directly trying this integral <code>quadgk&#40;x-&gt;sin&#40;x&#41;/x, -pi, pi&#41;</code> will fail, but you can specify the issue at $0$ as follows <code>quadgk&#40;x -&gt; sin&#40;x&#41;/x, -pi, 0, pi&#41;</code>. Do so. What is the value of the result:</p><form name='WeaveQuestion' data-id='dzhVUODH' data-controltype='numeric'>
+<h4>Question</h4><p>The <code>quadgk</code> function allows you to specify issues where there are troubles. For example, we know that $f(x) = \sin(x)/x$ has an issue at 0. Directly trying this integral <code>quadgk&#40;x-&gt;sin&#40;x&#41;/x, -pi, pi&#41;</code> will fail, but you can specify the issue at $0$ as follows <code>quadgk&#40;x -&gt; sin&#40;x&#41;/x, -pi, 0, pi&#41;</code>. Do so. What is the value of the result:</p><form name='WeaveQuestion' data-id='qtHjSm0k' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="dzhVUODH" type="number" class="form-control">
+<input id="qtHjSm0k" type="number" class="form-control">
 
 </div>
-  
-<div id='dzhVUODH_message'></div>
+
+<div id='qtHjSm0k_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#dzhVUODH').on('change', function() {
+$('#qtHjSm0k').on('change', function() {
   correct = Math.abs(this.value - 3.703874103964933) <= 0.0001;
 
   if(correct) {
-     $('#dzhVUODH_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#qtHjSm0k_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#dzhVUODH_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#qtHjSm0k_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -808,28 +815,28 @@ val = quadgk(f, 0, 0.3, 1);</pre>
 <pre class="output">
 (1.5608608290003951, 1.8324742568488245e-8)</pre>
 
-<p>Following the above, what answer do you get?</p><form name='WeaveQuestion' data-id='CrlvaMQv' data-controltype='numeric'>
+<p>Following the above, what answer do you get?</p><form name='WeaveQuestion' data-id='9RgxrAke' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="CrlvaMQv" type="number" class="form-control">
+<input id="9RgxrAke" type="number" class="form-control">
 
 </div>
-  
-<div id='CrlvaMQv_message'></div>
+
+<div id='9RgxrAke_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#CrlvaMQv').on('change', function() {
+$('#9RgxrAke').on('change', function() {
   correct = Math.abs(this.value - 1.5608608290003951) <= 0.0001;
 
   if(correct) {
-     $('#CrlvaMQv_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#9RgxrAke_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#CrlvaMQv_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#9RgxrAke_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -886,38 +893,38 @@ s(h) = 3 + \log(1 + h), \quad 0 \leq h \leq b
 </div>
 
 
-<p>One could also consider a fluted one, such as appears in the comparison noted in the article.</p><h4>Question</h4><p>Which of these functions might describe a fluted glass where the radius changes faster as the height gets bigger, that is the radius is a <em>concave up</em> function?</p><form name="WeaveQuestion" data-id="iQypFMoW" data-controltype="radio">
+<p>One could also consider a fluted one, such as appears in the comparison noted in the article.</p><h4>Question</h4><p>Which of these functions might describe a fluted glass where the radius changes faster as the height gets bigger, that is the radius is a <em>concave up</em> function?</p><form name="WeaveQuestion" data-id="wWeC5oQv" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_iQypFMoW" value="1"><div class="markdown"><p><code>r&#40;h&#41; &#61; 2 &#43; sqrt&#40;x/10&#41;, 0 &lt;&#61; x &lt;&#61; 10</code></p>
+      <input type="radio" name="radio_wWeC5oQv" value="1"><div class="markdown"><p><code>r&#40;h&#41; &#61; 2 &#43; &#40;x/10&#41;^2, 0 &lt;&#61; x &lt;&#61; 10</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_iQypFMoW" value="2"><div class="markdown"><p><code>r&#40;h&#41; &#61; 2 &#43; &#40;x/10&#41;^2, 0 &lt;&#61; x &lt;&#61; 10</code></p>
+      <input type="radio" name="radio_wWeC5oQv" value="2"><div class="markdown"><p><code>r&#40;h&#41; &#61; 2 &#43; sqrt&#40;x/10&#41;, 0 &lt;&#61; x &lt;&#61; 10</code></p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_iQypFMoW" value="3"><div class="markdown"><p><code>r&#40;h&#41; &#61; 2 &#43; x/10, 0 &lt;&#61; x &lt;&#61; 10</code></p>
+      <input type="radio" name="radio_wWeC5oQv" value="3"><div class="markdown"><p><code>r&#40;h&#41; &#61; 2 &#43; x/10, 0 &lt;&#61; x &lt;&#61; 10</code></p>
 </div>
     </label>
     </div>
 
-<div id="iQypFMoW_message"></div>
+<div id="wWeC5oQv_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_iQypFMoW']").on("change", function() {
-  correct = this.value == 2;
+$("input:radio[name='radio_wWeC5oQv']").on("change", function() {
+  correct = this.value == 1;
 
   if(correct) {
-     $("#iQypFMoW_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#wWeC5oQv_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#iQypFMoW_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#wWeC5oQv_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -957,78 +964,78 @@ r_b = fzero(x -> r_vol(x) - 450,  10)</pre>
 <pre class="output">
 0.6111581749616989</pre>
 
-<p>At this height only half the volume is remaining (and not at 50% of the original height.)</p><h3>Practice</h3><h4>Question</h4><p>Compare the above for the curved glass, where $s(h) = 3 + \log(1 + h)$.</p><p>What is the height of the glass, <code>b</code>, needed to make the volume 450?</p><form name='WeaveQuestion' data-id='tGLnkPWa' data-controltype='numeric'>
+<p>At this height only half the volume is remaining (and not at 50% of the original height.)</p><h3>Practice</h3><h4>Question</h4><p>Compare the above for the curved glass, where $s(h) = 3 + \log(1 + h)$.</p><p>What is the height of the glass, <code>b</code>, needed to make the volume 450?</p><form name='WeaveQuestion' data-id='ufLUqxsw' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="tGLnkPWa" type="number" class="form-control">
+<input id="ufLUqxsw" type="number" class="form-control">
 
 </div>
-  
-<div id='tGLnkPWa_message'></div>
+
+<div id='ufLUqxsw_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#tGLnkPWa').on('change', function() {
+$('#ufLUqxsw').on('change', function() {
   correct = Math.abs(this.value - 7.273543523711023) <= 0.001;
 
   if(correct) {
-     $('#tGLnkPWa_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#ufLUqxsw_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#tGLnkPWa_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#ufLUqxsw_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Find the volume of the glass represented by $s(h) = 3 + \log(1 + h), 0 \leq h \leq b$ when the glass is filled to half its height. Report the value as a percentage of the total volume.</p><form name='WeaveQuestion' data-id='UruIWcsu' data-controltype='numeric'>
+<h4>Question</h4><p>Find the volume of the glass represented by $s(h) = 3 + \log(1 + h), 0 \leq h \leq b$ when the glass is filled to half its height. Report the value as a percentage of the total volume.</p><form name='WeaveQuestion' data-id='ALETyhkC' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="UruIWcsu" type="number" class="form-control">
+<input id="ALETyhkC" type="number" class="form-control">
 
 </div>
-  
-<div id='UruIWcsu_message'></div>
+
+<div id='ALETyhkC_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#UruIWcsu').on('change', function() {
+$('#ALETyhkC').on('change', function() {
   correct = Math.abs(this.value - 40.17520354006269) <= 1;
 
   if(correct) {
-     $('#UruIWcsu_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#ALETyhkC_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#UruIWcsu_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#ALETyhkC_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Now, what height of filling will produce half the volume when? Report your answer in terms of a percentage of $b$, height of the glass.</p><form name='WeaveQuestion' data-id='XY9eiJZ8' data-controltype='numeric'>
+<h4>Question</h4><p>Now, what height of filling will produce half the volume when? Report your answer in terms of a percentage of $b$, height of the glass.</p><form name='WeaveQuestion' data-id='fdxqTTHY' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="XY9eiJZ8" type="number" class="form-control">
+<input id="fdxqTTHY" type="number" class="form-control">
 
 </div>
-  
-<div id='XY9eiJZ8_message'></div>
+
+<div id='fdxqTTHY_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#XY9eiJZ8').on('change', function() {
+$('#fdxqTTHY').on('change', function() {
   correct = Math.abs(this.value - 59.13334210350367) <= 0.1;
 
   if(correct) {
-     $('#XY9eiJZ8_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#fdxqTTHY_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#XY9eiJZ8_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#fdxqTTHY_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -1046,36 +1053,256 @@ $('#XY9eiJZ8').on('change', function() {
 </li>
 <li><p>the radius as a function of height is $r(h) = 5  + (3/15)\cdot h$</p>
 </li>
-</ul><form name='WeaveQuestion' data-id='fxn717QA' data-controltype='numeric'>
+</ul><form name='WeaveQuestion' data-id='Z0n1iAYO' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="fxn717QA" type="number" class="form-control">
+<input id="Z0n1iAYO" type="number" class="form-control">
 
 </div>
-  
-<div id='fxn717QA_message'></div>
+
+<div id='Z0n1iAYO_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#fxn717QA').on('change', function() {
+$('#Z0n1iAYO').on('change', function() {
   correct = Math.abs(this.value - 15157.98160668533) <= 10.0;
 
   if(correct) {
-     $('#fxn717QA_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#Z0n1iAYO_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#fxn717QA_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#Z0n1iAYO_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h2>Example, arc length</h2><p>The basic indefinite integral for a positive function answers the amount of area under the curve over a given interval. However, the integral can be interpreted in many different ways. For example, one can use an integral to answer how long a curve is. Of course one can estimate this answer. For example, consider this curve:</p><pre class="sourceCode julia">plot(x -> x^2, 0, 1)</pre>
-    <div id="99d03bca-ddbc-40bd-9b52-4764cc4371c3" style="width:600px;height:400px;"></div>
+    <div id="baa81a44-8439-4552-a33b-70ee002ecc85" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('99d03bca-ddbc-40bd-9b52-4764cc4371c3');
-    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[0.009765819019788131,0.10006491716837283,0.15433091130562387,0.20021211871576575,0.2500519700330514,0.29599990453462816,0.3452609464064898,0.4023346943385323,0.45305510611102146,0.49753233654022,0.5460244566553195,0.5948047787528121,0.6487376626244042,0.7000534407448434,0.7534099435113505,0.7983247536668452,0.8531606459863641,0.9047080021287085,0.9872908640160599],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[9.537122112725562e-5,0.010012987647913316,0.023818030184424344,0.04008489248065588,0.06252598771741004,0.08761594348450898,0.11920512111350502,0.16187320626848023,0.2052589291732689,0.24753842590317074,0.2981427072657369,0.35379272482718177,0.42086055490737534,0.490074819898694,0.5676265429817763,0.6373224123172291,0.7278830878598701,0.8184965691157192,0.9747432501695781],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.0,0.25,0.5,0.75,1.0],"visible":true,"ticks":"inside","range":[-0.019559932330100022,1.0166166153659482],"domain":[0.0658209390492855,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0.00","0.25","0.50","0.75","1.00"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[0.0,0.25,0.5,0.75,1.0],"visible":true,"ticks":"inside","range":[-0.02914406514732627,1.0039826865380317],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["0.00","0.25","0.50","0.75","1.00"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('baa81a44-8439-4552-a33b-70ee002ecc85');
+    Plotly.plot(PLOT, [
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            0.0,
+            0.009765819019788131,
+            0.10006491716837283,
+            0.15433091130562387,
+            0.20021211871576575,
+            0.2500519700330514,
+            0.29599990453462816,
+            0.3452609464064898,
+            0.4023346943385323,
+            0.45305510611102146,
+            0.49753233654022,
+            0.5460244566553195,
+            0.5948047787528121,
+            0.6487376626244042,
+            0.7000534407448434,
+            0.7534099435113505,
+            0.7983247536668452,
+            0.8531606459863641,
+            0.9047080021287085,
+            0.9872908640160599,
+            1.0
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y1",
+        "zmin": -0.1,
+        "legendgroup": "y1",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(0, 154, 250, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            0.0,
+            9.537122112725562e-5,
+            0.010012987647913316,
+            0.023818030184424344,
+            0.04008489248065588,
+            0.06252598771741004,
+            0.08761594348450898,
+            0.11920512111350502,
+            0.16187320626848023,
+            0.2052589291732689,
+            0.24753842590317074,
+            0.2981427072657369,
+            0.35379272482718177,
+            0.42086055490737534,
+            0.490074819898694,
+            0.5676265429817763,
+            0.6373224123172291,
+            0.7278830878598701,
+            0.8184965691157192,
+            0.9747432501695781,
+            1.0
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    }
+]
+, {
+    "showlegend": true,
+    "xaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            0.0,
+            0.25,
+            0.5,
+            0.75,
+            1.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            -0.03,
+            1.03
+        ],
+        "domain": [
+            0.0658209390492855,
+            0.9934383202099738
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "0.00",
+            "0.25",
+            "0.50",
+            "0.75",
+            "1.00"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "y1"
+    },
+    "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "annotations": [],
+    "height": 400,
+    "margin": {
+        "l": 0,
+        "b": 20,
+        "r": 0,
+        "t": 20
+    },
+    "plot_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "yaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            0.0,
+            0.25,
+            0.5,
+            0.75,
+            1.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            -0.03,
+            1.03
+        ],
+        "domain": [
+            0.03762029746281716,
+            0.9901574803149606
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "0.00",
+            "0.25",
+            "0.50",
+            "0.75",
+            "1.00"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "x1"
+    },
+    "legend": {
+        "tracegroupgap": 0,
+        "bordercolor": "rgba(0, 0, 0, 1.000)",
+        "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "font": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "y": 1.0,
+        "x": 1.0
+    },
+    "width": 600
+}
+);
     </script>
 <p>This curve has length no more than $2 = 1 + 1$ – the distance along the $x$ axis starting at $0$ to $1$ and then going up. It is also longer than $\sqrt{2} = \sqrt{1^2 + 1^2}$ – the straight line distance between the two endpoints. But how long is it?</p><p>In general, the <em>arc length</em> of the curve $y=f(x)$ between $a \leq x \leq b$ (or how long is the curve) is given through the formula</p>$$~
 l = \int_a^b \sqrt{1 + f'(x)^2} dx
@@ -1104,37 +1331,331 @@ y = a \cosh(x/a) = a \cdot \frac{e^{x/a} + e^{-x/a}}{2}.
 ~$$
 <p>Suppose we have the following wire hung between $x=-1$ and $x=1$ with $a = 2$:</p><pre class="sourceCode julia">f(x; a=2) = a * cosh(x/a)
 plot(f, -1, 1)</pre>
-    <div id="f7ad1f51-2bc1-41f9-ab8e-8901403cafdd" style="width:600px;height:400px;"></div>
+    <div id="887e2989-4d61-4c1a-8253-ca30d84f5bbc" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('f7ad1f51-2bc1-41f9-ab8e-8901403cafdd');
-    Plotly.plot(PLOT, [{"xaxis":"x1","colorbar":{"title":""},"yaxis":"y1","text":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],"x":[-0.9804683619604238,-0.7998701656632544,-0.6913381773887523,-0.5995757625684686,-0.49989605993389713,-0.4080001909307437,-0.3094781071870203,-0.19533061132293544,-0.09388978777795712,-0.004935326919559979,0.09204891331063893,0.1896095575056242,0.29747532524880854,0.4001068814896869,0.5068198870227011,0.5966495073336903,0.7063212919727282,0.809416004257417,0.9745817280321198],"showlegend":true,"mode":"lines","name":"y1","zmin":-0.1,"legendgroup":"y1","zmax":0.1,"line":{"color":"rgba(0, 154, 250, 1.000)","shape":"linear","dash":"solid","width":1},"y":[2.2451814676620367,2.162091418476982,2.120681632018331,2.0905478863839377,2.0627999460039548,2.0417605638641034,2.023991989814519,2.0095460962751908,2.002204227828322,2.0000060893660407,2.0021186245522906,2.0089946800227874,2.022163707567987,2.040155033243263,2.0645609835479393,2.0896596684617985,2.1260241504723734,2.166036365933794,2.242188370652083],"type":"scatter","hoverinfo":"text"}], {"showlegend":true,"xaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[-1.0,-0.5,0.0,0.5,1.0],"visible":true,"ticks":"inside","range":[-1.0391198646602,1.033233230731896],"domain":[0.0658209390492855,0.9934383202099738],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["-1.0","-0.5","0.0","0.5","1.0"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"y1"},"paper_bgcolor":"rgba(255, 255, 255, 1.000)","annotations":[],"height":400,"margin":{"l":0,"b":20,"r":0,"t":20},"plot_bgcolor":"rgba(255, 255, 255, 1.000)","yaxis":{"showticklabels":true,"gridwidth":0.5,"tickvals":[2.0,2.0500000000000003,2.1,2.15,2.2,2.25],"visible":true,"ticks":"inside","range":[1.9926508280171609,2.2525367290109166],"domain":[0.03762029746281716,0.9901574803149606],"tickmode":"array","linecolor":"rgba(0, 0, 0, 1.000)","showgrid":true,"title":"","mirror":false,"tickangle":0,"showline":true,"gridcolor":"rgba(0, 0, 0, 0.100)","titlefont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":15},"tickcolor":"rgb(0, 0, 0)","ticktext":["2.00","2.05","2.10","2.15","2.20","2.25"],"zeroline":false,"type":"-","tickfont":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"zerolinecolor":"rgba(0, 0, 0, 1.000)","anchor":"x1"},"legend":{"tracegroupgap":0,"bordercolor":"rgba(0, 0, 0, 1.000)","bgcolor":"rgba(255, 255, 255, 1.000)","font":{"color":"rgba(0, 0, 0, 1.000)","family":"sans-serif","size":11},"y":1.0,"x":1.0},"width":600});
+    PLOT = document.getElementById('887e2989-4d61-4c1a-8253-ca30d84f5bbc');
+    Plotly.plot(PLOT, [
+    {
+        "xaxis": "x1",
+        "colorbar": {
+            "title": ""
+        },
+        "yaxis": "y1",
+        "text": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        "x": [
+            -1.0,
+            -0.9951170904901059,
+            -0.9902341809802119,
+            -0.9853512714703179,
+            -0.9804683619604238,
+            -0.9353188128861314,
+            -0.890169263811839,
+            -0.8450197147375467,
+            -0.7998701656632544,
+            -0.7456041715260033,
+            -0.6913381773887523,
+            -0.6454569699786104,
+            -0.5995757625684686,
+            -0.5497359112511828,
+            -0.49989605993389713,
+            -0.45394812543232044,
+            -0.4080001909307437,
+            -0.358739149058882,
+            -0.3094781071870203,
+            -0.25240435925497784,
+            -0.19533061132293544,
+            -0.1446101995504463,
+            -0.09388978777795712,
+            -0.049412557348758546,
+            -0.004935326919559979,
+            0.04355679319553948,
+            0.09204891331063893,
+            0.14082923540813155,
+            0.1896095575056242,
+            0.24354244137721637,
+            0.29747532524880854,
+            0.34879110336924773,
+            0.4001068814896869,
+            0.45346338425619404,
+            0.5068198870227011,
+            0.5517346971781957,
+            0.5966495073336903,
+            0.6514853996532093,
+            0.7063212919727282,
+            0.7578686481150726,
+            0.809416004257417,
+            0.8919988661447684,
+            0.9745817280321198,
+            0.9872908640160599,
+            1.0
+        ],
+        "showlegend": true,
+        "mode": "lines",
+        "name": "y1",
+        "zmin": -0.1,
+        "legendgroup": "y1",
+        "zmax": 0.1,
+        "line": {
+            "color": "rgba(0, 154, 250, 1.000)",
+            "shape": "linear",
+            "dash": "solid",
+            "width": 1
+        },
+        "y": [
+            2.2552519304127614,
+            2.2527141881071273,
+            2.250189873564598,
+            2.2476789717384826,
+            2.2451814676620367,
+            2.222720494287667,
+            2.2013923128282036,
+            2.1811860535447023,
+            2.162091418476982,
+            2.140598523092304,
+            2.120681632018331,
+            2.1050608183631803,
+            2.0905478863839377,
+            2.0760292729480234,
+            2.0627999460039548,
+            2.0517387740026405,
+            2.0417605638641034,
+            2.0322597977066907,
+            2.023991989814519,
+            2.0159481404532382,
+            2.0095460962751908,
+            2.005230305539724,
+            2.002204227828322,
+            2.0006104312556023,
+            2.0000060893660407,
+            2.0004743173052595,
+            2.0021186245522906,
+            2.0049602673858273,
+            2.0089946800227874,
+            2.014846562281207,
+            2.022163707567987,
+            2.0304909699484326,
+            2.040155033243263,
+            2.0516278634685055,
+            2.0645609835479393,
+            2.0765866562865596,
+            2.0896596684617985,
+            2.1070498790404257,
+            2.1260241504723734,
+            2.1453176702851406,
+            2.166036365933794,
+            2.202234715963491,
+            2.242188370652083,
+            2.2486747490356556,
+            2.2552519304127614
+        ],
+        "type": "scatter",
+        "hoverinfo": "text"
+    }
+]
+, {
+    "showlegend": true,
+    "xaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            -1.0,
+            -0.5,
+            0.0,
+            0.5,
+            1.0
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            -1.06,
+            1.06
+        ],
+        "domain": [
+            0.0658209390492855,
+            0.9934383202099738
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "-1.0",
+            "-0.5",
+            "0.0",
+            "0.5",
+            "1.0"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "y1"
+    },
+    "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "annotations": [],
+    "height": 400,
+    "margin": {
+        "l": 0,
+        "b": 20,
+        "r": 0,
+        "t": 20
+    },
+    "plot_bgcolor": "rgba(255, 255, 255, 1.000)",
+    "yaxis": {
+        "showticklabels": true,
+        "gridwidth": 0.5,
+        "tickvals": [
+            2.0,
+            2.0500000000000003,
+            2.1,
+            2.15,
+            2.2,
+            2.25
+        ],
+        "visible": true,
+        "ticks": "inside",
+        "range": [
+            1.9923487141346392,
+            2.262909305644163
+        ],
+        "domain": [
+            0.03762029746281716,
+            0.9901574803149606
+        ],
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "ticktext": [
+            "2.00",
+            "2.05",
+            "2.10",
+            "2.15",
+            "2.20",
+            "2.25"
+        ],
+        "zeroline": false,
+        "type": "-",
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "x1"
+    },
+    "legend": {
+        "tracegroupgap": 0,
+        "bordercolor": "rgba(0, 0, 0, 1.000)",
+        "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "font": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "y": 1.0,
+        "x": 1.0
+    },
+    "width": 600
+}
+);
     </script>
 <p>How long is the chain? Looking at the graph we can guess an answer is between $2$ and $2.5$, say, but it isn't much work to get the answer:</p><pre class="sourceCode julia">quadgk(x -> sqrt(1 + f'(x)^2), -1, 1)</pre>
 <pre class="output">
 (2.0843812219749895, 4.440892098500626e-16)</pre>
 
-<h3>Practice</h3><h4>Question</h4><p>The sag in the chain is adjusted through the parameter $a$ – chains with larger $a$ have less sag.</p><p>Suppose your chain has parameter <code>a&#61;3</code> what is the length? (Use <code>quadgk</code>)</p><form name='WeaveQuestion' data-id='SXTjJbdV' data-controltype='numeric'>
+<h3>Practice</h3><h4>Question</h4><p>The sag in the chain is adjusted through the parameter $a$ – chains with larger $a$ have less sag.</p><p>Suppose your chain has parameter <code>a&#61;3</code> what is the length? (Use <code>quadgk</code>)</p><form name='WeaveQuestion' data-id='5a7Be983' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="SXTjJbdV" type="number" class="form-control">
+<input id="5a7Be983" type="number" class="form-control">
 
 </div>
-  
-<div id='SXTjJbdV_message'></div>
+
+<div id='5a7Be983_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#SXTjJbdV').on('change', function() {
+$('#5a7Be983').on('change', function() {
   correct = Math.abs(this.value - 15157.98160668533) <= 0.001;
 
   if(correct) {
-     $('#SXTjJbdV_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#5a7Be983_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#SXTjJbdV_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#5a7Be983_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -1160,28 +1681,28 @@ a = newton(a -> catenary(78/2, a=a, b=118 + a), 1)</pre>
 <pre class="output">
 12.994268574805396</pre>
 
-<p>Rounding, we take $a=13$. With these parameters ($a=13$, $b = 131$), compute the length of John's catenary.</p><form name='WeaveQuestion' data-id='TzCaZ8nU' data-controltype='numeric'>
+<p>Rounding, we take $a=13$. With these parameters ($a=13$, $b = 131$), compute the length of John's catenary.</p><form name='WeaveQuestion' data-id='3CDrVI56' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="TzCaZ8nU" type="number" class="form-control">
+<input id="3CDrVI56" type="number" class="form-control">
 
 </div>
-  
-<div id='TzCaZ8nU_message'></div>
+
+<div id='3CDrVI56_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#TzCaZ8nU').on('change', function() {
+$('#3CDrVI56').on('change', function() {
   correct = Math.abs(this.value - 260.46474811265745) <= 1;
 
   if(correct) {
-     $('#TzCaZ8nU_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#3CDrVI56_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#TzCaZ8nU_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#3CDrVI56_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -1194,57 +1715,57 @@ $('#TzCaZ8nU').on('change', function() {
 </ul><p>The parabola that fits these three points is</p>$$~
 y = \frac{-b}{a^2}(x^2 - a^2)
 ~$$
-<p>Find the arc length of the cable in meters.</p><form name='WeaveQuestion' data-id='B0pU1D1F' data-controltype='numeric'>
+<p>Find the arc length of the cable in meters.</p><form name='WeaveQuestion' data-id='hykxLtSp' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="B0pU1D1F" type="number" class="form-control">
+<input id="hykxLtSp" type="number" class="form-control">
 
 </div>
-  
-<div id='B0pU1D1F_message'></div>
+
+<div id='hykxLtSp_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#B0pU1D1F').on('change', function() {
+$('#hykxLtSp').on('change', function() {
   correct = Math.abs(this.value - 2.000000162403202) <= 0.001;
 
   if(correct) {
-     $('#B0pU1D1F_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#hykxLtSp_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#B0pU1D1F_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#hykxLtSp_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<p>In the picture of the Verrazano-Narrows <a href="http://observer.com/2012/09/staten-island/s-i-8/">bridge</a>, would the shape during construction be a parabola or a cateneary?</p><form name="WeaveQuestion" data-id="phisnEV6" data-controltype="radio">
+<p>In the picture of the Verrazano-Narrows <a href="http://observer.com/2012/09/staten-island/s-i-8/">bridge</a>, would the shape during construction be a parabola or a cateneary?</p><form name="WeaveQuestion" data-id="p08jKEs9" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_phisnEV6" value="1"><div class="markdown"><p>A parabola, as just mentioned</p>
+      <input type="radio" name="radio_p08jKEs9" value="1"><div class="markdown"><p>A parabola, as just mentioned</p>
 </div>
     </label>
     </div>
-    <div  class="radio"> 
+    <div  class="radio">
     <label>
-      <input type="radio" name="radio_phisnEV6" value="2"><div class="markdown"><p>A catenary, basically, as in the picture there is basically no load on the cables.</p>
+      <input type="radio" name="radio_p08jKEs9" value="2"><div class="markdown"><p>A catenary, basically, as in the picture there is basically no load on the cables.</p>
 </div>
     </label>
     </div>
 
-<div id="phisnEV6_message"></div>
+<div id="p08jKEs9_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_phisnEV6']").on("change", function() {
+$("input:radio[name='radio_p08jKEs9']").on("change", function() {
   correct = this.value == 2;
 
   if(correct) {
-     $("#phisnEV6_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#p08jKEs9_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#phisnEV6_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#p08jKEs9_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -1256,28 +1777,28 @@ y = a \ln\frac{a + \sqrt{a^2 - x^2}}{x} - \sqrt{a^2 - x^2}
 <pre class="output">
 g (generic function with 1 method)</pre>
 
-<p>Let $a=12$, $f(x) = g(x, a)$. Compute the length the bow of the boat has traveled between $x=1$ and $x=a$ using <code>quadgk</code>.</p><form name='WeaveQuestion' data-id='ONpj72DF' data-controltype='numeric'>
+<p>Let $a=12$, $f(x) = g(x, a)$. Compute the length the bow of the boat has traveled between $x=1$ and $x=a$ using <code>quadgk</code>.</p><form name='WeaveQuestion' data-id='BvhL03gX' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="ONpj72DF" type="number" class="form-control">
+<input id="BvhL03gX" type="number" class="form-control">
 
 </div>
-  
-<div id='ONpj72DF_message'></div>
+
+<div id='BvhL03gX_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#ONpj72DF').on('change', function() {
+$('#BvhL03gX').on('change', function() {
   correct = Math.abs(this.value - 29.818879797456006) <= 0.001;
 
   if(correct) {
-     $('#ONpj72DF_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#BvhL03gX_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#ONpj72DF_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#BvhL03gX_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -1319,16 +1840,14 @@ end</pre>
 lgp (generic function with 1 method)</pre>
 
 <p>This is used as,</p><pre class="sourceCode julia">p4 = lgp(4)</pre>
-<div class="well well-sm">
-0.375 &#45; 3.75&#8729;x^2 &#43; 4.375&#8729;x^4</div>
+<pre class="output">
+UndefVarError(:Poly)
+</pre>
 
 <p>The term <em>recursion</em> is applied to a function when it makes a reference to itself during a computation. With this function, don't try it with values much bigger than $20$, as the recursion can take a long time.</p><p>The nodes are the roots of the right polynomial. Here we have the values for <code>p4</code></p><pre class="sourceCode julia">xs = Polynomials.roots(p4)</pre>
 <pre class="output">
-4-element Array{Float64,1}:
- -0.8611363115940536 
-  0.8611363115940531 
- -0.33998104358485653
-  0.3399810435848563 </pre>
+UndefVarError(:p4)
+</pre>
 
 <p>(The Konrod part of <code>quadgk</code> changes the nodes so they can be reused during the refinement.)</p><p>Finally, the weights  involve the derivative of $P_n$ through:</p>$$~
 w_i = \frac{2}{(1 - x_i^2) \cdot(P^{'}_n(x_i)/P_n(1))^2}
@@ -1336,16 +1855,14 @@ w_i = \frac{2}{(1 - x_i^2) \cdot(P^{'}_n(x_i)/P_n(1))^2}
 <p>These can be done simply with:</p><pre class="sourceCode julia">weights(x) = 2 / ((1 - x^2) * (polyder(p4)(x)/p4(1))^2 )
 ws = [weights(xi) for xi in xs]</pre>
 <pre class="output">
-4-element Array{Float64,1}:
- 0.3478548451374517
- 0.3478548451374526
- 0.6521451548625459
- 0.6521451548625463</pre>
+UndefVarError(:polyder)
+</pre>
 
 <p>From here <code>gauss_quadrature</code> will do the integration of <code>f</code> over the interval $[-1,1]$, though we can do it ourself quickly enough. Here we compute the integral of $\cos(\pi/2 x)$ over $[-1,1]$ (you can check this is very close to the answer $4/\pi$ even with just 4 nodes):</p><pre class="sourceCode julia">f(x) = cos(pi/2*x)
 sum(w * f(x) for (w,x) in zip(ws, xs))</pre>
 <pre class="output">
-1.2732295042595059</pre>
+UndefVarError(:ws)
+</pre>
 
 <h3>Adaptive integration</h3><p>Next, we a have a brief discussion about an alternative means to compute integrals. The following function <code>adapt</code> implements a basic <em>adaptive quadrature</em> method for integration. The basic idea is that for a subinterval $[a,b]$ if the area of the trapezoid is not close to the area of Simpson's parabolic estimate then the subinterval is split into two pieces $[a,c]$ and $[c,b]$ and the same question is asked. If the area is close the Simpson's parabolic estimate is used to estimate the integral of $f$ over that subinterval.</p><p>Again, we see <em>recursion</em> when  programming this algorithm.  To avoid infinite loops during this, we use a limit below to keep track.</p><p>In general, the value of adaptive methods like this, is the function calls concentrate on areas where $f$ is not well approximated and where it is well approximated it just moves on. This approach works well for poorly behaved functions, as it has a more refined grid there.</p><p><!– from the MASS function adapt –></p><pre class="sourceCode julia">function adapt(f, a, b, limit)
 

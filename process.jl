@@ -15,8 +15,8 @@
 
 using WeavePynb
 
-md_files = filter(x-> ismatch(r"\.md$", x), readdir())
-html_files = map(x -> replace(x, r"md$", "html"), md_files)
+md_files = filter(x-> occursin(r"\.md$", x), readdir())
+html_files = map(x -> replace(x, r"md$" => "html"), md_files)
 
 for (m,h) in zip(md_files, html_files)
     if mtime(h) == 0.0 || (mtime(m) > mtime(h))	

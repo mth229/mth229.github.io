@@ -9,9 +9,8 @@ creating graphics. At this point there are many different ones
 and perhaps more will be generated before a dominant one is arrived
 at. As such, we don't try to teach the details of any one of them.
 
-Rather, we use the `Plots` package which provides a unified interface
-to many backend plotting pacakges. This package is loaded when the
-`MTH229` package is.
+Currently, the  the `Plots` package  provides a unified interface
+to many backend plotting packages. The `SimplePlots` package *mostly* follows the syntax and provides a package for quickly producing plots. We will use the `Plots` package in these examples, but save for a few details, the same commands will work with `SimplePlots`, provided `MTH229` is loaded.
 
 ```
 note("""Packages are described a bit more [here](http://mth229.github.io/index.html/#_packages_).""")
@@ -21,10 +20,11 @@ For the impatient, this is all that is needed to know to get up and running.
 
 
 ```
-using MTH229  # to load Plots
+using MTH229 
+using Plots
 ```
 
-```nocode, noout
+```nocode
 plotly()
 ```
 
@@ -590,13 +590,13 @@ Here are 5 evenly spaced numbers from $0$ to $\pi/2$ given by
 `range`
 
 ```
-range(0, stop=pi/2, length=5)   # using `stop=` is now unnecessary
+range(0, pi/2, length=5) 
 ```
 
 The values are not displayed, but will be if `collect`ed:
 
 ```
-collect(range(0, stop=pi/2, length=5))
+collect(range(0, pi/2, length=5))
 ```
 
 
@@ -650,7 +650,7 @@ to use.
 Which command will produce the sequence $1,3,5,7,9,11, ..., 99$?
 
 ```
-choices=["`range(1, stop=99, length=2)`",
+choices=["`range(1, 99, length=2)`",
        "`[1,3,5,7,9,11, ..., 99]`",
        "`1:2:99`",
        "`1:99`"];
@@ -664,7 +664,7 @@ Which command produces 10 numbers between 0 and 10 that are evenly spaced?
 
 ```
 choices=[
-"`range(0, stop=10, length=10)`",
+"`range(0, 10, length=10)`",
 "`0:10`",
 "`0:1:101",
 "`[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]`"
@@ -680,7 +680,7 @@ Which command does not produce the numbers $1, 2, 3, 4, 5$?
 
 ```
 choices=[
-"`range(1, stop=5, length=5)`",
+"`range(1, 5, length=5)`",
 "`[1, 2, 3, 4, 5]`",
 "`1:5`",
 "`1:5:1`"
@@ -699,7 +699,7 @@ Which command does  produces the numbers $1, 1, 2, 3, 5, 8, 13$?
 choices=[
 "`[1,1,2,3,5,8,13]`",
 "`1:2:13`",
-"`range(1, stop=13, length=7)`",
+"`range(1, 13, length=7)`",
 "`[0, 1, 1, 2, 3, 5]`"
 ];
 ans=1;
@@ -850,7 +850,7 @@ If we want to look at this function for $x$ values between $0$ and $2$
 we might define the $x$ values with:
 
 ```
-x = range(0, stop=2, length=5)
+x = range(0, 2, length=5)
 ```
 
 Then the `map` function will create the corresponding $y$ values:
@@ -923,7 +923,7 @@ the interval $[0,2]$, then use a "comprehension" to create the set
 notation above. The syntax is similar:
 
 ```
-xs = range(0, stop=2.0, length=5)
+xs = range(0, 2.0, length=5)
 [f(x) for x in xs]
 ```
 
@@ -1089,18 +1089,6 @@ x = [(1/10)^i for i in 1:4]
 booleanq(true)
 ```
 
-#### Questions
-
-Does this command produce the numbers $10, 100, 1000, 10 000$?
-
-```noout
-map(i -> 10^i, 1:4);
-```
-
-
-```
-booleanq(true)
-```
 
 #### Questions
 
@@ -1111,7 +1099,7 @@ Let $f(x) = x^2 - 2x$. Which command will produce the $y$ values for plotting $f
 choices=[
 "`[f(x) for x in [0,2]]`",
 "`map(f(x), [0,2])`",
-"`map(f, range(0, stop=2, length=100))`"];
+"`f.(range(0, 2, length=100))`"];
 ans = 3;
 radioq(choices, ans)
 ```
@@ -1144,8 +1132,8 @@ For example, to plot $y=x^2$ over $[-1,1]$ we might do:
 
 ```
 f(x) = x^2
-xs = range(-1, stop=1, length=101)
-ys = map(f, xs)
+xs = range(-1, 1, length=101)
+ys = f.(xs)
 plot(xs, ys)
 ```
 
@@ -1153,8 +1141,8 @@ plot(xs, ys)
 One can place both to get both points and lines. The `scatter` function will plot the points, but not connect the lines. In the following, the `scatter!` function is used. (Not the `!` at the end.) This form adds the plot of the lines to the last graph, rather than make a new one.
 
 ```
-xs = range(-2, stop=2, length=5)
-ys = map(f, xs)
+xs = range(-2, 2, length=5)
+ys = f.(xs)
 plot(xs, ys)
 scatter!(xs, ys, markersize=5)
 ```

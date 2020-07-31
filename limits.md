@@ -112,14 +112,16 @@ to have a limit. The basic idea is to simply make a graph around $c$
 and look to see if $f(x)$ gets close to some value as $x$ gets close
 to $c$:
 
-```nocode, noout
+```
 using MTH229
+using Plots
+```
+
+```nocode
 plotly()
 ```
 
-
 ```
-using MTH229
 f(x) = sin(x)/x
 c, delta = 0, pi/2
 plot(f, c - delta, c + delta)

@@ -26,13 +26,16 @@ $$~
 
 This is great as long as some antiderivative is known. There are several different techniques for finding antiderivatives. The `integrate` function in the `SymPy` package can do many of them:
 
-```nocode, noout
+```
 using MTH229
+using Plots
+```
+
+```nocode, noout
 plotly()
 ```
 
 ```
-using MTH229  # loads Plots and SymPy
 f(x) = x^3 - cos(x) + x*log(x)
 integrate(f)
 ```
@@ -139,13 +142,13 @@ sum(fx)
 Okay, just one subtlety, we really only want the points
 
 ```
-[ a .+ (0:n-1) * delta ]'
+[ a .+ (0:n-1) * delta ]
 ```
 
 for the left Riemann sum and the points
 
 ```
-[ a .+ (1:n) * delta ]'
+[ a .+ (1:n) * delta ]
 ```
 
 for the right.

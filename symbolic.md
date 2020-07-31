@@ -32,16 +32,8 @@ The `SymPy` package for `julia` is an add on, it is loaded into a session with t
 using SymPy  # also loaed with the MTH229 package
 ```
 
-If the package is not already installed, it can be installed through
-the command
 
-```verbatim
-Pkg.add("SymPy")
-```
-
-The package itself requires a version of `Python` that works with
-`julia`'s `PyCall` package *and* a version of sympy installed for
-`Python`.
+This is also loaded with the `MTH229` package.
 
 
 
@@ -84,7 +76,7 @@ The `@vars` macro can simplify variable creation:
 @vars a b c
 ```
 
-The `symbols` function can place assumptions on the created variables and create more than one at a time:
+The `symbols` function or `@vars` can place assumptions on the created variables and create more than one at a time:
 
 ```
 h, y = symbols("h, y", real=true)
@@ -205,16 +197,16 @@ factor(p)
 
 From this we can see clearly the linear terms correspond to roots. The
 `roots` function returns a dictionary of roots and their
-multiplicities.
+multiplicities. The `roots` function is not *exported*, so needs to be qualified with the `sympy` module:
 
 ```
-roots(p)
+sympy.roots(p)
 ```
 
 If the multiplicities are not of interest, we can get just the keys different ways, here is one:
 
 ```
-Sym[k for (k,v) in roots(p)]
+[k for (k,v) in sympy.roots(p)]
 ```
 
 In this case there are two complex roots as well, that `factor` leaves
@@ -231,7 +223,7 @@ factor(q)
 However, `roots` will work
 
 ```
-roots(q)
+sympy.roots(q)
 ```
 
 
@@ -248,12 +240,12 @@ polynomials when `roots` does not:
 
 ```
 q = x^4 - 8x^2 + 8
-real_roots(q)			# should find 4
+sympy.real_roots(q)			# should find 4
 ```
 
 ("Fails" is unfair, the above does actually find the roots, just not
 symbolically. Just call `N` on the output to get numeric
-approximations, as with `N(real_roots(q))`.)
+approximations, as with `N(sympy.real_roots(q))`.)
 
 The `solve` function is used to solve an equation of the type `expr = 0` for a variable.
 The above `q` can be solved:
@@ -285,7 +277,7 @@ a zero starting with an initial guess (which often comes from making a
 simple plot):
 
 ```
-nsolve(exp(x) - 2x^2, x, 3)	# 2.617...
+sympy.nsolve(exp(x) - 2x^2, x, 3)	# 2.617...
 ```
 
 
@@ -312,7 +304,7 @@ solved is a quadratic.  We can then evaluate these two values at a
 point, say $x=1/2$, as before:
 
 ```
-subs.(out, x, 1//2)
+subs.(out, x => 1//2)
 ```
 
 You can even do systems of equations. For this you specify the system and the variables to solve for using a vector:
@@ -447,7 +439,7 @@ plot!(f(c) + m * (x - c))
 Plot the expression `x^4 - 3x^3 + 3x^2 - 3x +2` over $[-1, 3]$. How many real roots are there?
 
 ```
-val = real_roots(x^4 - 3x^3 + 3x^2 - 3x +2) |> length;
+val = sympy.real_roots(x^4 - 3x^3 + 3x^2 - 3x +2) |> length;
 numericq(val)
 ```
 
@@ -495,7 +487,7 @@ limit(sin(x)/x, x, oo)
 We can even compute derivatives using limits. Here we do so symbolically:
 
 ```
-h = Sym("h")
+@vars h
 f(x) = x^10
 limit( (f(x+h) - f(x))/h, h, 0)
 ```
@@ -559,16 +551,16 @@ numericq(val)
 At [math overflow](http://mathoverflow.net/questions/51685/how-did-bernoulli-prove-lh%C3%B4pitals-rule) we learn that L'Hopital was motivated by the following limit:
 
 $$~
-\lim_{x \rightarrow a} \frac{(2a^3x-x^4)^(1/2) - a (a^2x)^(1/3)}{a - (ax^3)^(1/4)}
+\lim_{x \rightarrow a} \frac{(2a^3x-x^4)^{1/2} - a (a^2x)^{1/3}}{a - (ax^3)^{1/4}}
 ~$$
 
 What did he find (with the help of a Bernoulli)?
 
-You need to inform `SymPy` that $a > 0$. The following is a good start (though it is complicated enough the output is mis-formatted):
+You need to inform `SymPy` that $a > 0$. The following is a good start:
 
 ```
-x = Sym("x")
-a = symbols("a", positive=true)
+@vars x
+@vars a positive=true
 top = (2a^3*x-x^4)^(1//2) - a *(a^2*x)^(1//3) # rationals are converted exactly to SymPy
 bottom =  a - (a*x^3)^(1//4)
 ex = top/bottom
@@ -739,11 +731,11 @@ We can solve this with $L$ as a symbolic value, by looking at critical
 points of $A$ or when $A'(x) = 0$:
 
 ```
-L = Sym("L")
+@vars L
 A = x*y
 A = A(y => L - 2x)
 out = solve(diff(A, x), x)[1]	## solve returns an array, we need its first component
-subs(L - 2x, x, out)
+subs(L - 2x, x => out)
 ```
 
 This shows that  $y = L/2$. So solve for $x$ we have
@@ -757,7 +749,9 @@ solve(L/2 - (L - 2x), x)
 Find the derivative of $\tan^{-1}(x)$. What do you get?
 
 ```
-choices = jprint(map(diff, [asin(x), atan(x), log(x)]));
+@vars x
+using LaTeXStrings
+choices = latexstring.(sympy.latex.(diff.([asin(x), atan(x), log(x)], x)))
 ans = 2;
 radioq(choices, ans)
 ```
@@ -801,7 +795,7 @@ solve(f(c) + diff(f(c)) * (x - c), x)
 What do you get when $c = \pi/4$?
 
 ```
-ex =solve(f(c) + diff(f(c)) * (x - c), x)[1];
+ex = solve(f(c) + diff(f(c)) * (x - c), x)[1];
 val = subs(ex, c, pi/4) |> float;
 numericq(val, 1e-3)
 ```
@@ -876,7 +870,7 @@ solving with the  resulting symbolic answer from `integrate`:
 f(x) = 4x^3
 @vars b
 eq = integrate(f(x), (x,  0, b)) - 1/2 * integrate(f(x), (x, 0, 1))
-xs = real_roots(eq, b)
+xs = sympy.real_roots(eq, b)
 ```
 
 The equation `eq` is a 4th degree polynomial. It has two real and two complex roots. We used `real_roots` to get the two real ones. The positive one is clear.
@@ -888,7 +882,7 @@ The equation `eq` is a 4th degree polynomial. It has two real and two complex ro
 Integrate $f(x) = 2/(x \cdot \log(x))$. What do you get:
 
 ```
-choices = jprint(map(integrate, [3/x, 3/x*log(x), 1/(x*log(x)), 3/(x*log(x))]))	;
+choices = latexstring.(sympy.latex.(integrate.([3/x, 3/x*log(x), 1/(x*log(x)), 3/(x*log(x))], x)))
 ans = 3;
 radioq(choices, ans, keep_order=true)
 ```
@@ -948,7 +942,7 @@ The intersection point is clearly $c=-1 = (a+b)/2$.
 Let's see if we can get this fact using `SymPy`. First we define many variables:
 
 ```
-x, c2, c1, c0, a, b =  symbols("x, c2, c1, c0, a, b")
+@vars x c2 c1 c0 a b
 p = c2*x^2 + c1*x + c0
 ```
 

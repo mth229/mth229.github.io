@@ -1,7 +1,13 @@
 # Approximate derivatives in julia
 
-```nocode, noout
+We load our packages to begin.
+
+```
 using MTH229
+using Plots
+```
+
+```nocode
 plotly()
 ```
 
@@ -44,7 +50,6 @@ slope given by the derivative.
 This graph shows $f(x) = 2 - x^2$ and various secant lines when $c=-0.75$.
 
 ```
-using MTH229
 f(x) = 2 - x^2
 c = -0.75
 sec_line(h) = secant(f, c, c+h)                # secant in MTH229 package
@@ -650,7 +655,7 @@ differences have a long history, automatic differentiation only dates
 back to the 60s.
 
 The `ForwardDiff` package implements automatic differentiation.
-The `MTH229` package overloads the idea of `'` -- at the expense of a warning on startup -- that uses automatic differentiation when the notation `f'` is encountered. Also, the `D` operation can be used, allowing a second argument to specify the order of the derivative.
+The `MTH229` package overloads the idea of `'` that uses automatic differentiation when the notation `f'` is encountered. 
 
 That means, we can find derivatives, as familiarly as:
 
@@ -787,7 +792,7 @@ and $t$ is measured in days.
   leads to your answer.
 
 
-We can do all this relatively quickly with `D` and the `fzero` function from the `Roots` package.
+We can do all this relatively quickly with the `fzero` function from the `Roots` package.
 
 First, we define $A(t)$:
 
