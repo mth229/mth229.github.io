@@ -86,17 +86,22 @@ The first command *may* take some time the very first time it is entered, as the
 
 
 
-c) The projects (see below) need to be copied over. This can be done as follows. In an `IJulia` cell, copy and paste then run this set of commands:
+c) The projects (see below) need to be copied over. This can be done as follows. First, if the `ZipFile` package is note installed, copy and paste these commands into a cell and run them:
 
 ```verbatim
 using Pkg
 Pkg.add("ZipFile")
+```
+
+Next, in an `IJulia` cell, copy and paste this set of commands and run them:
+
+```verbatim
 using ZipFile
 zf = "https://www.github.com/mth229/229-projects/archive/master.zip"
 zarchive = ZipFile.Reader(download(zf))
 
-dirname = "./229-projects-master"
-isdir(dirname) || mkdir(dirname)
+dname = "./229-projects-master"
+isdir(dname) || mkdir(dname)
 
 for f in zarchive.files
     nm = f.name
@@ -280,6 +285,30 @@ of solids of revolution.
 An assignment for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/10-integration.ipynb)
 [view](http://nbviewer.ipython.org/github/mth229/229-projects/blob/master/10-integration.ipynb?create=1)
+
+
+
+
+#### Questions and Answers
+
+Question and answers are now presented and completed through  `WeBWork`.
+The  notebooks above only contain the background details. 
+
+There  are a few idiosyncracies to be aware of:
+
+*  The code examples  are typset in `WeBWorK` as though they  appear in  a *terminal*. A terminal displays  the output of  each  command immediately after execution. In a notebook,  when  a cell  is executed, all the  commands are computed and *only*  the  last  value is shown. (The use of `@show` or `print(...)` can be used to display intermediate values in a  cell.)
+
+* Copy and paste from a `WeBWorK` page into a notebook will usually be unsuccessful, as  numbers  in the  font  used to display computer markup do not copy as ASCII numbers  into a cell. The numbers can be hand edited though.
+
+
+* While `Julia` is very happy to express its output using scientific notation, `WeBWorK` is not happy to receive the exact output for an answer. Either replace `e` with `E` (as in `1.23e4` would be `1.23E4`) or use decimals.
+
+
+* For *most* questions with a  numeric answer  it is best to  copy all  16 digits of output. Several  digits are expected to match a  correct answer. For numeric questions where an  estimate is made, say from a graph, this is  significantly relaxed.
+
+* If the answer  is to  be a function, the  automatic grader is  expecting just  the  rule  of the function  (an expression), as in for `f(x) = sin(x)` just enter `sin(x)`.
+
+
 
 
 ### Calculus II material
