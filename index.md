@@ -35,7 +35,7 @@ Each topic is followed by a project. At CSI, these projects are completed during
 ### How to use `Julia` in MTH 229
 
 
-Using `Julia` to complete the projects of MTH 229 can be done in several ways. The following lists four possible maners in order of ease of setup:
+Using `Julia` to complete the projects of MTH 229 can be done in several ways. The following lists four possible manners in order of ease of setup:
 
 ##### Using the image in the lab:
 
