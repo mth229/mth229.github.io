@@ -70,16 +70,16 @@ We use the pipeline operator `|>` to compose functions in this project, as it ma
 ```
 
 
-The `@vars` macro can simplify variable creation:
+The `@syms` macro simplifies variable creation:
 
 ```verbatim
-@vars a b c
+@syms a b c
 ```
 
-The `symbols` function or `@vars` can place assumptions on the created variables and create more than one at a time:
+The `@syms` macro can place assumptions on the created variables and create more than one at a time:
 
 ```
-h, y = symbols("h, y", real=true)
+@syms h::real, y::positive
 ```
 
 
@@ -310,7 +310,7 @@ subs.(out, x => 1//2)
 You can even do systems of equations. For this you specify the system and the variables to solve for using a vector:
 
 ```
-@vars x y
+@syms x y
 eq1 = x + y -1
 eq2 = x - y - (-1)
 solve([eq1, eq2], [x,y])
@@ -325,7 +325,7 @@ solve([eq1, eq2], [x,y])
 What is the coefficient of $x^3$ in $(x-1)(x-2)(x-3)(x-4)(x-5)$?
 
 ```
-@vars x
+@syms x
 p = (x-1)*(x-2)*(x-3)*(x-4)*(x-5)
 val = sympy.Poly(p, x).coeffs()[3]
 numericq(N(val))
@@ -426,7 +426,7 @@ this.
 ```
 f(x) = sqrt(x);
 c = 2;
-fp = diff(f(x));		# diff finds derivative, fp an expression (not function)
+fp = diff(f(x), x);		# diff finds derivative, fp an expression (not function)
 m = fp(x=>c)	        # at c=2
 plot(f(x), 1, 3)
 plot!(f(c) + m * (x - c))
@@ -459,21 +459,21 @@ the limit, when it exists. The `limit` function is similar. Here we
 find an old classic:
 
 ```
-limit(sin(x)/x, x, 0)
+limit(sin(x)/x, x => 0)
 ```
 
 
 We can do other similar questions:
 
 ```
-limit((1-cos(x))/x^2, x, 0)
+limit((1-cos(x))/x^2, x => 0)
 ```
 
 The second argument is needed, as the expression may have more than one variable:
 
 ```
-lambda = symbols("lambda")
-limit((1 - lambda *x)^(1/x), x, 0)
+@syms lambda
+limit((1 - lambda *x)^(1/x), x => 0)
 ```
 
 
@@ -481,15 +481,15 @@ Limits can be taken at infinity as well. We can specify infinity using
 `oo`:
 
 ```
-limit(sin(x)/x, x, oo)
+limit(sin(x)/x, x => oo)
 ```
 
 We can even compute derivatives using limits. Here we do so symbolically:
 
 ```
-@vars h
+@syms h
 f(x) = x^10
-limit( (f(x+h) - f(x))/h, h, 0)
+limit( (f(x+h) - f(x))/h, h => 0)
 ```
 
 We can see that some of the more complicated formulas for derivatives
@@ -498,21 +498,22 @@ same answer:
 
 ```
 central_difference(f, x, h) = ( f(x+h) - f(x-h) ) / (2h)
-a = limit(central_difference(f, x, h), h, 0)
+a = limit(central_difference(f, x, h), h => 0)
 ```
 
 Even this more complicated expression works as expected:
 
 ```
 central_4th_difference(f, x, h) = (-f(x + 2h) + 8f(x+h) - 8f(x-h) + f(x-2h))/(12h)
-limit(central_4th_difference(f, x, h), h, 0)
+limit(central_4th_difference(f, x, h), h => 0)
 ```
 
 This limit matches the chain rule:
 
 ```
 g(x) = sin(x)
-limit( (f(g(x+h)) - f(g(x)))/h, h, 0) |> subs(x, 1)
+ex = limit( (f(g(x+h)) - f(g(x)))/h, h => 0) 
+ex(x => 1)
 ```
 
 
@@ -559,8 +560,7 @@ What did he find (with the help of a Bernoulli)?
 You need to inform `SymPy` that $a > 0$. The following is a good start:
 
 ```
-@vars x
-@vars a positive=true
+@syms x, a::positive
 top = (2a^3*x-x^4)^(1//2) - a *(a^2*x)^(1//3) # rationals are converted exactly to SymPy
 bottom =  a - (a*x^3)^(1//4)
 ex = top/bottom
@@ -581,7 +581,7 @@ radioq(choices, ans)
 Define a symbolic variable `h` and let $f(x) = \sin(x)$:
 
 ```
-@vars h
+@syms h
 f(x) = sin(x);
 ```
 
@@ -731,7 +731,7 @@ We can solve this with $L$ as a symbolic value, by looking at critical
 points of $A$ or when $A'(x) = 0$:
 
 ```
-@vars L
+@syms L
 A = x*y
 A = A(y => L - 2x)
 out = solve(diff(A, x), x)[1]	## solve returns an array, we need its first component
@@ -749,7 +749,7 @@ solve(L/2 - (L - 2x), x)
 Find the derivative of $\tan^{-1}(x)$. What do you get?
 
 ```
-@vars x
+@syms x
 using LaTeXStrings
 choices = latexstring.(sympy.latex.(diff.([asin(x), atan(x), log(x)], x)))
 ans = 2;
@@ -787,7 +787,7 @@ Let $f(x) = \tan(x)$. Newton's method finds the zero of the tangent
 line $f(c) + f'(c)(x-c)$. You can do this with `julia` via:
 
 ```
-@vars c
+@syms c
 f(x) = tan(x)
 solve(f(c) + diff(f(c)) * (x - c), x)
 ```
@@ -830,7 +830,7 @@ standard function is `integrate`.
 One can find general antiderivatives:
 
 ```
-@vars x a
+@syms x aa
 f(x) = cos(x) - sin(x)
 integrate(f(x), x)
 ```
@@ -868,7 +868,7 @@ solving with the  resulting symbolic answer from `integrate`:
 
 ```
 f(x) = 4x^3
-@vars b
+@syms b
 eq = integrate(f(x), (x,  0, b)) - 1/2 * integrate(f(x), (x, 0, 1))
 xs = sympy.real_roots(eq, b)
 ```
@@ -942,7 +942,7 @@ The intersection point is clearly $c=-1 = (a+b)/2$.
 Let's see if we can get this fact using `SymPy`. First we define many variables:
 
 ```
-@vars x c2 c1 c0 a b
+@syms x c2 c1 c0 a b
 p = c2*x^2 + c1*x + c0
 ```
 
@@ -978,7 +978,7 @@ We code this expression with:
 
 
 ```
-x, theta, v0, grav =  symbols("x, theta, v0, grav")
+@syms x, theta, v0, grav
 y = tan(theta) * x - (1//2)*grav*(x / (v0*cos(theta)))^2
 ```
 
@@ -1022,7 +1022,7 @@ We start with the same setup to create the tangent lines as symbolic
 expressions
 
 ```
-x, c2, c1, c0, a, b = symbols("x, c2, c1, c0, a, b")
+@syms x, c2, c1, c0, a, b
 p = c2*x^2 + c1*x + c0
 fa, fb = [subs(p, x, c) for c in [a,b]]
 ma, mb = [subs(diff(p, x), x, c) for c in [a,b]]

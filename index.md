@@ -8,7 +8,7 @@ note(""" For a more thorough introduction, visit [Calculus with Julia](http://ca
 ## Introduction
 
 ```
-note(""" These use version v1.4 of Julia.
+note(""" These use version v1.6 of Julia.
 See all projects at [https://github.com/mth229/229-projects](https://github.com/mth229/229-projects)""")
 ```
 
@@ -46,11 +46,16 @@ In the COVID world, the college is looking at a mechanism to remotely access a l
 
 ##### Using binder to run the projects  remotely:
 
-The website  `mybinder.org` allows `julia` and the  projects to be run for  free over the internet. Clicking the binder buttons below (e.g., [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mth229/229-projects/master) _) will redirect you. The start up  is slow so you must be patient. You can read the  projects while binder  activates. Your  work  will  be  erased when you log off.
+[![notebooks.gesis.org](https://img.shields.io/badge/launch-gesis.org%20(login%20required)-blue")](https://notebooks.gesis.org/services/binder/v2/gh/mth229/229-projects/HEAD)
 
-##### Using `cocalc.com`:
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mth229/229-projects/HEAD)
 
-The website [cocalc.com](www.cocalc.com) provides hosted access to `julia` and other programming languages. Though it can  be  used for free, this is not recommended. Rather, a modestly priced subscription is. 
+The two links above allow the projects for MTH229 to be run through the web.
+
+* `binder` is a service that runs interactive notebooks through the web. Each notebook is limited in memory and has a 10 minute *inactivity* timeout. Binder notebooks are not persistent, though they do have a button to save to local storage.
+* `notebooks.gesis.org` requires an academic login. It have more resources and a much longer time out. In addition the work is saved between sessions.
+
+Each takes between 30 seconds and one minute to get up and running. Once a notebook is selected, it takes another 30ish seconds to get the typical packages started.
 
 ##### Installing `Julia` on a personal laptop or computer.
 
@@ -64,7 +69,7 @@ b) open `Julia`. This will open a *terminal*, we will now add packages to make i
 ]
 add IJulia
 add https://github.com/mth229/MTH229.jl
-add SimplePlots
+add Plots
 [backspace key]
 ```
 
@@ -121,16 +126,16 @@ This will create a directory `229-projects-master` and populate it with the proj
 This table covers pros and cons for the  approaches mentioned above:
 
 ```verbatim
-                         Using Lab       Binder   CoCalc    Local Installation
-Setup ease                  ✓              ✓        ×              ×
+                         Using Lab       Binder       Local Installation
+Setup ease                  ✓              ✓                 ×
 
-Speed                       ✓              ×        ✓              ✓
+Speed                       ✓              ×                 ✓
 
-Persistence of work         ×              ×        ✓              ✓
+Persistence of work         ×              ×                 ✓
 
-Free                        ✓              ✓       $14             ✓
+Free                        ✓              ✓                 ✓
 
-Use at home                 ×              ✓        ✓              ✓
+Use at home                 ×              ✓                 ✓
 ```
 
 
@@ -144,8 +149,7 @@ See all projects at [https://github.com/mth229/229-projects](https://github.com/
 The projects provide some background details *and* are notebooks for you to answer the accompanying questions. The questions are asked and answered through your `WeBWorK` login.
 
 
-These projects may be accessed without a login or any special privledges through  [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mth229/229-projects/master).
-
+Both `binder` and `notebooks.gesis.org` have the current projects available.
 
 There are some longer notes available for each project, linked to below. 
 
@@ -211,7 +215,7 @@ An assignment for this material:
 
 Basics of limits.
 
-Discussion on floating point representation and potential issues (subtracting like-sized objects!)
+Discussion on floating point representation and potential issues.
 
 <br/>
 An assignment for this material:
@@ -222,11 +226,11 @@ An assignment for this material:
 
 * [Derivatives](http://mth229.github.io/derivatives.html)
 
-Explore forward difference and central difference with a bit on error
+Explore forward differences with a bit on error
 analysis.
 
 We end with a brief discussion on automatic differentiation, as
-implemented in the `ForwardDiff` add-on package.
+implemented in the `Zygote` add-on package.
 
 <br/>
 An assignment for this material:
@@ -250,8 +254,7 @@ An assignment for this material:
 * [Newton's method](http://mth229.github.io/newton.html)
 
 
-Basics of Newton's method with a copy-and-paste function to do the
-work after the student explores a bit.
+Basics of Newton's method.
 
 Discusses iterative algorithms, approximation, some analysis.
 
@@ -277,8 +280,8 @@ An assignment for this material:
 
 * [Integration](http://mth229.github.io/integration.html)
 
-Basics of integration with applications including rectangle,
-trapezoid, Simpson's, and the `quaggk` function. Applications to volumes
+Basics of Riemann integration with applications including 
+trapezoid and  Simpson's methods. The `quaggk` function. Applications to volumes
 of solids of revolution.
 
 <br/>
@@ -425,14 +428,14 @@ For example, the notes use:
 * `plot([f,g], a, b)` to plot both `f` and `g` over the interval `[a,b]`
 * `fzero(f, a, b)` to find a zero inside the bracketing interval `[a,b]` (from `Roots`)
 * `fzeros(f, a, b)` to find all the real zeros of a function `f` in `[a,b]` (from `Roots`)
-* `limit(f, c)` to find the limit of `f` at `c` (from `SymPy`)
+* `limit(f(x), x=>c)` to find the limit of `f` at `c` (from `SymPy`)
 * `f'`  to return a function that computes the derivative of `f` (Added in the `MTH229` package based on the `derivative` function from the `ForwardDiff` package)
-* `diff(f)` to find a symbolic derivative of `f` (from `SymPy`)
+* `diff(f(x),x)` to find a symbolic derivative of `f` (from `SymPy`)
 * `fzero(f, a)` to search for a zero of `f` starting at `a`
 * `quadgk(f, a, b)` to find the numeric integral of `f` over `(a,b)`
   (from the `QuadGK` package)
-* `integrate(f)` to find the symbolic integral of `f` (from the `SymPy` package)
-* `integrate(f, a, b)` to find the definite integral over `[a,b]`
+* `integrate(f(x),x)` to find the symbolic integral of `f` (from the `SymPy` package)
+* `integrate(f(x), (x, a, b))` to find the definite integral over `[a,b]`
   symbolically (from the `SymPy` package).
 
 

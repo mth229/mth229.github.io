@@ -19,7 +19,7 @@ We begin by loading some packages:
 
 ```noeval
 using MTH229
-using SimplePlots
+using Plots
 ```
 
 Then we define a function and plot it:

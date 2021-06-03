@@ -113,11 +113,12 @@ $( document ).ready(function() {
 <p>This is also loaded with the <code>MTH229</code> package.</p><h2>About</h2><p>The <code>SymPy</code> program extends <code>julia</code> by providing a type for <em>symbolic expressions</em>. Such an expression is encapsulated by a symbolic variable <code>x</code> instantiated through:</p><pre class="sourceCode julia">using SymPy
 x = Sym("x")</pre>
 <div class="well well-sm">
-\begin{equation*}x\end{equation*}</div>
+$\begin{equation*}x\end{equation*}$
+</div>
 
 <p>The "x" on the right-hand side is a character argument to the <code>Sym</code> constructor which returns a symbolic object stored as <code>x</code>:</p><pre class="sourceCode julia">x |> typeof</pre>
 <pre class="output">
-Sym</pre>
+SymPy.Sym</pre>
 
 <p>That was painless. The type is <code>Sym</code>.</p><div class="alert alert-success" role="alert">
 
@@ -125,32 +126,36 @@ Sym</pre>
 </div>
 
 </div>
-<p>The <code>@vars</code> macro can simplify variable creation:</p><pre class="sourceCode julia">@vars a b c</pre>
-<p>The <code>symbols</code> function or <code>@vars</code> can place assumptions on the created variables and create more than one at a time:</p><pre class="sourceCode julia">h, y = symbols("h, y", real=true)</pre>
+<p>The <code>@syms</code> macro simplifies variable creation:</p><pre class="sourceCode julia">@syms a b c</pre>
+<p>The <code>@syms</code> macro can place assumptions on the created variables and create more than one at a time:</p><pre class="sourceCode julia">@syms h::real, y::positive</pre>
 <pre class="output">
 (h, y)</pre>
 
 <p>Most of the typical math functions have been overloaded to work with these symbolic expressions: the functions accept a symbolic expression and return a newly computed one. For example, the expression <code>x^2 -2x &#43;2</code> when evaluated becomes a new symbolic expression:</p><pre class="sourceCode julia">x^2 - 2x + 2 |> typeof</pre>
 <pre class="output">
-Sym</pre>
+SymPy.Sym</pre>
 
 <p>Similarly, when working with mathematical functions a symbolic expression is returned:</p><pre class="sourceCode julia">f(x) = exp(-x^2/2)             ## a julia function
 f(x)                           ## takes a symbolic object and returns a new one</pre>
 <div class="well well-sm">
-\begin{equation*}e^{- \frac{x^{2}}{2}}\end{equation*}</div>
+$\begin{equation*}e^{- \frac{x^{2}}{2}}\end{equation*}$
+</div>
 
 <p>This shows that the function object <code>f</code> will map a symbolic object to another symbolic object.</p><p>In <code>SymPy</code>, the <code>subs</code> function allows you to evaluate a symbolic expression for a given value. For example,</p><pre class="sourceCode julia">subs(f(x), x, 1)		## set x equal to 1</pre>
 <div class="well well-sm">
-\begin{equation*}e^{- \frac{1}{2}}\end{equation*}</div>
+$\begin{equation*}e^{- \frac{1}{2}}\end{equation*}$
+</div>
 
 <p>The natural "call" notation for functions can also be used for substitution:</p><pre class="sourceCode julia">ex = exp(-x^2/2)  # a symbolic expression, not a function
 ex(1)</pre>
 <div class="well well-sm">
-\begin{equation*}e^{- \frac{1}{2}}\end{equation*}</div>
+$\begin{equation*}e^{- \frac{1}{2}}\end{equation*}$
+</div>
 
 <p>This works well when there is just one variable involved. Otherwise, the <code>&#61;&gt;</code> notation is useful to indicate which value is being substituted for, as with:</p><pre class="sourceCode julia">ex(x=>1)</pre>
 <div class="well well-sm">
-\begin{equation*}e^{- \frac{1}{2}}\end{equation*}</div>
+$\begin{equation*}e^{- \frac{1}{2}}\end{equation*}$
+</div>
 
 <p>The output of <code>subs</code> is still a symbolic object.  The <code>N</code> function will convert the value to a <code>julia</code>n one:</p><pre class="sourceCode julia">N(ex(1))</pre>
 <pre class="output">
@@ -158,69 +163,80 @@ ex(1)</pre>
 
 <p>For the most part, one can work with symbolic expressions without pulling them back into <code>julia</code> expressions until needed.</p><h2>Equations</h2><p><code>SymPy</code> can do much of the basic tasks learned during algebra: simplification, factoring and solving equations. Just a few new commands are needed.</p><h3>Basic algebra</h3><p><code>SymPy</code> does some automatic simplification of expressions. For example, terms are combined</p><pre class="sourceCode julia">(x+1) + (x+2) + (x+3)</pre>
 <div class="well well-sm">
-\begin{equation*}3 x + 6\end{equation*}</div>
+$\begin{equation*}3 x + 6\end{equation*}$
+</div>
 
 <p>However, not everything is as simplified as possible. The <code>simplify</code> function can be called to (sometimes) go further:</p><pre class="sourceCode julia">sin(x)^2 + cos(x)^2		# not simplified</pre>
 <div class="well well-sm">
-\begin{equation*}\sin^{2}{\left(x \right)} + \cos^{2}{\left(x \right)}\end{equation*}</div>
+$\begin{equation*}\sin^{2}{\left(x \right)} + \cos^{2}{\left(x \right)}\end{equation*}$
+</div>
 
 <pre class="sourceCode julia">simplify(sin(x)^2 + cos(x)^2)	# 1</pre>
 <div class="well well-sm">
-\begin{equation*}1\end{equation*}</div>
+$\begin{equation*}1\end{equation*}$
+</div>
 
 <p>One can <code>factor</code> polynomials:</p><pre class="sourceCode julia">factor(x^2 + 2x + 1)</pre>
 <div class="well well-sm">
-\begin{equation*}\left(x + 1\right)^{2}\end{equation*}</div>
+$\begin{equation*}\left(x + 1\right)^{2}\end{equation*}$
+</div>
 
 <p><code>SymPy</code> will leave terms in factored form. To multiply them out can be requested through the function <code>expand</code>:</p><pre class="sourceCode julia">expand( (x+1)*(x+2)*(x+3) )</pre>
 <div class="well well-sm">
-\begin{equation*}x^{3} + 6 x^{2} + 11 x + 6\end{equation*}</div>
+$\begin{equation*}x^{3} + 6 x^{2} + 11 x + 6\end{equation*}$
+</div>
 
 <h3>Solving equations</h3><p>With <code>SymPy</code> there are <em>several</em> ways to solve an equation. Here we mention <code>factor</code>, <code>roots</code>, <code>real_roots</code>, <code>solve</code>, <em>and</em> <code>nsolve</code>.</p><p>First for <em>polynomial</em> (or rational) functions, we can factor:</p><pre class="sourceCode julia">p = expand((x-1)*(x-2)*(x-3)*(x^2 + x + 1))</pre>
 <div class="well well-sm">
-\begin{equation*}x^{5} - 5 x^{4} + 6 x^{3} - x^{2} + 5 x - 6\end{equation*}</div>
+$\begin{equation*}x^{5} - 5 x^{4} + 6 x^{3} - x^{2} + 5 x - 6\end{equation*}$
+</div>
 
 <pre class="sourceCode julia">factor(p)</pre>
 <div class="well well-sm">
-\begin{equation*}\left(x - 3\right) \left(x - 2\right) \left(x - 1\right) \left(x^{2} + x + 1\right)\end{equation*}</div>
+$\begin{equation*}\left(x - 3\right) \left(x - 2\right) \left(x - 1\right) \left(x^{2} + x + 1\right)\end{equation*}$
+</div>
 
 <p>From this we can see clearly the linear terms correspond to roots. The <code>roots</code> function returns a dictionary of roots and their multiplicities. The <code>roots</code> function is not <em>exported</em>, so needs to be qualified with the <code>sympy</code> module:</p><pre class="sourceCode julia">sympy.roots(p)</pre>
 <pre class="output">
-Dict{Any,Any} with 5 entries:
-  1 => 1
+Dict{Any, Any} with 5 entries:
   -1/2 - sqrt(3)*I/2 => 1
   3 => 1
-  -1/2 + sqrt(3)*I/2 => 1
-  2 => 1</pre>
+  1 => 1
+  2 => 1
+  -1/2 + sqrt(3)*I/2 => 1</pre>
 
 <p>If the multiplicities are not of interest, we can get just the keys different ways, here is one:</p><pre class="sourceCode julia">[k for (k,v) in sympy.roots(p)]</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}1\\- \frac{1}{2} - \frac{\sqrt{3} i}{2}\\3\\- \frac{1}{2} + \frac{\sqrt{3} i}{2}\\2\end{array} \right] \]</div>
+$\left[ \begin{array}{r}- \frac{1}{2} - \frac{\sqrt{3} i}{2}\\3\\1\\2\\- \frac{1}{2} + \frac{\sqrt{3} i}{2}\end{array} \right]$
+</div>
 
 <p>In this case there are two complex roots as well, that <code>factor</code> leaves alone.  Factoring reduces over the rational numbers – not the real numbers (the domain can be adjusted). For example, this quadratic will not be factored, even though the answers are real:</p><pre class="sourceCode julia">q = x^2 - 8x + 8
 factor(q)</pre>
 <div class="well well-sm">
-\begin{equation*}x^{2} - 8 x + 8\end{equation*}</div>
+$\begin{equation*}x^{2} - 8 x + 8\end{equation*}$
+</div>
 
 <p>However, <code>roots</code> will work</p><pre class="sourceCode julia">sympy.roots(q)</pre>
 <pre class="output">
-Dict{Any,Any} with 2 entries:
-  2*sqrt(2) + 4 => 1
-  4 - 2*sqrt(2) => 1</pre>
+Dict{Any, Any} with 2 entries:
+  4 - 2*sqrt(2) => 1
+  2*sqrt(2) + 4 => 1</pre>
 
 <p>The basic theorem is that for each linear factor over the complex numbers there corresponds a root and vice versa after accounting for multiplicity.</p><p>The <code>real_roots</code> function tries to return the real roots (omitting the non-real roots). Here we see that it fails for some polynomials when <code>roots</code> does not:</p><pre class="sourceCode julia">q = x^4 - 8x^2 + 8
 sympy.real_roots(q)			# should find 4</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}\operatorname{CRootOf} {\left(x^{4} - 8 x^{2} + 8, 0\right)}\\\operatorname{CRootOf} {\left(x^{4} - 8 x^{2} + 8, 1\right)}\\\operatorname{CRootOf} {\left(x^{4} - 8 x^{2} + 8, 2\right)}\\\operatorname{CRootOf} {\left(x^{4} - 8 x^{2} + 8, 3\right)}\end{array} \right] \]</div>
+$\left[ \begin{array}{r}\operatorname{CRootOf} {\left(x^{4} - 8 x^{2} + 8, 0\right)}\\\operatorname{CRootOf} {\left(x^{4} - 8 x^{2} + 8, 1\right)}\\\operatorname{CRootOf} {\left(x^{4} - 8 x^{2} + 8, 2\right)}\\\operatorname{CRootOf} {\left(x^{4} - 8 x^{2} + 8, 3\right)}\end{array} \right]$
+</div>
 
 <p>("Fails" is unfair, the above does actually find the roots, just not symbolically. Just call <code>N</code> on the output to get numeric approximations, as with <code>N&#40;sympy.real_roots&#40;q&#41;&#41;</code>.)</p><p>The <code>solve</code> function is used to solve an equation of the type <code>expr &#61; 0</code> for a variable. The above <code>q</code> can be solved:</p><pre class="sourceCode julia">solve(q)</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}- \sqrt{4 - 2 \sqrt{2}}\\\sqrt{4 - 2 \sqrt{2}}\\- \sqrt{2 \sqrt{2} + 4}\\\sqrt{2 \sqrt{2} + 4}\end{array} \right] \]</div>
+$\left[ \begin{array}{r}- \sqrt{4 - 2 \sqrt{2}}\\\sqrt{4 - 2 \sqrt{2}}\\- \sqrt{2 \sqrt{2} + 4}\\\sqrt{2 \sqrt{2} + 4}\end{array} \right]$
+</div>
 
 <p>If it isn't clear which of these are real, they can be converted to numeric values via <code>N</code>:</p><pre class="sourceCode julia">as = solve(q)
 N.(as)			# all are real</pre>
 <pre class="output">
-4-element Array{BigFloat,1}:
+4-element Array{BigFloat, 1}:
  -1.082392200292393968799446410732778840122144126756030889362594191305977947082021
   1.082392200292393968799446410732778840122144126756030889362594191305977947082021
  -2.613125929752753055713286346854374307167522376698539055097796733816162082922383
@@ -228,116 +244,121 @@ N.(as)			# all are real</pre>
 
 <p>One could also try converting to complex (<code>complex&#40;as&#41;</code>) and seeing which have <code>0.0im</code> for an imaginary part.</p><p>The <code>solve</code> function solves for when an expression is 0. Sometimes, the problem is to find when <code>f&#40;x&#41; &#61; g&#40;x&#41;</code>, for example, <code>2x^2 &#61; exp&#40;x&#41;</code>. Here we see:</p><pre class="sourceCode julia">solve(exp(x) - 2x^2, x)</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}- 2 W\left(- \frac{\sqrt{2}}{4}\right)\\- 2 W\left(\frac{\sqrt{2}}{4}\right)\\- 2 W_{-1}\left(- \frac{\sqrt{2}}{4}\right)\end{array} \right] \]</div>
+$\left[ \begin{array}{r}- 2 W\left(- \frac{\sqrt{2}}{4}\right)\\- 2 W\left(\frac{\sqrt{2}}{4}\right)\\- 2 W_{-1}\left(- \frac{\sqrt{2}}{4}\right)\end{array} \right]$
+</div>
 
 <p>We could also have used <code>nsolve</code>, a numeric solver. The second zero above can be found with <code>nsolve</code>, which is a numeric algorithm to find a zero starting with an initial guess (which often comes from making a simple plot):</p><pre class="sourceCode julia">sympy.nsolve(exp(x) - 2x^2, x, 3)	# 2.617...</pre>
 <div class="well well-sm">
-\begin{equation*}2.617866613066812769178978059143202817320274359410482919210508161040370325332\end{equation*}</div>
+$\begin{equation*}2.617866613066812769178978059143202817320274359410482919210508161040370325332\end{equation*}$
+</div>
 
 <p>Trigonometric functions have infinitely many solutions, with the <code>sin</code> function <code>SymPy</code> solves only within the range $[-90, 90]$ degrees (the range of the <code>asin</code> function).</p><pre class="sourceCode julia">solve(sin(x)^2 - (1//2)^2) * 180 / pi</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}-30\\30\\150\\210\end{array} \right] \]</div>
+$\left[ \begin{array}{r}-30\\30\\150\\210\end{array} \right]$
+</div>
 
 <p>SymPy introduced the <code>solveset</code> function for such scenarios. The answer now will be an infinite set, suitably described.</p><p>To solve an expression in another variable, we specify it through the second argument:</p><pre class="sourceCode julia">out = solve(x^2 + y^2 - 1, y)</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}- \sqrt{1 - x^{2}}\\\sqrt{1 - x^{2}}\end{array} \right] \]</div>
+$\left[ \begin{array}{r}- \sqrt{1 - x^{2}}\\\sqrt{1 - x^{2}}\end{array} \right]$
+</div>
 
 <p>This returns a vector of two symbolic answers, as the expression being solved is a quadratic.  We can then evaluate these two values at a point, say $x=1/2$, as before:</p><pre class="sourceCode julia">subs.(out, x => 1//2)</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}- \frac{\sqrt{3}}{2}\\\frac{\sqrt{3}}{2}\end{array} \right] \]</div>
+$\left[ \begin{array}{r}- \frac{\sqrt{3}}{2}\\\frac{\sqrt{3}}{2}\end{array} \right]$
+</div>
 
-<p>You can even do systems of equations. For this you specify the system and the variables to solve for using a vector:</p><pre class="sourceCode julia">@vars x y
+<p>You can even do systems of equations. For this you specify the system and the variables to solve for using a vector:</p><pre class="sourceCode julia">@syms x y
 eq1 = x + y -1
 eq2 = x - y - (-1)
 solve([eq1, eq2], [x,y])</pre>
 <pre class="output">
-Dict{Any,Any} with 2 entries:
+Dict{Any, Any} with 2 entries:
   x => 0
   y => 1</pre>
 
-<h3>Practice</h3><h4>Question</h4><p>What is the coefficient of $x^3$ in $(x-1)(x-2)(x-3)(x-4)(x-5)$?</p><form name='WeaveQuestion' data-id='vZ7LbsmN' data-controltype='numeric'>
+<h3>Practice</h3><h4>Question</h4><p>What is the coefficient of $x^3$ in $(x-1)(x-2)(x-3)(x-4)(x-5)$?</p><form name='WeaveQuestion' data-id='Pooai194' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="vZ7LbsmN" type="number" class="form-control">
+<input id="Pooai194" type="number" class="form-control">
 
 </div>
 
-<div id='vZ7LbsmN_message'></div>
+<div id='Pooai194_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#vZ7LbsmN').on('change', function() {
+$('#Pooai194').on('change', function() {
   correct = Math.abs(this.value - 85) <= 0;
 
   if(correct) {
-     $('#vZ7LbsmN_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#Pooai194_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#vZ7LbsmN_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#Pooai194_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h3>Question <small>Horner's method</small></h3><p>Expand $(((1x + 2)x + 3)x + 4)$. What do you get?</p><form name="WeaveQuestion" data-id="hoBzwxmN" data-controltype="radio">
+<h3>Question <small>Horner's method</small></h3><p>Expand $(((1x + 2)x + 3)x + 4)$. What do you get?</p><form name="WeaveQuestion" data-id="enHjvXhz" data-controltype="radio">
 <div class="form-group ">
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_hoBzwxmN" value="1"><div class="markdown"><p>(1+2+3+4)x</p>
+      <input type="radio" name="radio_enHjvXhz" value="1"><div class="markdown"><p>(1+2+3+4)x</p>
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_hoBzwxmN" value="2"><div class="markdown"><p>1x^3 + 2x^2 + 3x + 4</p>
+      <input type="radio" name="radio_enHjvXhz" value="2"><div class="markdown"><p>4x^3 + 3x^2 + 2x + 1</p>
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_hoBzwxmN" value="3"><div class="markdown"><p>4x^3 + 3x^2 + 2x + 1</p>
+      <input type="radio" name="radio_enHjvXhz" value="3"><div class="markdown"><p>1x^3 + 2x^2 + 3x + 4</p>
 </div>
     </label>
     </div>
 
-<div id="hoBzwxmN_message"></div>
+<div id="enHjvXhz_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_hoBzwxmN']").on("change", function() {
-  correct = this.value == 2;
+$("input:radio[name='radio_enHjvXhz']").on("change", function() {
+  correct = this.value == 3;
 
   if(correct) {
-     $("#hoBzwxmN_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#enHjvXhz_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#hoBzwxmN_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#enHjvXhz_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<p>(Horner's method is an alternate way of evaluating $a_n x^n + a_{n-1}x^{n-1} + \cdots a_1 x + a_0$ expressed in terms of the coefficients, which are 1,2,3,4 in the example.)</p><h4>Question</h4><p>Find the largest root of $x^3 - 6x^2 + 11x - 6$.</p><form name='WeaveQuestion' data-id='tqcBZNzG' data-controltype='numeric'>
+<p>(Horner's method is an alternate way of evaluating $a_n x^n + a_{n-1}x^{n-1} + \cdots a_1 x + a_0$ expressed in terms of the coefficients, which are 1,2,3,4 in the example.)</p><h4>Question</h4><p>Find the largest root of $x^3 - 6x^2 + 11x - 6$.</p><form name='WeaveQuestion' data-id='EoRg5wp9' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="tqcBZNzG" type="number" class="form-control">
+<input id="EoRg5wp9" type="number" class="form-control">
 
 </div>
 
-<div id='tqcBZNzG_message'></div>
+<div id='EoRg5wp9_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#tqcBZNzG').on('change', function() {
+$('#EoRg5wp9').on('change', function() {
   correct = Math.abs(this.value - 3) <= 0.01;
 
   if(correct) {
-     $('#tqcBZNzG_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#EoRg5wp9_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#tqcBZNzG_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#EoRg5wp9_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
@@ -350,148 +371,106 @@ $('#tqcBZNzG').on('change', function() {
 </div>
 
 
-<p>Solve for $x$ using <code>solve&#40;x^2 - &#40;3^2 &#43; 4^2&#41;&#41;</code> not the picture. What do you get</p><form name="WeaveQuestion" data-id="hQ1mjDsY" data-controltype="radio">
+<p>Solve for $x$ using <code>solve&#40;x^2 - &#40;3^2 &#43; 4^2&#41;&#41;</code> not the picture. What do you get</p><form name="WeaveQuestion" data-id="Qc7BHKtw" data-controltype="radio">
 <div class="form-group ">
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_hQ1mjDsY" value="1"><div class="markdown"><p>The value 5</p>
+      <input type="radio" name="radio_Qc7BHKtw" value="1"><div class="markdown"><p>The value 5</p>
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_hQ1mjDsY" value="2"><div class="markdown"><p>Same as the picture</p>
+      <input type="radio" name="radio_Qc7BHKtw" value="2"><div class="markdown"><p>two answers -5 and 5</p>
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_hQ1mjDsY" value="3"><div class="markdown"><p>two answers -5 and 5</p>
+      <input type="radio" name="radio_Qc7BHKtw" value="3"><div class="markdown"><p>Same as the picture</p>
 </div>
     </label>
     </div>
 
-<div id="hQ1mjDsY_message"></div>
+<div id="Qc7BHKtw_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_hQ1mjDsY']").on("change", function() {
-  correct = this.value == 3;
+$("input:radio[name='radio_Qc7BHKtw']").on("change", function() {
+  correct = this.value == 2;
 
   if(correct) {
-     $("#hQ1mjDsY_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#Qc7BHKtw_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#hQ1mjDsY_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#Qc7BHKtw_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question</h4><p>The Soviet historian I. Y. Depman claimed that in 1486, Spanish mathematician Valmes was burned at the stake for claiming to have solved the <a href="https://en.wikipedia.org/wiki/Quartic_function">quartic equation</a>. Here we don't face such consequences.</p><p>Find the largest root of $x^4 - 10x^3 + 32x^2 - 38x + 15$.</p><form name='WeaveQuestion' data-id='PzM6Gd51' data-controltype='numeric'>
+<h4>Question</h4><p>The Soviet historian I. Y. Depman claimed that in 1486, Spanish mathematician Valmes was burned at the stake for claiming to have solved the <a href="https://en.wikipedia.org/wiki/Quartic_function">quartic equation</a>. Here we don't face such consequences.</p><p>Find the largest root of $x^4 - 10x^3 + 32x^2 - 38x + 15$.</p><form name='WeaveQuestion' data-id='E16Y2SaS' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="PzM6Gd51" type="number" class="form-control">
+<input id="E16Y2SaS" type="number" class="form-control">
 
 </div>
 
-<div id='PzM6Gd51_message'></div>
+<div id='E16Y2SaS_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#PzM6Gd51').on('change', function() {
+$('#E16Y2SaS').on('change', function() {
   correct = Math.abs(this.value - 5) <= 0;
 
   if(correct) {
-     $('#PzM6Gd51_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#E16Y2SaS_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#PzM6Gd51_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#E16Y2SaS_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Solve $e^x = x^4$ using <code>SymPy</code>. (You will need to convert to numeric with <code>N</code>.) What is the smallest value?</p><form name='WeaveQuestion' data-id='Tw3TknQe' data-controltype='numeric'>
+<h4>Question</h4><p>Solve $e^x = x^4$ using <code>SymPy</code>. (You will need to convert to numeric with <code>N</code>.) What is the smallest value?</p><form name='WeaveQuestion' data-id='Q6KlxTzz' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="Tw3TknQe" type="number" class="form-control">
+<input id="Q6KlxTzz" type="number" class="form-control">
 
 </div>
 
-<div id='Tw3TknQe_message'></div>
+<div id='Q6KlxTzz_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#Tw3TknQe').on('change', function() {
+$('#Q6KlxTzz').on('change', function() {
   correct = Math.abs(this.value - -0.8155534188089606577727273253085594805974099088406385398936250403272774562683745) <= 0.01;
 
   if(correct) {
-     $('#Tw3TknQe_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#Q6KlxTzz_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#Tw3TknQe_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#Q6KlxTzz_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h2>Graphing expressions</h2><p>Plotting a symbolic expression is done by coercing the expression into a function. For simple plots, this happens behind the scenes:</p><pre class="sourceCode julia">using Plots
 ex = x^2 - 2x + 4
 plot(ex, -1, 3)          # plot of a symbolic expression</pre>
-    <div id="3c39accd-bf58-4886-8670-04412f0046ac" style="width:600px;height:400px;"></div>
+    <div id="089411d8-5efa-4fbf-a424-2e1ae50c5290" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('3c39accd-bf58-4886-8670-04412f0046ac');
+    
+    PLOT = document.getElementById('089411d8-5efa-4fbf-a424-2e1ae50c5290');
     Plotly.plot(PLOT, [
     {
-        "xaxis": "x1",
+        "xaxis": "x",
         "colorbar": {
             "title": ""
         },
-        "yaxis": "y1",
-        "text": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ],
+        "yaxis": "y",
         "x": [
             -1.0,
             -0.9804683619604238,
@@ -538,9 +517,9 @@ plot(ex, -1, 3)          # plot of a symbolic expression</pre>
         "showlegend": true,
         "mode": "lines",
         "name": "y1",
-        "zmin": -0.1,
+        "zmin": null,
         "legendgroup": "y1",
-        "zmax": 0.1,
+        "zmax": null,
         "line": {
             "color": "rgba(0, 154, 250, 1.000)",
             "shape": "linear",
@@ -590,8 +569,7 @@ plot(ex, -1, 3)          # plot of a symbolic expression</pre>
             6.898973000678312,
             7.0
         ],
-        "type": "scatter",
-        "hoverinfo": "text"
+        "type": "scatter"
     }
 ]
 , {
@@ -606,8 +584,6 @@ plot(ex, -1, 3)          # plot of a symbolic expression</pre>
             2.0,
             3.0
         ],
-        "visible": true,
-        "ticks": "inside",
         "range": [
             -1.12,
             3.12
@@ -616,13 +592,30 @@ plot(ex, -1, 3)          # plot of a symbolic expression</pre>
             0.02137649460484106,
             0.9934383202099737
         ],
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "ticktext": [
+            "−1",
+            "0",
+            "1",
+            "2",
+            "3"
+        ],
+        "zeroline": false,
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "y",
+        "visible": true,
+        "ticks": "inside",
         "tickmode": "array",
         "linecolor": "rgba(0, 0, 0, 1.000)",
         "showgrid": true,
         "title": "",
-        "mirror": false,
-        "tickangle": 0,
-        "showline": true,
         "gridcolor": "rgba(0, 0, 0, 0.100)",
         "titlefont": {
             "color": "rgba(0, 0, 0, 1.000)",
@@ -630,22 +623,7 @@ plot(ex, -1, 3)          # plot of a symbolic expression</pre>
             "size": 15
         },
         "tickcolor": "rgb(0, 0, 0)",
-        "ticktext": [
-            "-1",
-            "0",
-            "1",
-            "2",
-            "3"
-        ],
-        "zeroline": false,
-        "type": "-",
-        "tickfont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 11
-        },
-        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
-        "anchor": "y1"
+        "type": "-"
     },
     "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
     "annotations": [],
@@ -667,8 +645,6 @@ plot(ex, -1, 3)          # plot of a symbolic expression</pre>
             6.0,
             7.0
         ],
-        "visible": true,
-        "ticks": "inside",
         "range": [
             2.8801003527014277,
             7.119997077105784
@@ -677,20 +653,9 @@ plot(ex, -1, 3)          # plot of a symbolic expression</pre>
             0.03762029746281716,
             0.9901574803149606
         ],
-        "tickmode": "array",
-        "linecolor": "rgba(0, 0, 0, 1.000)",
-        "showgrid": true,
-        "title": "",
         "mirror": false,
         "tickangle": 0,
         "showline": true,
-        "gridcolor": "rgba(0, 0, 0, 0.100)",
-        "titlefont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 15
-        },
-        "tickcolor": "rgb(0, 0, 0)",
         "ticktext": [
             "3",
             "4",
@@ -699,86 +664,70 @@ plot(ex, -1, 3)          # plot of a symbolic expression</pre>
             "7"
         ],
         "zeroline": false,
-        "type": "-",
         "tickfont": {
             "color": "rgba(0, 0, 0, 1.000)",
             "family": "sans-serif",
             "size": 11
         },
         "zerolinecolor": "rgba(0, 0, 0, 1.000)",
-        "anchor": "x1"
+        "anchor": "x",
+        "visible": true,
+        "ticks": "inside",
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "type": "-"
     },
     "legend": {
-        "tracegroupgap": 0,
+        "yanchor": "auto",
+        "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
         "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "borderwidth": 1,
+        "tracegroupgap": 0,
+        "y": 1.0,
         "font": {
             "color": "rgba(0, 0, 0, 1.000)",
             "family": "sans-serif",
             "size": 11
         },
-        "y": 1.0,
+        "title": {
+            "font": {
+                "color": "rgba(0, 0, 0, 1.000)",
+                "family": "sans-serif",
+                "size": 15
+            },
+            "text": ""
+        },
+        "traceorder": "normal",
         "x": 1.0
     },
     "width": 600
 }
 );
+    
     </script>
 <p>This is similar to how functions can be used as well. The following is similar, but different:</p><pre class="sourceCode julia">f(x) = x^2 - 2x + 4
 plot(f, -1, 3)           # plot of a function object</pre>
-    <div id="e16ebc91-f8c7-4f3a-91a8-1697c2290570" style="width:600px;height:400px;"></div>
+    <div id="34d35ff0-b01f-4de4-b36b-b136b11dc665" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('e16ebc91-f8c7-4f3a-91a8-1697c2290570');
+    
+    PLOT = document.getElementById('34d35ff0-b01f-4de4-b36b-b136b11dc665');
     Plotly.plot(PLOT, [
     {
-        "xaxis": "x1",
+        "xaxis": "x",
         "colorbar": {
             "title": ""
         },
-        "yaxis": "y1",
-        "text": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ],
+        "yaxis": "y",
         "x": [
             -1.0,
             -0.9804683619604238,
@@ -825,9 +774,9 @@ plot(f, -1, 3)           # plot of a function object</pre>
         "showlegend": true,
         "mode": "lines",
         "name": "y1",
-        "zmin": -0.1,
+        "zmin": null,
         "legendgroup": "y1",
-        "zmax": 0.1,
+        "zmax": null,
         "line": {
             "color": "rgba(0, 154, 250, 1.000)",
             "shape": "linear",
@@ -877,8 +826,7 @@ plot(f, -1, 3)           # plot of a function object</pre>
             6.898973000678312,
             7.0
         ],
-        "type": "scatter",
-        "hoverinfo": "text"
+        "type": "scatter"
     }
 ]
 , {
@@ -893,8 +841,6 @@ plot(f, -1, 3)           # plot of a function object</pre>
             2.0,
             3.0
         ],
-        "visible": true,
-        "ticks": "inside",
         "range": [
             -1.12,
             3.12
@@ -903,13 +849,30 @@ plot(f, -1, 3)           # plot of a function object</pre>
             0.02137649460484106,
             0.9934383202099737
         ],
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "ticktext": [
+            "−1",
+            "0",
+            "1",
+            "2",
+            "3"
+        ],
+        "zeroline": false,
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "y",
+        "visible": true,
+        "ticks": "inside",
         "tickmode": "array",
         "linecolor": "rgba(0, 0, 0, 1.000)",
         "showgrid": true,
         "title": "",
-        "mirror": false,
-        "tickangle": 0,
-        "showline": true,
         "gridcolor": "rgba(0, 0, 0, 0.100)",
         "titlefont": {
             "color": "rgba(0, 0, 0, 1.000)",
@@ -917,22 +880,7 @@ plot(f, -1, 3)           # plot of a function object</pre>
             "size": 15
         },
         "tickcolor": "rgb(0, 0, 0)",
-        "ticktext": [
-            "-1",
-            "0",
-            "1",
-            "2",
-            "3"
-        ],
-        "zeroline": false,
-        "type": "-",
-        "tickfont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 11
-        },
-        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
-        "anchor": "y1"
+        "type": "-"
     },
     "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
     "annotations": [],
@@ -954,8 +902,6 @@ plot(f, -1, 3)           # plot of a function object</pre>
             6.0,
             7.0
         ],
-        "visible": true,
-        "ticks": "inside",
         "range": [
             2.880100352701428,
             7.119997077105784
@@ -964,20 +910,9 @@ plot(f, -1, 3)           # plot of a function object</pre>
             0.03762029746281716,
             0.9901574803149606
         ],
-        "tickmode": "array",
-        "linecolor": "rgba(0, 0, 0, 1.000)",
-        "showgrid": true,
-        "title": "",
         "mirror": false,
         "tickangle": 0,
         "showline": true,
-        "gridcolor": "rgba(0, 0, 0, 0.100)",
-        "titlefont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 15
-        },
-        "tickcolor": "rgb(0, 0, 0)",
         "ticktext": [
             "3",
             "4",
@@ -986,70 +921,74 @@ plot(f, -1, 3)           # plot of a function object</pre>
             "7"
         ],
         "zeroline": false,
-        "type": "-",
         "tickfont": {
             "color": "rgba(0, 0, 0, 1.000)",
             "family": "sans-serif",
             "size": 11
         },
         "zerolinecolor": "rgba(0, 0, 0, 1.000)",
-        "anchor": "x1"
+        "anchor": "x",
+        "visible": true,
+        "ticks": "inside",
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "type": "-"
     },
     "legend": {
-        "tracegroupgap": 0,
+        "yanchor": "auto",
+        "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
         "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "borderwidth": 1,
+        "tracegroupgap": 0,
+        "y": 1.0,
         "font": {
             "color": "rgba(0, 0, 0, 1.000)",
             "family": "sans-serif",
             "size": 11
         },
-        "y": 1.0,
+        "title": {
+            "font": {
+                "color": "rgba(0, 0, 0, 1.000)",
+                "family": "sans-serif",
+                "size": 15
+            },
+            "text": ""
+        },
+        "traceorder": "normal",
         "x": 1.0
     },
     "width": 600
 }
 );
+    
     </script>
 <p>Graphing more than one expression at a time is, of course, possible. For example, to graph a function and its tangent line at a point we can do this.</p><pre class="sourceCode julia">f(x) = sqrt(x);
 c = 2;
-fp = diff(f(x));		# diff finds derivative, fp an expression (not function)
+fp = diff(f(x), x);		# diff finds derivative, fp an expression (not function)
 m = fp(x=>c)	        # at c=2
 plot(f(x), 1, 3)
 plot!(f(c) + m * (x - c))</pre>
-    <div id="7ef2e83f-36fb-4e60-8d85-fbaeb1263a0d" style="width:600px;height:400px;"></div>
+    <div id="2d0dfcaa-9ff6-4a9b-a2a9-d753a083360c" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('7ef2e83f-36fb-4e60-8d85-fbaeb1263a0d');
+    
+    PLOT = document.getElementById('2d0dfcaa-9ff6-4a9b-a2a9-d753a083360c');
     Plotly.plot(PLOT, [
     {
-        "xaxis": "x1",
+        "xaxis": "x",
         "colorbar": {
             "title": ""
         },
-        "yaxis": "y1",
-        "text": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ],
+        "yaxis": "y",
         "x": [
             1.0,
             1.0195316380395762,
@@ -1076,9 +1015,9 @@ plot!(f(c) + m * (x - c))</pre>
         "showlegend": true,
         "mode": "lines",
         "name": "y1",
-        "zmin": -0.1,
+        "zmin": null,
         "legendgroup": "y1",
-        "zmax": 0.1,
+        "zmax": null,
         "line": {
             "color": "rgba(0, 154, 250, 1.000)",
             "shape": "linear",
@@ -1108,38 +1047,14 @@ plot!(f(c) + m * (x - c))</pre>
             1.724697575817894,
             1.7320508075688772
         ],
-        "type": "scatter",
-        "hoverinfo": "text"
+        "type": "scatter"
     },
     {
-        "xaxis": "x1",
+        "xaxis": "x",
         "colorbar": {
             "title": ""
         },
-        "yaxis": "y1",
-        "text": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ],
+        "yaxis": "y",
         "x": [
             0.94,
             0.9607035363219507,
@@ -1166,9 +1081,9 @@ plot!(f(c) + m * (x - c))</pre>
         "showlegend": true,
         "mode": "lines",
         "name": "y2",
-        "zmin": -0.1,
+        "zmin": null,
         "legendgroup": "y2",
-        "zmax": 0.1,
+        "zmax": null,
         "line": {
             "color": "rgba(227, 111, 71, 1.000)",
             "shape": "linear",
@@ -1198,8 +1113,7 @@ plot!(f(c) + m * (x - c))</pre>
             1.7794542371904634,
             1.7889801564019654
         ],
-        "type": "scatter",
-        "hoverinfo": "text"
+        "type": "scatter"
     }
 ]
 , {
@@ -1214,8 +1128,6 @@ plot!(f(c) + m * (x - c))</pre>
             2.5,
             3.0
         ],
-        "visible": true,
-        "ticks": "inside",
         "range": [
             0.8764,
             3.1236
@@ -1224,20 +1136,9 @@ plot!(f(c) + m * (x - c))</pre>
             0.05100612423447069,
             0.9934383202099737
         ],
-        "tickmode": "array",
-        "linecolor": "rgba(0, 0, 0, 1.000)",
-        "showgrid": true,
-        "title": "",
         "mirror": false,
         "tickangle": 0,
         "showline": true,
-        "gridcolor": "rgba(0, 0, 0, 0.100)",
-        "titlefont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 15
-        },
-        "tickcolor": "rgb(0, 0, 0)",
         "ticktext": [
             "1.0",
             "1.5",
@@ -1246,14 +1147,27 @@ plot!(f(c) + m * (x - c))</pre>
             "3.0"
         ],
         "zeroline": false,
-        "type": "-",
         "tickfont": {
             "color": "rgba(0, 0, 0, 1.000)",
             "family": "sans-serif",
             "size": 11
         },
         "zerolinecolor": "rgba(0, 0, 0, 1.000)",
-        "anchor": "y1"
+        "anchor": "y",
+        "visible": true,
+        "ticks": "inside",
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "type": "-"
     },
     "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
     "annotations": [],
@@ -1275,8 +1189,6 @@ plot!(f(c) + m * (x - c))</pre>
             1.6,
             1.8
         ],
-        "visible": true,
-        "ticks": "inside",
         "range": [
             0.9763305953079411,
             1.8126495610940243
@@ -1285,20 +1197,9 @@ plot!(f(c) + m * (x - c))</pre>
             0.03762029746281716,
             0.9901574803149606
         ],
-        "tickmode": "array",
-        "linecolor": "rgba(0, 0, 0, 1.000)",
-        "showgrid": true,
-        "title": "",
         "mirror": false,
         "tickangle": 0,
         "showline": true,
-        "gridcolor": "rgba(0, 0, 0, 0.100)",
-        "titlefont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 15
-        },
-        "tickcolor": "rgb(0, 0, 0)",
         "ticktext": [
             "1.0",
             "1.2",
@@ -1307,207 +1208,242 @@ plot!(f(c) + m * (x - c))</pre>
             "1.8"
         ],
         "zeroline": false,
-        "type": "-",
         "tickfont": {
             "color": "rgba(0, 0, 0, 1.000)",
             "family": "sans-serif",
             "size": 11
         },
         "zerolinecolor": "rgba(0, 0, 0, 1.000)",
-        "anchor": "x1"
+        "anchor": "x",
+        "visible": true,
+        "ticks": "inside",
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "type": "-"
     },
     "legend": {
-        "tracegroupgap": 0,
+        "yanchor": "auto",
+        "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
         "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "borderwidth": 1,
+        "tracegroupgap": 0,
+        "y": 1.0,
         "font": {
             "color": "rgba(0, 0, 0, 1.000)",
             "family": "sans-serif",
             "size": 11
         },
-        "y": 1.0,
+        "title": {
+            "font": {
+                "color": "rgba(0, 0, 0, 1.000)",
+                "family": "sans-serif",
+                "size": 15
+            },
+            "text": ""
+        },
+        "traceorder": "normal",
         "x": 1.0
     },
     "width": 600
 }
 );
+    
     </script>
-<h3>Practice</h3><h4>Question</h4><p>Plot the expression <code>x^4 - 3x^3 &#43; 3x^2 - 3x &#43;2</code> over $[-1, 3]$. How many real roots are there?</p><form name='WeaveQuestion' data-id='ZONCN6K0' data-controltype='numeric'>
+<h3>Practice</h3><h4>Question</h4><p>Plot the expression <code>x^4 - 3x^3 &#43; 3x^2 - 3x &#43;2</code> over $[-1, 3]$. How many real roots are there?</p><form name='WeaveQuestion' data-id='BuHMdk6V' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="ZONCN6K0" type="number" class="form-control">
+<input id="BuHMdk6V" type="number" class="form-control">
 
 </div>
 
-<div id='ZONCN6K0_message'></div>
+<div id='BuHMdk6V_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#ZONCN6K0').on('change', function() {
+$('#BuHMdk6V').on('change', function() {
   correct = Math.abs(this.value - 2) <= 0;
 
   if(correct) {
-     $('#ZONCN6K0_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#BuHMdk6V_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#ZONCN6K0_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#BuHMdk6V_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h2>Limits</h2><p>The <code>Limit</code> function can find the limit of an expression. Let's see how well it does. The basic question</p>$$~
 \lim_{x \rightarrow c} f(x) = L
 ~$$
-<p>has three inputs: A function the limit is being taken of, a dummy variable $x$, and a value where the limit is taken, $c$. The output is the limit, when it exists. The <code>limit</code> function is similar. Here we find an old classic:</p><pre class="sourceCode julia">limit(sin(x)/x, x, 0)</pre>
+<p>has three inputs: A function the limit is being taken of, a dummy variable $x$, and a value where the limit is taken, $c$. The output is the limit, when it exists. The <code>limit</code> function is similar. Here we find an old classic:</p><pre class="sourceCode julia">limit(sin(x)/x, x => 0)</pre>
 <div class="well well-sm">
-\begin{equation*}1\end{equation*}</div>
+$\begin{equation*}1\end{equation*}$
+</div>
 
-<p>We can do other similar questions:</p><pre class="sourceCode julia">limit((1-cos(x))/x^2, x, 0)</pre>
+<p>We can do other similar questions:</p><pre class="sourceCode julia">limit((1-cos(x))/x^2, x => 0)</pre>
 <div class="well well-sm">
-\begin{equation*}\frac{1}{2}\end{equation*}</div>
+$\begin{equation*}\frac{1}{2}\end{equation*}$
+</div>
 
-<p>The second argument is needed, as the expression may have more than one variable:</p><pre class="sourceCode julia">lambda = symbols("lambda")
-limit((1 - lambda *x)^(1/x), x, 0)</pre>
+<p>The second argument is needed, as the expression may have more than one variable:</p><pre class="sourceCode julia">@syms lambda
+limit((1 - lambda *x)^(1/x), x => 0)</pre>
 <div class="well well-sm">
-\begin{equation*}e^{- \lambda}\end{equation*}</div>
+$\begin{equation*}e^{- \lambda}\end{equation*}$
+</div>
 
-<p>Limits can be taken at infinity as well. We can specify infinity using <code>oo</code>:</p><pre class="sourceCode julia">limit(sin(x)/x, x, oo)</pre>
+<p>Limits can be taken at infinity as well. We can specify infinity using <code>oo</code>:</p><pre class="sourceCode julia">limit(sin(x)/x, x => oo)</pre>
 <div class="well well-sm">
-\begin{equation*}0\end{equation*}</div>
+$\begin{equation*}0\end{equation*}$
+</div>
 
-<p>We can even compute derivatives using limits. Here we do so symbolically:</p><pre class="sourceCode julia">@vars h
+<p>We can even compute derivatives using limits. Here we do so symbolically:</p><pre class="sourceCode julia">@syms h
 f(x) = x^10
-limit( (f(x+h) - f(x))/h, h, 0)</pre>
+limit( (f(x+h) - f(x))/h, h => 0)</pre>
 <div class="well well-sm">
-\begin{equation*}10 x^{9}\end{equation*}</div>
+$\begin{equation*}10 x^{9}\end{equation*}$
+</div>
 
 <p>We can see that some of the more complicated formulas for derivatives give the same answer. Here we see the central difference gives the same answer:</p><pre class="sourceCode julia">central_difference(f, x, h) = ( f(x+h) - f(x-h) ) / (2h)
-a = limit(central_difference(f, x, h), h, 0)</pre>
+a = limit(central_difference(f, x, h), h => 0)</pre>
 <div class="well well-sm">
-\begin{equation*}10 x^{9}\end{equation*}</div>
+$\begin{equation*}10 x^{9}\end{equation*}$
+</div>
 
 <p>Even this more complicated expression works as expected:</p><pre class="sourceCode julia">central_4th_difference(f, x, h) = (-f(x + 2h) + 8f(x+h) - 8f(x-h) + f(x-2h))/(12h)
-limit(central_4th_difference(f, x, h), h, 0)</pre>
+limit(central_4th_difference(f, x, h), h => 0)</pre>
 <div class="well well-sm">
-\begin{equation*}10 x^{9}\end{equation*}</div>
+$\begin{equation*}10 x^{9}\end{equation*}$
+</div>
 
 <p>This limit matches the chain rule:</p><pre class="sourceCode julia">g(x) = sin(x)
-limit( (f(g(x+h)) - f(g(x)))/h, h, 0) |> subs(x, 1)</pre>
+ex = limit( (f(g(x+h)) - f(g(x)))/h, h => 0) 
+ex(x => 1)</pre>
 <div class="well well-sm">
-\begin{equation*}10 \sin^{9}{\left(1 \right)} \cos{\left(1 \right)}\end{equation*}</div>
+$\begin{equation*}10 \sin^{9}{\left(1 \right)} \cos{\left(1 \right)}\end{equation*}$
+</div>
 
 <h3>Practice</h3><h4>Question</h4><p>Find</p>$$~
 \lim_{x \rightarrow 4} \frac{(3 - \sqrt(x + 5))}{(x-4)}
 ~$$
-<form name='WeaveQuestion' data-id='qs6UVC2D' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='lhteCbJp' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="qs6UVC2D" type="number" class="form-control">
+<input id="lhteCbJp" type="number" class="form-control">
 
 </div>
 
-<div id='qs6UVC2D_message'></div>
+<div id='lhteCbJp_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#qs6UVC2D').on('change', function() {
+$('#lhteCbJp').on('change', function() {
   correct = Math.abs(this.value - -0.16666666666666666) <= 0.001;
 
   if(correct) {
-     $('#qs6UVC2D_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#lhteCbJp_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#qs6UVC2D_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#lhteCbJp_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h4>Question</h4><p>Compute</p>$$~
 \lim_{x \rightarrow 1} \frac{x^{1/4} - 1}{x^{1/3} - 1}.
 ~$$
-<form name='WeaveQuestion' data-id='o3NhYX3l' data-controltype='numeric'>
+<form name='WeaveQuestion' data-id='LkhAbRm4' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="o3NhYX3l" type="number" class="form-control">
+<input id="LkhAbRm4" type="number" class="form-control">
 
 </div>
 
-<div id='o3NhYX3l_message'></div>
+<div id='LkhAbRm4_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#o3NhYX3l').on('change', function() {
+$('#LkhAbRm4').on('change', function() {
   correct = Math.abs(this.value - 0.75) <= 0.001;
 
   if(correct) {
-     $('#o3NhYX3l_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#LkhAbRm4_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#o3NhYX3l_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#LkhAbRm4_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h4>Question</h4><p>At <a href="http://mathoverflow.net/questions/51685/how-did-bernoulli-prove-lh&#37;C3&#37;B4pitals-rule">math overflow</a> we learn that L'Hopital was motivated by the following limit:</p>$$~
 \lim_{x \rightarrow a} \frac{(2a^3x-x^4)^{1/2} - a (a^2x)^{1/3}}{a - (ax^3)^{1/4}}
 ~$$
-<p>What did he find (with the help of a Bernoulli)?</p><p>You need to inform <code>SymPy</code> that $a > 0$. The following is a good start:</p><pre class="sourceCode julia">@vars x
-@vars a positive=true
+<p>What did he find (with the help of a Bernoulli)?</p><p>You need to inform <code>SymPy</code> that $a > 0$. The following is a good start:</p><pre class="sourceCode julia">@syms x, a::positive
 top = (2a^3*x-x^4)^(1//2) - a *(a^2*x)^(1//3) # rationals are converted exactly to SymPy
 bottom =  a - (a*x^3)^(1//4)
 ex = top/bottom</pre>
 <div class="well well-sm">
-\begin{equation*}\frac{- a^{\frac{5}{3}} \sqrt[3]{x} + \sqrt{2 a^{3} x - x^{4}}}{- \sqrt[4]{a} \sqrt[4]{x^{3}} + a}\end{equation*}</div>
+$\begin{equation*}\frac{- a^{\frac{5}{3}} \sqrt[3]{x} + \sqrt{2 a^{3} x - x^{4}}}{- \sqrt[4]{a} \sqrt[4]{x^{3}} + a}\end{equation*}$
+</div>
 
-<p>Now find the limit.</p><form name="WeaveQuestion" data-id="pwYskO6y" data-controltype="radio">
+<p>Now find the limit.</p><form name="WeaveQuestion" data-id="xhdgAjhr" data-controltype="radio">
 <div class="form-group ">
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_pwYskO6y" value="1"><div class="markdown">$0$
+      <input type="radio" name="radio_xhdgAjhr" value="1"><div class="markdown">$9\sqrt{a}$
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_pwYskO6y" value="2"><div class="markdown">$9\sqrt{a}$
+      <input type="radio" name="radio_xhdgAjhr" value="2"><div class="markdown">$16a/9$
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_pwYskO6y" value="3"><div class="markdown">$16a/9$
+      <input type="radio" name="radio_xhdgAjhr" value="3"><div class="markdown"><p>Does not exist</p>
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_pwYskO6y" value="4"><div class="markdown"><p>Does not exist</p>
+      <input type="radio" name="radio_xhdgAjhr" value="4"><div class="markdown">$0$
 </div>
     </label>
     </div>
 
-<div id="pwYskO6y_message"></div>
+<div id="xhdgAjhr_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_pwYskO6y']").on("change", function() {
-  correct = this.value == 3;
+$("input:radio[name='radio_xhdgAjhr']").on("change", function() {
+  correct = this.value == 2;
 
   if(correct) {
-     $("#pwYskO6y_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#xhdgAjhr_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#pwYskO6y_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#xhdgAjhr_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question</h4><p>Define a symbolic variable <code>h</code> and let $f(x) = \sin(x)$:</p><pre class="sourceCode julia">@vars h
+<h4>Question</h4><p>Define a symbolic variable <code>h</code> and let $f(x) = \sin(x)$:</p><pre class="sourceCode julia">@syms h
 f(x) = sin(x);</pre>
 <pre class="output">
 f (generic function with 1 method)</pre>
@@ -1515,38 +1451,38 @@ f (generic function with 1 method)</pre>
 <p>Compute the following:</p>$$~
 \lim_{h->0} \frac{f(x+h) - 2f(x) + f(x-h)}{h^2}
 ~$$
-<p>Based on your answer, what do you think the above expression finds for any <code>f</code>?</p><form name="WeaveQuestion" data-id="CGShYniO" data-controltype="radio">
+<p>Based on your answer, what do you think the above expression finds for any <code>f</code>?</p><form name="WeaveQuestion" data-id="usxpfBbV" data-controltype="radio">
 <div class="form-group ">
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_CGShYniO" value="1"><div class="markdown"><p><code>f&#39;&#40;x&#41;</code></p>
+      <input type="radio" name="radio_usxpfBbV" value="1"><div class="markdown"><p><code>f&#39;&#40;x&#41;</code></p>
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_CGShYniO" value="2"><div class="markdown"><p><code>f&#39;&#39;&#40;x&#41;</code></p>
+      <input type="radio" name="radio_usxpfBbV" value="2"><div class="markdown"><p><code>f&#39;&#39;&#40;x&#41;</code></p>
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_CGShYniO" value="3"><div class="markdown"><p><code>f&#39;&#39;&#39;&#40;x&#41;</code></p>
+      <input type="radio" name="radio_usxpfBbV" value="3"><div class="markdown"><p><code>f&#39;&#39;&#39;&#40;x&#41;</code></p>
 </div>
     </label>
     </div>
 
-<div id="CGShYniO_message"></div>
+<div id="usxpfBbV_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_CGShYniO']").on("change", function() {
+$("input:radio[name='radio_usxpfBbV']").on("change", function() {
   correct = this.value == 2;
 
   if(correct) {
-     $("#CGShYniO_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#usxpfBbV_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#CGShYniO_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#usxpfBbV_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -1554,44 +1490,44 @@ $("input:radio[name='radio_CGShYniO']").on("change", function() {
 <h4>Question</h4><p>Define a symbolic quantity <code>a</code>. Compute the limit</p>$$~
 \lim_{x \rightarrow 0} \frac{\cos(ax) - 1}{\cos(x) - 1}
 ~$$
-<p>What is the answer?</p><form name="WeaveQuestion" data-id="0rLjIwDo" data-controltype="radio">
+<p>What is the answer?</p><form name="WeaveQuestion" data-id="D76Jkb8P" data-controltype="radio">
 <div class="form-group ">
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_0rLjIwDo" value="1"><div class="markdown"><p>1</p>
+      <input type="radio" name="radio_D76Jkb8P" value="1"><div class="markdown"><p>1</p>
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_0rLjIwDo" value="2"><div class="markdown"><p>a</p>
+      <input type="radio" name="radio_D76Jkb8P" value="2"><div class="markdown"><p>a</p>
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_0rLjIwDo" value="3"><div class="markdown"><p>a^2</p>
+      <input type="radio" name="radio_D76Jkb8P" value="3"><div class="markdown"><p>a^2</p>
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_0rLjIwDo" value="4"><div class="markdown"><p>No limit exists</p>
+      <input type="radio" name="radio_D76Jkb8P" value="4"><div class="markdown"><p>No limit exists</p>
 </div>
     </label>
     </div>
 
-<div id="0rLjIwDo_message"></div>
+<div id="D76Jkb8P_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_0rLjIwDo']").on("change", function() {
+$("input:radio[name='radio_D76Jkb8P']").on("change", function() {
   correct = this.value == 3;
 
   if(correct) {
-     $("#0rLjIwDo_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#D76Jkb8P_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#0rLjIwDo_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#D76Jkb8P_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -1604,7 +1540,7 @@ f (generic function with 1 method)</pre>
 fxs = map(f, xs);
 [xs fxs]</pre>
 <pre class="output">
-9×2 Array{Float64,2}:
+9×2 Array{Float64, 2}:
  0.010000000000000002    0.000191087007486009
  0.0010000000000000002   5.60274947776528e-5
  0.00010000000000000002  1.2464663061530679e-5
@@ -1615,44 +1551,44 @@ fxs = map(f, xs);
  1.0000000000000005e-9   8.52991892929208e-9
  1.0000000000000006e-10  2.1768694181535853e-9</pre>
 
-<p>It looks like the limit is $0$. What does <code>limit</code> compute for the <em>real</em> answer?</p><form name="WeaveQuestion" data-id="hZfxb9Dl" data-controltype="radio">
+<p>It looks like the limit is $0$. What does <code>limit</code> compute for the <em>real</em> answer?</p><form name="WeaveQuestion" data-id="QrqzUkUZ" data-controltype="radio">
 <div class="form-group ">
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_hZfxb9Dl" value="1"><div class="markdown"><p><code>1</code></p>
+      <input type="radio" name="radio_QrqzUkUZ" value="1"><div class="markdown"><p><code>e &#61; 2.7182818284590455</code></p>
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_hZfxb9Dl" value="2"><div class="markdown"><p><code>0</code></p>
+      <input type="radio" name="radio_QrqzUkUZ" value="2"><div class="markdown"><p><code>Inf</code></p>
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_hZfxb9Dl" value="3"><div class="markdown"><p><code>e &#61; 2.7182818284590455</code></p>
+      <input type="radio" name="radio_QrqzUkUZ" value="3"><div class="markdown"><p><code>1</code></p>
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_hZfxb9Dl" value="4"><div class="markdown"><p><code>Inf</code></p>
+      <input type="radio" name="radio_QrqzUkUZ" value="4"><div class="markdown"><p><code>0</code></p>
 </div>
     </label>
     </div>
 
-<div id="hZfxb9Dl_message"></div>
+<div id="QrqzUkUZ_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_hZfxb9Dl']").on("change", function() {
-  correct = this.value == 4;
+$("input:radio[name='radio_QrqzUkUZ']").on("change", function() {
+  correct = this.value == 2;
 
   if(correct) {
-     $("#hZfxb9Dl_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#QrqzUkUZ_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#hZfxb9Dl_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#QrqzUkUZ_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -1661,87 +1597,60 @@ $("input:radio[name='radio_hZfxb9Dl']").on("change", function() {
 <pre class="output">
 f (generic function with 1 method)</pre>
 
-<p>This function has a limit at $\infty$. It can't be found numerically though (well, not easily). You can verify this by trying to evaluate the function at $10$, let alone for really large values. However, it can be computed symbolically. What is the answer?</p><form name='WeaveQuestion' data-id='JdylB8w4' data-controltype='numeric'>
+<p>This function has a limit at $\infty$. It can't be found numerically though (well, not easily). You can verify this by trying to evaluate the function at $10$, let alone for really large values. However, it can be computed symbolically. What is the answer?</p><form name='WeaveQuestion' data-id='RBPqRSA0' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="JdylB8w4" type="number" class="form-control">
+<input id="RBPqRSA0" type="number" class="form-control">
 
 </div>
 
-<div id='JdylB8w4_message'></div>
+<div id='RBPqRSA0_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#JdylB8w4').on('change', function() {
+$('#RBPqRSA0').on('change', function() {
   correct = Math.abs(this.value - 0) <= 1.0e-8;
 
   if(correct) {
-     $('#JdylB8w4_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#RBPqRSA0_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#JdylB8w4_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#RBPqRSA0_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <p>(Again, this is from Gruntz.)</p><h2>Derivatives</h2><p>We just saw we can take derivatives with a limit, though just as with pen and paper, it is better to use the rules of derivatives.  These rules are implemented by the <code>diff</code> operator, which takes a symbolic expression, a variable to differentiate in (the default is <code>x</code>) and an optional integer for the number of derivatives and returns a symbolic derivative.</p><p>For example</p><pre class="sourceCode julia">f(x) = exp(exp(x))
 diff(f(x))		       ## not f, but the symbolic expression f(x)</pre>
 <div class="well well-sm">
-\begin{equation*}e^{x} e^{e^{x}}\end{equation*}</div>
+$\begin{equation*}e^{x} e^{e^{x}}\end{equation*}$
+</div>
 
 <pre class="sourceCode julia">diff(f(x), x)                  ## optional x is necessary if other symbols involved</pre>
 <div class="well well-sm">
-\begin{equation*}e^{x} e^{e^{x}}\end{equation*}</div>
+$\begin{equation*}e^{x} e^{e^{x}}\end{equation*}$
+</div>
 
 <pre class="sourceCode julia">diff(f(x), x, 2)               ## Finds f''(x), not f'(2).</pre>
 <div class="well well-sm">
-\begin{equation*}\left(e^{x} + 1\right) e^{x} e^{e^{x}}\end{equation*}</div>
+$\begin{equation*}\left(e^{x} + 1\right) e^{x} e^{e^{x}}\end{equation*}$
+</div>
 
 <p>Here we find and plot the derivative of $x^x$ avoiding the asymptote at $x=0$.</p><pre class="sourceCode julia">f(x) = x^x
 plot(diff(f(x)), 1/10, 2)</pre>
-    <div id="b2d16cc7-c26e-4ad0-8ffd-05fcdf8511a7" style="width:600px;height:400px;"></div>
+    <div id="b151bfd9-68ce-44da-a198-66a84ea57f12" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('b2d16cc7-c26e-4ad0-8ffd-05fcdf8511a7');
+    
+    PLOT = document.getElementById('b151bfd9-68ce-44da-a198-66a84ea57f12');
     Plotly.plot(PLOT, [
     {
-        "xaxis": "x1",
+        "xaxis": "x",
         "colorbar": {
             "title": ""
         },
-        "yaxis": "y1",
-        "text": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ],
+        "yaxis": "y",
         "x": [
             0.1,
             0.11855505613759745,
@@ -1776,9 +1685,9 @@ plot(diff(f(x)), 1/10, 2)</pre>
         "showlegend": true,
         "mode": "lines",
         "name": "y1",
-        "zmin": -0.1,
+        "zmin": null,
         "legendgroup": "y1",
-        "zmax": 0.1,
+        "zmax": null,
         "line": {
             "color": "rgba(0, 154, 250, 1.000)",
             "shape": "linear",
@@ -1816,8 +1725,7 @@ plot(diff(f(x)), 1/10, 2)</pre>
             6.69180898077738,
             6.772588722239782
         ],
-        "type": "scatter",
-        "hoverinfo": "text"
+        "type": "scatter"
     }
 ]
 , {
@@ -1831,8 +1739,6 @@ plot(diff(f(x)), 1/10, 2)</pre>
             1.5,
             2.0
         ],
-        "visible": true,
-        "ticks": "inside",
         "range": [
             0.04300000000000001,
             2.057
@@ -1841,20 +1747,9 @@ plot(diff(f(x)), 1/10, 2)</pre>
             0.02137649460484106,
             0.9934383202099737
         ],
-        "tickmode": "array",
-        "linecolor": "rgba(0, 0, 0, 1.000)",
-        "showgrid": true,
-        "title": "",
         "mirror": false,
         "tickangle": 0,
         "showline": true,
-        "gridcolor": "rgba(0, 0, 0, 0.100)",
-        "titlefont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 15
-        },
-        "tickcolor": "rgb(0, 0, 0)",
         "ticktext": [
             "0.5",
             "1.0",
@@ -1862,14 +1757,27 @@ plot(diff(f(x)), 1/10, 2)</pre>
             "2.0"
         ],
         "zeroline": false,
-        "type": "-",
         "tickfont": {
             "color": "rgba(0, 0, 0, 1.000)",
             "family": "sans-serif",
             "size": 11
         },
         "zerolinecolor": "rgba(0, 0, 0, 1.000)",
-        "anchor": "y1"
+        "anchor": "y",
+        "visible": true,
+        "ticks": "inside",
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "type": "-"
     },
     "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
     "annotations": [],
@@ -1890,8 +1798,6 @@ plot(diff(f(x)), 1/10, 2)</pre>
             4.0,
             6.0
         ],
-        "visible": true,
-        "ticks": "inside",
         "range": [
             -1.2688981826882013,
             7.0068067874318585
@@ -1900,20 +1806,9 @@ plot(diff(f(x)), 1/10, 2)</pre>
             0.03762029746281716,
             0.9901574803149606
         ],
-        "tickmode": "array",
-        "linecolor": "rgba(0, 0, 0, 1.000)",
-        "showgrid": true,
-        "title": "",
         "mirror": false,
         "tickangle": 0,
         "showline": true,
-        "gridcolor": "rgba(0, 0, 0, 0.100)",
-        "titlefont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 15
-        },
-        "tickcolor": "rgb(0, 0, 0)",
         "ticktext": [
             "0",
             "2",
@@ -1921,68 +1816,72 @@ plot(diff(f(x)), 1/10, 2)</pre>
             "6"
         ],
         "zeroline": false,
-        "type": "-",
         "tickfont": {
             "color": "rgba(0, 0, 0, 1.000)",
             "family": "sans-serif",
             "size": 11
         },
         "zerolinecolor": "rgba(0, 0, 0, 1.000)",
-        "anchor": "x1"
+        "anchor": "x",
+        "visible": true,
+        "ticks": "inside",
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "type": "-"
     },
     "legend": {
-        "tracegroupgap": 0,
+        "yanchor": "auto",
+        "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
         "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "borderwidth": 1,
+        "tracegroupgap": 0,
+        "y": 1.0,
         "font": {
             "color": "rgba(0, 0, 0, 1.000)",
             "family": "sans-serif",
             "size": 11
         },
-        "y": 1.0,
+        "title": {
+            "font": {
+                "color": "rgba(0, 0, 0, 1.000)",
+                "family": "sans-serif",
+                "size": 15
+            },
+            "text": ""
+        },
+        "traceorder": "normal",
         "x": 1.0
     },
     "width": 600
 }
 );
+    
     </script>
 <p>Here we plot $f(x)$ and it's tangent line at $c=1$:</p><pre class="sourceCode julia">f(x) = x^x; c = 1
 m = diff(f(x)) |> subs(x, c);
 plot(f, 0.5, 1.5)
 plot!(f(c) + m*(x-c))</pre>
-    <div id="22f764bd-404d-4b57-8dc7-5769e98bf3b5" style="width:600px;height:400px;"></div>
+    <div id="aa0c8c33-124d-4d96-ba0c-ca6d73ac53ec" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('22f764bd-404d-4b57-8dc7-5769e98bf3b5');
+    
+    PLOT = document.getElementById('aa0c8c33-124d-4d96-ba0c-ca6d73ac53ec');
     Plotly.plot(PLOT, [
     {
-        "xaxis": "x1",
+        "xaxis": "x",
         "colorbar": {
             "title": ""
         },
-        "yaxis": "y1",
-        "text": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ],
+        "yaxis": "y",
         "x": [
             0.5,
             0.5097658190197881,
@@ -2009,9 +1908,9 @@ plot!(f(c) + m*(x-c))</pre>
         "showlegend": true,
         "mode": "lines",
         "name": "y1",
-        "zmin": -0.1,
+        "zmin": null,
         "legendgroup": "y1",
-        "zmax": 0.1,
+        "zmax": null,
         "line": {
             "color": "rgba(0, 154, 250, 1.000)",
             "shape": "linear",
@@ -2041,38 +1940,14 @@ plot!(f(c) + m*(x-c))</pre>
             1.804691040439711,
             1.8371173070873836
         ],
-        "type": "scatter",
-        "hoverinfo": "text"
+        "type": "scatter"
     },
     {
-        "xaxis": "x1",
+        "xaxis": "x",
         "colorbar": {
             "title": ""
         },
-        "yaxis": "y1",
-        "text": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ],
+        "yaxis": "y",
         "x": [
             0.47,
             0.48035176816097536,
@@ -2099,9 +1974,9 @@ plot!(f(c) + m*(x-c))</pre>
         "showlegend": true,
         "mode": "lines",
         "name": "y2",
-        "zmin": -0.1,
+        "zmin": null,
         "legendgroup": "y2",
-        "zmax": 0.1,
+        "zmax": null,
         "line": {
             "color": "rgba(227, 111, 71, 1.000)",
             "shape": "linear",
@@ -2131,8 +2006,7 @@ plot!(f(c) + m*(x-c))</pre>
             1.5165283158570235,
             1.53
         ],
-        "type": "scatter",
-        "hoverinfo": "text"
+        "type": "scatter"
     }
 ]
 , {
@@ -2147,8 +2021,6 @@ plot!(f(c) + m*(x-c))</pre>
             1.2000000000000002,
             1.4000000000000001
         ],
-        "visible": true,
-        "ticks": "inside",
         "range": [
             0.4382,
             1.5618
@@ -2157,20 +2029,9 @@ plot!(f(c) + m*(x-c))</pre>
             0.05100612423447069,
             0.9934383202099737
         ],
-        "tickmode": "array",
-        "linecolor": "rgba(0, 0, 0, 1.000)",
-        "showgrid": true,
-        "title": "",
         "mirror": false,
         "tickangle": 0,
         "showline": true,
-        "gridcolor": "rgba(0, 0, 0, 0.100)",
-        "titlefont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 15
-        },
-        "tickcolor": "rgb(0, 0, 0)",
         "ticktext": [
             "0.6",
             "0.8",
@@ -2179,14 +2040,27 @@ plot!(f(c) + m*(x-c))</pre>
             "1.4"
         ],
         "zeroline": false,
-        "type": "-",
         "tickfont": {
             "color": "rgba(0, 0, 0, 1.000)",
             "family": "sans-serif",
             "size": 11
         },
         "zerolinecolor": "rgba(0, 0, 0, 1.000)",
-        "anchor": "y1"
+        "anchor": "y",
+        "visible": true,
+        "ticks": "inside",
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "type": "-"
     },
     "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
     "annotations": [],
@@ -2210,8 +2084,6 @@ plot!(f(c) + m*(x-c))</pre>
             1.6,
             1.8
         ],
-        "visible": true,
-        "ticks": "inside",
         "range": [
             0.42898648078737844,
             1.8781308263000052
@@ -2220,20 +2092,9 @@ plot!(f(c) + m*(x-c))</pre>
             0.03762029746281716,
             0.9901574803149606
         ],
-        "tickmode": "array",
-        "linecolor": "rgba(0, 0, 0, 1.000)",
-        "showgrid": true,
-        "title": "",
         "mirror": false,
         "tickangle": 0,
         "showline": true,
-        "gridcolor": "rgba(0, 0, 0, 0.100)",
-        "titlefont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 15
-        },
-        "tickcolor": "rgb(0, 0, 0)",
         "ticktext": [
             "0.6",
             "0.8",
@@ -2244,319 +2105,354 @@ plot!(f(c) + m*(x-c))</pre>
             "1.8"
         ],
         "zeroline": false,
-        "type": "-",
         "tickfont": {
             "color": "rgba(0, 0, 0, 1.000)",
             "family": "sans-serif",
             "size": 11
         },
         "zerolinecolor": "rgba(0, 0, 0, 1.000)",
-        "anchor": "x1"
+        "anchor": "x",
+        "visible": true,
+        "ticks": "inside",
+        "tickmode": "array",
+        "linecolor": "rgba(0, 0, 0, 1.000)",
+        "showgrid": true,
+        "title": "",
+        "gridcolor": "rgba(0, 0, 0, 0.100)",
+        "titlefont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 15
+        },
+        "tickcolor": "rgb(0, 0, 0)",
+        "type": "-"
     },
     "legend": {
-        "tracegroupgap": 0,
+        "yanchor": "auto",
+        "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
         "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "borderwidth": 1,
+        "tracegroupgap": 0,
+        "y": 1.0,
         "font": {
             "color": "rgba(0, 0, 0, 1.000)",
             "family": "sans-serif",
             "size": 11
         },
-        "y": 1.0,
+        "title": {
+            "font": {
+                "color": "rgba(0, 0, 0, 1.000)",
+                "family": "sans-serif",
+                "size": 15
+            },
+            "text": ""
+        },
+        "traceorder": "normal",
         "x": 1.0
     },
     "width": 600
 }
 );
+    
     </script>
 <h3>Extrema</h3><p>We can combine <code>solve</code> with <code>diff</code> to find extrema of a differentiable function over a closed interval, by locating the critical points where $f'(x) = 0$.</p><p>For example, consider the problem enclosing the maximum amount of area with 3 sides of a rectangle where the length of the 3 sides is fixed.</p><p>For this, we have</p>$$~
 L = 2x + y, \quad A = xy, \quad\text{or}\quad A(x) = x \cdot (L-2x)
 ~$$
-<p>We can solve this with $L$ as a symbolic value, by looking at critical points of $A$ or when $A'(x) = 0$:</p><pre class="sourceCode julia">@vars L
+<p>We can solve this with $L$ as a symbolic value, by looking at critical points of $A$ or when $A'(x) = 0$:</p><pre class="sourceCode julia">@syms L
 A = x*y
 A = A(y => L - 2x)
 out = solve(diff(A, x), x)[1]	## solve returns an array, we need its first component
 subs(L - 2x, x => out)</pre>
 <div class="well well-sm">
-\begin{equation*}\frac{L}{2}\end{equation*}</div>
+$\begin{equation*}\frac{L}{2}\end{equation*}$
+</div>
 
 <p>This shows that  $y = L/2$. So solve for $x$ we have</p><pre class="sourceCode julia">solve(L/2 - (L - 2x), x)</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}\frac{L}{4}\end{array} \right] \]</div>
+$\left[ \begin{array}{r}\frac{L}{4}\end{array} \right]$
+</div>
 
-<h3>Practice</h3><p>Find the derivative of $\tan^{-1}(x)$. What do you get?</p><form name="WeaveQuestion" data-id="93EC2byn" data-controltype="radio">
+<h3>Practice</h3><p>Find the derivative of $\tan^{-1}(x)$. What do you get?</p><form name="WeaveQuestion" data-id="ZnAwDihQ" data-controltype="radio">
 <div class="form-group ">
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_93EC2byn" value="1"><div class="markdown">$\frac{1}{x^{2} + 1}$
+      <input type="radio" name="radio_ZnAwDihQ" value="1"><div class="markdown">$\frac{1}{\sqrt{1 - x^{2}}}$
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_93EC2byn" value="2"><div class="markdown">$\frac{1}{\sqrt{1 - x^{2}}}$
+      <input type="radio" name="radio_ZnAwDihQ" value="2"><div class="markdown">$\frac{1}{x^{2} + 1}$
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_93EC2byn" value="3"><div class="markdown">$\frac{1}{x}$
+      <input type="radio" name="radio_ZnAwDihQ" value="3"><div class="markdown">$\frac{1}{x}$
 </div>
     </label>
     </div>
 
-<div id="93EC2byn_message"></div>
+<div id="ZnAwDihQ_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_93EC2byn']").on("change", function() {
-  correct = this.value == 1;
+$("input:radio[name='radio_ZnAwDihQ']").on("change", function() {
+  correct = this.value == 2;
 
   if(correct) {
-     $("#93EC2byn_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#ZnAwDihQ_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#93EC2byn_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#ZnAwDihQ_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Questions</h4><p>Let $f(x) = \exp(-\cos(x))$. Evaluate $f'(3)$. (You'll need to <code>subs</code>titute 3 for <code>x</code> and convert to floating point.)</p><form name='WeaveQuestion' data-id='Z061QqQI' data-controltype='numeric'>
+<h4>Questions</h4><p>Let $f(x) = \exp(-\cos(x))$. Evaluate $f'(3)$. (You'll need to <code>subs</code>titute 3 for <code>x</code> and convert to floating point.)</p><form name='WeaveQuestion' data-id='nMkK0h22' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="Z061QqQI" type="number" class="form-control">
+<input id="nMkK0h22" type="number" class="form-control">
 
 </div>
 
-<div id='Z061QqQI_message'></div>
+<div id='nMkK0h22_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#Z061QqQI').on('change', function() {
+$('#nMkK0h22').on('change', function() {
   correct = Math.abs(this.value - 0.3797841807457766324319619290395706689950768584935908050136628093384225996266999) <= 0.001;
 
   if(correct) {
-     $('#Z061QqQI_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#nMkK0h22_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#Z061QqQI_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#nMkK0h22_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Questions</h4><p>Find the single critical point of $f(x) = 1/x^2 + x^3$.</p><form name='WeaveQuestion' data-id='wXzpGuN7' data-controltype='numeric'>
+<h4>Questions</h4><p>Find the single critical point of $f(x) = 1/x^2 + x^3$.</p><form name='WeaveQuestion' data-id='4GTLG3Zx' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="wXzpGuN7" type="number" class="form-control">
+<input id="4GTLG3Zx" type="number" class="form-control">
 
 </div>
 
-<div id='wXzpGuN7_message'></div>
+<div id='4GTLG3Zx_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#wXzpGuN7').on('change', function() {
+$('#4GTLG3Zx').on('change', function() {
   correct = Math.abs(this.value - 0.9221079114817277656701705309291930146705850859540336029625316749125970624956978) <= 0.01;
 
   if(correct) {
-     $('#wXzpGuN7_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#4GTLG3Zx_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#wXzpGuN7_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#4GTLG3Zx_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Question</h4><p>Let $f(x) = \tan(x)$. Newton's method finds the zero of the tangent line $f(c) + f'(c)(x-c)$. You can do this with <code>julia</code> via:</p><pre class="sourceCode julia">@vars c
+<h4>Question</h4><p>Let $f(x) = \tan(x)$. Newton's method finds the zero of the tangent line $f(c) + f'(c)(x-c)$. You can do this with <code>julia</code> via:</p><pre class="sourceCode julia">@syms c
 f(x) = tan(x)
 solve(f(c) + diff(f(c)) * (x - c), x)</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}c - \frac{\sin{\left(2 c \right)}}{2}\end{array} \right] \]</div>
+$\left[ \begin{array}{r}c - \frac{\sin{\left(2 c \right)}}{2}\end{array} \right]$
+</div>
 
-<p>What do you get when $c = \pi/4$?</p><form name='WeaveQuestion' data-id='veHRXrgf' data-controltype='numeric'>
+<p>What do you get when $c = \pi/4$?</p><form name='WeaveQuestion' data-id='Ah2iHFgz' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="veHRXrgf" type="number" class="form-control">
+<input id="Ah2iHFgz" type="number" class="form-control">
 
 </div>
 
-<div id='veHRXrgf_message'></div>
+<div id='Ah2iHFgz_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#veHRXrgf').on('change', function() {
+$('#Ah2iHFgz').on('change', function() {
   correct = Math.abs(this.value - 0.2853981633974483) <= 0.001;
 
   if(correct) {
-     $('#veHRXrgf_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#Ah2iHFgz_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#veHRXrgf_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#Ah2iHFgz_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
 <h4>Question</h4><p>You have a 12-inch wide rectangular piece of metal that you will fold into three 4 inch strips in a symmetric manner. Let $\theta$ be the amount each wing is folded up ($\theta \in [0, 90^\circ]$). What value of $\theta$ will produce the larges cross sectional area?</p><p>The area as a function of $\theta$ is that of two right triangles with hypotenuse $4$ and height given by $h/4 = \sin(\theta)$ and base given by $b/4 = \cos(\theta)$. The total area then is:</p>$$~
 A(\theta) = 2 \cdot (1/2) \cdot 4\sin(\theta) \cdot 4 \cos(\theta) + 4 \cdot 4\sin(\theta)
 ~$$
-<p>In degrees, what angle maximizes the area?</p><form name='WeaveQuestion' data-id='FDSDyZ8y' data-controltype='numeric'>
+<p>In degrees, what angle maximizes the area?</p><form name='WeaveQuestion' data-id='5T02kmwU' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="FDSDyZ8y" type="number" class="form-control">
+<input id="5T02kmwU" type="number" class="form-control">
 
 </div>
 
-<div id='FDSDyZ8y_message'></div>
+<div id='5T02kmwU_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#FDSDyZ8y').on('change', function() {
+$('#5T02kmwU').on('change', function() {
   correct = Math.abs(this.value - 49.6569) <= 0.01;
 
   if(correct) {
-     $('#FDSDyZ8y_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#5T02kmwU_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#FDSDyZ8y_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#5T02kmwU_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h2>Integration</h2><p>The <code>SymPy</code> program can do symbolic integration, though it is not as effective at it, as say <code>Mathematica</code>, it can do many things. The standard function is <code>integrate</code>.</p><p>One can find general antiderivatives:</p><pre class="sourceCode julia">@vars x a
+<h2>Integration</h2><p>The <code>SymPy</code> program can do symbolic integration, though it is not as effective at it, as say <code>Mathematica</code>, it can do many things. The standard function is <code>integrate</code>.</p><p>One can find general antiderivatives:</p><pre class="sourceCode julia">@syms x aa
 f(x) = cos(x) - sin(x)
 integrate(f(x), x)</pre>
 <div class="well well-sm">
-\begin{equation*}\sin{\left(x \right)} + \cos{\left(x \right)}\end{equation*}</div>
+$\begin{equation*}\sin{\left(x \right)} + \cos{\left(x \right)}\end{equation*}$
+</div>
 
 <p>One can parameterize an integral using a constant:</p><pre class="sourceCode julia">integrate(1/cos(x + a), x)</pre>
 <div class="well well-sm">
-\begin{equation*}- \log{\left(\tan{\left(\frac{a}{2} + \frac{x}{2} \right)} - 1 \right)} + \log{\left(\tan{\left(\frac{a}{2} + \frac{x}{2} \right)} + 1 \right)}\end{equation*}</div>
+$\begin{equation*}- \log{\left(\tan{\left(\frac{a}{2} + \frac{x}{2} \right)} - 1 \right)} + \log{\left(\tan{\left(\frac{a}{2} + \frac{x}{2} \right)} + 1 \right)}\end{equation*}$
+</div>
 
 <p>Integrate can do many of the integrals thrown at it.</p><pre class="sourceCode julia">integrate(x^3 * (1-x)^4, x)</pre>
 <div class="well well-sm">
-\begin{equation*}\frac{x^{8}}{8} - \frac{4 x^{7}}{7} + x^{6} - \frac{4 x^{5}}{5} + \frac{x^{4}}{4}\end{equation*}</div>
+$\begin{equation*}\frac{x^{8}}{8} - \frac{4 x^{7}}{7} + x^{6} - \frac{4 x^{5}}{5} + \frac{x^{4}}{4}\end{equation*}$
+</div>
 
 <pre class="sourceCode julia">integrate(x/(x^2+1), x)</pre>
 <div class="well well-sm">
-\begin{equation*}\frac{\log{\left(x^{2} + 1 \right)}}{2}\end{equation*}</div>
+$\begin{equation*}\frac{\log{\left(x^{2} + 1 \right)}}{2}\end{equation*}$
+</div>
 
 <h3>Definite integrals</h3><p>By specifying a range to integrate over, the definite integral $\int_a^b f(x) dx$ can be found.</p><pre class="sourceCode julia">integrate(x^2, (x, 0, 1))</pre>
 <div class="well well-sm">
-\begin{equation*}\frac{1}{3}\end{equation*}</div>
+$\begin{equation*}\frac{1}{3}\end{equation*}$
+</div>
 
 <p>More interestingly, we can find the median value of an integral by solving with the  resulting symbolic answer from <code>integrate</code>:</p><pre class="sourceCode julia">f(x) = 4x^3
-@vars b
+@syms b
 eq = integrate(f(x), (x,  0, b)) - 1/2 * integrate(f(x), (x, 0, 1))
 xs = sympy.real_roots(eq, b)</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}- \frac{2^{\frac{3}{4}}}{2}\\\frac{2^{\frac{3}{4}}}{2}\end{array} \right] \]</div>
+$\left[ \begin{array}{r}- \frac{2^{\frac{3}{4}}}{2}\\\frac{2^{\frac{3}{4}}}{2}\end{array} \right]$
+</div>
 
-<p>The equation <code>eq</code> is a 4th degree polynomial. It has two real and two complex roots. We used <code>real_roots</code> to get the two real ones. The positive one is clear.</p><h3>Practice</h3><h4>Question</h4><p>Integrate $f(x) = 2/(x \cdot \log(x))$. What do you get:</p><form name="WeaveQuestion" data-id="IMsoDEHe" data-controltype="radio">
+<p>The equation <code>eq</code> is a 4th degree polynomial. It has two real and two complex roots. We used <code>real_roots</code> to get the two real ones. The positive one is clear.</p><h3>Practice</h3><h4>Question</h4><p>Integrate $f(x) = 2/(x \cdot \log(x))$. What do you get:</p><form name="WeaveQuestion" data-id="Vb9DVuiZ" data-controltype="radio">
 <div class="form-group ">
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_IMsoDEHe" value="1"><div class="markdown">$3 \log{\left(x \right)}$
+      <input type="radio" name="radio_Vb9DVuiZ" value="1"><div class="markdown">$3 \log{\left(x \right)}$
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_IMsoDEHe" value="2"><div class="markdown">$\frac{3 \log{\left(x \right)}^{2}}{2}$
+      <input type="radio" name="radio_Vb9DVuiZ" value="2"><div class="markdown">$\frac{3 \log{\left(x \right)}^{2}}{2}$
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_IMsoDEHe" value="3"><div class="markdown">$\log{\left(\log{\left(x \right)} \right)}$
+      <input type="radio" name="radio_Vb9DVuiZ" value="3"><div class="markdown">$\log{\left(\log{\left(x \right)} \right)}$
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_IMsoDEHe" value="4"><div class="markdown">$3 \log{\left(\log{\left(x \right)} \right)}$
+      <input type="radio" name="radio_Vb9DVuiZ" value="4"><div class="markdown">$3 \log{\left(\log{\left(x \right)} \right)}$
 </div>
     </label>
     </div>
 
-<div id="IMsoDEHe_message"></div>
+<div id="Vb9DVuiZ_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_IMsoDEHe']").on("change", function() {
+$("input:radio[name='radio_Vb9DVuiZ']").on("change", function() {
   correct = this.value == 3;
 
   if(correct) {
-     $("#IMsoDEHe_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#Vb9DVuiZ_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#IMsoDEHe_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#Vb9DVuiZ_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
 </script>
-<h4>Question</h4><p>Integrate $f(x) = (2x+5)(x^2 + 5x)^7$ from $0$ to $1$.</p><form name='WeaveQuestion' data-id='orbYaXXq' data-controltype='numeric'>
+<h4>Question</h4><p>Integrate $f(x) = (2x+5)(x^2 + 5x)^7$ from $0$ to $1$.</p><form name='WeaveQuestion' data-id='i0ahQIqy' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="orbYaXXq" type="number" class="form-control">
+<input id="i0ahQIqy" type="number" class="form-control">
 
 </div>
 
-<div id='orbYaXXq_message'></div>
+<div id='i0ahQIqy_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#orbYaXXq').on('change', function() {
+$('#i0ahQIqy').on('change', function() {
   correct = Math.abs(this.value - 209952.0) <= 0.001;
 
   if(correct) {
-     $('#orbYaXXq_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+     $('#i0ahQIqy_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
   } else {
-     $('#orbYaXXq_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+     $('#i0ahQIqy_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
   }
 });
 </script>
-<h4>Questions</h4><p>Integrate <code>f&#40;x&#41; &#61; sqrt&#40;4 - sqrt&#40;x&#41;&#41;</code> over $[0,9]$. What value do you get? Does it make any sense?</p><form name="WeaveQuestion" data-id="KcrHpk8z" data-controltype="radio">
+<h4>Questions</h4><p>Integrate <code>f&#40;x&#41; &#61; sqrt&#40;4 - sqrt&#40;x&#41;&#41;</code> over $[0,9]$. What value do you get? Does it make any sense?</p><form name="WeaveQuestion" data-id="IhGwLjiV" data-controltype="radio">
 <div class="form-group ">
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_KcrHpk8z" value="1"><div class="markdown"><p>Inf, and yes it makes sense as the vertical asymptote at 0 makes this a problem integral.</p>
+      <input type="radio" name="radio_IhGwLjiV" value="1"><div class="markdown"><p>-8.884, and no it makes no sense as f(x) > 0, but the integral is negative</p>
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_KcrHpk8z" value="2"><div class="markdown"><p>-8.884, and no it makes no sense as f(x) > 0, but the integral is negative</p>
+      <input type="radio" name="radio_IhGwLjiV" value="2"><div class="markdown"><p>Inf, and yes it makes sense as the vertical asymptote at 0 makes this a problem integral.</p>
 </div>
     </label>
     </div>
     <div  class="radio">
     <label>
-      <input type="radio" name="radio_KcrHpk8z" value="3"><div class="markdown"><p>12.5333, and yes it makes sense.</p>
+      <input type="radio" name="radio_IhGwLjiV" value="3"><div class="markdown"><p>12.5333, and yes it makes sense.</p>
 </div>
     </label>
     </div>
 
-<div id="KcrHpk8z_message"></div>
+<div id="IhGwLjiV_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_KcrHpk8z']").on("change", function() {
-  correct = this.value == 2;
+$("input:radio[name='radio_IhGwLjiV']").on("change", function() {
+  correct = this.value == 1;
 
   if(correct) {
-     $("#KcrHpk8z_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+     $("#IhGwLjiV_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
   } else {
-     $("#KcrHpk8z_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+     $("#IhGwLjiV_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
   }
 });
 
@@ -2567,39 +2463,17 @@ tl(c) = x -> f(c) + 2*c*(x-c)
 plot(f, a, b)
 plot!(tl(a))
 plot!(tl(b))</pre>
-    <div id="0d47969a-64e0-44db-b290-c27ca7fe0471" style="width:600px;height:400px;"></div>
+    <div id="8dffa5c0-ffca-4ece-af33-0a3bfe57fd51" style="width:600px;height:400px;"></div>
     <script>
-    PLOT = document.getElementById('0d47969a-64e0-44db-b290-c27ca7fe0471');
+    
+    PLOT = document.getElementById('8dffa5c0-ffca-4ece-af33-0a3bfe57fd51');
     Plotly.plot(PLOT, [
     {
-        "xaxis": "x1",
+        "xaxis": "x",
         "colorbar": {
             "title": ""
         },
-        "yaxis": "y1",
-        "text": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ],
+        "yaxis": "y",
         "x": [
             -3.0,
             -2.9609367239208475,
@@ -2626,9 +2500,9 @@ plot!(tl(b))</pre>
         "showlegend": true,
         "mode": "lines",
         "name": "y1",
-        "zmin": -0.1,
+        "zmin": null,
         "legendgroup": "y1",
-        "zmax": 0.1,
+        "zmax": null,
         "line": {
             "color": "rgba(0, 154, 250, 1.000)",
             "shape": "linear",
@@ -2658,38 +2532,14 @@ plot!(tl(b))</pre>
             0.9009112663278118,
             1.0
         ],
-        "type": "scatter",
-        "hoverinfo": "text"
+        "type": "scatter"
     },
     {
-        "xaxis": "x1",
+        "xaxis": "x",
         "colorbar": {
             "title": ""
         },
-        "yaxis": "y1",
-        "text": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ],
+        "yaxis": "y",
         "x": [
             -3.12,
             -3.0785929273560986,
@@ -2716,9 +2566,9 @@ plot!(tl(b))</pre>
         "showlegend": true,
         "mode": "lines",
         "name": "y2",
-        "zmin": -0.1,
+        "zmin": null,
         "legendgroup": "y2",
-        "zmax": 0.1,
+        "zmax": null,
         "line": {
             "color": "rgba(227, 111, 71, 1.000)",
             "shape": "linear",
@@ -2748,38 +2598,14 @@ plot!(tl(b))</pre>
             -15.396679580568566,
             -15.719999999999999
         ],
-        "type": "scatter",
-        "hoverinfo": "text"
+        "type": "scatter"
     },
     {
-        "xaxis": "x1",
+        "xaxis": "x",
         "colorbar": {
             "title": ""
         },
-        "yaxis": "y1",
-        "text": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ],
+        "yaxis": "y",
         "x": [
             -3.2472000000000003,
             -3.203308502997465,
@@ -2806,9 +2632,9 @@ plot!(tl(b))</pre>
         "showlegend": true,
         "mode": "lines",
         "name": "y3",
-        "zmin": -0.1,
+        "zmin": null,
         "legendgroup": "y3",
-        "zmax": 0.1,
+        "zmax": null,
         "line": {
             "color": "rgba(62, 164, 78, 1.000)",
             "shape": "linear",
@@ -2838,8 +2664,7 @@ plot!(tl(b))</pre>
             1.3801601184675594,
             1.4944000000000002
         ],
-        "type": "scatter",
-        "hoverinfo": "text"
+        "type": "scatter"
     }
 ]
 , {
@@ -2854,8 +2679,6 @@ plot!(tl(b))</pre>
             0.0,
             1.0
         ],
-        "visible": true,
-        "ticks": "inside",
         "range": [
             -3.382032,
             1.3820320000000001
@@ -2864,13 +2687,30 @@ plot!(tl(b))</pre>
             0.05100612423447069,
             0.9934383202099737
         ],
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "ticktext": [
+            "−3",
+            "−2",
+            "−1",
+            "0",
+            "1"
+        ],
+        "zeroline": false,
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "y",
+        "visible": true,
+        "ticks": "inside",
         "tickmode": "array",
         "linecolor": "rgba(0, 0, 0, 1.000)",
         "showgrid": true,
         "title": "",
-        "mirror": false,
-        "tickangle": 0,
-        "showline": true,
         "gridcolor": "rgba(0, 0, 0, 0.100)",
         "titlefont": {
             "color": "rgba(0, 0, 0, 1.000)",
@@ -2878,22 +2718,7 @@ plot!(tl(b))</pre>
             "size": 15
         },
         "tickcolor": "rgb(0, 0, 0)",
-        "ticktext": [
-            "-3",
-            "-2",
-            "-1",
-            "0",
-            "1"
-        ],
-        "zeroline": false,
-        "type": "-",
-        "tickfont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 11
-        },
-        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
-        "anchor": "y1"
+        "type": "-"
     },
     "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
     "annotations": [],
@@ -2916,8 +2741,6 @@ plot!(tl(b))</pre>
             5.0,
             10.0
         ],
-        "visible": true,
-        "ticks": "inside",
         "range": [
             -16.4832,
             10.4832
@@ -2926,13 +2749,31 @@ plot!(tl(b))</pre>
             0.03762029746281716,
             0.9901574803149606
         ],
+        "mirror": false,
+        "tickangle": 0,
+        "showline": true,
+        "ticktext": [
+            "−15",
+            "−10",
+            "−5",
+            "0",
+            "5",
+            "10"
+        ],
+        "zeroline": false,
+        "tickfont": {
+            "color": "rgba(0, 0, 0, 1.000)",
+            "family": "sans-serif",
+            "size": 11
+        },
+        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
+        "anchor": "x",
+        "visible": true,
+        "ticks": "inside",
         "tickmode": "array",
         "linecolor": "rgba(0, 0, 0, 1.000)",
         "showgrid": true,
         "title": "",
-        "mirror": false,
-        "tickangle": 0,
-        "showline": true,
         "gridcolor": "rgba(0, 0, 0, 0.100)",
         "titlefont": {
             "color": "rgba(0, 0, 0, 1.000)",
@@ -2940,88 +2781,94 @@ plot!(tl(b))</pre>
             "size": 15
         },
         "tickcolor": "rgb(0, 0, 0)",
-        "ticktext": [
-            "-15",
-            "-10",
-            "-5",
-            "0",
-            "5",
-            "10"
-        ],
-        "zeroline": false,
-        "type": "-",
-        "tickfont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 11
-        },
-        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
-        "anchor": "x1"
+        "type": "-"
     },
     "legend": {
-        "tracegroupgap": 0,
+        "yanchor": "auto",
+        "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
         "bgcolor": "rgba(255, 255, 255, 1.000)",
+        "borderwidth": 1,
+        "tracegroupgap": 0,
+        "y": 1.0,
         "font": {
             "color": "rgba(0, 0, 0, 1.000)",
             "family": "sans-serif",
             "size": 11
         },
-        "y": 1.0,
+        "title": {
+            "font": {
+                "color": "rgba(0, 0, 0, 1.000)",
+                "family": "sans-serif",
+                "size": 15
+            },
+            "text": ""
+        },
+        "traceorder": "normal",
         "x": 1.0
     },
     "width": 600
 }
 );
+    
     </script>
-<p>The intersection point is clearly $c=-1 = (a+b)/2$.</p><p>Let's see if we can get this fact using <code>SymPy</code>. First we define many variables:</p><pre class="sourceCode julia">@vars x c2 c1 c0 a b
+<p>The intersection point is clearly $c=-1 = (a+b)/2$.</p><p>Let's see if we can get this fact using <code>SymPy</code>. First we define many variables:</p><pre class="sourceCode julia">@syms x c2 c1 c0 a b
 p = c2*x^2 + c1*x + c0</pre>
 <div class="well well-sm">
-\begin{equation*}c_{0} + c_{1} x + c_{2} x^{2}\end{equation*}</div>
+$\begin{equation*}c_{0} + c_{1} x + c_{2} x^{2}\end{equation*}$
+</div>
 
 <p>Then we create values for the tangent lines at <code>a</code> and <code>b</code></p><pre class="sourceCode julia">fa, fb = [subs(p, x, c) for c in [a,b]]
 ma, mb = [subs(diff(p, x), x, c) for c in [a,b]]
 tla = fa + ma*(x-a)
 tlb = fb + mb*(x-b)</pre>
 <div class="well well-sm">
-\begin{equation*}b^{2} c_{2} + b c_{1} + c_{0} + \left(- b + x\right) \left(2 b c_{2} + c_{1}\right)\end{equation*}</div>
+$\begin{equation*}b^{2} c_{2} + b c_{1} + c_{0} + \left(- b + x\right) \left(2 b c_{2} + c_{1}\right)\end{equation*}$
+</div>
 
 <p>Finally, we solve for the intersection:</p><pre class="sourceCode julia">solve(tla - tlb, x)</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}\frac{a}{2} + \frac{b}{2}\end{array} \right] \]</div>
+$\left[ \begin{array}{r}\frac{a}{2} + \frac{b}{2}\end{array} \right]$
+</div>
 
 <h3>Maximization in two variables</h3><p>For simple ballistic motion, we "know" that launching the projectile at 45 degrees will yield the optimal distance. Let's see that it is the case. We'll start with the equation of motion</p>$$~
 y(x) = \tan(\theta) x - (1/2) \cdot g(\frac{x}{v_0 \cos\theta})^2.
 ~$$
-<p>This is valid for $\theta \in [0,\pi/2]$ and for $x \in [0, x^*]$, where $x^*$ is when the projectile returns to ground, that is $y(x*) = 0$.</p><p>We code this expression with:</p><pre class="sourceCode julia">x, theta, v0, grav =  symbols("x, theta, v0, grav")
+<p>This is valid for $\theta \in [0,\pi/2]$ and for $x \in [0, x^*]$, where $x^*$ is when the projectile returns to ground, that is $y(x*) = 0$.</p><p>We code this expression with:</p><pre class="sourceCode julia">@syms x, theta, v0, grav
 y = tan(theta) * x - (1//2)*grav*(x / (v0*cos(theta)))^2</pre>
 <div class="well well-sm">
-\begin{equation*}- \frac{grav x^{2}}{2 v_{0}^{2} \cos^{2}{\left(\theta \right)}} + x \tan{\left(\theta \right)}\end{equation*}</div>
+$\begin{equation*}- \frac{grav x^{2}}{2 v_{0}^{2} \cos^{2}{\left(\theta \right)}} + x \tan{\left(\theta \right)}\end{equation*}$
+</div>
 
 <p>The use of the rational value for $1/2$ (the <code>1//2</code>) is needed, as this will convert to a symbolic value of $1/2$, and not a floating point value of $0.5$.</p><p>First we need to solve when <code>y&#40;x&#41;&#61;0</code>:</p><pre class="sourceCode julia">xs = solve(y, x)</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}0\\\frac{v_{0}^{2} \sin{\left(2 \theta \right)}}{grav}\end{array} \right] \]</div>
+$\left[ \begin{array}{r}0\\\frac{v_{0}^{2} \sin{\left(2 \theta \right)}}{grav}\end{array} \right]$
+</div>
 
 <p>There are, of course, two values. The first is 0, the starting point. We want the latter:</p><pre class="sourceCode julia">xstar = xs[2]</pre>
 <div class="well well-sm">
-\begin{equation*}\frac{v_{0}^{2} \sin{\left(2 \theta \right)}}{grav}\end{equation*}</div>
+$\begin{equation*}\frac{v_{0}^{2} \sin{\left(2 \theta \right)}}{grav}\end{equation*}$
+</div>
 
 <p>Now, we want to find the critical point for <code>xstar</code>. We take the derivative with respect to <code>theta</code> and solve for when that is 0:</p><pre class="sourceCode julia">solve(diff(xstar, theta), theta)</pre>
 <div class="well well-sm">
-\[ \left[ \begin{array}{r}\frac{\pi}{4}\\\frac{3 \pi}{4}\end{array} \right] \]</div>
+$\left[ \begin{array}{r}\frac{\pi}{4}\\\frac{3 \pi}{4}\end{array} \right]$
+</div>
 
-<p>The value of $3\pi/4$ is clearly, wrong (it shoots in the opposite direction). We get $\pi/4$ as expected.</p><h3>More on tangent lines</h3><p>For parabolas, we just saw that the tangent lines intersect in the midpoint. Let $c$ be that midpoint. That's not the only fact about that picture that is true for parabolas. For a given parabola, the area between the parabola and the tangent lines over $[a,c]$ equals that over $[c,b]$ and the total area over $[a,b]$ depends only on $|b-a|$ and not the position of either. Can we demonstrate that?</p><p>We start with the same setup to create the tangent lines as symbolic expressions</p><pre class="sourceCode julia">x, c2, c1, c0, a, b = symbols("x, c2, c1, c0, a, b")
+<p>The value of $3\pi/4$ is clearly, wrong (it shoots in the opposite direction). We get $\pi/4$ as expected.</p><h3>More on tangent lines</h3><p>For parabolas, we just saw that the tangent lines intersect in the midpoint. Let $c$ be that midpoint. That's not the only fact about that picture that is true for parabolas. For a given parabola, the area between the parabola and the tangent lines over $[a,c]$ equals that over $[c,b]$ and the total area over $[a,b]$ depends only on $|b-a|$ and not the position of either. Can we demonstrate that?</p><p>We start with the same setup to create the tangent lines as symbolic expressions</p><pre class="sourceCode julia">@syms x, c2, c1, c0, a, b
 p = c2*x^2 + c1*x + c0
 fa, fb = [subs(p, x, c) for c in [a,b]]
 ma, mb = [subs(diff(p, x), x, c) for c in [a,b]]
 tla = fa + ma*(x-a)
 tlb = fb + mb*(x-b)</pre>
 <div class="well well-sm">
-\begin{equation*}b^{2} c_{2} + b c_{1} + c_{0} + \left(- b + x\right) \left(2 b c_{2} + c_{1}\right)\end{equation*}</div>
+$\begin{equation*}b^{2} c_{2} + b c_{1} + c_{0} + \left(- b + x\right) \left(2 b c_{2} + c_{1}\right)\end{equation*}$
+</div>
 
 <p>We need to solve for the intersection point:</p><pre class="sourceCode julia">c = solve(tla - tlb, x)[1]	# only one solution</pre>
 <div class="well well-sm">
-\begin{equation*}\frac{a}{2} + \frac{b}{2}\end{equation*}</div>
+$\begin{equation*}\frac{a}{2} + \frac{b}{2}\end{equation*}$
+</div>
 
 <p>Then the areas are:</p><pre class="sourceCode julia">area_ac = integrate(p - tla, (x, a, c))
 area_cb = integrate(p - tlb, (x, c, b))
@@ -3031,19 +2878,23 @@ area_ac, area_cb</pre>
 
 <p>Okay, are they equal?</p><pre class="sourceCode julia">area_ac - area_cb</pre>
 <div class="well well-sm">
-\begin{equation*}- \frac{a^{3} c_{2}}{3} + a^{2} c_{2} \left(\frac{a}{2} + \frac{b}{2}\right) - a c_{2} \left(\frac{a}{2} + \frac{b}{2}\right)^{2} - \frac{b^{3} c_{2}}{3} + b^{2} c_{2} \left(\frac{a}{2} + \frac{b}{2}\right) - b c_{2} \left(\frac{a}{2} + \frac{b}{2}\right)^{2} + \frac{2 c_{2} \left(\frac{a}{2} + \frac{b}{2}\right)^{3}}{3}\end{equation*}</div>
+$\begin{equation*}- \frac{a^{3} c_{2}}{3} + a^{2} c_{2} \left(\frac{a}{2} + \frac{b}{2}\right) - a c_{2} \left(\frac{a}{2} + \frac{b}{2}\right)^{2} - \frac{b^{3} c_{2}}{3} + b^{2} c_{2} \left(\frac{a}{2} + \frac{b}{2}\right) - b c_{2} \left(\frac{a}{2} + \frac{b}{2}\right)^{2} + \frac{2 c_{2} \left(\frac{a}{2} + \frac{b}{2}\right)^{3}}{3}\end{equation*}$
+</div>
 
 <p>Hard to tell. Maybe we need to simplify:</p><pre class="sourceCode julia">simplify(area_ac - area_cb)</pre>
 <div class="well well-sm">
-\begin{equation*}0\end{equation*}</div>
+$\begin{equation*}0\end{equation*}$
+</div>
 
 <p>Ahh, 0, as expected.</p><p>Now, is the sum only dependent on the distance – and not the values?</p><pre class="sourceCode julia">simplify(area_ac + area_cb)</pre>
 <div class="well well-sm">
-\begin{equation*}\frac{c_{2} \left(- a^{3} + 3 a^{2} b - 3 a b^{2} + b^{3}\right)}{12}\end{equation*}</div>
+$\begin{equation*}\frac{c_{2} \left(- a^{3} + 3 a^{2} b - 3 a b^{2} + b^{3}\right)}{12}\end{equation*}$
+</div>
 
 <p>Hard to tell, we also factor:</p><pre class="sourceCode julia">simplify(area_ac + area_cb) |> factor</pre>
 <div class="well well-sm">
-\begin{equation*}- \frac{c_{2} \left(a - b\right)^{3}}{12}\end{equation*}</div>
+$\begin{equation*}- \frac{c_{2} \left(a - b\right)^{3}}{12}\end{equation*}$
+</div>
 
 <p>We see in fact, that it only depends on the distance (<code>b-a</code>) and the value of <code>c2</code>, the quadratic term, and not the linear or constant term.</p>
   </div>

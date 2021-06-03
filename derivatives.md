@@ -654,8 +654,8 @@ finite differences by using a different approach. Whereas finite
 differences have a long history, automatic differentiation only dates
 back to the 60s.
 
-The `ForwardDiff` package implements automatic differentiation.
-The `MTH229` package overloads the idea of `'` that uses automatic differentiation when the notation `f'` is encountered. 
+The `Zygote` package implements automatic differentiation.
+This package overloads the idea of `'`, so uses automatic differentiation when the notation `f'` is encountered. 
 
 That means, we can find derivatives, as familiarly as:
 

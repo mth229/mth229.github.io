@@ -37,13 +37,14 @@ plotly()
 
 ```
 f(x) = x^3 - cos(x) + x*log(x)
-integrate(f)
+@syms x
+integrate(f(x), x)
 ```
 
 To find the definite integral, say from $1$ to $10$ we have:
 
 ```
-integrate(f, 1, 10)
+integrate(f(x), (x, 1, 10))
 ```
 
 

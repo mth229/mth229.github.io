@@ -1203,12 +1203,13 @@ language. This package is loaded by the `MTH229` package. The SymPy package
 provides symbolic math features. One such feature is the ability to
 perform symbolically the limit of $f(x)$ as $x$ approaches $c$.
 
-The `limit` function accesses these features. Its basic use is straightforward, just pass a function and a value of `c`:
+The `limit` function accesses these features. Its basic use is straightforward, just pass a symbolica expression, and indicate the variable going to `c`:
 
 ```
+@syms x
 f(x) = sin(x)/x
 c = 0
-limit(f, c)
+limit(f(x), x=>c)
 ```
 
 
@@ -1217,17 +1218,21 @@ Or, with a limit at infinity
 ```
 f(x) = (1 + 1/x)^x
 c = oo                 # oo is symbolic infinity. Can also use Inf.
-limit(f, c)
+limit(f(x), x=>c)
 ```
 
 The latter shows the results are not quite real numbers. Rather, they are symbolic values. We aren't discussing these here, but the values are readily apparent.
+
+The command `@syms x` creates `x` as a symbolic variable. The call `f(x)` returns a symbolic expression. These can also be created directly, as with `sin(x)/x`.
+
 
 The `limit` function has one named argument, `dir`, used to adjust if
 a left, right (the default) limit is sought. For example, this function has different left and right limits at 0:
 
 ```
 f(h) = abs(h) / h
-limit(f, 0, dir="-"), limit(f, 0, dir="+")
+@syms h
+limit(f(h), h=>0, dir="-"), limit(f(h), h=>0, dir="+")
 ```
 
 
@@ -1253,7 +1258,7 @@ ys = f.(xs)
 But in fact the limit is quite different from $0$:
 
 ```
-limit(f, 0, dir="+")
+limit(f(x), x->0, dir="+")
 ```
 
 ### limits with parameters
@@ -1265,7 +1270,7 @@ L = \lim_{x \rightarrow 0} \frac{b^x - 1}{x}.
 ~$$
 
 It's answer depends on the value of $b$. How would we approach this
-with `SymPy`? The interface described above where functions are use is not the only one `SymPy`
+with `SymPy`? The interface described above where functions are used is not the only one `SymPy`
 knows of, and indeed is not typical of how one works with
 `SymPy`. Typically, symbolic values are defined and then symbolic
 expressions are used.
@@ -1273,7 +1278,7 @@ expressions are used.
 Here is how we define a symbolic value (in fact two):
 
 ```
-@vars x b
+@syms x b
 ```
 
 And here is how we use them:
@@ -1282,15 +1287,8 @@ And here is how we use them:
 limit((b^x - 1) / x, x=>0)
 ```
 
-First, we see the $\log(b)$ value "magically" appearing. That may not
+We see the $\log(b)$ value "magically" appearing. That may not
 have been expected.
-
-More importantly for using this on a different problem, note that
-*instead* of a function an *expression* was used. (This being `(b^x -
-1)/x`.) Symbolic values when combined create symbolic expressions
-which can be passed onto a `SymPy` function, like `limit`. To specify
-the $x \rightarrow c$ we have the "pair" notation `x => 0`. And that
-was it.
 
 ### Problem
 

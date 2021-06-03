@@ -36,8 +36,8 @@ Here we discuss a few different elementary means to do find zeros with
 `Julia`, leaving some others for a later time.
 
 
-We will use the add-on packages `Roots` and `PolynomialZeros`, which
-provide implementations of a few zero- and root-finding algorithms.
+We will use the add-on package `Roots`  which
+provides implementations of a few zero- and root-finding algorithms.
 
 ```
 using MTH229    
@@ -188,15 +188,8 @@ easily enough. Let's guess the distance is no more than 500 feet:
 plot(j, 0, 500)
 ```
 
-Well, we haven't even seen the peak yet. Better to do a little spade
-work first. This is a quadratic equation, so we can use the `poly_roots` function:
-
-```
-poly_roots(j, Over.R)
-```
-
-
-We see that $1250$ is the largest root. So we plot over this domain to visualize the flight:
+Well, we haven't even seen the peak yet. Plotting over a wider interval will show that
+$1250$ is the largest root. So we plot over this domain to visualize the flight:
 
 ```
 plot(j, 0, 1250)
@@ -211,7 +204,8 @@ plot(y, 0, 1250)
 ```
 
 Oh, "Domain Error." Of course, when the argument to the logarithm is negative we will have issues.
-We don't have the simplicity of using `roots` to find out the answer, so we solve for when $a-\gamma^2 x$ is $0$:
+
+We solve for when $a-\gamma^2 x$ is $0$:
 
 ```
 gamma = 1
@@ -280,7 +274,8 @@ plan2(x) = 30.00 + 2.00x
 Assuming this is a realistic problem and an average American household might produce 10-20 bags of trash a month (yes, that seems too much!) we plot in that range:
 
 ```
-plot([plan1, plan2], 10, 20)
+plot(plan1, 10, 20)
+plot!(plan2)
 ```
 
 
@@ -516,7 +511,7 @@ A `while` loop is used to repeat the central step until the above is
 `false`. Our code looks like this:
 
 ```verbatim
-function bisection (f::Function, a, b)
+function bisection(f::Function, a, b)
 
 	if f(a) * f(b) > 0
       stop("[a,b] is not a bracket")
@@ -818,7 +813,7 @@ For Polynomials of higher degree, there are some specific methods that can be us
 We will demonstrate the methods from the `SymPy` package. These work on symbolic expressions. These will be described in more detail later, but for now, we have to make a *symbolic* variable, `x` to proceed:
 
 ```
-x = symbols("x")
+@syms x
 ```
 
 The two functions we discuss are `sympy.roots` and `sympy.real_roots`.
@@ -913,7 +908,7 @@ polynomial $x^2 + x - 5$
 
 
 ```
-@vars x
+@syms x
 p = N.(sympy.real_roots(x^2 + x - 5))
 val = maximum(p);
 numericq(val, 1e-3)
@@ -924,7 +919,7 @@ numericq(val, 1e-3)
 Find the largest real root of the polynomial $x^3 - x - 17$
 
 ```
-@vars x
+@syms x
 zs = N.(sympy.real_roots(x^2 - x - 17))
 val = maximum(zs)
 numericq(val, 1e-3)
