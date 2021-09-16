@@ -61,63 +61,35 @@ Each takes between 30 seconds and one minute to get up and running. Once a noteb
 
 This is not terribly difficult, but does involve a few additional steps:
 
-a) install `Julia` from [julialang.org/](https://julialang.org/downloads/). This will install like any other software for you system
 
-b) open `Julia`. This will open a *terminal*, we will now add packages to make interactive usage more comfortable. First, run these two commands by copying over, being mindful of capitalizations, then entering:
 
-```verbatim
-]
-add IJulia
-add https://github.com/mth229/MTH229.jl
-add Plots
-[backspace key]
+* Download and install `Julia` from [julialang.org/](https://julialang.org/downloads/). This will install like any other software for you system.
+
+* Start the application
+
+This opens a  terminal. Commands are typed after the prompt (`> julia`) and executed when the return key is pressed.
+
+First, the `MTH229` package must be installed. This  only needs to be done once. Copy and paste these commands to the terminal and press return to run them:
+
 ```
-
-
-The first command (`]`) drops into "package mode". The next 3 commands add some packages that are utilized in this course. The backspace key returns one to the command line. These packages need only be added once.
-
-The notes assume that the
-[MTH229](https://github.com/mth229/MTH229.jl) add-on package is
-installed. (The second package loaded). (The package `CalculusWithJulia` can mostly substitute for `MTH229` and can be installed directly from its name, as it is registered.)
-
-c) When you wish to use `Julia`, you open the *terminal* (as above) and then issue these two commands:
-
-```verbatim
-using IJulia
-notebook()
-```
-
-The first command *may* take some time the very first time it is entered, as the package is "compiled." The first command loads a package, the second command executes the `notebook` function in the package that starts the notebook interface through the browser. The `jupyterla()` function call is an alterative.
-
-
-
-c) The projects (see below) need to be copied over. This can be done as follows. First, if the `ZipFile` package is note installed, copy and paste these commands into a cell and run them:
-
-```verbatim
 using Pkg
-Pkg.add("ZipFile")
+Pkg.add([PackageSpec(url="https://github.com/mth229/MTH229.jl.git", rev="F21")])
+Pkg.add(["Plots","SymPy","IJulia"])
+Pkg.build("IJulia")
 ```
 
-Next, in an `IJulia` cell, copy and paste this set of commands and run them:
 
-```verbatim
-using ZipFile
-zf = "https://www.github.com/mth229/229-projects/archive/master.zip"
-zarchive = ZipFile.Reader(download(zf))
 
-dname = "./229-projects-master"
-isdir(dname) || mkdir(dname)
+* Then, each session where you want to use Julia, open the terminal and issue these two case-sensitive commands:
 
-for f in zarchive.files
-    nm = f.name
-    occursin("ipynb", nm) || continue
-    open(nm, "w") do io
-        write(io, read(f, String))
-    end
-end
+```
+using MTH229
+mth229()
 ```
 
-This will create a directory `229-projects-master` and populate it with the projects.
+Your browser should open to the Jupyter interface.
+
+The first time you do this, the projects will be downloaded and installed into your home directory.
 
 
 
@@ -151,7 +123,7 @@ The projects provide some background details *and* are notebooks for you to answ
 
 Both `binder` and `notebooks.gesis.org` have the current projects available.
 
-There are some longer notes available for each project, linked to below. 
+There are some longer notes available for each project, linked to below.
 
 
 -----
@@ -280,7 +252,7 @@ An assignment for this material:
 
 * [Integration](http://mth229.github.io/integration.html)
 
-Basics of Riemann integration with applications including 
+Basics of Riemann integration with applications including
 trapezoid and  Simpson's methods. The `quaggk` function. Applications to volumes
 of solids of revolution.
 
@@ -295,7 +267,7 @@ An assignment for this material:
 #### Questions and Answers
 
 Question and answers are now presented and completed through  `WeBWork`.
-The  notebooks above only contain the background details. 
+The  notebooks above only contain the background details.
 
 There  are a few idiosyncracies to be aware of:
 
@@ -440,5 +412,3 @@ For example, the notes use:
 
 
 With just this basic set of actions, akin to buttons on the calculator, a rich variety of problems can be addressed.
-
-
