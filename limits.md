@@ -96,11 +96,10 @@ indeterminate form.
 The value `NaN` is returned by *most* of the
 indeterminate forms listed above, but not all. For example, `0^0` is `1` to `Julia`:
 
-
-> It proved more useful to adhere to the simply stated rule *anything
-  raised to the $0$ gives $1$ then special case $0^0$. Some comments by
-  the "father of floating point" can be read
-  [near the end of this](http://people.freebsd.org/~das/kahan86branch.pdf).
+"It proved more useful to adhere to the simply stated rule *anything
+raised to the $0$ gives $1$ then special case $0^0$. Some comments by
+the "father of floating point" can be read
+[near the end of this](http://people.freebsd.org/~das/kahan86branch.pdf)."
 
 """)
 ```
