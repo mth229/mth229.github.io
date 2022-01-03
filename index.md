@@ -1,12 +1,11 @@
 # MTH 229 Projects
 
 
-## Introduction
 
-```
-note(""" These use version v1.6 of Julia.
-See all projects at [https://github.com/mth229/229-projects](https://github.com/mth229/229-projects)""")
-```
+!!! note "Version 1.6 or newer"
+    These use version v1.6 of Julia. See all projects at [https://github.com/mth229/229-projects](https://github.com/mth229/229-projects)
+
+## Introduction
 
 
 MTH229 at the College of Staten Island is a course intended to introduce the use of a computer to assist in solving problems from a first semester calculus course.
@@ -51,7 +50,7 @@ Basics of types, order of operations, assignment and variables.
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/01-calculator.ipynb)
-[Pluto html](./229-projects/01-calculator.html)
+[(Pluto html)](./229-projects/01-calculator.html)
 
 ----
 
@@ -63,7 +62,7 @@ ternary operator, multiple arguments, and return values (tuples).
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/02-functions.ipynb)
-[Pluto html](./229-projects/02-functions.html)
+[(Pluto html)](./229-projects/02-functions.html)
 
 ----
 
@@ -80,7 +79,7 @@ array is given. This will be useful later on with limits, ...
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/03-graphics.ipynb)
-[Pluto html](./229-projects/03-graphics.html)
+[(Pluto html)](./229-projects/03-graphics.html)
 
 ----
 
@@ -95,7 +94,7 @@ The add-on `Roots` package provides some convenient functionality.
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/04-zeros.ipynb)
-[Pluto html](./229-projects/04-zeros.html)
+[(Pluto html)](./229-projects/04-zeros.html)
 
 ----
 
@@ -108,7 +107,7 @@ Discussion on floating point representation and potential issues.
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/05-limits.ipynb)
-[Pluto html](./229-projects/05-limits.html)
+[(Pluto html)](./229-projects/05-limits.html)
 
 ----
 
@@ -123,7 +122,7 @@ implemented in the `ForwardDiff` add-on package.
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/06-derivatives.ipynb)
-[Pluto html](./229-projects/06-derivatives.html)
+[(Pluto html)](./229-projects/06-derivatives.html)
 
 
 ----
@@ -136,7 +135,7 @@ derivatives.
 <br/>
 A notebook for this material:
 [ipynb](http://mth229.github.io/229-projects/07-first_second_derivatives.ipynb)
-[Pluto html](./229-projects/07-first_second_derivatives.html)
+[(Pluto html)](./229-projects/07-first_second_derivatives.html)
 
 
 ----
@@ -153,7 +152,7 @@ The `fzero` function of the `Roots` package is discussed.
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/08-newton.ipynb)
-[Pluto html](./229-projects/08-newton.html)
+[(Pluto html)](./229-projects/08-newton.html)
 
 ----
 
@@ -164,7 +163,7 @@ A project on minimization and maximization. Some standard applied problems are p
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/09-extrema.ipynb)
-[Pluto html](./229-projects/09-extrema.html)
+[(Pluto html)](./229-projects/09-extrema.html)
 
 ----
 
@@ -177,7 +176,7 @@ of solids of revolution.
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/10-integration.ipynb)
-[Pluto html](./229-projects/10-integration.html)
+[(Pluto html)](./229-projects/10-integration.html)
 
 
 ----
@@ -185,7 +184,7 @@ A notebook for this material:
 Blank notebooks for test taking, etc.:
 
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/00-blank-notebook.ipynb)
-[Pluto html](./229-projects/00-blank-notebook.html)
+[(Pluto html)](./229-projects/00-blank-notebook.html)
 
 #### Questions and Answers
 
