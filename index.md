@@ -2,8 +2,7 @@
 
 
 
-!!! note "Version 1.6 or newer"
-    These use version v1.6 of Julia. See all projects at [https://github.com/mth229/229-projects](https://github.com/mth229/229-projects)
+> These project use version v1.6 of Julia.
 
 ## Introduction
 
