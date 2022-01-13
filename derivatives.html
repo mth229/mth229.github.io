@@ -111,20 +111,21 @@ $( document ).ready(function() {
   <div class="span10 offset1">
 <h1>Approximate derivatives in julia</h1><p>We load our packages to begin.</p><pre class="sourceCode julia">using MTH229
 using Plots</pre>
-<pre class="output">
-Plots.PlotlyBackend()</pre>
-
-<h2>Introduction</h2><p>Single-variable calculus has two main concepts: the derivative and the integral, both defined in terms of a third important concept: the limit. The derivative is what we discuss here. The derivative allows us to talk about a tangent line to a curve. This is often called a line that touches the curve at just one point, but that isn't quite correct, though often the case locally. A better idea would be to say it is the line that best approximates the curve at that point. That is, if we were to zoom in to the graph it might appear to look straight, and that straightness would have a slope that would match the tangent line. This idea leads to a primary use of the derivative – to approximate functions with simpler lines.  Of course, this intuition is informal, a definition is in terms of the slope of approximating secant lines.</p><p>Historically, Fermat, in a treatise on finding maxima and minima, approached the problem of finding the tangent line by comparing the value of $f(x)$ to a nearby value $f(x+h)$. Working with polynomials, meant that subtracting $f(x+h) - f(x)$ led to a polynomial in $h$. Dividing by $h$ and then setting $h=0$ yields an answer for the slope.</p><p>The more modern approach (well Cauchy in the 1820s) defines the derivative of a function, $f$, at a point $c$ as the slope of the <em>tangent line</em>, defined in terms of the <em>limit</em> of the slopes of approximating secant lines. The notation is:</p>$$~
+<h2>Introduction</h2><p>Single-variable calculus has two main concepts: the derivative and the integral, both defined in terms of a third important concept: the limit. The derivative is what we discuss here. The derivative allows us to talk about a tangent line to a curve. This is often called a line that touches the curve at just one point, but that isn't quite correct, though often the case locally. A better idea would be to say it is the line that best approximates the curve at that point. That is, if we were to zoom in to the graph it might appear to look straight, and that straightness would have a slope that would match the tangent line. This idea leads to a primary use of the derivative – to approximate functions with simpler lines.  Of course, this intuition is informal, a definition is in terms of the slope of approximating secant lines.</p><p>Historically, Fermat, in a treatise on finding maxima and minima, approached the problem of finding the tangent line by comparing the value of <span class="tex">$f&#40;x&#41;$</span> to a nearby value <span class="tex">$f&#40;x&#43;h&#41;$</span>. Working with polynomials, meant that subtracting <span class="tex">$f&#40;x&#43;h&#41; - f&#40;x&#41;$</span> led to a polynomial in <span class="tex">$h$</span>. Dividing by <span class="tex">$h$</span> and then setting <span class="tex">$h&#61;0$</span> yields an answer for the slope.</p><p>The more modern approach (well Cauchy in the 1820s) defines the derivative of a function, <span class="tex">$f$</span>, at a point <span class="tex">$c$</span> as the slope of the <em>tangent line</em>, defined in terms of the <em>limit</em> of the slopes of approximating secant lines. The notation is:</p>$$~
 f'( c ) = \lim_{h \rightarrow 0} \frac{f(c + h) - f( c)}{h}.\quad\text{Derivative at a point}
 ~$$
-<p>As mentioned, intuitively, the tangent line is the best straight-line approximation to a function near the point $(c, f( c))$ and would have slope given by the derivative.</p><p>This graph shows $f(x) = 2 - x^2$ and various secant lines when $c=-0.75$.</p><pre class="sourceCode julia">f(x) = 2 - x^2
+<p>As mentioned, intuitively, the tangent line is the best straight-line approximation to a function near the point <span class="tex">$&#40;c, f&#40; c&#41;&#41;$</span> and would have slope given by the derivative.</p><p>This graph shows <span class="tex">$f&#40;x&#41; &#61; 2 - x^2$</span> and various secant lines when <span class="tex">$c&#61;-0.75$</span>.</p><pre class="sourceCode julia">f(x) = 2 - x^2
 c = -0.75
 sec_line(h) = secant(f, c, c+h)                # secant in MTH229 package
-plot([f, sec_line(1), sec_line(.75), sec_line(.5), sec_line(.25)], -1, 1)</pre>
-    <div id="f12138ae-601b-449f-acb1-78645ba7a049" style="width:600px;height:400px;"></div>
+plot(f, -1, 1, legend=false)
+plot!(sec_line(1))
+plot!(sec_line(0.75))
+plot!(sec_line(0.5))
+plot!(sec_line(0.25))</pre>
+    <div id="cdddf1ca-549c-4bc1-b883-9e0425bee7bf" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('f12138ae-601b-449f-acb1-78645ba7a049');
+        var PLOT = document.getElementById('cdddf1ca-549c-4bc1-b883-9e0425bee7bf');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -498,7 +499,7 @@ plot([f, sec_line(1), sec_line(.75), sec_line(.5), sec_line(.25)], -1, 1)</pre>
     }
 ]
 , {
-    "showlegend": true,
+    "showlegend": false,
     "xaxis": {
         "showticklabels": true,
         "gridwidth": 0.5,
@@ -613,36 +614,13 @@ plot([f, sec_line(1), sec_line(.75), sec_line(.5), sec_line(.25)], -1, 1)</pre>
         "tickcolor": "rgb(0, 0, 0)",
         "type": "-"
     },
-    "legend": {
-        "yanchor": "auto",
-        "xanchor": "auto",
-        "bordercolor": "rgba(0, 0, 0, 1.000)",
-        "bgcolor": "rgba(255, 255, 255, 1.000)",
-        "borderwidth": 1,
-        "tracegroupgap": 0,
-        "y": 1.0,
-        "font": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 11
-        },
-        "title": {
-            "font": {
-                "color": "rgba(0, 0, 0, 1.000)",
-                "family": "sans-serif",
-                "size": 15
-            },
-            "text": ""
-        },
-        "traceorder": "normal",
-        "x": 1.0
-    },
     "width": 600
 }
 );
+
     
     </script>
-<p>As the value of $h$ goes towards 0 along the path $1$, $0.75$, $0.5$, $0.25$, ... the slope of the secant line heads towards the slope of the tangent line, in this case $2\cdot 0.75 = 1.5$.</p><p>Using the idea of a derivative at a point, one defines the derivative of the function $f$ to be the function which for each $x$ returns the derivative of $f$ at the point $x$. Notationally, this just replaces $c$ above with $x$, but conceptually there is a bit more to it.</p><h2>Forward differences <small>Slope of the tangent line</small></h2><p>The rules of derivatives allow for a mechanical approach to taking derivatives with the power rule, chain rule and some special cases. In this project we look at approaching the derivative numerically. We start by investigating <em>approximate derivatives</em> computed with <em>finite differences</em>.</p><p>The most naive approximation is simply to assume $h$ is some small number and use that to approximate the limit above:</p><pre class="sourceCode julia">f(x) = x^2 - 2x; fp(x) = 2x - 2
+<p>As the value of <span class="tex">$h$</span> goes towards 0 along the path <span class="tex">$1$</span>, <span class="tex">$0.75$</span>, <span class="tex">$0.5$</span>, <span class="tex">$0.25$</span>, ... the slope of the secant line heads towards the slope of the tangent line, in this case <span class="tex">$2\cdot 0.75 &#61; 1.5$</span>.</p><p>Using the idea of a derivative at a point, one defines the derivative of the function <span class="tex">$f$</span> to be the function which for each <span class="tex">$x$</span> returns the derivative of <span class="tex">$f$</span> at the point <span class="tex">$x$</span>. Notationally, this just replaces <span class="tex">$c$</span> above with <span class="tex">$x$</span>, but conceptually there is a bit more to it.</p><h2>Forward differences <small>Slope of the tangent line</small></h2><p>The rules of derivatives allow for a mechanical approach to taking derivatives with the power rule, chain rule and some special cases. In this project we look at approaching the derivative numerically. We start by investigating <em>approximate derivatives</em> computed with <em>finite differences</em>.</p><p>The most naive approximation is simply to assume <span class="tex">$h$</span> is some small number and use that to approximate the limit above:</p><pre class="sourceCode julia">f(x) = x^2 - 2x; fp(x) = 2x - 2
 h = .001
 c = 3
 ( f(c + h) - f(c) ) / h</pre>
@@ -656,7 +634,7 @@ c = 3
 <p>That is not too close, just to 3 digits of accuracy.</p><p>Notationally, we may write this as:</p>$$~
 f'( c) \approx \frac{f(c + h) - f( c) }{h}
 ~$$
-<p>For some small value of $h$. The equals sign is replaced by an approximation symbol, as there is no limit expression written.</p><div class="alert alert-danger" role="alert">
+<p>For some small value of <span class="tex">$h$</span>. The equals sign is replaced by an approximation symbol, as there is no limit expression written.</p><div class="alert alert-danger" role="alert">
 
 <span class="glyphicon glyphicon-th" aria-hidden="true"></span>
 
@@ -665,7 +643,7 @@ f'( c) \approx \frac{f(c + h) - f( c) }{h}
 
 </div>
 
-<p>Let's try the derivative of some well known function.  We know the derivative of $f(x) = \sin(x)$ is $f'(x) = \cos(x)$. Let's see if the above works well:</p><pre class="sourceCode julia">f(x) = sin(x); fp(x) = cos(x)
+<p>Let's try the derivative of some well known function.  We know the derivative of <span class="tex">$f&#40;x&#41; &#61; \sin&#40;x&#41;$</span> is <span class="tex">$f&#39;&#40;x&#41; &#61; \cos&#40;x&#41;$</span>. Let's see if the above works well:</p><pre class="sourceCode julia">f(x) = sin(x); fp(x) = cos(x)
 c = pi/4; h = 0.0001
 ( f(c + h) - f(c) )/h - fp(c)</pre>
 <pre class="output">
@@ -680,14 +658,14 @@ c = pi/4; h = 0.0001
 
 </div>
 
-<p>Suppose the tractor company John Deere models its profit per units sold through the function $P(x) = 50 e^{x/250}/(1 - e^{x/250})$. Find the marginal profit for $x=200$.</p><p>The marginal profit is the change in profit per unit sold – or the derivative – at $x=200$.  We can find this quite simply by either differentiating directly, or as we do here, approximating the answer with <code>julia</code>. We first note that the function above, is a composition, so it may be written using two functions:</p><pre class="sourceCode julia">f1(x) = exp(x)/(1 - exp(x))
+<p>Suppose the tractor company John Deere models its profit per units sold through the function <span class="tex">$P&#40;x&#41; &#61; 50 e^&#123;x/250&#125;/&#40;1 - e^&#123;x/250&#125;&#41;$</span>. Find the marginal profit for <span class="tex">$x&#61;200$</span>.</p><p>The marginal profit is the change in profit per unit sold – or the derivative – at <span class="tex">$x&#61;200$</span>.  We can find this quite simply by either differentiating directly, or as we do here, approximating the answer with <code>julia</code>. We first note that the function above, is a composition, so it may be written using two functions:</p><pre class="sourceCode julia">f1(x) = exp(x)/(1 - exp(x))
 f(x) = 50 * f1(x/250)
 c = 200; h = 0.0001;
 res = (f(c+h) - f(c))/h</pre>
 <pre class="output">
 0.29635326299626286</pre>
 
-<p>If $50$ is the maximum profit, this is a percentage increase of:</p><pre class="sourceCode julia">(res/50) * 100</pre>
+<p>If <span class="tex">$50$</span> is the maximum profit, this is a percentage increase of:</p><pre class="sourceCode julia">(res/50) * 100</pre>
 <pre class="output">
 0.5927065259925257</pre>
 
@@ -700,10 +678,10 @@ res = (f(c+h) - f(c))/h</pre>
 
 </div>
 
-<p>Let $f(x) = x^x$. Find the tangent line at $c=2$. Compare the difference between the value of the tangent line  and the function at $x=2.1$.</p><p>The tangent line is most easily expressed in terms of the <em>point-slope</em> formula for a line where the point is $(c, f( c))$ and the slope is $f'( c)$. This gives:</p>$$~
+<p>Let <span class="tex">$f&#40;x&#41; &#61; x^x$</span>. Find the tangent line at <span class="tex">$c&#61;2$</span>. Compare the difference between the value of the tangent line  and the function at <span class="tex">$x&#61;2.1$</span>.</p><p>The tangent line is most easily expressed in terms of the <em>point-slope</em> formula for a line where the point is <span class="tex">$&#40;c, f&#40; c&#41;&#41;$</span> and the slope is <span class="tex">$f&#39;&#40; c&#41;$</span>. This gives:</p>$$~
 y = f( c) + f'( c)\cdot(x - c)
 ~$$
-<p>In the following, the slope of the tangent line will be <em>approximated</em> using a numeric derivative.  We use $h=0.0001$:</p><pre class="sourceCode julia">f(x) = x^x
+<p>In the following, the slope of the tangent line will be <em>approximated</em> using a numeric derivative.  We use <span class="tex">$h&#61;0.0001$</span>:</p><pre class="sourceCode julia">f(x) = x^x
 c = 2; h = 0.0001
 m = ( f(c + h) - f(c) ) / h
 tangent_line(x) = f(c) + m * (x - c)</pre>
@@ -715,10 +693,10 @@ tangent_line (generic function with 1 method)</pre>
 0.07231187980696063</pre>
 
 <p>A graph shows this difference:</p><pre class="sourceCode julia">plot([f, tangent_line], 1.85, 2.15)</pre>
-    <div id="cded703f-43aa-4bad-bf86-80874e89cb7b" style="width:600px;height:400px;"></div>
+    <div id="a47625dc-4a89-4436-9feb-0d458f36208d" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('cded703f-43aa-4bad-bf86-80874e89cb7b');
+        var PLOT = document.getElementById('a47625dc-4a89-4436-9feb-0d458f36208d');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -971,7 +949,7 @@ tangent_line (generic function with 1 method)</pre>
         "tickcolor": "rgb(0, 0, 0)",
         "type": "-"
     },
-    "legend": {
+    "legend_position": {
         "yanchor": "auto",
         "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
@@ -998,198 +976,177 @@ tangent_line (generic function with 1 method)</pre>
     "width": 600
 }
 );
+
     
     </script>
-<h3>Practice</h3><h4>Question</h4><p>Find the slope of the tangent line of $f(x) = x\log(x)$ at the value $x=1$ using $h=0.0001$ and the forward difference method:</p><form name='WeaveQuestion' data-id='imsVqAtG' data-controltype='numeric'>
+<h3>Practice</h3><h4>Question</h4><p>Find the slope of the tangent line of <span class="tex">$f&#40;x&#41; &#61; x\log&#40;x&#41;$</span> at the value <span class="tex">$x&#61;1$</span> using <span class="tex">$h&#61;0.0001$</span> and the forward difference method:</p><form name='WeaveQuestion' data-id='vPhfCagc' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="imsVqAtG" type="number" class="form-control">
+<input id="vPhfCagc" type="number" class="form-control">
 
 </div>
 
-<div id='imsVqAtG_message'></div>
+<div id='vPhfCagc_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#imsVqAtG').on('change', function() {
-  correct = Math.abs(this.value - 1.0000499983333064) <= 1.0e-6;
-
+document.getElementById("vPhfCagc").addEventListener("change", function() {
+  var correct = Math.abs(this.value - 1.0000499983333064) <= 1.0e-6;
+  var msgBox = document.getElementById('vPhfCagc_message');
   if(correct) {
-     $('#imsVqAtG_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#imsVqAtG_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
-<h4>Question</h4><p>Find the slope of the tangent line of $f(x) = x-\log(x)$ at the value $x=1$ using $h=0.0001$ and the forward difference method:</p><form name='WeaveQuestion' data-id='sGD9SplH' data-controltype='numeric'>
+<h4>Question</h4><p>Find the slope of the tangent line of <span class="tex">$f&#40;x&#41; &#61; x-\log&#40;x&#41;$</span> at the value <span class="tex">$x&#61;1$</span> using <span class="tex">$h&#61;0.0001$</span> and the forward difference method:</p><form name='WeaveQuestion' data-id='H36NHn1T' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="sGD9SplH" type="number" class="form-control">
+<input id="H36NHn1T" type="number" class="form-control">
 
 </div>
 
-<div id='sGD9SplH_message'></div>
+<div id='H36NHn1T_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#sGD9SplH').on('change', function() {
-  correct = Math.abs(this.value - 4.999666680660653e-5) <= 1.0e-6;
-
+document.getElementById("H36NHn1T").addEventListener("change", function() {
+  var correct = Math.abs(this.value - 4.999666680660653e-5) <= 1.0e-6;
+  var msgBox = document.getElementById('H36NHn1T_message');
   if(correct) {
-     $('#sGD9SplH_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#sGD9SplH_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
-<h4>Question</h4><p>The built-in <code>airyai</code> function, when called as <code>airyai&#40;x&#41;</code>, returns the so-called Airy function, a special function named after</p><p><a href="http://en.wikipedia.org/wiki/Airy_function">George Biddell Airy</a>.</p><p>Compute the derivative at $c=-3$ using $h=0.0001$.</p><form name='WeaveQuestion' data-id='xDbuzoIf' data-controltype='numeric'>
+<h4>Question</h4><p>The built-in <code>airyai</code> function, when called as <code>airyai&#40;x&#41;</code>, returns the so-called Airy function, a special function named after</p><p><a href="http://en.wikipedia.org/wiki/Airy_function">George Biddell Airy</a>.</p><p>Compute the derivative at <span class="tex">$c&#61;-3$</span> using <span class="tex">$h&#61;0.0001$</span>.</p><form name='WeaveQuestion' data-id='z6toWYni' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="xDbuzoIf" type="number" class="form-control">
+<input id="z6toWYni" type="number" class="form-control">
 
 </div>
 
-<div id='xDbuzoIf_message'></div>
+<div id='z6toWYni_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#xDbuzoIf').on('change', function() {
-  correct = Math.abs(this.value - 0.3146405891557569) <= 1.0e-6;
-
+document.getElementById("z6toWYni").addEventListener("change", function() {
+  var correct = Math.abs(this.value - 0.3146405891557569) <= 1.0e-6;
+  var msgBox = document.getElementById('z6toWYni_message');
   if(correct) {
-     $('#xDbuzoIf_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#xDbuzoIf_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
-<h4>Question</h4><p>Let $f(x) = \sin(x)$. The slope of the tangent line at $c=\pi/4$ is well known to have slope $\sqrt{2}/2$.</p><p>Compute the forward difference quotient for $f$ at $c$ using $h=0.01$. What is the order of the difference between the two values?</p><form name="WeaveQuestion" data-id="Zme19fo5" data-controltype="radio">
+<h4>Question</h4><p>Let <span class="tex">$f&#40;x&#41; &#61; \sin&#40;x&#41;$</span>. The slope of the tangent line at <span class="tex">$c&#61;\pi/4$</span> is well known to have slope <span class="tex">$\sqrt&#123;2&#125;/2$</span>.</p><p>Compute the forward difference quotient for <span class="tex">$f$</span> at <span class="tex">$c$</span> using <span class="tex">$h&#61;0.01$</span>. What is the order of the difference between the two values?</p><form name="WeaveQuestion" data-id="PGaeP6sM" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio inline">
-    <label>
-      <input type="radio" name="radio_Zme19fo5" value="1"><div class="markdown"><p>3 parts in 100</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio inline">
-    <label>
-      <input type="radio" name="radio_Zme19fo5" value="2"><div class="markdown"><p>3 parts in 1000</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio inline">
-    <label>
-      <input type="radio" name="radio_Zme19fo5" value="3"><div class="markdown"><p>3 parts in 10,000</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio inline">
-    <label>
-      <input type="radio" name="radio_Zme19fo5" value="4"><div class="markdown"><p>3 parts in 100,000</p>
-</div>
-    </label>
-    </div>
+  <input type="radio" name="radio_PGaeP6sM" id="1" value="1">
+  <label for="1">3 parts in 100</label>
+  <br>
+  <input type="radio" name="radio_PGaeP6sM" id="2" value="2">
+  <label for="2">3 parts in 1000</label>
+  <br>
+  <input type="radio" name="radio_PGaeP6sM" id="3" value="3">
+  <label for="3">3 parts in 10,000</label>
+  <br>
+  <input type="radio" name="radio_PGaeP6sM" id="4" value="4">
+  <label for="4">3 parts in 100,000</label>
+  <br>
 
-<span class="help-inline"><span id="Zme19fo5_hint" class="glyphicon glyphicon-gift"></span></span>
-<script>$("#Zme19fo5_hint").tooltip({title:"<div class="markdown"><p>Look at <code>sqrt&#40;2&#41;/2</code> minus the computed value</p>
+<span class="help-inline"><span id="PGaeP6sM_hint" class="glyphicon glyphicon-gift"></span></span>
+<script>$("#PGaeP6sM_hint").tooltip({title:"<div class="markdown"><p>Look at <code>sqrt&#40;2&#41;/2</code> minus the computed value</p>
 </div>", html:true, placement:"right"});</script>
-<div id="Zme19fo5_message"></div>
+<div id="PGaeP6sM_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_Zme19fo5']").on("change", function() {
-  correct = this.value == 2;
-
-  if(correct) {
-     $("#Zme19fo5_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+_.forEach(document.querySelectorAll('input[name="radio_PGaeP6sM"]'), function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 2;
+    var msgBox = document.getElementById('PGaeP6sM_message');
+    if (correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $("#Zme19fo5_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
-});
+})});
+
+
+
 
 </script>
-<h4>Question</h4><p>For the function $f(x) = x^3 - 5x$ use a forward difference with $h=0.0001$ to approximate the slope of the tangent line at $c=1$. Use this value to create a tangent line at <code>&#40;c, f&#40; c&#41;&#41;</code>. Plot both the function and the tangent. Estimate graphically where the tangent line crosses the $x$ axis. The value is near:</p><form name="WeaveQuestion" data-id="meharrkh" data-controltype="radio">
+<h4>Question</h4><p>For the function <span class="tex">$f&#40;x&#41; &#61; x^3 - 5x$</span> use a forward difference with <span class="tex">$h&#61;0.0001$</span> to approximate the slope of the tangent line at <span class="tex">$c&#61;1$</span>. Use this value to create a tangent line at <code>&#40;c, f&#40; c&#41;&#41;</code>. Plot both the function and the tangent. Estimate graphically where the tangent line crosses the <span class="tex">$x$</span> axis. The value is near:</p><form name="WeaveQuestion" data-id="TvQx8JzP" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_meharrkh" value="1"><div class="markdown"><p>-2.0</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_meharrkh" value="2"><div class="markdown"><p>-1.5</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_meharrkh" value="3"><div class="markdown"><p>-1.0</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_meharrkh" value="4"><div class="markdown"><p>-0.5</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_meharrkh" value="5"><div class="markdown"><p>0.0</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_meharrkh" value="6"><div class="markdown"><p>1.0</p>
-</div>
-    </label>
-    </div>
+  <input type="radio" name="radio_TvQx8JzP" id="1" value="1">
+  <label for="1">-2.0</label>
+  <br>
+  <input type="radio" name="radio_TvQx8JzP" id="2" value="2">
+  <label for="2">-1.5</label>
+  <br>
+  <input type="radio" name="radio_TvQx8JzP" id="3" value="3">
+  <label for="3">-1.0</label>
+  <br>
+  <input type="radio" name="radio_TvQx8JzP" id="4" value="4">
+  <label for="4">-0.5</label>
+  <br>
+  <input type="radio" name="radio_TvQx8JzP" id="5" value="5">
+  <label for="5">0.0</label>
+  <br>
+  <input type="radio" name="radio_TvQx8JzP" id="6" value="6">
+  <label for="6">1.0</label>
+  <br>
 
-<div id="meharrkh_message"></div>
+<div id="TvQx8JzP_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_meharrkh']").on("change", function() {
-  correct = this.value == 3;
-
-  if(correct) {
-     $("#meharrkh_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+_.forEach(document.querySelectorAll('input[name="radio_TvQx8JzP"]'), function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 3;
+    var msgBox = document.getElementById('TvQx8JzP_message');
+    if (correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $("#meharrkh_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
-});
+})});
+
+
+
 
 </script>
-<h2>Derivative of a function</h2><p>We might be interested not in the derivative at a point, but in the derivative as a function. This is how we think of the derivative when we say if $f(x) = \sin(x)$, the $f'(x) = \cos(x)$.  Mathematically, from this viewpoint, the derivative is referred to as an <em>operator</em>, as it takes a function and returns a function.</p><p>We can reproduce this behavior easily enough with <code>julia</code>, as functions are <em>first class objects</em>: they can be passed as arguments and returned as values.</p><p>First, let's define a function to find the derivative at a point using the "forward difference":</p><pre class="sourceCode julia">forward_difference(f, x0, h) = (f(x0 + h) - f(x0))/h</pre>
+<h2>Derivative of a function</h2><p>We might be interested not in the derivative at a point, but in the derivative as a function. This is how we think of the derivative when we say if <span class="tex">$f&#40;x&#41; &#61; \sin&#40;x&#41;$</span>, the <span class="tex">$f&#39;&#40;x&#41; &#61; \cos&#40;x&#41;$</span>.  Mathematically, from this viewpoint, the derivative is referred to as an <em>operator</em>, as it takes a function and returns a function.</p><p>We can reproduce this behavior easily enough with <code>julia</code>, as functions are <em>first class objects</em>: they can be passed as arguments and returned as values.</p><p>First, let's define a function to find the derivative at a point using the "forward difference":</p><pre class="sourceCode julia">forward_difference(f, x0, h) = (f(x0 + h) - f(x0))/h</pre>
 <pre class="output">
 forward_difference (generic function with 1 method)</pre>
 
-<p>We need three arguments of course as we have three ingredients to worry about: the function, the point and the size of $h$.</p><p>To make an operator that takes $f$ and returns a function (an anonymous function in this case) that computes our approximation to $f'$ we can do the following:</p><pre class="sourceCode julia">Df(f; h=1e-8) = x -> forward_difference(f, x, h)</pre>
+<p>We need three arguments of course as we have three ingredients to worry about: the function, the point and the size of <span class="tex">$h$</span>.</p><p>To make an operator that takes <span class="tex">$f$</span> and returns a function (an anonymous function in this case) that computes our approximation to <span class="tex">$f&#39;$</span> we can do the following:</p><pre class="sourceCode julia">Df(f; h=1e-8) = x -> forward_difference(f, x, h)</pre>
 <pre class="output">
 Df (generic function with 1 method)</pre>
 
-<p>We specified a default value of $h$ for convenience, but allow it to be varied if desired.</p><p>To see this work, we can find and plot the derivative of $\sin(x)$:</p><pre class="sourceCode julia">f(x) = sin(x)
+<p>We specified a default value of <span class="tex">$h$</span> for convenience, but allow it to be varied if desired.</p><p>To see this work, we can find and plot the derivative of <span class="tex">$\sin&#40;x&#41;$</span>:</p><pre class="sourceCode julia">f(x) = sin(x)
 fp(x) = Df(f)(x)
 plot(f, 0, 2pi)
 plot!(fp)</pre>
-    <div id="e812e8a9-8ba2-40d6-bb58-79915f06836f" style="width:600px;height:400px;"></div>
+    <div id="e06b4968-d263-4a61-b936-c784677978d6" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('e812e8a9-8ba2-40d6-bb58-79915f06836f');
+        var PLOT = document.getElementById('e06b4968-d263-4a61-b936-c784677978d6');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -1312,53 +1269,55 @@ plot!(fp)</pre>
         },
         "yaxis": "y",
         "x": [
-            -0.18849555921538758,
-            -0.17223503981229504,
-            -0.15597452040920248,
-            -0.13971400100610992,
-            -0.12345348160301738,
-            0.026898499582752623,
-            0.17725048076852262,
-            0.32760246195429266,
-            0.47795444314006263,
-            0.6586649905726774,
-            0.8393755380052922,
-            0.9921640059910752,
-            1.1449524739768584,
-            1.47689467677617,
-            1.7829160269490605,
-            1.9469596418370494,
-            2.1110032567250383,
-            2.301063871974147,
-            2.4911244872232556,
-            2.6600279326154466,
-            2.828931378007638,
-            2.977044478798132,
-            3.125157579588626,
-            3.205899098393239,
-            3.2866406171978517,
-            3.3673821360024645,
-            3.4481236548070773,
-            3.6105664304407776,
-            3.773009206074478,
-            3.952610466937858,
-            4.132211727801238,
-            4.303097795651038,
-            4.473983863500838,
-            4.829347585379343,
-            5.128488145137733,
-            5.311096503789617,
-            5.4937048624415015,
-            5.6653621055323935,
-            5.837019348623285,
-            5.974523456098678,
-            6.112027563574072,
-            6.249531671049466,
-            6.38703577852486,
-            6.408197050492388,
-            6.429358322459917,
-            6.450519594427446,
-            6.471680866394974
+            0.0,
+            0.015340112644426933,
+            0.030680225288853866,
+            0.0460203379332808,
+            0.06136045057770773,
+            0.20320194226239643,
+            0.34504343394708514,
+            0.4868849256317738,
+            0.6287264173164625,
+            0.7139672415771299,
+            0.7992080658377971,
+            0.8844488900984645,
+            0.9696897143591319,
+            1.113829778496663,
+            1.2579698426341943,
+            1.5711228641429789,
+            1.8598222510985358,
+            2.0145803783513556,
+            2.1693385056041756,
+            2.3486409728203155,
+            2.5279434400364558,
+            2.6076148765422063,
+            2.6872863130479567,
+            2.7669577495537077,
+            2.846629186059458,
+            2.986358526427849,
+            3.1260878667962397,
+            3.27843035510683,
+            3.43077284341742,
+            3.5840207449586465,
+            3.7372686464998734,
+            3.906703798257779,
+            4.076138950015684,
+            4.2373522215721,
+            4.398565493128515,
+            4.733814287353519,
+            5.016022362597284,
+            5.188294399061325,
+            5.360566435525367,
+            5.522507230894133,
+            5.684448026262899,
+            5.814168882371761,
+            5.943889738480623,
+            6.073610594589485,
+            6.203331450698347,
+            6.2232949148186565,
+            6.243258378938966,
+            6.263221843059276,
+            6.283185307179586
         ],
         "showlegend": true,
         "mode": "lines",
@@ -1373,53 +1332,55 @@ plot!(fp)</pre>
             "width": 1
         },
         "y": [
-            0.9822872487630363,
-            0.9852041765734398,
-            0.9878606155311331,
-            0.9902558661956107,
-            0.9923892929641909,
-            0.999638257240254,
-            0.9843322157365719,
-            0.9468165307335852,
-            0.887937656735005,
-            0.7908100507769689,
-            0.6679276909338228,
-            0.5468794084251272,
-            0.41308940712525555,
-            0.09376370790903366,
-            -0.2105325691559301,
-            -0.36735475772431414,
-            -0.5143134695906326,
-            -0.6670689778331962,
-            -0.7958003811481262,
-            -0.8862712785884241,
-            -0.9515183474473332,
-            -0.9864924627178695,
-            -0.9998649411896432,
-            -0.9979330459208846,
-            -0.9894989660974574,
-            -0.9746176587999145,
-            -0.9533860811927752,
-            -0.8920325755834568,
-            -0.8071921353547395,
-            -0.6887608705596904,
-            -0.5481721854216914,
-            -0.39795915451890096,
-            -0.23615314148628386,
-            0.1166921337336646,
-            0.4041955437017464,
-            0.5635752753363477,
-            0.7042142868840529,
-            0.8151413211088254,
-            0.9021081492921468,
-            0.9527409305931656,
-            0.9853882321220198,
-            0.9994337642205142,
-            0.9946123785686822,
-            0.9921961960368542,
-            0.9893357272305892,
-            0.9860322502941443,
-            0.9822872432119212
+            1.0,
+            0.9998823427212478,
+            0.9995293988318554,
+            0.9989412512456664,
+            0.9981180375262522,
+            0.97942542687246,
+            0.9410607570981,
+            0.8837946041673206,
+            0.8087771785625364,
+            0.7557699244209459,
+            0.6972745825173376,
+            0.6337159241809331,
+            0.5655554469186086,
+            0.44122792086653817,
+            0.30774915948938997,
+            -0.00032653879600275104,
+            -0.2850186864300497,
+            -0.4293600364135841,
+            -0.563438684597628,
+            -0.7017455172508846,
+            -0.8175520482822662,
+            -0.8607893509093856,
+            -0.8985656441140577,
+            -0.9306412807053022,
+            -0.9568127568027052,
+            -0.9879753543051706,
+            -0.9998797971880191,
+            -0.9906523157354741,
+            -0.9584779747662253,
+            -0.9037147696844272,
+            -0.8277693974712008,
+            -0.7213053709875794,
+            -0.5941834135825275,
+            -0.4573711298583305,
+            -0.30869762301932724,
+            0.021423673945974997,
+            0.2989893554961043,
+            0.4581434343009505,
+            0.603734495729924,
+            0.7243686983571251,
+            0.826047930058138,
+            0.8920133021117493,
+            0.9429893421675217,
+            0.9781194770797086,
+            0.996813367959426,
+            0.9982071010050664,
+            0.9992030196304125,
+            0.9998007307471246,
+            0.999999993922529
         ],
         "type": "scatter"
     }
@@ -1439,8 +1400,8 @@ plot!(fp)</pre>
             6.0
         ],
         "range": [
-            -0.3883008519836984,
-            6.671486159163284
+            -0.18849555921538758,
+            6.471680866394974
         ],
         "domain": [
             0.0658209390492855,
@@ -1502,8 +1463,8 @@ plot!(fp)</pre>
             1.0
         ],
         "range": [
-            -1.0598608878259328,
-            1.0599958933229703
+            -1.0598761911036596,
+            1.0599963939156405
         ],
         "domain": [
             0.03762029746281716,
@@ -1542,7 +1503,7 @@ plot!(fp)</pre>
         "tickcolor": "rgb(0, 0, 0)",
         "type": "-"
     },
-    "legend": {
+    "legend_position": {
         "yanchor": "auto",
         "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
@@ -1569,9 +1530,10 @@ plot!(fp)</pre>
     "width": 600
 }
 );
+
     
     </script>
-<p>Well, we already knew that should just be $\cos(x)$.  The point is we can easily make the an approximate derivative function from <code>f</code> with the definition <code>fp&#40;x&#41; &#61; Df&#40;f&#41;&#40;x&#41;</code>.</p><div class="alert alert-success" role="alert">
+<p>Well, we already knew that should just be <span class="tex">$\cos&#40;x&#41;$</span>.  The point is we can easily make the an approximate derivative function from <code>f</code> with the definition <code>fp&#40;x&#41; &#61; Df&#40;f&#41;&#40;x&#41;</code>.</p><div class="alert alert-success" role="alert">
 
 <div class="markdown"><p><strong>Parsing <code>Df&#40;f&#41;&#40;x&#41;</code></strong> Seeing the pair of parenthesis can lead to confusion, as it isn't common math notation. Here parentheses are not used for grouping, but rather function application. There are two function applications and the associativity rules for function application are left to right, as with most – but not all – operations. So <code>Df&#40;f&#41;</code> is done first. This returns a function (the approximate derivative) which is then evaluated at <code>x</code>.</p>
 </div>
@@ -1586,10 +1548,10 @@ plot!(fp)</pre>
 <p>Let's look at a different function, where we don't know in our heads the answer.</p><pre class="sourceCode julia">f(x) = exp(x)/(1 + exp(x))
 plot(f, 0, 5)
 plot!(Df(f))</pre>
-    <div id="2dfff180-85c4-4b04-8dec-fee726372e12" style="width:600px;height:400px;"></div>
+    <div id="6dd5da57-c0a5-45a9-9e0e-31bbaf083623" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('2dfff180-85c4-4b04-8dec-fee726372e12');
+        var PLOT = document.getElementById('6dd5da57-c0a5-45a9-9e0e-31bbaf083623');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -1664,35 +1626,35 @@ plot!(Df(f))</pre>
         },
         "yaxis": "y",
         "x": [
-            -0.15,
-            -0.1370602897987807,
-            -0.12412057959756145,
-            -0.11118086939634217,
-            -0.0982411591951229,
-            0.02140514585175183,
-            0.14105145089862656,
-            0.26069775594550126,
-            0.380344060992376,
-            0.5241489454560913,
-            0.6679538299198066,
-            0.7895390295566824,
-            0.9111242291935584,
-            1.1752754411751727,
-            1.4187994940335291,
-            1.6798830159543963,
-            1.982373879994221,
-            2.2511920623884136,
-            2.486921383663166,
-            2.7439296202731933,
-            3.002465327389904,
-            3.2883096119093427,
-            3.5602832359476704,
-            3.843072700610158,
-            4.081121194434279,
-            4.37175142372773,
-            4.644952411282155,
-            5.082641579285118,
-            5.15
+            0.0,
+            0.012207273774735164,
+            0.02441454754947033,
+            0.036621821324205495,
+            0.04882909509894066,
+            0.16170296778467153,
+            0.2745768404704024,
+            0.3874507131561332,
+            0.5003245858418641,
+            0.6359895711849918,
+            0.7716545565281194,
+            0.886357575053474,
+            1.0010605935788286,
+            1.250259850165257,
+            1.4799995226731408,
+            1.7263047320324492,
+            2.0116734716926614,
+            2.2652755305551073,
+            2.4876616827011,
+            2.7301222832765975,
+            2.9740238937640604,
+            3.2436883131220213,
+            3.5002672037242175,
+            3.7670497175567528,
+            3.9916237683342257,
+            4.26580322993182,
+            4.523540010643543,
+            4.9364543200802995,
+            5.0
         ],
         "showlegend": true,
         "mode": "lines",
@@ -1707,35 +1669,35 @@ plot!(Df(f))</pre>
             "width": 1
         },
         "y": [
-            0.24859900249474265,
-            0.2488295736124968,
-            0.24903959450206514,
-            0.24922901520341156,
-            0.24939775244980922,
-            0.24997135472659693,
-            0.2487606343137827,
-            0.24579993596063332,
-            0.2411722710427,
-            0.23358591727529188,
-            0.2240645669004948,
-            0.21475656808433996,
-            0.20453290172639527,
-            0.18025264614252023,
-            0.15688339516373162,
-            0.13242711371930227,
-            0.10640901493275123,
-            0.0861747562197479,
-            0.07088494236029419,
-            0.05677857073393966,
-            0.0450759540804313,
-            0.03468025866482094,
-            0.02688057554323109,
-            0.020538060141461756,
-            0.016332202257274275,
-            0.012316059283534742,
-            0.009427902902814367,
-            0.006127243157294515,
-            0.005732725405493966
+            0.24999999848063226,
+            0.24999068370945565,
+            0.24996275049815608,
+            0.24991619884673355,
+            0.2498510398574183,
+            0.24837285561574163,
+            0.24534655418406714,
+            0.24084746419461567,
+            0.2349850203309245,
+            0.22633129814764175,
+            0.21618862255934346,
+            0.20667860756162781,
+            0.1965155482785974,
+            0.17307982824732449,
+            0.15104413275679462,
+            0.12824146189416297,
+            0.10406281392150163,
+            0.08519643879267846,
+            0.07084054454153943,
+            0.05747134990130576,
+            0.04625002603120265,
+            0.03614402110940773,
+            0.02844586788341985,
+            0.02208705440764902,
+            0.01780587899347097,
+            0.013654466446411107,
+            0.010618850243560018,
+            0.0070780048488927605,
+            0.006648059880376422
         ],
         "type": "scatter"
     }
@@ -1754,8 +1716,8 @@ plot!(Df(f))</pre>
             5.0
         ],
         "range": [
-            -0.309,
-            5.309
+            -0.15,
+            5.15
         ],
         "domain": [
             0.0658209390492855,
@@ -1816,8 +1778,8 @@ plot!(Df(f))</pre>
             1.0
         ],
         "range": [
-            -0.023894507304612667,
-            1.0229343817858219
+            -0.022951712795483737,
+            1.0229069217515754
         ],
         "domain": [
             0.03762029746281716,
@@ -1856,7 +1818,7 @@ plot!(Df(f))</pre>
         "tickcolor": "rgb(0, 0, 0)",
         "type": "-"
     },
-    "legend": {
+    "legend_position": {
         "yanchor": "auto",
         "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
@@ -1883,6 +1845,7 @@ plot!(Df(f))</pre>
     "width": 600
 }
 );
+
     
     </script>
 <p>If we look, we can see from the graph that <code>f</code> is increasing and <code>Df&#40;f&#41;</code> is positive – this is no coincidence, of course.</p><div class="alert alert-danger" role="alert">
@@ -1894,13 +1857,13 @@ plot!(Df(f))</pre>
 
 </div>
 
-<p>A function's <em>critical points</em> are where its derivative is $0$ or undefined. We can examine these by graphing the function's derivative. Let's do so for the polynomial $f(x) = x^3 - 5x + 4$:</p><pre class="sourceCode julia">f(x) = x^3 -5x + 4
+<p>A function's <em>critical points</em> are where its derivative is <span class="tex">$0$</span> or undefined. We can examine these by graphing the function's derivative. Let's do so for the polynomial <span class="tex">$f&#40;x&#41; &#61; x^3 - 5x &#43; 4$</span>:</p><pre class="sourceCode julia">f(x) = x^3 -5x + 4
 fp(x) = Df(f)(x)
 plot(fp, -5, 5)</pre>
-    <div id="a0ca2bfa-4040-41f7-9eb0-b8b09d58ec65" style="width:600px;height:400px;"></div>
+    <div id="8b56bc4f-d4aa-42c6-81b4-66d8e3e2a22f" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('a0ca2bfa-4040-41f7-9eb0-b8b09d58ec65');
+        var PLOT = document.getElementById('8b56bc4f-d4aa-42c6-81b4-66d8e3e2a22f');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -2121,7 +2084,7 @@ plot(fp, -5, 5)</pre>
         "tickcolor": "rgb(0, 0, 0)",
         "type": "-"
     },
-    "legend": {
+    "legend_position": {
         "yanchor": "auto",
         "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
@@ -2148,14 +2111,15 @@ plot(fp, -5, 5)</pre>
     "width": 600
 }
 );
+
     
     </script>
-<p>You can check the zeroes graphically, say by zooming in a bit and adding the line $y=0$:</p><pre class="sourceCode julia">plot(fp, -2, 2)
+<p>You can check the zeroes graphically, say by zooming in a bit and adding the line <span class="tex">$y&#61;0$</span>:</p><pre class="sourceCode julia">plot(fp, -2, 2)
 plot!(zero)</pre>
-    <div id="1e1b1367-fd38-4bb5-bccb-a8ec6c3d04cd" style="width:600px;height:400px;"></div>
+    <div id="e8f54b71-0fcf-45ed-a425-5efbeede8091" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('1e1b1367-fd38-4bb5-bccb-a8ec6c3d04cd');
+        var PLOT = document.getElementById('e8f54b71-0fcf-45ed-a425-5efbeede8091');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -2270,27 +2234,27 @@ plot!(zero)</pre>
         },
         "yaxis": "y",
         "x": [
-            -2.12,
-            -2.0785929273560986,
-            -1.6957247512060991,
-            -1.4656369360641548,
-            -1.2711006166451533,
-            -1.059779647059862,
-            -0.8649604047731766,
-            -0.656093587236483,
-            -0.4141008960046231,
-            -0.19904635008926908,
-            -0.010462893069467153,
-            0.19514369621855449,
-            0.40197226191192326,
-            0.6306476895274741,
-            0.8482265887581363,
-            1.0744581604881263,
-            1.2648969555474234,
-            1.4974011389821837,
-            1.715961929025724,
-            2.066113263428094,
-            2.12
+            -2.0,
+            -1.9609367239208475,
+            -1.5997403313265088,
+            -1.3826763547775045,
+            -1.1991515251369371,
+            -0.9997921198677943,
+            -0.8160003818614874,
+            -0.6189562143740406,
+            -0.3906612226458709,
+            -0.18777957555591424,
+            -0.009870653839119958,
+            0.18409782662127785,
+            0.3792191150112484,
+            0.5949506504976171,
+            0.8002137629793739,
+            1.0136397740454022,
+            1.1932990146673805,
+            1.4126425839454564,
+            1.618832008514834,
+            1.9491634560642397,
+            2.0
         ],
         "showlegend": true,
         "mode": "lines",
@@ -2343,8 +2307,8 @@ plot!(zero)</pre>
             2.0
         ],
         "range": [
-            -2.2472000000000003,
-            2.2472000000000003
+            -2.12,
+            2.12
         ],
         "domain": [
             0.0658209390492855,
@@ -2444,7 +2408,7 @@ plot!(zero)</pre>
         "tickcolor": "rgb(0, 0, 0)",
         "type": "-"
     },
-    "legend": {
+    "legend_position": {
         "yanchor": "auto",
         "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
@@ -2471,25 +2435,25 @@ plot!(zero)</pre>
     "width": 600
 }
 );
+
     
     </script>
-<p>If you want, we can find the roots numerically. For example,</p><pre class="sourceCode julia">using Roots
-fzeros(fp, -10, 10)</pre>
+<p>If you want, we can find the roots numerically. For example,</p><pre class="sourceCode julia">find_zeros(fp, -10, 10)</pre>
 <pre class="output">
 2-element Array{Float64, 1}:
  -1.290994449095253
   1.2909944355487426</pre>
 
-<h3>Example: When is a function increasing?</h3><p>Let $f(x) = \cos(x)$ over the interval $[0, 360]$ (in degrees). When is the function increasing?</p><p>From the relationship of the derivative and the function, we know the answer is when $f'(x) > 0$. For this example, we can solve this directly as $f'(x) = -\sin(x)$ and we know when that is positive (well you are supposed to anyways: when the angle is in the third and fourth quadrants). Let's see how we would do this task with <code>julia</code> and compare.</p><p>First, we only need the derivative, so we just ask:</p><pre class="sourceCode julia">f(x) = cosd(x)			# using degrees
+<h3>Example: When is a function increasing?</h3><p>Let <span class="tex">$f&#40;x&#41; &#61; \cos&#40;x&#41;$</span> over the interval <span class="tex">$&#91;0, 360&#93;$</span> (in degrees). When is the function increasing?</p><p>From the relationship of the derivative and the function, we know the answer is when <span class="tex">$f&#39;&#40;x&#41; &gt; 0$</span>. For this example, we can solve this directly as <span class="tex">$f&#39;&#40;x&#41; &#61; -\sin&#40;x&#41;$</span> and we know when that is positive (well you are supposed to anyways: when the angle is in the third and fourth quadrants). Let's see how we would do this task with <code>julia</code> and compare.</p><p>First, we only need the derivative, so we just ask:</p><pre class="sourceCode julia">f(x) = cosd(x)			# using degrees
 fp(x) = Df(f)(x)                # use default h</pre>
 <pre class="output">
 fp (generic function with 1 method)</pre>
 
-<p>Then we wish to indicate on the graph where <code>fp&#40;x&#41; &gt; 0</code>. We can do this by defining a function that is $0$ when that is the case and <code>NaN</code> otherwise (so that those points are not plotted). We do so below using the <code>plotif</code> function from the <code>MTH229</code> package</p><pre class="sourceCode julia">plotif(f, fp, 0, 360)  # second color when fp > 0</pre>
-    <div id="3d2dd9b7-28b2-492c-aac9-14d7385c6532" style="width:600px;height:400px;"></div>
+<p>Then we wish to indicate on the graph where <code>fp&#40;x&#41; &gt; 0</code>. We can do this by defining a function that is <span class="tex">$0$</span> when that is the case and <code>NaN</code> otherwise (so that those points are not plotted). We do so below using the <code>plotif</code> function from the <code>MTH229</code> package</p><pre class="sourceCode julia">plotif(f, fp, 0, 360)  # second color when fp > 0</pre>
+    <div id="6d3c584c-f49c-4338-af4b-5416134c74b4" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('3d2dd9b7-28b2-492c-aac9-14d7385c6532');
+        var PLOT = document.getElementById('6d3c584c-f49c-4338-af4b-5416134c74b4');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -9607,123 +9571,106 @@ fp (generic function with 1 method)</pre>
     "width": 600
 }
 );
+
     
     </script>
-<h3>Practice</h3><h4>question</h4><p>Let $f(x) = e^x$. Using a forward difference and $h=0.001$ graph both the function and its approximate derivative over the interval $[0, 3]$. Estimate graphically the largest difference between the function and its approximate derivative.</p><form name="WeaveQuestion" data-id="cbdeRpqR" data-controltype="radio">
+<h3>Practice</h3><h4>question</h4><p>Let <span class="tex">$f&#40;x&#41; &#61; e^x$</span>. Using a forward difference and <span class="tex">$h&#61;0.001$</span> graph both the function and its approximate derivative over the interval <span class="tex">$&#91;0, 3&#93;$</span>. Estimate graphically the largest difference between the function and its approximate derivative.</p><form name="WeaveQuestion" data-id="qTb63gjI" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_cbdeRpqR" value="1"><div class="markdown"><p>It is about 0.01</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_cbdeRpqR" value="2"><div class="markdown"><p>It is about 0.1</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_cbdeRpqR" value="3"><div class="markdown"><p>It is about 0</p>
-</div>
-    </label>
-    </div>
+  <input type="radio" name="radio_qTb63gjI" id="1" value="1">
+  <label for="1">It is about 0.1</label>
+  <br>
+  <input type="radio" name="radio_qTb63gjI" id="2" value="2">
+  <label for="2">It is about 0.01</label>
+  <br>
+  <input type="radio" name="radio_qTb63gjI" id="3" value="3">
+  <label for="3">It is about 0</label>
+  <br>
 
-<div id="cbdeRpqR_message"></div>
+<div id="qTb63gjI_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_cbdeRpqR']").on("change", function() {
-  correct = this.value == 3;
-
-  if(correct) {
-     $("#cbdeRpqR_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+_.forEach(document.querySelectorAll('input[name="radio_qTb63gjI"]'), function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 3;
+    var msgBox = document.getElementById('qTb63gjI_message');
+    if (correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $("#cbdeRpqR_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
-});
+})});
+
+
+
 
 </script>
-<h4>question</h4><p>Let $f(x) = x^2 \exp(-x)$. Using $h=0.0001$ and an approximate derivative, estimate graphically where $f'(x)$ is positive on the interval $[0,3]$.</p><form name="WeaveQuestion" data-id="byTONJJf" data-controltype="radio">
+<h4>question</h4><p>Let <span class="tex">$f&#40;x&#41; &#61; x^2 \exp&#40;-x&#41;$</span>. Using <span class="tex">$h&#61;0.0001$</span> and an approximate derivative, estimate graphically where <span class="tex">$f&#39;&#40;x&#41;$</span> is positive on the interval <span class="tex">$&#91;0,3&#93;$</span>.</p><form name="WeaveQuestion" data-id="fWkkOKFi" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_byTONJJf" value="1"><div class="markdown"><p>From 0 to about 0.45</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_byTONJJf" value="2"><div class="markdown"><p>Between 0 and 2</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_byTONJJf" value="3"><div class="markdown"><p>It is for the entire interval</p>
-</div>
-    </label>
-    </div>
+  <input type="radio" name="radio_fWkkOKFi" id="1" value="1">
+  <label for="1">From 0 to about 0.45</label>
+  <br>
+  <input type="radio" name="radio_fWkkOKFi" id="2" value="2">
+  <label for="2">It is for the entire interval</label>
+  <br>
+  <input type="radio" name="radio_fWkkOKFi" id="3" value="3">
+  <label for="3">Between 0 and 2</label>
+  <br>
 
-<div id="byTONJJf_message"></div>
+<div id="fWkkOKFi_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_byTONJJf']").on("change", function() {
-  correct = this.value == 2;
-
-  if(correct) {
-     $("#byTONJJf_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+_.forEach(document.querySelectorAll('input[name="radio_fWkkOKFi"]'), function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 3;
+    var msgBox = document.getElementById('fWkkOKFi_message');
+    if (correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $("#byTONJJf_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
-});
+})});
+
+
+
 
 </script>
-<h4>question</h4><p>The critical points of a function are where its derivative is undefined or where its derivative is $0$. For the function $f(x) = 3x^4 -28x^3 + 96x^2 - 144x$ graphically find any critical points over the interval $[0,10]$</p><form name="WeaveQuestion" data-id="M8Nm4whd" data-controltype="radio">
+<h4>question</h4><p>The critical points of a function are where its derivative is undefined or where its derivative is <span class="tex">$0$</span>. For the function <span class="tex">$f&#40;x&#41; &#61; 3x^4 -28x^3 &#43; 96x^2 - 144x$</span> graphically find any critical points over the interval <span class="tex">$&#91;0,10&#93;$</span></p><form name="WeaveQuestion" data-id="WpVu72S5" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_M8Nm4whd" value="1"><div class="markdown"><p>There are two distinct ones: 2, 2.6667</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_M8Nm4whd" value="2"><div class="markdown"><p>There are two distinct ones: 2, 3</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_M8Nm4whd" value="3"><div class="markdown"><p>There are two distinct ones: 2, 4.69</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_M8Nm4whd" value="4"><div class="markdown"><p>There is one at 3</p>
-</div>
-    </label>
-    </div>
+  <input type="radio" name="radio_WpVu72S5" id="1" value="1">
+  <label for="1">There is one at 3</label>
+  <br>
+  <input type="radio" name="radio_WpVu72S5" id="2" value="2">
+  <label for="2">There are two distinct ones: 2, 3</label>
+  <br>
+  <input type="radio" name="radio_WpVu72S5" id="3" value="3">
+  <label for="3">There are two distinct ones: 2, 4.69</label>
+  <br>
+  <input type="radio" name="radio_WpVu72S5" id="4" value="4">
+  <label for="4">There are two distinct ones: 2, 2.6667</label>
+  <br>
 
-<div id="M8Nm4whd_message"></div>
+<div id="WpVu72S5_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_M8Nm4whd']").on("change", function() {
-  correct = this.value == 2;
-
-  if(correct) {
-     $("#M8Nm4whd_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+_.forEach(document.querySelectorAll('input[name="radio_WpVu72S5"]'), function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 2;
+    var msgBox = document.getElementById('WpVu72S5_message');
+    if (correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $("#M8Nm4whd_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
-});
+})});
+
+
+
 
 </script>
-<h2>Improvements to the basic forward difference equation</h2><p>The error in the approximation of the derivative depends on the size of $h$. Mathematically, as $h$ gets smaller we get better approximations, though with the computer other complications arise. To see mathematically that this is the case, let's look at the difference between the approximate numeric derivative from the forward difference and a known derivative.</p><pre class="sourceCode julia">f(x) = sin(x)
+<h2>Improvements to the basic forward difference equation</h2><p>The error in the approximation of the derivative depends on the size of <span class="tex">$h$</span>. Mathematically, as <span class="tex">$h$</span> gets smaller we get better approximations, though with the computer other complications arise. To see mathematically that this is the case, let's look at the difference between the approximate numeric derivative from the forward difference and a known derivative.</p><pre class="sourceCode julia">f(x) = sin(x)
 fp(x) = cos(x)
 [ Df(f,h=h)(.5) - fp(.5) for h=[.1, .01, .001, .0001, .00001] ]</pre>
 <pre class="output">
@@ -9734,7 +9681,7 @@ fp(x) = cos(x)
  -2.3972739644051444e-5
  -2.3971472203898614e-6</pre>
 
-<p>It gets better as $h$ gets smaller. In fact, it looks like when $h$ gets smaller by a factor of $1/10$ so does the error. Let's look a little deeper though. Rather than type in the values of $h$ as above, let's use an expression to compute them. Here we find the powers $10^{-1}, \dots, 10^{-16}$ at once and then compute the differences:</p><pre class="sourceCode julia">hs = [(1/10)^i for i in 1:16];
+<p>It gets better as <span class="tex">$h$</span> gets smaller. In fact, it looks like when <span class="tex">$h$</span> gets smaller by a factor of <span class="tex">$1/10$</span> so does the error. Let's look a little deeper though. Rather than type in the values of <span class="tex">$h$</span> as above, let's use an expression to compute them. Here we find the powers <span class="tex">$10^&#123;-1&#125;, \dots, 10^&#123;-16&#125;$</span> at once and then compute the differences:</p><pre class="sourceCode julia">hs = [(1/10)^i for i in 1:16];
 out = [ Df(f,h=h)(.5) - fp(.5) for h in hs ];
 [hs out]</pre>
 <pre class="output">
@@ -9756,15 +9703,15 @@ out = [ Df(f,h=h)(.5) - fp(.5) for h in hs ];
  1.0000000000000009e-15   0.010595857809751696
  1.0000000000000008e-16   0.2326404627347829</pre>
 
-<p>When we look, we see that for awhile the approximation gets better (to about <code>1e-9</code>), but then does a U-turn and starts getting worse. The mathematical approximation gets better and better, but what happens is the computational error gets worse. We'll see below how to pick the $h$ that best balances these off, but first lets look at how using different approximations for the derivative can improve the "mathematical" error.</p><h3>Central difference</h3><p>It turns out that just by looking to the left and the right we can improve the mathematical error from getting better at a rate of $h$ to a rate of $h^2$, provided our function is smooth enough and we don't have issues on the boundaries. The formula, called the <em>central difference</em> approximation to the derivative is:</p>$$~
+<p>When we look, we see that for awhile the approximation gets better (to about <code>1e-9</code>), but then does a U-turn and starts getting worse. The mathematical approximation gets better and better, but what happens is the computational error gets worse. We'll see below how to pick the <span class="tex">$h$</span> that best balances these off, but first lets look at how using different approximations for the derivative can improve the "mathematical" error.</p><h3>Central difference</h3><p>It turns out that just by looking to the left and the right we can improve the mathematical error from getting better at a rate of <span class="tex">$h$</span> to a rate of <span class="tex">$h^2$</span>, provided our function is smooth enough and we don't have issues on the boundaries. The formula, called the <em>central difference</em> approximation to the derivative is:</p>$$~
 f'(x) \approx \frac{ f(x + h) - f(x - h) }{2h}
 ~$$
-<p>For this the mathematical error is like $h^2$, not $h$.</p><p>Let's compare. To make our life easier we again create some functions, as we did with <code>Df</code> above.</p><pre class="sourceCode julia">central_difference(f, x0, h) = (f(x0 + h) - f(x0 - h)) / (2h)
+<p>For this the mathematical error is like <span class="tex">$h^2$</span>, not <span class="tex">$h$</span>.</p><p>Let's compare. To make our life easier we again create some functions, as we did with <code>Df</code> above.</p><pre class="sourceCode julia">central_difference(f, x0, h) = (f(x0 + h) - f(x0 - h)) / (2h)
 Dc(f; h=0.0001) = x -> central_difference(f, x, h)</pre>
 <pre class="output">
 Dc (generic function with 1 method)</pre>
 
-<p>Now to see whether a forward difference or central difference works better. We can do so with a table. Again with $f(x) = \sin(x)$</p><pre class="sourceCode julia">f(x) = sin(x)
+<p>Now to see whether a forward difference or central difference works better. We can do so with a table. Again with <span class="tex">$f&#40;x&#41; &#61; \sin&#40;x&#41;$</span></p><pre class="sourceCode julia">f(x) = sin(x)
 fp(x) = cos(x)
 using_D =  [ Df(f,h=h)(.5) - fp(.5) for h in hs ];
 using_Dc = [ Dc(f,h=h)(.5) - fp(.5) for h in hs ];
@@ -9788,7 +9735,7 @@ using_Dc = [ Dc(f,h=h)(.5) - fp(.5) for h in hs ];
  1.0000000000000009e-15   0.010595857809751696     0.010595857809751696
  1.0000000000000008e-16   0.2326404627347829       0.2326404627347829</pre>
 
-<p>The errors for the central difference are either much smaller for the same size $h$ or the same. We see that we can use a larger $h$ to get the most accuracy in this example.</p><div class="alert alert-danger" role="alert">
+<p>The errors for the central difference are either much smaller for the same size <span class="tex">$h$</span> or the same. We see that we can use a larger <span class="tex">$h$</span> to get the most accuracy in this example.</p><div class="alert alert-danger" role="alert">
 
 <span class="glyphicon glyphicon-th" aria-hidden="true"></span>
 
@@ -9797,30 +9744,30 @@ using_Dc = [ Dc(f,h=h)(.5) - fp(.5) for h in hs ];
 
 </div>
 
-<p>Let $f(x) = 10/(1+x^2) - 10\exp(-(1/2)x^2)$. The tangent line at $x=c$ is given by</p>$$~
+<p>Let <span class="tex">$f&#40;x&#41; &#61; 10/&#40;1&#43;x^2&#41; - 10\exp&#40;-&#40;1/2&#41;x^2&#41;$</span>. The tangent line at <span class="tex">$x&#61;c$</span> is given by</p>$$~
 y = f( c) - f'( c)(x - c)
 ~$$
-<p>and this intersects the $x$ axis when $y=0$. Solving this gives:</p>$$~
+<p>and this intersects the <span class="tex">$x$</span> axis when <span class="tex">$y&#61;0$</span>. Solving this gives:</p>$$~
 c - f( c)/f'( c)
 ~$$
-<p>Our goal is to compute this value for any $c > 0$.</p><p>Doing so is easy:</p><pre class="sourceCode julia">f(x) = 10/(1+x^2) - 10*exp(-(1/2)*x^2)
+<p>Our goal is to compute this value for any <span class="tex">$c &gt; 0$</span>.</p><p>Doing so is easy:</p><pre class="sourceCode julia">f(x) = 10/(1+x^2) - 10*exp(-(1/2)*x^2)
 fp(x) = Dc(f)(x)
 intersection_point(c) = c - f(c)/fp(c)</pre>
 <pre class="output">
 intersection_point (generic function with 1 method)</pre>
 
-<p>For example, when $c=1$ we have:</p><pre class="sourceCode julia">c = 1;
+<p>For example, when <span class="tex">$c&#61;1$</span> we have:</p><pre class="sourceCode julia">c = 1;
 intersection_point(c)</pre>
 <pre class="output">
 2.000000018978514</pre>
 
-<p>You can tell from the graph of $f(x)$ that this value should be more than 1, as it is.</p><pre class="sourceCode julia">plot(f, .5, 2.1, legend=false)
+<p>You can tell from the graph of <span class="tex">$f&#40;x&#41;$</span> that this value should be more than 1, as it is.</p><pre class="sourceCode julia">plot(f, .5, 2.1, legend=false)
 plot!(zero)
 plot!(x -> f(c) + fp(c)*(x-c))</pre>
-    <div id="3fa75825-422d-45c3-ac3b-fcf9065df2e9" style="width:600px;height:400px;"></div>
+    <div id="dac5f73d-200a-4274-aa91-13535c92394e" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('3fa75825-422d-45c3-ac3b-fcf9065df2e9');
+        var PLOT = document.getElementById('dac5f73d-200a-4274-aa91-13535c92394e');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -9911,27 +9858,27 @@ plot!(x -> f(c) + fp(c)*(x-c))</pre>
         },
         "yaxis": "y",
         "x": [
-            0.452,
-            0.4685628290575607,
-            0.6217100995175604,
-            0.7137452255743382,
-            0.7915597533419387,
-            0.8760881411760553,
-            0.9540158380907293,
-            1.0375625651054068,
-            1.1343596415981507,
-            1.2203814599642924,
-            1.2958148427722131,
-            1.3780574784874218,
-            1.4607889047647693,
-            1.5522590758109895,
-            1.6392906355032546,
-            1.7297832641952504,
-            1.8059587822189693,
-            1.8989604555928734,
-            1.9863847716102896,
-            2.126445305371238,
-            2.148
+            0.5,
+            0.515625310431661,
+            0.6601038674693965,
+            0.7469294580889982,
+            0.8203393899452252,
+            0.9000831520528824,
+            0.973599847255405,
+            1.0524175142503838,
+            1.1437355109416516,
+            1.2248881697776344,
+            1.2960517384643522,
+            1.373639130648511,
+            1.4516876460044994,
+            1.5379802601990469,
+            1.6200855051917495,
+            1.7054559096181607,
+            1.7773196058669523,
+            1.8650570335781826,
+            1.9475328034059336,
+            2.079665382425696,
+            2.1
         ],
         "showlegend": true,
         "mode": "lines",
@@ -9977,27 +9924,27 @@ plot!(x -> f(c) + fp(c)*(x-c))</pre>
         },
         "yaxis": "y",
         "x": [
-            0.40112000000000003,
-            0.4186765988010143,
-            0.5810127054886141,
-            0.6785699391087984,
-            0.761053338542455,
-            0.8506534296466185,
-            0.9332567883761731,
-            1.021816319011731,
-            1.1244212200940398,
-            1.21560434756215,
-            1.295563733338546,
-            1.382740927196667,
-            1.4704362390506553,
-            1.567394620359649,
-            1.6596480736334498,
-            1.7555702600469654,
-            1.8363163091521075,
-            1.934898082928446,
-            2.027567857906907,
-            2.176032023693512,
-            2.19888
+            0.5,
+            0.515625310431661,
+            0.6601038674693965,
+            0.7469294580889982,
+            0.8203393899452252,
+            0.9000831520528824,
+            0.973599847255405,
+            1.0524175142503838,
+            1.1437355109416516,
+            1.2248881697776344,
+            1.2960517384643522,
+            1.373639130648511,
+            1.4516876460044994,
+            1.5379802601990469,
+            1.6200855051917495,
+            1.7054559096181607,
+            1.7773196058669523,
+            1.8650570335781826,
+            1.9475328034059336,
+            2.079665382425696,
+            2.1
         ],
         "showlegend": true,
         "mode": "lines",
@@ -10012,27 +9959,27 @@ plot!(x -> f(c) + fp(c)*(x-c))</pre>
             "width": 1
         },
         "y": [
-            -1.7032973999052352,
-            -1.6845942397343725,
-            -1.5116565176103691,
-            -1.4077281550097978,
-            -1.3198580471073609,
-            -1.224406480762504,
-            -1.1364085794331857,
-            -1.042065528999205,
-            -0.9327598530531859,
-            -0.8356218676583311,
-            -0.7504406081051809,
-            -0.657570170131706,
-            -0.5641477776496193,
-            -0.4608573763547561,
-            -0.36257916583966454,
-            -0.260392629781913,
-            -0.17437333261083654,
-            -0.06935352064360745,
-            0.02936820012156871,
-            0.1875280523692573,
-            0.21186815179760643
+            -1.5979598855805328,
+            -1.581314139611449,
+            -1.427400182576914,
+            -1.3349043098458964,
+            -1.2567002266290606,
+            -1.1717486723883546,
+            -1.0934308534765371,
+            -1.0094658744502103,
+            -0.9121842119849033,
+            -0.8257317507933275,
+            -0.7499207330350945,
+            -0.6672663738561389,
+            -0.5841207771294683,
+            -0.49219268768939783,
+            -0.4047254301999964,
+            -0.3137797768912107,
+            -0.2372229086364258,
+            -0.14375564985462697,
+            -0.05589366982154065,
+            0.08486803563208078,
+            0.10653063747290403
         ],
         "type": "scatter"
     }
@@ -10049,8 +9996,8 @@ plot!(x -> f(c) + fp(c)*(x-c))</pre>
             2.0
         ],
         "range": [
-            0.34718720000000003,
-            2.2528128
+            0.452,
+            2.148
         ],
         "domain": [
             0.0658209390492855,
@@ -10109,8 +10056,8 @@ plot!(x -> f(c) + fp(c)*(x-c))</pre>
             0.5
         ],
         "range": [
-            -1.7767740293757417,
-            0.8194002119154877
+            -1.6682763896212982,
+            0.8162400864857466
         ],
         "domain": [
             0.03762029746281716,
@@ -10152,6 +10099,7 @@ plot!(x -> f(c) + fp(c)*(x-c))</pre>
     "width": 600
 }
 );
+
     
     </script>
 <p><hr/></p><div class="alert alert-info" role="alert">
@@ -10168,112 +10116,112 @@ intersection_point (generic function with 2 methods)</pre>
 <pre class="output">
 f (generic function with 1 method)</pre>
 
-<p>This defines $f$ as a Bessel function of the first kind with order $\alpha=1$. Plot the approximate derivative over the interval $[0,5]$. There is one zero. What is its approximate value:</p><form name='WeaveQuestion' data-id='aAJ7EAOf' data-controltype='numeric'>
+<p>This defines <span class="tex">$f$</span> as a Bessel function of the first kind with order <span class="tex">$\alpha&#61;1$</span>. Plot the approximate derivative over the interval <span class="tex">$&#91;0,5&#93;$</span>. There is one zero. What is its approximate value:</p><form name='WeaveQuestion' data-id='5jcExeLM' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="aAJ7EAOf" type="number" class="form-control">
+<input id="5jcExeLM" type="number" class="form-control">
 
 </div>
 
-<div id='aAJ7EAOf_message'></div>
+<div id='5jcExeLM_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#aAJ7EAOf').on('change', function() {
-  correct = Math.abs(this.value - 1.8411837814875183) <= 0.1;
-
+document.getElementById("5jcExeLM").addEventListener("change", function() {
+  var correct = Math.abs(this.value - 1.8411837814875183) <= 0.1;
+  var msgBox = document.getElementById('5jcExeLM_message');
   if(correct) {
-     $('#aAJ7EAOf_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#aAJ7EAOf_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
-<h4>question</h4><p>Let $f(x) = \sin(\cos(x))$. Plot the approximate derivative of $f$. How many zeros are there between $5$ and $20$?</p><form name='WeaveQuestion' data-id='HYwM3LYi' data-controltype='numeric'>
+<h4>question</h4><p>Let <span class="tex">$f&#40;x&#41; &#61; \sin&#40;\cos&#40;x&#41;&#41;$</span>. Plot the approximate derivative of <span class="tex">$f$</span>. How many zeros are there between <span class="tex">$5$</span> and <span class="tex">$20$</span>?</p><form name='WeaveQuestion' data-id='o35TYSvA' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="HYwM3LYi" type="number" class="form-control">
+<input id="o35TYSvA" type="number" class="form-control">
 
 </div>
 
-<div id='HYwM3LYi_message'></div>
+<div id='o35TYSvA_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#HYwM3LYi').on('change', function() {
-  correct = Math.abs(this.value - 5) <= 1.0e-10;
-
+document.getElementById("o35TYSvA").addEventListener("change", function() {
+  var correct = Math.abs(this.value - 5) <= 1.0e-10;
+  var msgBox = document.getElementById('o35TYSvA_message');
   if(correct) {
-     $('#HYwM3LYi_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#HYwM3LYi_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
-<h4>question</h4><p>Let $f(x) = |x^2 - 2|$. Plot the derivative of $f(x)$ over the interval $[-2,2]$. How many critical points do you see? (A critical point is where the derivative is $0$ <em>or</em> undefined.)</p><form name='WeaveQuestion' data-id='5sqddIrh' data-controltype='numeric'>
+<h4>question</h4><p>Let <span class="tex">$f&#40;x&#41; &#61; |x^2 - 2|$</span>. Plot the derivative of <span class="tex">$f&#40;x&#41;$</span> over the interval <span class="tex">$&#91;-2,2&#93;$</span>. How many critical points do you see? (A critical point is where the derivative is <span class="tex">$0$</span> <em>or</em> undefined.)</p><form name='WeaveQuestion' data-id='IgD2FfWF' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="5sqddIrh" type="number" class="form-control">
+<input id="IgD2FfWF" type="number" class="form-control">
 
 </div>
 
-<div id='5sqddIrh_message'></div>
+<div id='IgD2FfWF_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#5sqddIrh').on('change', function() {
-  correct = Math.abs(this.value - 3) <= 1.0e-10;
-
+document.getElementById("IgD2FfWF").addEventListener("change", function() {
+  var correct = Math.abs(this.value - 3) <= 1.0e-10;
+  var msgBox = document.getElementById('IgD2FfWF_message');
   if(correct) {
-     $('#5sqddIrh_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#5sqddIrh_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
-<h2>Automatic differentiation</h2><p>We discuss now <a href="http://en.wikipedia.org/wiki/Automatic_differentiation">Forward Mode Automatic Differentiation</a>.</p><p>Automatic differentiation avoids the numeric instability issues of finite differences by using a different approach. Whereas finite differences have a long history, automatic differentiation only dates back to the 60s.</p><p>The <code>Zygote</code> package implements automatic differentiation. This package overloads the idea of <code>&#39;</code>, so uses automatic differentiation when the notation <code>f&#39;</code> is encountered. </p><p>That means, we can find derivatives, as familiarly as:</p><pre class="sourceCode julia">f(x) = x^x
+<h2>Automatic differentiation</h2><p>We discuss now <a href="http://en.wikipedia.org/wiki/Automatic_differentiation">Forward Mode Automatic Differentiation</a>.</p><p>Automatic differentiation avoids the numeric instability issues of finite differences by using a different approach. Whereas finite differences have a long history, automatic differentiation only dates back to the 60s.</p><p>The <code>ForwardDiff</code> package implements automatic differentiation.</p><p>The <code>MTH229</code> package overloads the idea of <code>&#39;</code>, so uses automatic differentiation when the notation <code>f&#39;</code> is encountered.</p><p>That means, we can find derivatives, as familiarly as:</p><pre class="sourceCode julia">f(x) = x^x
 f'(1)</pre>
 <pre class="output">
 1.0</pre>
 
-<p>Unlike, finite differences automatic differentiation does not have issues arising from the loss of precision encountered when subtracting two like-sized numbers. Unlike symbolic derivatives (such as those found by the Wolfram Alpha website used by your iPhone's Siri) they can be computed quickly, even if the computations defining the function involve many steps.</p><p>So what is automatic differentiation? The idea of the forward mode is quite intuitive. The <em>tangent line</em> approximation of a function at the point $c$ becomes</p>$$~
+<p>Here <code>f</code> is a  function, <code>f&#39;</code> is a derived function, and <code>f&#39;&#40;1&#41;</code> is this derived function evaluated at <code>1</code> – just as with the use within a math text book.</p><p>Unlike, finite differences automatic differentiation does not have issues arising from the loss of precision encountered when subtracting two like-sized numbers. Unlike symbolic derivatives (such as those found by the Wolfram Alpha website used by your iPhone's Siri) they can be computed quickly, even if the computations defining the function involve many steps.</p><p>So what is automatic differentiation? The idea of the forward mode is quite intuitive. The <em>tangent line</em> approximation of a function at the point <span class="tex">$c$</span> becomes</p>$$~
 f(x) = f(c) + f'( c)(x-c) + O((x-c)^2)
 ~$$
-<p>Where the notation $O(x-c)^2$ means that the last term is not precisely spelled out, but is like some constant times the difference $(x-c)^2$. This has many applications, but for this one it reduces the knowledge of the function values at this level to two values $(f(c), f'(c))$</p><p>Now consider the product of two functions $f(x)$ and $g(x)$? The above formula applied to $f \cdot g$ is:</p>$$~
+<p>Where the notation <span class="tex">$O&#40;x-c&#41;^2$</span> means that the last term is not precisely spelled out, but is like some constant times the difference <span class="tex">$&#40;x-c&#41;^2$</span>. This has many applications, but for this one it reduces the knowledge of the function values at this level to two values <span class="tex">$&#40;f&#40;c&#41;, f&#39;&#40;c&#41;&#41;$</span></p><p>Now consider the product of two functions <span class="tex">$f&#40;x&#41;$</span> and <span class="tex">$g&#40;x&#41;$</span>? The above formula applied to <span class="tex">$f \cdot g$</span> is:</p>$$~
 (f\cdot g)(x) = f(c) \cdot g(c) + (f'( c)g( c) + f( c)g'( c))(x-c) + O((x-c)^2)
 ~$$
-<p>This follows by the product rule. Again we have that two values determine the product $f\cdot g$ at this level, these being $(f(c) \cdot g(c)$, and $f'( c)g( c) + f( c)g'( c)$. <em>But</em>, this combination can be made from the values $(f(c), f'(c))$ and $(g(c), g'(c))$ which represent $f$ and $g$. Hence it is enough to know the two values for $f$ and $g$ to compute the two values for $f\cdot g$.</p><p>In fact, the rules of derivatives allow us to say the same for addition, subtraction, multiplication, division, powers <em>and</em> composition. For composition this is from the chain rule:</p>$$~
+<p>This follows by the product rule. Again we have that two values determine the product <span class="tex">$f\cdot g$</span> at this level, these being <span class="tex">$&#40;f&#40;c&#41; \cdot g&#40;c&#41;$</span>, and <span class="tex">$f&#39;&#40; c&#41;g&#40; c&#41; &#43; f&#40; c&#41;g&#39;&#40; c&#41;$</span>. <em>But</em>, this combination can be made from the values <span class="tex">$&#40;f&#40;c&#41;, f&#39;&#40;c&#41;&#41;$</span> and <span class="tex">$&#40;g&#40;c&#41;, g&#39;&#40;c&#41;&#41;$</span> which represent <span class="tex">$f$</span> and <span class="tex">$g$</span>. Hence it is enough to know the two values for <span class="tex">$f$</span> and <span class="tex">$g$</span> to compute the two values for <span class="tex">$f\cdot g$</span>.</p><p>In fact, the rules of derivatives allow us to say the same for addition, subtraction, multiplication, division, powers <em>and</em> composition. For composition this is from the chain rule:</p>$$~
 (f \circ g)(x) = (f \circ g)(c) + f'( g(c)) g'(c) (x-c) + O((x-c)^2).
 ~$$
-<p>Automatic differentiation can be implemented by extending how we store a value, storing both $(x, dx)$ as above.  With this, the rules of differentials inform us how we combine these values. For example:</p><ul>
-<li>$(x, dx) + (y, dy) = (x + y, d(x+y)) = (x + y, 1dx +  1dy)$
+<p>Automatic differentiation can be implemented by extending how we store a value, storing both <span class="tex">$&#40;x, dx&#41;$</span> as above.  With this, the rules of differentials inform us how we combine these values. For example:</p><ul>
+<li><p class="tex">$$&#40;x, dx&#41; &#43; &#40;y, dy&#41; &#61; &#40;x &#43; y, d&#40;x&#43;y&#41;&#41; &#61; &#40;x &#43; y, 1dx &#43;  1dy&#41;$$</p>
 </li>
-<li>$(x, dx) \cdot (y, dy) = (xy, d(xy)) = (xy, y dx + x dy)$
+<li><p class="tex">$$&#40;x, dx&#41; \cdot &#40;y, dy&#41; &#61; &#40;xy, d&#40;xy&#41;&#41; &#61; &#40;xy, y dx &#43; x dy&#41;$$</p>
 </li>
-<li>$(x, dx)^n = (x^n, d(x^n)) = (x^n, n x^{n-1} dx)$
+<li><p class="tex">$$&#40;x, dx&#41;^n &#61; &#40;x^n, d&#40;x^n&#41;&#41; &#61; &#40;x^n, n x^&#123;n-1&#125; dx&#41;$$</p>
 </li>
 </ul><p>etc.</p><p>For functions we need to use the chain rule:</p><ul>
-<li>$f((x, dx)) = (f(x), d(f(x))) = (f(x), f'(x) dx )$
+<li><p class="tex">$$f&#40;&#40;x, dx&#41;&#41; &#61; &#40;f&#40;x&#41;, d&#40;f&#40;x&#41;&#41;&#41; &#61; &#40;f&#40;x&#41;, f&#39;&#40;x&#41; dx &#41;$$</p>
 </li>
 </ul><h3>Examples</h3><p>Using <code>&#39;</code>, we see that plotting a function and its derivative is straightforward:</p><pre class="sourceCode julia">f(x) = exp(-x)*sin(x)
 plot(f, 0, 2pi)
 plot!(f')</pre>
-    <div id="1dc3e601-d857-4f97-9552-7ffcb4b2ce5d" style="width:600px;height:400px;"></div>
+    <div id="957de3c6-6c0d-42b8-a5fa-5b6adeb5c2b8" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('1dc3e601-d857-4f97-9552-7ffcb4b2ce5d');
+        var PLOT = document.getElementById('957de3c6-6c0d-42b8-a5fa-5b6adeb5c2b8');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -10416,45 +10364,45 @@ plot!(f')</pre>
         },
         "yaxis": "y",
         "x": [
-            -0.18849555921538758,
-            -0.17223503981229504,
-            -0.15597452040920248,
-            -0.13971400100610992,
-            -0.12345348160301738,
-            -0.04827749101013237,
-            0.026898499582752623,
-            0.10207449017563762,
-            0.17725048076852262,
-            0.2524264713614076,
-            0.32760246195429266,
-            0.40277845254717765,
-            0.47795444314006263,
-            0.56830971685637,
-            0.6586649905726774,
-            0.7490202642889847,
-            0.8393755380052922,
-            0.9157697719981837,
-            0.9921640059910752,
-            1.0685582399839668,
-            1.1449524739768584,
-            1.3109235753765143,
-            1.47689467677617,
-            1.6299053518626152,
-            1.7829160269490605,
-            2.1110032567250383,
-            2.4911244872232556,
-            2.828931378007638,
-            3.125157579588626,
-            3.4481236548070773,
-            3.773009206074478,
-            4.132211727801238,
-            4.473983863500838,
-            4.829347585379343,
-            5.128488145137733,
-            5.4937048624415015,
-            5.837019348623285,
-            6.38703577852486,
-            6.471680866394974
+            0.0,
+            0.015340112644426933,
+            0.030680225288853866,
+            0.0460203379332808,
+            0.06136045057770773,
+            0.1322811964200521,
+            0.20320194226239643,
+            0.2741226881047408,
+            0.34504343394708514,
+            0.41596417978942946,
+            0.4868849256317738,
+            0.5578056714741182,
+            0.6287264173164625,
+            0.7139672415771299,
+            0.7992080658377971,
+            0.8844488900984645,
+            0.9696897143591319,
+            1.0417597464278976,
+            1.113829778496663,
+            1.1858998105654286,
+            1.2579698426341943,
+            1.4145463533885865,
+            1.5711228641429789,
+            1.7154725576207572,
+            1.8598222510985358,
+            2.1693385056041756,
+            2.5279434400364558,
+            2.846629186059458,
+            3.1260878667962397,
+            3.43077284341742,
+            3.7372686464998734,
+            4.076138950015684,
+            4.398565493128515,
+            4.733814287353519,
+            5.016022362597284,
+            5.360566435525367,
+            5.684448026262899,
+            6.203331450698347,
+            6.283185307179586
         ],
         "showlegend": true,
         "mode": "lines",
@@ -10469,45 +10417,45 @@ plot!(f')</pre>
             "width": 1
         },
         "y": [
-            1.4122949288528603,
-            1.3739779264861338,
-            1.336172135372795,
-            1.2988808674077785,
-            1.2621070608162817,
-            1.0988847751612256,
-            0.9469264437997346,
-            0.8062528540820795,
-            0.6767635788253049,
-            0.5582549501563693,
-            0.4504366067053849,
-            0.352946639816143,
-            0.26536537554644235,
-            0.17255254351452204,
-            0.09250976043184245,
-            0.024319881402944554,
-            -0.03295942904732535,
-            -0.07357890142487764,
-            -0.10764739320094283,
-            -0.13572469869917206,
-            -0.1583560824771134,
-            -0.1912511982486299,
-            -0.2059291552465127,
-            -0.2071814686844193,
-            -0.19977884493205691,
-            -0.16616148804754063,
-            -0.11605608588751605,
-            -0.07438313857745697,
-            -0.04464603820700175,
-            -0.02072535325291819,
-            -0.0049850464391577205,
-            0.004624738016587962,
-            0.008386740204194863,
-            0.008869707493517976,
-            0.007814969314212246,
-            0.005816017064493417,
-            0.003890865367953748,
-            0.0014996786131513764,
-            0.0012294205022001525
+            1.0,
+            0.9695550845943993,
+            0.93958067978216,
+            0.9100764617293519,
+            0.8810418984673482,
+            0.7528875309743965,
+            0.634625302118615,
+            0.5260552738516516,
+            0.4269131246143155,
+            0.3368811403911599,
+            0.2555982526241395,
+            0.18266915496668718,
+            0.11767253526229005,
+            0.049426497262895275,
+            -0.008782135854274176,
+            -0.057749870126385716,
+            -0.09827168223526783,
+            -0.12652312342119795,
+            -0.14975932117717372,
+            -0.168428891805188,
+            -0.18296437257193807,
+            -0.20225511245274283,
+            -0.20787955419008605,
+            -0.2039329200779943,
+            -0.1936196561889144,
+            -0.15876581250392535,
+            -0.1112259250168442,
+            -0.07240546621478844,
+            -0.04456435158073201,
+            -0.0217896508752738,
+            -0.006352569566809976,
+            0.003566784012995811,
+            0.00789905472718596,
+            0.008979225883154791,
+            0.008310084200212052,
+            0.006581863929800907,
+            0.004722590978270082,
+            0.0021775826813764704,
+            0.0018674427317079897
         ],
         "type": "scatter"
     }
@@ -10527,12 +10475,12 @@ plot!(f')</pre>
             6.0
         ],
         "range": [
-            -0.3883008519836984,
-            6.671486159163284
+            -0.18849555921538758,
+            6.471680866394974
         ],
         "domain": [
-            0.05100612423447069,
-            0.9934383202099737
+            0.0658209390492855,
+            0.9934383202099738
         ],
         "mirror": false,
         "tickangle": 0,
@@ -10584,14 +10532,14 @@ plot!(f')</pre>
         "gridwidth": 0.5,
         "tickvals": [
             0.0,
-            0.30000000000000004,
-            0.6000000000000001,
-            0.9000000000000001,
-            1.2000000000000002
+            0.25,
+            0.5,
+            0.75,
+            1.0
         ],
         "range": [
-            -0.2557657606105377,
-            1.4608792207789787
+            -0.24411594081578863,
+            1.0362363866257025
         ],
         "domain": [
             0.03762029746281716,
@@ -10601,11 +10549,11 @@ plot!(f')</pre>
         "tickangle": 0,
         "showline": true,
         "ticktext": [
-            "0.0",
-            "0.3",
-            "0.6",
-            "0.9",
-            "1.2"
+            "0.00",
+            "0.25",
+            "0.50",
+            "0.75",
+            "1.00"
         ],
         "zeroline": false,
         "tickfont": {
@@ -10630,7 +10578,7 @@ plot!(f')</pre>
         "tickcolor": "rgb(0, 0, 0)",
         "type": "-"
     },
-    "legend": {
+    "legend_position": {
         "yanchor": "auto",
         "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
@@ -10657,16 +10605,17 @@ plot!(f')</pre>
     "width": 600
 }
 );
+
     
     </script>
 <p>Second derivatives are also available:</p><pre class="sourceCode julia">f(x) = x^2 - 2x
 plot(f, -2, 2)
 plot!(f')
 plot!(f'')</pre>
-    <div id="f3654cb7-66a3-400e-aae2-a6de5a00c671" style="width:600px;height:400px;"></div>
+    <div id="b28de26c-b1e5-4e97-b287-8e28807984d0" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('f3654cb7-66a3-400e-aae2-a6de5a00c671');
+        var PLOT = document.getElementById('b28de26c-b1e5-4e97-b287-8e28807984d0');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -10741,27 +10690,27 @@ plot!(f'')</pre>
         },
         "yaxis": "y",
         "x": [
-            -2.12,
-            -2.0785929273560986,
-            -1.6957247512060991,
-            -1.4656369360641548,
-            -1.2711006166451533,
-            -1.059779647059862,
-            -0.8649604047731766,
-            -0.656093587236483,
-            -0.4141008960046231,
-            -0.19904635008926908,
-            -0.010462893069467153,
-            0.19514369621855449,
-            0.40197226191192326,
-            0.6306476895274741,
-            0.8482265887581363,
-            1.0744581604881263,
-            1.2648969555474234,
-            1.4974011389821837,
-            1.715961929025724,
-            2.066113263428094,
-            2.12
+            -2.0,
+            -1.9609367239208475,
+            -1.5997403313265088,
+            -1.3826763547775045,
+            -1.1991515251369371,
+            -0.9997921198677943,
+            -0.8160003818614874,
+            -0.6189562143740406,
+            -0.3906612226458709,
+            -0.18777957555591424,
+            -0.009870653839119958,
+            0.18409782662127785,
+            0.3792191150112484,
+            0.5949506504976171,
+            0.8002137629793739,
+            1.0136397740454022,
+            1.1932990146673805,
+            1.4126425839454564,
+            1.618832008514834,
+            1.9491634560642397,
+            2.0
         ],
         "showlegend": true,
         "mode": "lines",
@@ -10776,27 +10725,27 @@ plot!(f'')</pre>
             "width": 1
         },
         "y": [
-            -6.24,
-            -6.157185854712197,
-            -5.391449502412199,
-            -4.93127387212831,
-            -4.542201233290307,
-            -4.119559294119724,
-            -3.7299208095463534,
-            -3.312187174472966,
-            -2.828201792009246,
-            -2.3980927001785384,
-            -2.0209257861389345,
-            -1.6097126075628911,
-            -1.1960554761761535,
-            -0.7387046209450518,
-            -0.30354682248372744,
-            0.14891632097625251,
-            0.5297939110948469,
-            0.9948022779643675,
-            1.431923858051448,
-            2.132226526856188,
-            2.24
+            -6.0,
+            -5.921873447841695,
+            -5.199480662653018,
+            -4.765352709555009,
+            -4.398303050273874,
+            -3.9995842397355883,
+            -3.6320007637229748,
+            -3.237912428748081,
+            -2.7813224452917416,
+            -2.3755591511118284,
+            -2.01974130767824,
+            -1.6318043467574443,
+            -1.2415617699775032,
+            -0.8100986990047658,
+            -0.3995724740412523,
+            0.02727954809080435,
+            0.38659802933476106,
+            0.8252851678909128,
+            1.237664017029668,
+            1.8983269121284794,
+            2.0
         ],
         "type": "scatter"
     },
@@ -10807,27 +10756,27 @@ plot!(f'')</pre>
         },
         "yaxis": "y",
         "x": [
-            -2.2472000000000003,
-            -2.203308502997465,
-            -1.7974682362784653,
-            -1.5535751522280044,
-            -1.3473666536438627,
-            -1.1233664258834537,
-            -0.9168580290595673,
-            -0.6954592024706722,
-            -0.43894694976490056,
-            -0.21098913109462525,
-            -0.011090666653635185,
-            0.2068523179916678,
-            0.42609059762663876,
-            0.6684865508991226,
-            0.8991201840836246,
-            1.138925650117414,
-            1.3407907728802688,
-            1.587245207321115,
-            1.8189196447672678,
-            2.19008005923378,
-            2.2472000000000003
+            -2.0,
+            -1.9609367239208475,
+            -1.5997403313265088,
+            -1.3826763547775045,
+            -1.1991515251369371,
+            -0.9997921198677943,
+            -0.8160003818614874,
+            -0.6189562143740406,
+            -0.3906612226458709,
+            -0.18777957555591424,
+            -0.009870653839119958,
+            0.18409782662127785,
+            0.3792191150112484,
+            0.5949506504976171,
+            0.8002137629793739,
+            1.0136397740454022,
+            1.1932990146673805,
+            1.4126425839454564,
+            1.618832008514834,
+            1.9491634560642397,
+            2.0
         ],
         "showlegend": true,
         "mode": "lines",
@@ -10880,11 +10829,11 @@ plot!(f'')</pre>
             2.0
         ],
         "range": [
-            -2.382032,
-            2.382032
+            -2.12,
+            2.12
         ],
         "domain": [
-            0.03619130941965587,
+            0.0658209390492855,
             0.9934383202099738
         ],
         "mirror": false,
@@ -10934,15 +10883,16 @@ plot!(f'')</pre>
         "showticklabels": true,
         "gridwidth": 0.5,
         "tickvals": [
-            -6.0,
-            -3.0,
+            -5.0,
+            -2.5,
             0.0,
-            3.0,
-            6.0
+            2.5,
+            5.0,
+            7.5
         ],
         "range": [
-            -6.6672,
-            8.4272
+            -6.42,
+            8.42
         ],
         "domain": [
             0.03762029746281716,
@@ -10952,11 +10902,12 @@ plot!(f'')</pre>
         "tickangle": 0,
         "showline": true,
         "ticktext": [
-            "−6",
-            "−3",
-            "0",
-            "3",
-            "6"
+            "−5.0",
+            "−2.5",
+            "0.0",
+            "2.5",
+            "5.0",
+            "7.5"
         ],
         "zeroline": false,
         "tickfont": {
@@ -10981,7 +10932,7 @@ plot!(f'')</pre>
         "tickcolor": "rgb(0, 0, 0)",
         "type": "-"
     },
-    "legend": {
+    "legend_position": {
         "yanchor": "auto",
         "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
@@ -11008,6 +10959,7 @@ plot!(f'')</pre>
     "width": 600
 }
 );
+
     
     </script>
 <p>Here is an example where we plot the tangent line and the function. The <code>MTH229</code> package provides this function to compute a tangent line function:</p><pre class="sourceCode julia">tangent(f, c) = x -> f(c) + f'(c)*(x-c)</pre>
@@ -11015,10 +10967,10 @@ plot!(f'')</pre>
 c = 1
 plot(f, 1/2, 2)
 plot!(tangent(f, c))</pre>
-    <div id="9ad43b9a-3e61-408d-995f-a2a18e792e5a" style="width:600px;height:400px;"></div>
+    <div id="f37f1544-b1af-4cbb-a0b7-04d96a66ad50" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('9ad43b9a-3e61-408d-995f-a2a18e792e5a');
+        var PLOT = document.getElementById('f37f1544-b1af-4cbb-a0b7-04d96a66ad50');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -11101,27 +11053,27 @@ plot!(tangent(f, c))</pre>
         },
         "yaxis": "y",
         "x": [
-            0.455,
-            0.47052765224146315,
-            0.6141032182977127,
-            0.700386148975942,
-            0.7733372687580675,
-            0.8525826323525518,
-            0.9256398482100588,
-            1.0039649047863188,
-            1.0947121639982662,
-            1.1753576187165242,
-            1.2460764150989498,
-            1.3231788860819578,
-            1.4007395982169712,
-            1.4864928835728026,
-            1.5680849707843012,
-            1.6529218101830474,
-            1.7243363583302838,
-            1.811525427118319,
-            1.8934857233846465,
-            2.0247924737855354,
-            2.045
+            0.5,
+            0.5146487285296822,
+            0.6500973757525592,
+            0.7314963669584358,
+            0.8003181780736487,
+            0.8750779550495772,
+            0.9439998568019422,
+            1.0178914196097346,
+            1.1035020415077985,
+            1.1795826591665322,
+            1.24629850481033,
+            1.319036684982979,
+            1.392207168129218,
+            1.4731064939366065,
+            1.5500801611172652,
+            1.6301149152670258,
+            1.6974871305002677,
+            1.779740968979546,
+            1.857062003193063,
+            1.98093629602409,
+            2.0
         ],
         "showlegend": true,
         "mode": "lines",
@@ -11136,27 +11088,27 @@ plot!(tangent(f, c))</pre>
             "width": 1
         },
         "y": [
-            0.45500000000000007,
-            0.4705276522414632,
-            0.6141032182977127,
-            0.700386148975942,
-            0.7733372687580675,
-            0.8525826323525518,
-            0.9256398482100588,
-            1.0039649047863188,
-            1.0947121639982662,
-            1.1753576187165242,
-            1.2460764150989498,
-            1.3231788860819578,
-            1.4007395982169712,
-            1.4864928835728026,
-            1.5680849707843012,
-            1.6529218101830474,
-            1.7243363583302838,
-            1.811525427118319,
-            1.8934857233846465,
-            2.0247924737855354,
-            2.045
+            0.5,
+            0.5146487285296822,
+            0.6500973757525592,
+            0.7314963669584358,
+            0.8003181780736487,
+            0.8750779550495772,
+            0.9439998568019422,
+            1.0178914196097346,
+            1.1035020415077985,
+            1.1795826591665322,
+            1.24629850481033,
+            1.319036684982979,
+            1.392207168129218,
+            1.4731064939366065,
+            1.5500801611172652,
+            1.6301149152670258,
+            1.6974871305002677,
+            1.779740968979546,
+            1.857062003193063,
+            1.98093629602409,
+            2.0
         ],
         "type": "scatter"
     }
@@ -11174,8 +11126,8 @@ plot!(tangent(f, c))</pre>
             1.8000000000000003
         ],
         "range": [
-            0.4073,
-            2.0927
+            0.455,
+            2.045
         ],
         "domain": [
             0.02137649460484106,
@@ -11234,8 +11186,8 @@ plot!(tangent(f, c))</pre>
             4.0
         ],
         "range": [
-            0.34865000000000007,
-            4.10635
+            0.395,
+            4.105
         ],
         "domain": [
             0.03762029746281716,
@@ -11273,7 +11225,7 @@ plot!(tangent(f, c))</pre>
         "tickcolor": "rgb(0, 0, 0)",
         "type": "-"
     },
-    "legend": {
+    "legend_position": {
         "yanchor": "auto",
         "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
@@ -11300,6 +11252,7 @@ plot!(tangent(f, c))</pre>
     "width": 600
 }
 );
+
     
     </script>
 <hr /><div class="alert alert-danger" role="alert">
@@ -11311,20 +11264,20 @@ plot!(tangent(f, c))</pre>
 
 </div>
 
-<p>The 2014 AP Calculus exam included this question:</p><p>Grass clippings are placed in a bin, where they decompose. For $0 \leq t \leq 30$, the amount of grass clippings remaining in the bin is modeled by $A(t) = 6.687(0.931)^t$. Where $A(t)$ is measured in pounds and $t$ is measured in days.</p><ul>
-<li><p>Find the average rate of change of $A(t)$ over the interval of $0 \leq t \leq 30$. Indicate units of measure.</p>
+<p>The 2014 AP Calculus exam included this question:</p><p>Grass clippings are placed in a bin, where they decompose. For <span class="tex">$0 \leq t \leq 30$</span>, the amount of grass clippings remaining in the bin is modeled by <span class="tex">$A&#40;t&#41; &#61; 6.687&#40;0.931&#41;^t$</span>. Where <span class="tex">$A&#40;t&#41;$</span> is measured in pounds and <span class="tex">$t$</span> is measured in days.</p><ul>
+<li><p>Find the average rate of change of <span class="tex">$A&#40;t&#41;$</span> over the interval of <span class="tex">$0 \leq t \leq 30$</span>. Indicate units of measure.</p>
 </li>
-<li><p>Find the value of $A'(15)$. Using correct units, interpret the meaning of the value in the context of the problem.</p>
+<li><p>Find the value of <span class="tex">$A&#39;&#40;15&#41;$</span>. Using correct units, interpret the meaning of the value in the context of the problem.</p>
 </li>
-<li><p>Find the time $t$ for which the amount of grass clippings in the bin is equal to the average amount of grass clippings in the bin over the interval $0 \leq t \leq 30$.</p>
+<li><p>Find the time <span class="tex">$t$</span> for which the amount of grass clippings in the bin is equal to the average amount of grass clippings in the bin over the interval <span class="tex">$0 \leq t \leq 30$</span>.</p>
 </li>
-<li><p>For $t > 30$, $L(t)$, the linear approximation to $A$ at $t=30$ is a better model for the amount of grass clippings remaining in the bin. Use $L(t)$ to predict the time at which there will be 0.5% pound of grass clippings remaining in the bin. Show the work that leads to your answer.</p>
+<li><p>For <span class="tex">$t &gt; 30$</span>, <span class="tex">$L&#40;t&#41;$</span>, the linear approximation to <span class="tex">$A$</span> at <span class="tex">$t&#61;30$</span> is a better model for the amount of grass clippings remaining in the bin. Use <span class="tex">$L&#40;t&#41;$</span> to predict the time at which there will be 0.5% pound of grass clippings remaining in the bin. Show the work that leads to your answer.</p>
 </li>
-</ul><p>We can do all this relatively quickly with the <code>fzero</code> function from the <code>Roots</code> package.</p><p>First, we define $A(t)$:</p><pre class="sourceCode julia">A(t) = 6.687 * (0.931)^t</pre>
+</ul><p>We can do all this relatively quickly with the <code>find_zero</code> function from the <code>Roots</code> package.</p><p>First, we define <span class="tex">$A&#40;t&#41;$</span>:</p><pre class="sourceCode julia">A(t) = 6.687 * (0.931)^t</pre>
 <pre class="output">
 A (generic function with 1 method)</pre>
 
-<p>The first question is answered by the slope of the secant line connecting $(0,A(0))$ and $(30, A(30))$:</p><pre class="sourceCode julia">m = (A(30) - A(0)) / (30 - 0)</pre>
+<p>The first question is answered by the slope of the secant line connecting <span class="tex">$&#40;0,A&#40;0&#41;&#41;$</span> and <span class="tex">$&#40;30, A&#40;30&#41;&#41;$</span>:</p><pre class="sourceCode julia">m = (A(30) - A(0)) / (30 - 0)</pre>
 <pre class="output">
 -0.1968024043540685</pre>
 
@@ -11332,34 +11285,34 @@ A (generic function with 1 method)</pre>
 <pre class="output">
 -0.1635905803884566</pre>
 
-<p>This also has units in pounds per day. This is the instantaneous rate of decomposition, and is less (in absolute value) than the average decay rate.</p><p>The mean value theorem tells us that there is at least one time where the instantaneous decomposition rate equals the average rate over the interval $[0,30]$. Thus the endpoints form a bracketing interval for the equation $A'(t) = m$, which we solve with:</p><pre class="sourceCode julia">fzero(t -> A'(t) - m, [0, 30])</pre>
+<p>This also has units in pounds per day. This is the instantaneous rate of decomposition, and is less (in absolute value) than the average decay rate.</p><p>The mean value theorem tells us that there is at least one time where the instantaneous decomposition rate equals the average rate over the interval <span class="tex">$&#91;0,30&#93;$</span>. Thus the endpoints form a bracketing interval for the equation <span class="tex">$A&#39;&#40;t&#41; &#61; m$</span>, which we solve with:</p><pre class="sourceCode julia">find_zero(t -> A'(t) - m, (0, 30))</pre>
 <pre class="output">
 12.414773526372592</pre>
 
 <p>So at 12.4 days, the instantaneous rate is equal to the average rate of decomposition over the first 30 days.</p><p>But this doesn't really answer the question asked, which is about the average amount of grass clippings in the bin. For this we need the integral form of the mean value theorem. Skipping ahead a few lessons to solve this problem, we have:</p><pre class="sourceCode julia">a, err = quadgk(A, 0, 30)	# area under A from 0,30
 avg = a/(30-0)
-fzero(t -> A(t) - avg, [0, 30])</pre>
+find_zero(t -> A(t) - avg, (0, 30))</pre>
 <pre class="output">
 12.414773526372596</pre>
 
-<p>We get the same answer – think about whether that is a coincidence.</p><p>Finally, we can define $L(t)$ using the point-slope form of the line. The point is $(30, A(30))$ and the slope is $A'(30)$:</p><pre class="sourceCode julia">L(t) = A(30) + A'(30) * (t - 30) # t > 30</pre>
+<p>We get the same answer – think about whether that is a coincidence.</p><p>Finally, we can define <span class="tex">$L&#40;t&#41;$</span> using the point-slope form of the line. The point is <span class="tex">$&#40;30, A&#40;30&#41;&#41;$</span> and the slope is <span class="tex">$A&#39;&#40;30&#41;$</span>:</p><pre class="sourceCode julia">L(t) = A(30) + A'(30) * (t - 30) # t > 30</pre>
 <pre class="output">
 L (generic function with 1 method)</pre>
 
-<p>We could restrict $L$ to insist that $t > 30$, but this isn't necessary. We are asked to solve this. Using <code>fzero</code> requires a bracket. We check that $L(30) > 0.5$ and that $L(100)$ is negative:</p><pre class="sourceCode julia">L(30), L(100)</pre>
+<p>We could restrict <span class="tex">$L$</span> to insist that <span class="tex">$t &gt; 30$</span>, but this isn't necessary. We are asked to solve this. Using <code>find_zero</code> requires a bracket. We check that <span class="tex">$L&#40;30&#41; &gt; 0.5$</span> and that <span class="tex">$L&#40;100&#41;$</span> is negative:</p><pre class="sourceCode julia">L(30), L(100)</pre>
 <pre class="output">
 (0.7829278693779448, -3.135406990501517)</pre>
 
-<p>So, we can use $[30, 100]$ as a bracket for $L(t) - 0.5 = 0$:</p><pre class="sourceCode julia">fzero(t -> L(t) - 0.5, [30, 100])</pre>
+<p>So, we can use <span class="tex">$&#91;30, 100&#93;$</span> as a bracket for <span class="tex">$L&#40;t&#41; - 0.5 &#61; 0$</span>:</p><pre class="sourceCode julia">find_zero(t -> L(t) - 0.5, (30, 100))</pre>
 <pre class="output">
 35.054430405946825</pre>
 
 <p>So a bit over 35 days to decompose to half a pound.</p><p>Here is a picture, showing the decay:</p><pre class="sourceCode julia">f(t) = t <= 30 ? A(t) : L(t)
 plot(f, 0, 40)</pre>
-    <div id="19741bd9-784c-413b-a0f8-a5356005d5fb" style="width:600px;height:400px;"></div>
+    <div id="bcb3ad50-82d1-40da-bcf1-81cddf716259" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('19741bd9-784c-413b-a0f8-a5356005d5fb');
+        var PLOT = document.getElementById('bcb3ad50-82d1-40da-bcf1-81cddf716259');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -11552,7 +11505,7 @@ plot(f, 0, 40)</pre>
         "tickcolor": "rgb(0, 0, 0)",
         "type": "-"
     },
-    "legend": {
+    "legend_position": {
         "yanchor": "auto",
         "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
@@ -11579,120 +11532,111 @@ plot(f, 0, 40)</pre>
     "width": 600
 }
 );
+
     
     </script>
-<h3>Practice</h3><h4>question</h4><p>Which definition would be right for  $(x,dx) - (y, dy)$?</p><form name="WeaveQuestion" data-id="XdG3Wrhg" data-controltype="radio">
+<h3>Practice</h3><h4>question</h4><p>Which definition would be right for  <span class="tex">$&#40;x,dx&#41; - &#40;y, dy&#41;$</span>?</p><form name="WeaveQuestion" data-id="D4lZ4ndx" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_XdG3Wrhg" value="1"><div class="markdown"><p><code>&#40;x-y, dx - dy&#41;</code></p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_XdG3Wrhg" value="2"><div class="markdown"><p><code>&#40;x - dx, y -dy&#41;</code></p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_XdG3Wrhg" value="3"><div class="markdown"><p><code>&#40;x - y, dx - y&#41;</code></p>
-</div>
-    </label>
-    </div>
+  <input type="radio" name="radio_D4lZ4ndx" id="1" value="1">
+  <label for="1"><code>&#40;x-y, dx - dy&#41;</code></label>
+  <br>
+  <input type="radio" name="radio_D4lZ4ndx" id="2" value="2">
+  <label for="2"><code>&#40;x - dx, y -dy&#41;</code></label>
+  <br>
+  <input type="radio" name="radio_D4lZ4ndx" id="3" value="3">
+  <label for="3"><code>&#40;x - y, dx - y&#41;</code></label>
+  <br>
 
-<div id="XdG3Wrhg_message"></div>
+<div id="D4lZ4ndx_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_XdG3Wrhg']").on("change", function() {
-  correct = this.value == 1;
-
-  if(correct) {
-     $("#XdG3Wrhg_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+_.forEach(document.querySelectorAll('input[name="radio_D4lZ4ndx"]'), function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 1;
+    var msgBox = document.getElementById('D4lZ4ndx_message');
+    if (correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $("#XdG3Wrhg_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
-});
+})});
+
+
+
 
 </script>
 <h4>question (Find tangent line intersection)</h4><p>Redefine <code>intersection_point</code> as:</p><pre class="sourceCode julia">intersection_point(f, c) = c - f(c)/f'(c)</pre>
 <pre class="output">
 intersection_point (generic function with 2 methods)</pre>
 
-<p>Now for $f(x) = 10/(1+x^2) - 10 \cdot \exp(-(1/2) \cdot x^2)$ and $c=1$ find the intersection point.</p><form name='WeaveQuestion' data-id='kib4vG7i' data-controltype='numeric'>
+<p>Now for <span class="tex">$f&#40;x&#41; &#61; 10/&#40;1&#43;x^2&#41; - 10 \cdot \exp&#40;-&#40;1/2&#41; \cdot x^2&#41;$</span> and <span class="tex">$c&#61;1$</span> find the intersection point.</p><form name='WeaveQuestion' data-id='4EL4x1Dd' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="kib4vG7i" type="number" class="form-control">
+<input id="4EL4x1Dd" type="number" class="form-control">
 
 </div>
 
-<div id='kib4vG7i_message'></div>
+<div id='4EL4x1Dd_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#kib4vG7i').on('change', function() {
-  correct = Math.abs(this.value - 2) <= 0.0001;
-
+document.getElementById("4EL4x1Dd").addEventListener("change", function() {
+  var correct = Math.abs(this.value - 2) <= 0.0001;
+  var msgBox = document.getElementById('4EL4x1Dd_message');
   if(correct) {
-     $('#kib4vG7i_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#kib4vG7i_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
 <h4>question (What is the size of the error?)</h4><p>We can compare the error at many different points with the following construct</p><pre class="sourceCode julia">f(x) = exp(-x)*sin(x)
 fp(x) = exp(-x)*(cos(x) - sin(x))
 [abs(f'(x) - fp(x) ) for x in linspace(0, pi, 25)]</pre>
-<p>What is the order (exponent) of the largest difference above?</p><form name="WeaveQuestion" data-id="RmwalIRT" data-controltype="radio">
+<p>What is the order (exponent) of the largest difference above?</p><form name="WeaveQuestion" data-id="ISFQcHpn" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_RmwalIRT" value="1"><div class="markdown"><p><code>1e-14</code></p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_RmwalIRT" value="2"><div class="markdown"><p><code>1e-17</code></p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_RmwalIRT" value="3"><div class="markdown"><p><code>1e-10</code></p>
-</div>
-    </label>
-    </div>
+  <input type="radio" name="radio_ISFQcHpn" id="1" value="1">
+  <label for="1"><code>1e-14</code></label>
+  <br>
+  <input type="radio" name="radio_ISFQcHpn" id="2" value="2">
+  <label for="2"><code>1e-10</code></label>
+  <br>
+  <input type="radio" name="radio_ISFQcHpn" id="3" value="3">
+  <label for="3"><code>1e-17</code></label>
+  <br>
 
-<div id="RmwalIRT_message"></div>
+<div id="ISFQcHpn_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_RmwalIRT']").on("change", function() {
-  correct = this.value == 2;
-
-  if(correct) {
-     $("#RmwalIRT_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+_.forEach(document.querySelectorAll('input[name="radio_ISFQcHpn"]'), function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 3;
+    var msgBox = document.getElementById('ISFQcHpn_message');
+    if (correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $("#RmwalIRT_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
-});
+})});
+
+
+
 
 </script>
-<h2>Error analysis</h2><p>We end with a digression on how big <code>h</code> should be to have the approximate derivatives as close as can be.</p><p>The choice of $h$ in the derivative approximations above was done somewhat arbitrarily, with only the intuition that smaller $h$'s should produce more accurate approximations (which of course may be way off, as we are subtracting like-sized values in the derivative formula). Here we look a bit more closely at how to choose $h$.</p><p>As mentioned, with a bit of work from the second semester of calculus one can learn that the <em>mathematical error</em> in the forward difference is "order $h$" whereas the mathematical error in the central difference is "order $h^2$. This means that as $h$ gets small the approximation error in the first is a multple of $h$, but for the second a multiple of $h^2$ – a much smaller error in general.</p><p>However there is also error due to <em>floating point approximation</em>. Such error is different in that it gets bigger as $h$ gets smaller. So one error gets bigger, the other gets smaller. So clearly if $h$ gets too small, the floating point error will dominate and the overall error will not get smaller, rather larger.</p><p>So, how big is the floating point error? For any given number, it can be roughly as big as the the machine precision amount, $\epsilon$. So in the forward-difference approximation we could have errors in both terms $f(x+h)$ and $f(x)$ so the total error could be as big as $2\epsilon$. But this is divided by $h$ as we have:</p>$$~
+<h2>Error analysis</h2><p>We end with a digression on how big <code>h</code> should be to have the approximate derivatives as close as can be.</p><p>The choice of <span class="tex">$h$</span> in the derivative approximations above was done somewhat arbitrarily, with only the intuition that smaller <span class="tex">$h$</span>'s should produce more accurate approximations (which of course may be way off, as we are subtracting like-sized values in the derivative formula). Here we look a bit more closely at how to choose <span class="tex">$h$</span>.</p><p>As mentioned, with a bit of work from the second semester of calculus one can learn that the <em>mathematical error</em> in the forward difference is "order <span class="tex">$h$</span>" whereas the mathematical error in the central difference is "order <span class="tex">$h^2$</span>. This means that as <span class="tex">$h$</span> gets small the approximation error in the first is a multple of <span class="tex">$h$</span>, but for the second a multiple of <span class="tex">$h^2$</span> – a much smaller error in general.</p><p>However there is also error due to <em>floating point approximation</em>. Such error is different in that it gets bigger as <span class="tex">$h$</span> gets smaller. So one error gets bigger, the other gets smaller. So clearly if <span class="tex">$h$</span> gets too small, the floating point error will dominate and the overall error will not get smaller, rather larger.</p><p>So, how big is the floating point error? For any given number, it can be roughly as big as the the machine precision amount, <span class="tex">$\epsilon$</span>. So in the forward-difference approximation we could have errors in both terms <span class="tex">$f&#40;x&#43;h&#41;$</span> and <span class="tex">$f&#40;x&#41;$</span> so the total error could be as big as <span class="tex">$2\epsilon$</span>. But this is divided by <span class="tex">$h$</span> as we have:</p>$$~
 \frac{f(x+h) - f(x)}{h} = \frac{float(f(x +h)) + \epsilon - float(f(x_) + \epsilon}{h} =
 	     \frac{float(f(x+h))-float(f(x))}{h} + \frac{2\epsilon}{h}.
 ~$$
-<p>The errors may or <em>may not</em> cancel so the algebra with $\epsilon$ is unusual to the untrained eye. It basically takes into account the worse case.</p><p>The key is the $2\epsilon/h$ term – it gets bigger as $h$ gets smaller.</p><p>So if each floating point approximation is no more off than $\epsilon$, we have this bound on the error:</p>$$~
+<p>The errors may or <em>may not</em> cancel so the algebra with <span class="tex">$\epsilon$</span> is unusual to the untrained eye. It basically takes into account the worse case.</p><p>The key is the <span class="tex">$2\epsilon/h$</span> term – it gets bigger as <span class="tex">$h$</span> gets smaller.</p><p>So if each floating point approximation is no more off than <span class="tex">$\epsilon$</span>, we have this bound on the error:</p>$$~
 \text{error} \leq \frac{2\epsilon}{h} + (M/2)h
 ~$$
-<p>Where $M$ is a constant that depends on the maximum absolute value of the second derivative and the $1/2$ comes from second semester calculus. Choosing $h$ to make this as small as possible is possible with some calculus involving the derivative, but for now we simply note the answer is $h=((2\epsilon)/(M/2))^{1/2}$.</p><p>Taking $\epsilon$ as machine tolerance and (conveniently) $M=1$ we get</p>$$~
+<p>Where <span class="tex">$M$</span> is a constant that depends on the maximum absolute value of the second derivative and the <span class="tex">$1/2$</span> comes from second semester calculus. Choosing <span class="tex">$h$</span> to make this as small as possible is possible with some calculus involving the derivative, but for now we simply note the answer is <span class="tex">$h&#61;&#40;&#40;2\epsilon&#41;/&#40;M/2&#41;&#41;^&#123;1/2&#125;$</span>.</p><p>Taking <span class="tex">$\epsilon$</span> as machine tolerance and (conveniently) <span class="tex">$M&#61;1$</span> we get</p>$$~
 h_{min} = \sqrt((2\epsilon)/(1/2)) \approx 10^{-8}
 ~$$
 <p>Or more precisely:</p><pre class="sourceCode julia">sqrt( (2*eps())/(1/2) )</pre>
@@ -11702,10 +11646,10 @@ h_{min} = \sqrt((2\epsilon)/(1/2)) \approx 10^{-8}
 <p>We can check this is about right,but graphing on a different scale:</p><pre class="sourceCode julia">f(h; M=1) = 2*eps()/h + (M/2)*h
 g(x) = log10(f(10.0^(-x)))
 plot(g, 1, 10)			# min near 8, which means h like 1e-8</pre>
-    <div id="3de38bc4-2683-4fc1-ba6e-7b21202c4373" style="width:600px;height:400px;"></div>
+    <div id="26b393ad-4b97-46e3-87bb-b2047a842f86" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('3de38bc4-2683-4fc1-ba6e-7b21202c4373');
+        var PLOT = document.getElementById('26b393ad-4b97-46e3-87bb-b2047a842f86');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -11902,7 +11846,7 @@ plot(g, 1, 10)			# min near 8, which means h like 1e-8</pre>
         "tickcolor": "rgb(0, 0, 0)",
         "type": "-"
     },
-    "legend": {
+    "legend_position": {
         "yanchor": "auto",
         "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
@@ -11929,6 +11873,7 @@ plot(g, 1, 10)			# min near 8, which means h like 1e-8</pre>
     "width": 600
 }
 );
+
     
     </script>
 <p>Numerically, we can check how this basically works for some test function:</p><pre class="sourceCode julia">f(x) = exp(x) - x^3
@@ -11953,10 +11898,10 @@ fp(x) = exp(x) - 3x^2
  1.0000000000000009e-15  -0.010542851000003739
  1.0000000000000008e-16   1.321724778550183</pre>
 
-<p>We see the best case is around $h=10^{-8}$, as expected by the theory.</p><h3>Approximation errors for the central difference</h3><p>For the central difference, the errors are different. The error in $h$ becomes:</p>$$~
+<p>We see the best case is around <span class="tex">$h&#61;10^&#123;-8&#125;$</span>, as expected by the theory.</p><h3>Approximation errors for the central difference</h3><p>For the central difference, the errors are different. The error in <span class="tex">$h$</span> becomes:</p>$$~
 \text{error} \leq (2\epsilon)/(2h) + (M/6) h^2
 ~$$
-<p>This gives $(3\epsilon/M)^{1/3}$ as the choice for $h$ that minimizes the right-hand expression.</p><p>Taking $\epsilon$ as the machine tolerance and (conveniently) $M=3$ we get</p>$$~
+<p>This gives <span class="tex">$&#40;3\epsilon/M&#41;^&#123;1/3&#125;$</span> as the choice for <span class="tex">$h$</span> that minimizes the right-hand expression.</p><p>Taking <span class="tex">$\epsilon$</span> as the machine tolerance and (conveniently) <span class="tex">$M&#61;3$</span> we get</p>$$~
 h_{min} \approx 10^{-6}
 ~$$
 <p>We can again check how this works for our function and point:</p><pre class="sourceCode julia">[hs [ Dc(f,h=h)(.5) - fp(.5) for h in hs] ]</pre>
@@ -11979,7 +11924,7 @@ h_{min} \approx 10^{-6}
  1.0000000000000009e-15   0.1004794514625118
  1.0000000000000008e-16   1.321724778550183</pre>
 
-<h3>Practice</h3><h4>question (Best depends on the function and value)</h4><p>A subtle point above is that we are minimizing an upper bound in $h$ with an assumption, not the actual error. The actual answer may differ as it depends on a function and the point of evaluation. Look at the function $f(x) = x^2 - 2x$ and compare the values at $0.5$ as above:</p><pre class="sourceCode julia">hs = [(1/10)^i for i in 1:16]
+<h3>Practice</h3><h4>question (Best depends on the function and value)</h4><p>A subtle point above is that we are minimizing an upper bound in <span class="tex">$h$</span> with an assumption, not the actual error. The actual answer may differ as it depends on a function and the point of evaluation. Look at the function <span class="tex">$f&#40;x&#41; &#61; x^2 - 2x$</span> and compare the values at <span class="tex">$0.5$</span> as above:</p><pre class="sourceCode julia">hs = [(1/10)^i for i in 1:16]
 f(x) = x^2 - 2x
 fp(x) = 2x - 2
 [hs [Dc(f,h=h)(.5) - fp(.5) for h in hs] ]</pre>
@@ -12002,79 +11947,69 @@ fp(x) = 2x - 2
  1.0000000000000009e-15   0.0007992778373600018
  1.0000000000000008e-16  -0.11022302462515565</pre>
 
-<p>What is the best value of $h$?</p><p>For which of these values of $h$ is the error smallest?</p><form name="WeaveQuestion" data-id="nfvZ5tRU" data-controltype="radio">
+<p>What is the best value of <span class="tex">$h$</span>?</p><p>For which of these values of <span class="tex">$h$</span> is the error smallest?</p><form name="WeaveQuestion" data-id="7TsYgcfk" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_nfvZ5tRU" value="1"><div class="markdown"><p><code>1e-3</code></p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_nfvZ5tRU" value="2"><div class="markdown"><p><code>1e-6</code></p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_nfvZ5tRU" value="3"><div class="markdown"><p><code>1e-8</code></p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_nfvZ5tRU" value="4"><div class="markdown"><p><code>1e-12</code></p>
-</div>
-    </label>
-    </div>
+  <input type="radio" name="radio_7TsYgcfk" id="1" value="1">
+  <label for="1"><code>1e-3</code></label>
+  <br>
+  <input type="radio" name="radio_7TsYgcfk" id="2" value="2">
+  <label for="2"><code>1e-6</code></label>
+  <br>
+  <input type="radio" name="radio_7TsYgcfk" id="3" value="3">
+  <label for="3"><code>1e-8</code></label>
+  <br>
+  <input type="radio" name="radio_7TsYgcfk" id="4" value="4">
+  <label for="4"><code>1e-12</code></label>
+  <br>
 
-<div id="nfvZ5tRU_message"></div>
+<div id="7TsYgcfk_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_nfvZ5tRU']").on("change", function() {
-  correct = this.value == 1;
-
-  if(correct) {
-     $("#nfvZ5tRU_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+_.forEach(document.querySelectorAll('input[name="radio_7TsYgcfk"]'), function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 1;
+    var msgBox = document.getElementById('7TsYgcfk_message');
+    if (correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $("#nfvZ5tRU_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
-});
+})});
+
+
+
 
 </script>
 <h4>question (Error analysis)</h4><p>Consider these commands:</p><pre class="sourceCode julia">f(x) = sin(x)
 fp(x) = cos(x)
 [hs [ Dc(f,h=h)(.5) - fp(.5) for h in hs] ]</pre>
-<p>Do they show the smallest error around $10^{-6}$ as expected?</p><form name="WeaveQuestion" data-id="LVHGwWPS" data-controltype="radio">
+<p>Do they show the smallest error around <span class="tex">$10^&#123;-6&#125;$</span> as expected?</p><form name="WeaveQuestion" data-id="IjhuZeMN" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio inline">
-    <label>
-      <input type="radio" name="radio_LVHGwWPS" value="1"><div class="markdown"><p>true</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio inline">
-    <label>
-      <input type="radio" name="radio_LVHGwWPS" value="2"><div class="markdown"><p>false</p>
-</div>
-    </label>
-    </div>
+  <input type="radio" name="radio_IjhuZeMN" id="1" value="1">
+  <label for="1">true</label>
+  <br>
+  <input type="radio" name="radio_IjhuZeMN" id="2" value="2">
+  <label for="2">false</label>
+  <br>
 
-<div id="LVHGwWPS_message"></div>
+<div id="IjhuZeMN_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_LVHGwWPS']").on("change", function() {
-  correct = this.value == 1;
-
-  if(correct) {
-     $("#LVHGwWPS_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+_.forEach(document.querySelectorAll('input[name="radio_IjhuZeMN"]'), function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 1;
+    var msgBox = document.getElementById('IjhuZeMN_message');
+    if (correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $("#LVHGwWPS_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
-});
+})});
+
+
+
 
 </script>
 

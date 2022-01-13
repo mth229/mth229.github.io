@@ -9,6 +9,7 @@ using Plots
 
 ```nocode
 plotly()
+nothing
 ```
 
 ## Introduction
@@ -53,7 +54,11 @@ This graph shows $f(x) = 2 - x^2$ and various secant lines when $c=-0.75$.
 f(x) = 2 - x^2
 c = -0.75
 sec_line(h) = secant(f, c, c+h)                # secant in MTH229 package
-plot([f, sec_line(1), sec_line(.75), sec_line(.5), sec_line(.25)], -1, 1)
+plot(f, -1, 1, legend=false)
+plot!(sec_line(1))
+plot!(sec_line(0.75))
+plot!(sec_line(0.5))
+plot!(sec_line(0.25))
 ```
 
 As the value of $h$ goes towards 0 along the path $1$, $0.75$, $0.5$, $0.25$,
@@ -381,8 +386,7 @@ plot!(zero)
 If you want, we can find the roots numerically. For example,
 
 ```
-using Roots
-fzeros(fp, -10, 10)
+find_zeros(fp, -10, 10)
 ```
 
 
@@ -611,7 +615,7 @@ one zero. What is its approximate value:
 
 ```
 using Roots
-val = fzero(Dc(f), [0,5])
+val = find_zero(Dc(f), [0,5])
 numericq(val, 1e-1)
 ```
 
@@ -654,8 +658,9 @@ finite differences by using a different approach. Whereas finite
 differences have a long history, automatic differentiation only dates
 back to the 60s.
 
-The `Zygote` package implements automatic differentiation.
-This package overloads the idea of `'`, so uses automatic differentiation when the notation `f'` is encountered. 
+The `ForwardDiff` package implements automatic differentiation.
+
+The `MTH229` package overloads the idea of `'`, so uses automatic differentiation when the notation `f'` is encountered.
 
 That means, we can find derivatives, as familiarly as:
 
@@ -663,6 +668,8 @@ That means, we can find derivatives, as familiarly as:
 f(x) = x^x
 f'(1)
 ```
+
+Here `f` is a  function, `f'` is a derived function, and `f'(1)` is this derived function evaluated at `1` -- just as with the use within a math text book.
 
 
 Unlike, finite differences automatic differentiation does not have
@@ -792,7 +799,7 @@ and $t$ is measured in days.
   leads to your answer.
 
 
-We can do all this relatively quickly with the `fzero` function from the `Roots` package.
+We can do all this relatively quickly with the `find_zero` function from the `Roots` package.
 
 First, we define $A(t)$:
 
@@ -824,7 +831,7 @@ interval $[0,30]$. Thus the endpoints form a bracketing interval for
 the equation $A'(t) = m$, which we solve with:
 
 ```
-fzero(t -> A'(t) - m, [0, 30])
+find_zero(t -> A'(t) - m, (0, 30))
 ```
 
 So at 12.4 days, the instantaneous rate is equal to the average rate
@@ -837,7 +844,7 @@ integral form of the mean value theorem. Skipping ahead a few lessons to solve t
 ```
 a, err = quadgk(A, 0, 30)	# area under A from 0,30
 avg = a/(30-0)
-fzero(t -> A(t) - avg, [0, 30])
+find_zero(t -> A(t) - avg, (0, 30))
 ```
 
 We get the same answer -- think about whether that is a coincidence.
@@ -850,7 +857,7 @@ Finally, we can define $L(t)$ using the point-slope form of the line. The point 
 L(t) = A(30) + A'(30) * (t - 30) # t > 30
 ```
 
-We could restrict $L$ to insist that $t > 30$, but this isn't necessary. We are asked to solve this. Using `fzero` requires a bracket. We check that $L(30) > 0.5$ and that $L(100)$ is negative:
+We could restrict $L$ to insist that $t > 30$, but this isn't necessary. We are asked to solve this. Using `find_zero` requires a bracket. We check that $L(30) > 0.5$ and that $L(100)$ is negative:
 
 
 ```
@@ -860,7 +867,7 @@ L(30), L(100)
 So, we can use $[30, 100]$ as a bracket for $L(t) - 0.5 = 0$:
 
 ```
-fzero(t -> L(t) - 0.5, [30, 100])
+find_zero(t -> L(t) - 0.5, (30, 100))
 ```
 
 

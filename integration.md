@@ -126,17 +126,17 @@ delta = (b-a)/n;
 xs = a .+ (0:n) * delta
 ```
 
-To apply a function to a range of values, we may use a map, a comprehension, a `for` loop or the "dot" notation. We will use `map` here. Recall, the syntax:
+To apply a function to a range of values, we may use a map, a comprehension, a `for` loop or the "dot" notation. We will use broadcasting here. Recall, the syntax:
 
 ```
 f(x) = x^2
-fx = map(f, xs)
+fxs = f.(xs)
 ```
 
 Now to add the numbers up. For this task, the `sum` function is available
 
 ```
-sum(fx)
+sum(fxs)
 ```
 
 
@@ -161,7 +161,7 @@ f(x) = x^2
 a, b, n = 1, 3, 10;		   ## note n=10
 delta = (b - a)/n;		   ## nothing to change below here
 xs = a .+ (0:n-1) * delta;          ## n, right is 1:n * delta
-fx = map(f, xs);
+fxs = f.(xs);
 sum(fx) * delta
 ```
 
@@ -260,18 +260,18 @@ This function is defined in `MTH229`:
 ```verbatim
 function riemann(f::Function, a::Real, b::Real, n::Int; method="right")
   if method == "right"
-     meth(f,l,r) = f(r) * (r-l)
+     meth = (f,l,r) -> f(r) * (r-l)
   elseif method == "left"
-     meth(f,l,r) = f(l) * (r-l)
+     meth= (f,l,r) -> f(l) * (r-l)
   elseif method == "trapezoid"
-     meth(f,l,r) = (1/2) * (f(l) + f(r)) * (r-l)
+     meth = (f,l,r) -> (1/2) * (f(l) + f(r)) * (r-l)
   elseif method == "simpsons"
-     meth(f,l,r) = (1/6) * (f(l) + 4*(f((l+r)/2)) + f(r)) * (r-l)
+     meth = (f,l,r) -> (1/6) * (f(l) + 4*(f((l+r)/2)) + f(r)) * (r-l)
   end
 
   xs = a .+ (0:n) * (b-a)/n
-  as = [meth(f, l, r) for (l,r) in zip(xs[1:end-1], xs[2:end])]
-  sum(as)
+  sum(meth(f, l, r) for (l,r) in zip(xs[1:end-1], xs[2:end]))
+
 end
 ```
 
@@ -518,7 +518,7 @@ a, err = quadgk(sin, 0, pi)		## 2 is exact
 
 Two values are returned, the answer and an estimate of the error. In
 the above, $2$ is the exact answer to this integral, the estimated
-value a just a bit more $2$, but is guaranteed to be off my no more than
+value a just a bit more $2$, but is estimated to be off my no more than
 the second value, $1.78 \cdot 10^{-12}$.
 
 
@@ -538,6 +538,9 @@ quadgk(x -> x^2, 0, 1)
 
 
 The `riemann` function is good for pedagogical purposes, but the `quadgk` function should be used instead of the `riemann` function -- besides being built-in to `julia` it is more accurate, more robust, fast, and less work to use.
+
+
+(That `quadgk` is exact with polynomials is no surprise, as the underlying choice of nodes and weights makes it so for polynomials of certain degree.)
 
 ```
 alert("""
@@ -783,14 +786,13 @@ V(b) = \int_0^b \pi r(h)^2 dh = 450.
 ~$$
 
 
-Not to worry, we can use `fzero` from the `Roots` package for
-that.
+Not to worry, we can use `find_zero` from the `Roots` package for
+that (again, this is loaded with the `MTH229` package).
 To solve for when `V(b) = r_vol(b) - 450 = 0` we have
 
 
 ```
-using Roots
-r_b = fzero(x -> r_vol(x) - 450,  10)
+r_b = find_zero(x -> r_vol(x) - 450,  10)
 ```
 
 
@@ -812,7 +814,7 @@ As this height is often mistaken for the half-way by volume mark, people tend to
 Now compare to the height to get half the volume (225 ml):
 
 ```
-r_half = fzero(x -> r_vol(x) - 225,  5)
+r_half = find_zero(x -> r_vol(x) - 225,  5)
 ```
 
 This value is more than half of $b$:
@@ -840,7 +842,7 @@ What is the height of the glass, `b`, needed to make the volume 450?
 ```
 s(h) = 3 + log(1 + h)
 s_vol(b) = quadgk(x -> pi*s(x)^2, 0, b)[1]
-b = fzero(x -> s_vol(x) - 450, 8);
+b = find_zero(x -> s_vol(x) - 450, 8);
 val = b
 numericq(val, 1e-3)
 ```
@@ -868,7 +870,7 @@ your answer in terms of a percentage of $b$, height of the glass.
 
 
 ```
-b12 = fzero(x -> s_vol(x) - 450/2, 4)
+b12 = find_zero(x -> s_vol(x) - 450/2, 4)
 val = b12/b*100;
 numericq(val, .1)
 ```
@@ -1199,8 +1201,8 @@ implemented almost verbatim:
 ```
 using Polynomials
 function lgp(n::Integer)
-    if n == 0 return Polynomials.Poly([1]) end
-    if n == 1 return Polynomials.Poly([0, 1]) end
+    if n == 0 return Polynomial([1]) end
+    if n == 1 return Polynomial([0, 1]) end
 
     (2*(n-1) + 1) / n * lgp(1) * lgp(n-1) - (n-1)/n * lgp(n-2)
 end
@@ -1236,7 +1238,7 @@ w_i = \frac{2}{(1 - x_i^2) \cdot(P^{'}_n(x_i)/P_n(1))^2}
 These can be done simply with:
 
 ```
-weights(x) = 2 / ((1 - x^2) * (polyder(p4)(x)/p4(1))^2 )
+weights(x) = 2 / ((1 - x^2) * (derivative(p4)(x)/p4(1))^2 )
 ws = [weights(xi) for xi in xs]
 ```
 

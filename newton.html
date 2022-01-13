@@ -109,12 +109,12 @@ $( document ).ready(function() {
 
 <div class="container-fluid">
   <div class="span10 offset1">
-<h1>Newton's method using julia</h1><h2>Introduction</h2><p>Newton's method is an old method for <em>approximating</em> a zero of a function, $f(x)$:</p>$$~
+<h1>Newton's method using julia</h1><h2>Introduction</h2><p>Newton's method is an old method for <em>approximating</em> a zero of a function, <span class="tex">$f&#40;x&#41;$</span>:</p>$$~
 f(x) = 0
 ~$$
-<p>Previously we discussed the <em>bisection method</em> which applied for some continuous function $f(x)$ which changed signs between $a$ and $b$, points which bracket a zero. Not only did we need to find these bracketing points – which wasn't hard from a graph, more importantly the actual algorithm is pretty slow.</p><p>If the function $f$ is sufficiently differentiable, then Newton's method may work to find a zero.  Unlike the bisection method which is slow but guaranteed to find a root by the intermediate value theorem, Newton's method is fast (once it is close) but has no such guarantee of converging. In this project, we'll see how to implement the algorithm, try some examples, and then look at what can go wrong.</p><p>The <code>MTH229</code> package provides a function <code>newton</code> for easily performing Newton's method, utilizing a function from the <code>Roots</code> package. More usefully, we will see that <code>fzero</code>, which we used for bisection, can also be used for root finding with an algorithm that is a bit more robust than Newton's method.</p><p>To begin, we load <code>MTH229</code> and <code>Plots</code>. In the background this loads <code>Roots</code>:</p><pre class="sourceCode julia">using MTH229
+<p>Previously we discussed the <em>bisection method</em> which applied for some continuous function <span class="tex">$f&#40;x&#41;$</span> which changed signs between <span class="tex">$a$</span> and <span class="tex">$b$</span>, points which bracket a zero. Not only did we need to find these bracketing points – which wasn't hard from a graph, more importantly the actual algorithm is pretty slow.</p><p>If the function <span class="tex">$f$</span> is sufficiently differentiable, then Newton's method may work to find a zero.  Unlike the bisection method which is slow but guaranteed to find a root by the intermediate value theorem, Newton's method is fast (once it is close) but has no such guarantee of converging. In this project, we'll see how to implement the algorithm, try some examples, and then look at what can go wrong.</p><p>The <code>MTH229</code> package provides a function <code>newton</code> for easily performing Newton's method, utilizing a function from the <code>Roots</code> package. More usefully, we will see that <code>find_zero</code>, which we used for bisection, can also be used for root finding with an algorithm that is a bit more robust than Newton's method.</p><p>To begin, we load <code>MTH229</code> and <code>Plots</code>. In the background this loads <code>Roots</code>:</p><pre class="sourceCode julia">using MTH229
 using Plots</pre>
-<h2>Basic idea</h2><p>The idea behind Newton's method is simple – <em>linear approximation</em>. That is, most functions at any given point are well approximated by the tangent line at that point. If we have a good guess $x_n$, then we can improve this guess iteratively by replacing it with the zero, $x_{n+1}$, of the tangent line at $(x_n, f(x_n))$.</p>
+<h2>Basic idea</h2><p>The idea behind Newton's method is simple – <em>linear approximation</em>. That is, most functions at any given point are well approximated by the tangent line at that point. If we have a good guess <span class="tex">$x_n$</span>, then we can improve this guess iteratively by replacing it with the zero, <span class="tex">$x_&#123;n&#43;1&#125;$</span>, of the tangent line at <span class="tex">$&#40;x_n, f&#40;x_n&#41;&#41;$</span>.</p>
 <div class="well well-sm">
 <figure>
 <img src="data:image/gif;base64,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"/>
@@ -123,19 +123,19 @@ using Plots</pre>
 </div>
 
 
-<p>A simple picture shows that we have a triangle with base $x_{n+1} - x_{n}$, rise $0 - f(x_n)$ and slope $f'(x_n)$, using the "rise over run" formula:</p>$$~
+<p>A simple picture shows that we have a triangle with base <span class="tex">$x_&#123;n&#43;1&#125; - x_&#123;n&#125;$</span>, rise <span class="tex">$0 - f&#40;x_n&#41;$</span> and slope <span class="tex">$f&#39;&#40;x_n&#41;$</span>, using the "rise over run" formula:</p>$$~
 f'(x_n) = \frac{-f(x_n)}{x_{n+1} - x_{n}}.
 ~$$
 <p>The basic algorithm of Newton's methods solves this to get:</p>$$~
 x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}.
 ~$$
-<p>Some books write the right-hand side as $x_n - f'(x_n)^{-1} f(x_n)$, a form that generalizes to different settings.</p><p>Like the bisection method, Newton's method is an <em>iterative method</em>. One begins with a (suitable) guess $x_0$. From that the algorithm produces $x_1$ which is used to produce $x_2$, etc. The idea is that one eventually will settle on a value $x_n$ sufficiently close to the desired root.</p><p>Mathematically, the indices indicate that the right hand side is computed and assigned to the left hand side. This is exactly what is done in assignment within <code>julia</code>, so  the above simply becomes:</p><pre class="sourceCode julia">x = x - f(x)/f'(x)</pre>
-<p>Where <code>f&#40;x&#41;</code> is the function and <code>f&#39;&#40;x&#41;</code> its derivative. (In this case found by automatic differentiation.) This line starts with a previously defined value of <code>x</code> and updates it accordingly.</p><p>The updating is continued – by executing the exact same command – until either the algorithm has gotten close enough to an answer (i.e., it has converged) or we have given up on it converging.</p><p>Here is an example to find a zero of the function: $f(x) = x^3 - 2x - 5$.</p><p>A quick graph shows a root near 2:</p><pre class="sourceCode julia">f(x) = x^3 - 2x - 5
+<p>Some books write the right-hand side as <span class="tex">$x_n - f&#39;&#40;x_n&#41;^&#123;-1&#125; f&#40;x_n&#41;$</span>, a form that generalizes to different settings.</p><p>Like the bisection method, Newton's method is an <em>iterative method</em>. One begins with a (suitable) guess <span class="tex">$x_0$</span>. From that the algorithm produces <span class="tex">$x_1$</span> which is used to produce <span class="tex">$x_2$</span>, etc. The idea is that one eventually will settle on a value <span class="tex">$x_n$</span> sufficiently close to the desired root.</p><p>Mathematically, the indices indicate that the right hand side is computed and assigned to the left hand side. This is exactly what is done in assignment within <code>julia</code>, so  the above simply becomes:</p><pre class="sourceCode julia">x = x - f(x)/f'(x)</pre>
+<p>Where <code>f&#40;x&#41;</code> is the function and <code>f&#39;&#40;x&#41;</code> its derivative. (In this case found by automatic differentiation.) This line starts with a previously defined value of <code>x</code> and updates it accordingly.</p><p>The updating is continued – by executing the exact same command – until either the algorithm has gotten close enough to an answer (i.e., it has converged) or we have given up on it converging.</p><p>Here is an example to find a zero of the function: <span class="tex">$f&#40;x&#41; &#61; x^3 - 2x - 5$</span>.</p><p>A quick graph shows a root near 2:</p><pre class="sourceCode julia">f(x) = x^3 - 2x - 5
 plot(f, -3, 3)</pre>
-    <div id="db9ef88b-7c93-42ef-b5c2-a60c1762dd37" style="width:600px;height:400px;"></div>
+    <div id="6fea97e0-4ecd-4655-8146-c90a926f6ad2" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('db9ef88b-7c93-42ef-b5c2-a60c1762dd37');
+        var PLOT = document.getElementById('6fea97e0-4ecd-4655-8146-c90a926f6ad2');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -360,7 +360,7 @@ plot(f, -3, 3)</pre>
         "tickcolor": "rgb(0, 0, 0)",
         "type": "-"
     },
-    "legend": {
+    "legend_position": {
         "yanchor": "auto",
         "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
@@ -387,6 +387,7 @@ plot(f, -3, 3)</pre>
     "width": 600
 }
 );
+
     
     </script>
 <p>Here we improve the estimate for the root near 2 using Newton's method. We will need the first derivative, which we denote <code>fp</code></p><pre class="sourceCode julia">fp(x) = 3x^2 - 2
@@ -396,14 +397,14 @@ x, f(x)</pre>
 <pre class="output">
 (2.1, 0.06100000000000083)</pre>
 
-<p>We can visualize our progress as follows, noting that <code>x</code> holds $x_1$, and zooming into the domain $[1,3]$:</p><pre class="sourceCode julia">x0, x1 = 2, x
+<p>We can visualize our progress as follows, noting that <code>x</code> holds <span class="tex">$x_1$</span>, and zooming into the domain <span class="tex">$&#91;1,3&#93;$</span>:</p><pre class="sourceCode julia">x0, x1 = 2, x
 plot(f, 1, 3, legend=false)
 plot!([x0, x0, x1], [0, f(x0), 0])  # why these values?
 scatter!([x0, x1], [0, 0])</pre>
-    <div id="06ee7555-65eb-4f52-9e92-658b245ccb7d" style="width:600px;height:400px;"></div>
+    <div id="7b4c034f-f80b-46bb-acb0-80fa840dd330" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('06ee7555-65eb-4f52-9e92-658b245ccb7d');
+        var PLOT = document.getElementById('7b4c034f-f80b-46bb-acb0-80fa840dd330');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -650,34 +651,35 @@ scatter!([x0, x1], [0, 0])</pre>
     "width": 600
 }
 );
+
     
     </script>
-<p>Continuing, though without visualizing the progress, this next step will compute $x_2$:</p><pre class="sourceCode julia">x = x - f(x)/fp(x)
+<p>Continuing, though without visualizing the progress, this next step will compute <span class="tex">$x_2$</span>:</p><pre class="sourceCode julia">x = x - f(x)/fp(x)
 x, f(x)</pre>
 <pre class="output">
 (2.094568121104185, 0.00018572317327247845)</pre>
 
-<p>This next step will compute $x_3$:</p><pre class="sourceCode julia">x = x - f(x)/fp(x)
+<p>This next step will compute <span class="tex">$x_3$</span>:</p><pre class="sourceCode julia">x = x - f(x)/fp(x)
 x, f(x)</pre>
 <pre class="output">
 (2.094551481698199, 1.7397612239733462e-9)</pre>
 
-<p>This next step will compute $x_4$:</p><pre class="sourceCode julia">x = x - f(x)/fp(x)
+<p>This next step will compute <span class="tex">$x_4$</span>:</p><pre class="sourceCode julia">x = x - f(x)/fp(x)
 x, f(x)</pre>
 <pre class="output">
 (2.0945514815423265, -8.881784197001252e-16)</pre>
 
-<p>This next step will compute $x_5$:</p><pre class="sourceCode julia">x = x - f(x)/fp(x)		# x stopped changing
+<p>This next step will compute <span class="tex">$x_5$</span>:</p><pre class="sourceCode julia">x = x - f(x)/fp(x)		# x stopped changing
 x, f(x)</pre>
 <pre class="output">
 (2.0945514815423265, -8.881784197001252e-16)</pre>
 
-<p>We see that $x_4=x_5$, so the algorithm has stabilized. We also see that $f(x_4)$ is basically $0$ (Recall, <code>eps&#40;&#41;</code> is the machine precision, or the size of the difference between floating point values at $1.0$ is basically $10^{-16}$, the size of $f(x_4)$.)</p><p>You can see in this case that the convergence happens quickly as soon as the algorithm gets close.</p><p>The approximate root is $x_4$.  It is important to realize that the actual, <em>exact</em>, answer is not likely to be the value computed by Newton's method, which we call <code>xstar</code> at times. In most cases, the true answer will be irrational and <code>xstar</code> a floating point number, which ultimately can never be better than an approximation to an irrational number.</p><p>The above example iterated until it was clear the algorithm does not improve itself, as the values returned did not change. This need not be the case for every problem.</p><p>Rather, we can determine two ways that the number is close enough to the answer:</p><ul>
+<p>We see that <span class="tex">$x_4&#61;x_5$</span>, so the algorithm has stabilized. We also see that <span class="tex">$f&#40;x_4&#41;$</span> is basically <span class="tex">$0$</span> (Recall, <code>eps&#40;&#41;</code> is the machine precision, or the size of the difference between floating point values at <span class="tex">$1.0$</span> is basically <span class="tex">$10^&#123;-16&#125;$</span>, the size of <span class="tex">$f&#40;x_4&#41;$</span>.)</p><p>You can see in this case that the convergence happens quickly as soon as the algorithm gets close.</p><p>The approximate root is <span class="tex">$x_4$</span>.  It is important to realize that the actual, <em>exact</em>, answer is not likely to be the value computed by Newton's method, which we call <code>xstar</code> at times. In most cases, the true answer will be irrational and <code>xstar</code> a floating point number, which ultimately can never be better than an approximation to an irrational number.</p><p>The above example iterated until it was clear the algorithm does not improve itself, as the values returned did not change. This need not be the case for every problem.</p><p>Rather, we can determine two ways that the number is close enough to the answer:</p><ul>
 <li><p>The sequence of <code>x</code>'s stop changing by much</p>
 </li>
 <li><p>the values <code>f&#40;x&#41;</code> get close enough to zero.</p>
 </li>
-</ul><p>In the above, the first one was used. In either case, rather than look for values to be equal (e.g. $x_{n+1} = x_{n}$ or $f(x_n) = 0$, we look at whether these two things are close enough to be so. That means for some tolerance, we stop when the change in the <code>x</code>'s is smaller than the tolerance or <code>f&#40;x&#41;</code> is smaller – in absolute value – than the tolerance.</p><h3>Repeating steps</h3><p>The above approach – basically repeating steps – can be tedious. There will be a function to do this for you (<code>newton</code>). One can use copy and paste to do much of this though:</p><pre class="sourceCode julia">f(x) = x^3 - 2x - 5
+</ul><p>In the above, the first one was used. In either case, rather than look for values to be equal (e.g. <span class="tex">$x_&#123;n&#43;1&#125; &#61; x_&#123;n&#125;$</span> or <span class="tex">$f&#40;x_n&#41; &#61; 0$</span>, we look at whether these two things are close enough to be so. That means for some tolerance, we stop when the change in the <code>x</code>'s is smaller than the tolerance or <code>f&#40;x&#41;</code> is smaller – in absolute value – than the tolerance.</p><h3>Repeating steps</h3><p>The above approach – basically repeating steps – can be tedious. There will be a function to do this for you (<code>newton</code>). One can use copy and paste to do much of this though:</p><pre class="sourceCode julia">f(x) = x^3 - 2x - 5
 x = 2
 x = x - f(x)/f'(x)
 x = x - f(x)/f'(x)
@@ -695,92 +697,92 @@ x = x - f(x)/f'(x)
 </div>
 
 </div>
-<hr /><h3>Practice</h3><h4>Question</h4><p>Using Newton's method to find $\sqrt{k}$ (by solving for roots of $f(x) = x^2 - k$) is also referred to as the Babylonian method, due to its origins. The resulting method</p>$$~
+<hr /><h3>Practice</h3><h4>Question</h4><p>Using Newton's method to find <span class="tex">$\sqrt&#123;k&#125;$</span> (by solving for roots of <span class="tex">$f&#40;x&#41; &#61; x^2 - k$</span>) is also referred to as the Babylonian method, due to its origins. The resulting method</p>$$~
 x_{n+1} = \frac{1}{2}(x_n + \frac{k}{x_n})
 ~$$
-<p>is described by the first-century <a href="http://en.wikipedia.org/wiki/Babylonian_method">Greek mathematician Hero of Alexandria</a>.</p><p>Let $k=15$ and $x_0$ be $4$. What is the value of $x_3$?</p><form name='WeaveQuestion' data-id='Hqepu0kv' data-controltype='numeric'>
+<p>is described by the first-century <a href="http://en.wikipedia.org/wiki/Babylonian_method">Greek mathematician Hero of Alexandria</a>.</p><p>Let <span class="tex">$k&#61;15$</span> and <span class="tex">$x_0$</span> be <span class="tex">$4$</span>. What is the value of <span class="tex">$x_3$</span>?</p><form name='WeaveQuestion' data-id='Y3kLdM7d' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="Hqepu0kv" type="number" class="form-control">
+<input id="Y3kLdM7d" type="number" class="form-control">
 
 </div>
 
-<div id='Hqepu0kv_message'></div>
+<div id='Y3kLdM7d_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#Hqepu0kv').on('change', function() {
-  correct = Math.abs(this.value - 3.8729833462074525) <= 0.0001;
-
+document.getElementById("Y3kLdM7d").addEventListener("change", function() {
+  var correct = Math.abs(this.value - 3.8729833462074525) <= 0.0001;
+  var msgBox = document.getElementById('Y3kLdM7d_message');
   if(correct) {
-     $('#Hqepu0kv_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#Hqepu0kv_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
-<h4>Question</h4><p>The function $f(x) = \sin(x)$ has derivative $f'(x) = \cos(x)$. Use Newton's method to solve $f(x) = 0$ starting at $3$. Repeat 5 times. What value do you get for <code>x</code>?</p><form name='WeaveQuestion' data-id='88ED5XDI' data-controltype='numeric'>
+<h4>Question</h4><p>The function <span class="tex">$f&#40;x&#41; &#61; \sin&#40;x&#41;$</span> has derivative <span class="tex">$f&#39;&#40;x&#41; &#61; \cos&#40;x&#41;$</span>. Use Newton's method to solve <span class="tex">$f&#40;x&#41; &#61; 0$</span> starting at <span class="tex">$3$</span>. Repeat 5 times. What value do you get for <code>x</code>?</p><form name='WeaveQuestion' data-id='0DqaQiB4' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="88ED5XDI" type="number" class="form-control">
+<input id="0DqaQiB4" type="number" class="form-control">
 
 </div>
 
-<div id='88ED5XDI_message'></div>
+<div id='0DqaQiB4_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#88ED5XDI').on('change', function() {
-  correct = Math.abs(this.value - 3.141592653589793) <= 1.0e-14;
-
+document.getElementById("0DqaQiB4").addEventListener("change", function() {
+  var correct = Math.abs(this.value - 3.141592653589793) <= 1.0e-14;
+  var msgBox = document.getElementById('0DqaQiB4_message');
   if(correct) {
-     $('#88ED5XDI_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#88ED5XDI_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
-<p>(This can be used to compute $\pi$ numerically, as the convergence is very fast. Here it takes 4 steps to verify.)</p><h4>Question</h4><p>Let $f(x) = x^2 - 3^x$. This has derivative $2x - 3^x \cdot \log(3)$. Starting with $x_0=0$, what does Newton's method converge on?</p><form name='WeaveQuestion' data-id='Lb8Gf9Ix' data-controltype='numeric'>
+<p>(This can be used to compute <span class="tex">$\pi$</span> numerically, as the convergence is very fast. Here it takes 4 steps to verify.)</p><h4>Question</h4><p>Let <span class="tex">$f&#40;x&#41; &#61; x^2 - 3^x$</span>. This has derivative <span class="tex">$2x - 3^x \cdot \log&#40;3&#41;$</span>. Starting with <span class="tex">$x_0&#61;0$</span>, what does Newton's method converge on?</p><form name='WeaveQuestion' data-id='bvpgpFir' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="Lb8Gf9Ix" type="number" class="form-control">
+<input id="bvpgpFir" type="number" class="form-control">
 
 </div>
 
-<div id='Lb8Gf9Ix_message'></div>
+<div id='bvpgpFir_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#Lb8Gf9Ix').on('change', function() {
-  correct = Math.abs(this.value - -0.6860267245362514) <= 1.0e-14;
-
+document.getElementById("bvpgpFir").addEventListener("change", function() {
+  var correct = Math.abs(this.value - -0.6860267245362514) <= 1.0e-14;
+  var msgBox = document.getElementById('bvpgpFir_message');
   if(correct) {
-     $('#Lb8Gf9Ix_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#Lb8Gf9Ix_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
 <h2>Implementing a Newton's method function</h2><p>For iterative algorithms it is better to repeat the expression until something happens – not a fixed number of times.  In this case, we need a criteria to decide if the algorithm has converged. We shall use the following:</p><ul>
-<li><p>If the value of $|x_{n+1} - x_n| < tol$ the algorithm has converged</p>
+<li><p>If the value of <span class="tex">$|x_&#123;n&#43;1&#125; - x_n| &lt; tol$</span> the algorithm has converged</p>
 </li>
-<li><p>If the value of $|f(x_n)| < tol$ the algorithm has converged</p>
+<li><p>If the value of <span class="tex">$|f&#40;x_n&#41;| &lt; tol$</span> the algorithm has converged</p>
 </li>
-<li><p>If the above hasn't happened by $n=100$ the algorithm fails to converge</p>
+<li><p>If the above hasn't happened by <span class="tex">$n&#61;100$</span> the algorithm fails to converge</p>
 </li>
-</ul><p>This isn't perfect, but will be sufficient. (Well, in fact no stopping rule can be perfect, but this one doesn't account for the relative size of the $x_n$s which can be important.)</p><p>The first two steps require a tolerance. We will use <code>1e-14</code> for this. This is about 100 times the machine precision, <code>eps&#40;&#41;</code>, which is sufficient when the answers are moderate in size. This is not very good if the answers are very large.</p><p>A basic algorithm is to repeat a step of Newton's method until the above occurs. We wrap this up in a function for reuse, and employ a <code>while</code> loop to repeat the update step until something happens:</p><pre class="sourceCode julia">function nm(f, fp, x)
+</ul><p>This isn't perfect, but will be sufficient. (Well, in fact no stopping rule can be perfect, but this one doesn't account for the relative size of the <span class="tex">$x_n$</span>s which can be important.)</p><p>The first two steps require a tolerance. We will use <code>1e-14</code> for this. This is about 100 times the machine precision, <code>eps&#40;&#41;</code>, which is sufficient when the answers are moderate in size. This is not very good if the answers are very large.</p><p>A basic algorithm is to repeat a step of Newton's method until the above occurs. We wrap this up in a function for reuse, and employ a <code>while</code> loop to repeat the update step until something happens:</p><pre class="sourceCode julia">function nm(f, fp, x)
 	 xnew, xold = x, Inf
 	 fn, fo = f(xnew), Inf
 
@@ -810,7 +812,7 @@ xstar, ctr = nm(f, fp, 0)	# takes 6 steps</pre>
 <pre class="output">
 (0.20163967572340466, 6)</pre>
 
-<p>However, the <code>MTH229</code> package provides the <code>newton</code> function. So we shall use that in the sequel. To see the number of steps, the argument <code>verbose&#61;true</code> may be given.</p><hr /><p>We revisit a problem from a previous project, finding zeroes of the function $f(x) = \exp(x) - x^4$. We know from previous work that there are three of them. Let's find one near $x=2$:</p><pre class="sourceCode julia">f(x) = exp(x) - x^4
+<p>However, the <code>MTH229</code> package provides the <code>newton</code> function. So we shall use that in the sequel. To see the number of steps, the argument <code>verbose&#61;true</code> may be given.</p><hr /><p>We revisit a problem from a previous project, finding zeroes of the function <span class="tex">$f&#40;x&#41; &#61; \exp&#40;x&#41; - x^4$</span>. We know from previous work that there are three of them. Let's find one near <span class="tex">$x&#61;2$</span>:</p><pre class="sourceCode julia">f(x) = exp(x) - x^4
 x = 2
 newton(f, 2)  # newton will use automatic differentiation for the derivative</pre>
 <pre class="output">
@@ -820,82 +822,82 @@ newton(f, 2)  # newton will use automatic differentiation for the derivative</pr
 <pre class="output">
 (0.20163967572340466, 1.2217539869961238)</pre>
 
-<p>In this case, the answer is exact up to floating point round off.</p><h3>Practice</h3><h4>Question</h4><p>Repeat the problem of finding a root of $f(x) = \exp(x) - x^4$ starting at $x=2$. (<code>newton&#40;f, 2, verbose&#61;true&#41;</code>). How many iterations does it take with the default tolerances?</p><form name='WeaveQuestion' data-id='WGLoGpz6' data-controltype='numeric'>
+<p>In this case, the answer is exact up to floating point round off.</p><h3>Practice</h3><h4>Question</h4><p>Repeat the problem of finding a root of <span class="tex">$f&#40;x&#41; &#61; \exp&#40;x&#41; - x^4$</span> starting at <span class="tex">$x&#61;2$</span>. (<code>newton&#40;f, 2, verbose&#61;true&#41;</code>). How many iterations does it take with the default tolerances?</p><form name='WeaveQuestion' data-id='8k098ezK' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="WGLoGpz6" type="number" class="form-control">
+<input id="8k098ezK" type="number" class="form-control">
 
 </div>
 
-<div id='WGLoGpz6_message'></div>
+<div id='8k098ezK_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#WGLoGpz6').on('change', function() {
-  correct = Math.abs(this.value - 6) <= 0.1;
-
+document.getElementById("8k098ezK").addEventListener("change", function() {
+  var correct = Math.abs(this.value - 6) <= 0.1;
+  var msgBox = document.getElementById('8k098ezK_message');
   if(correct) {
-     $('#WGLoGpz6_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#WGLoGpz6_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
-<h4>Question</h4><p>If we repeat with $f(x) = \exp(x) - x^4$ but start now at $x=8$ where does the algorithm converge?</p><form name='WeaveQuestion' data-id='iJOT7eUh' data-controltype='numeric'>
+<h4>Question</h4><p>If we repeat with <span class="tex">$f&#40;x&#41; &#61; \exp&#40;x&#41; - x^4$</span> but start now at <span class="tex">$x&#61;8$</span> where does the algorithm converge?</p><form name='WeaveQuestion' data-id='P0HA4RO5' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="iJOT7eUh" type="number" class="form-control">
+<input id="P0HA4RO5" type="number" class="form-control">
 
 </div>
 
-<div id='iJOT7eUh_message'></div>
+<div id='P0HA4RO5_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#iJOT7eUh').on('change', function() {
-  correct = Math.abs(this.value - NaN) <= 1.0e-6;
-
+document.getElementById("P0HA4RO5").addEventListener("change", function() {
+  var correct = Math.abs(this.value - NaN) <= 1.0e-6;
+  var msgBox = document.getElementById('P0HA4RO5_message');
   if(correct) {
-     $('#iJOT7eUh_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#iJOT7eUh_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
-<h4>Question</h4><p>Let $f(x) = \sin(x) - \cos(4\cdot x)$.</p><p>Starting at $\pi/8$, solve for the root returned by Newton's method</p><form name='WeaveQuestion' data-id='QVJqTSXl' data-controltype='numeric'>
+<h4>Question</h4><p>Let <span class="tex">$f&#40;x&#41; &#61; \sin&#40;x&#41; - \cos&#40;4\cdot x&#41;$</span>.</p><p>Starting at <span class="tex">$\pi/8$</span>, solve for the root returned by Newton's method</p><form name='WeaveQuestion' data-id='Fj92stZG' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="QVJqTSXl" type="number" class="form-control">
+<input id="Fj92stZG" type="number" class="form-control">
 
 </div>
 
-<div id='QVJqTSXl_message'></div>
+<div id='Fj92stZG_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#QVJqTSXl').on('change', function() {
-  correct = Math.abs(this.value - 0.3141592653589793) <= 0.001;
-
+document.getElementById("Fj92stZG").addEventListener("change", function() {
+  var correct = Math.abs(this.value - 0.3141592653589793) <= 0.001;
+  var msgBox = document.getElementById('Fj92stZG_message');
   if(correct) {
-     $('#QVJqTSXl_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#QVJqTSXl_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
-<h2>Numeric derivatives</h2><p>In order to use Newton's method we need to evaluate $f'(x)$. We have used automatic differentiation above through <code>f&#39;&#40;x&#41;</code>. Automatic differentiation returns a numerically accurate value for the derivative.</p><p>However, Newton's method is actually fairly robust to using other related values to the derivative. That is the method will converge, though perhaps not as fast as with the derivative.</p><h3>The secant method</h3><p>The <a href="http://en.wikipedia.org/wiki/Secant_method">secant method</a> is perhaps the oldest numerical linear algebra tool dating back over <a href="http://scholarship.rice.edu/bitstream/handle/1911/20568/1442093.PDF?sequence&#61;1">3000 years</a> well before Newton's method. Rather than use the derivative at $x_i$ to compute $x_{i+1}$, the secant line is used between $x_{i-1}$ and $x_i$. This method will also converge to a zero with a good starting point, though not nearly as quickly as Newton's method.</p><p>You can check – if you want – by repeating the last command until the change in <code>x2</code> is within your tolerance:</p><pre class="sourceCode julia">x2, x1 = 1, 2			# initial guess of 2
+<h2>Numeric derivatives</h2><p>In order to use Newton's method we need to evaluate <span class="tex">$f&#39;&#40;x&#41;$</span>. We have used automatic differentiation above through <code>f&#39;&#40;x&#41;</code>. Automatic differentiation returns a numerically accurate value for the derivative.</p><p>However, Newton's method is actually fairly robust to using other related values to the derivative. That is the method will converge, though perhaps not as fast as with the derivative.</p><h3>The secant method</h3><p>The <a href="http://en.wikipedia.org/wiki/Secant_method">secant method</a> is perhaps the oldest numerical linear algebra tool dating back over <a href="http://scholarship.rice.edu/bitstream/handle/1911/20568/1442093.PDF?sequence&#61;1">3000 years</a> well before Newton's method. Rather than use the derivative at <span class="tex">$x_i$</span> to compute <span class="tex">$x_&#123;i&#43;1&#125;$</span>, the secant line is used between <span class="tex">$x_&#123;i-1&#125;$</span> and <span class="tex">$x_i$</span>. This method will also converge to a zero with a good starting point, though not nearly as quickly as Newton's method.</p><p>You can check – if you want – by repeating the last command until the change in <code>x2</code> is within your tolerance:</p><pre class="sourceCode julia">x2, x1 = 1, 2			# initial guess of 2
 f(x) = x^2 - 2			# some function
 fp(x1,x2) = (f(x1) - f(x2))/(x1 - x2)
 x2, x1 = x2 - f(x2)/fp(x1, x2), x2 # update step</pre>
@@ -912,86 +914,86 @@ x2, f(x2)</pre>
 <pre class="output">
 (1.4142135623730947, -8.881784197001252e-16)</pre>
 
-<p>The last line shows the algorithm has basically converged, as the values agree to $10^{-14}$. We have</p><h3>Using forward differences</h3><p>Recall the forward difference approximation to the derivative:</p>$$~
+<p>The last line shows the algorithm has basically converged, as the values agree to <span class="tex">$10^&#123;-14&#125;$</span>. We have</p><h3>Using forward differences</h3><p>Recall the forward difference approximation to the derivative:</p>$$~
 f'(x) \approx \frac{f(x + h) - f(x)}{h}
 ~$$
-<p>For some small $h$ (with $h=10^{-8}$ a reasonable choice for many functions). This can be used</p><p>One can also use approximate derivatives based on forward differences in place of $f'(x)$ in the formula. Again, this won't be as fast.</p><p>The update step $x - f(x)/f'(x)$ becomes</p>$$~
+<p>For some small <span class="tex">$h$</span> (with <span class="tex">$h&#61;10^&#123;-8&#125;$</span> a reasonable choice for many functions). This can be used</p><p>One can also use approximate derivatives based on forward differences in place of <span class="tex">$f&#39;&#40;x&#41;$</span> in the formula. Again, this won't be as fast.</p><p>The update step <span class="tex">$x - f&#40;x&#41;/f&#39;&#40;x&#41;$</span> becomes</p>$$~
 x - \frac{h \cdot f(x)}{f(x+h) - f(x)}.
 ~$$
-<p>The issue with this approximation is when the estimated value gets close to the actual root, the value of $h$ becomes too large. Steffenson's method replaces $h$ with $f(x)$, which for values close to a root gets quite small. This improves the convergence rate to be on par with Newton's method. In this case, the update step looks like</p>$$~
+<p>The issue with this approximation is when the estimated value gets close to the actual root, the value of <span class="tex">$h$</span> becomes too large. Steffenson's method replaces <span class="tex">$h$</span> with <span class="tex">$f&#40;x&#41;$</span>, which for values close to a root gets quite small. This improves the convergence rate to be on par with Newton's method. In this case, the update step looks like</p>$$~
 x - \frac{f(x)^2}{f(x+ f(x)) - f(x)}.
 ~$$
-<h3>Problems</h3><h4>Question</h4><p>Use the secant method to find a root to $f(x) = \cos(x) - x^3$ starting with $x_0=1/2$ and $x_1=1$.</p><form name='WeaveQuestion' data-id='G2cdyxUy' data-controltype='numeric'>
+<h3>Problems</h3><h4>Question</h4><p>Use the secant method to find a root to <span class="tex">$f&#40;x&#41; &#61; \cos&#40;x&#41; - x^3$</span> starting with <span class="tex">$x_0&#61;1/2$</span> and <span class="tex">$x_1&#61;1$</span>.</p><form name='WeaveQuestion' data-id='lIbV5wca' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="G2cdyxUy" type="number" class="form-control">
+<input id="lIbV5wca" type="number" class="form-control">
 
 </div>
 
-<div id='G2cdyxUy_message'></div>
+<div id='lIbV5wca_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#G2cdyxUy').on('change', function() {
-  correct = Math.abs(this.value - 1) <= 1.0e-10;
-
+document.getElementById("lIbV5wca").addEventListener("change", function() {
+  var correct = Math.abs(this.value - 1) <= 1.0e-10;
+  var msgBox = document.getElementById('lIbV5wca_message');
   if(correct) {
-     $('#G2cdyxUy_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#G2cdyxUy_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
-<h4>Question</h4><p>Use the secant method to find a root to $f(x) = x^5 + x - 1$ starting with $x_0=1/2$ and $x_1=1$.</p><form name='WeaveQuestion' data-id='esHyYSio' data-controltype='numeric'>
+<h4>Question</h4><p>Use the secant method to find a root to <span class="tex">$f&#40;x&#41; &#61; x^5 &#43; x - 1$</span> starting with <span class="tex">$x_0&#61;1/2$</span> and <span class="tex">$x_1&#61;1$</span>.</p><form name='WeaveQuestion' data-id='jDARKPzI' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="esHyYSio" type="number" class="form-control">
+<input id="jDARKPzI" type="number" class="form-control">
 
 </div>
 
-<div id='esHyYSio_message'></div>
+<div id='jDARKPzI_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#esHyYSio').on('change', function() {
-  correct = Math.abs(this.value - 1) <= 1.0e-10;
-
+document.getElementById("jDARKPzI").addEventListener("change", function() {
+  var correct = Math.abs(this.value - 1) <= 1.0e-10;
+  var msgBox = document.getElementById('jDARKPzI_message');
   if(correct) {
-     $('#esHyYSio_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#esHyYSio_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
-<h2>The <code>fzero</code> function</h2><p>There are also very fast algorithms which do not require a derivative. The <code>Roots</code> package provides an interface to these through the <code>fzero</code> function.</p><p>The <code>fzero</code> function has two interfaces:</p><ul>
-<li><p>when called with a bracketing interval, as in <code>fzero&#40;f, &#91;a,b&#93;&#41;</code>, it will use a bisection method to find a root.</p>
+<h2>The <code>find_zero</code> function</h2><p>There are also very fast algorithms which do not require a derivative. The <code>Roots</code> package provides an interface to these through the <code>find_zero</code> function.</p><p>The <code>find_zero</code> function has two interfaces:</p><ul>
+<li><p>when called with a bracketing interval, as in <code>find_zero&#40;f, &#40;a,b&#41;&#41;</code>, it will use a bisection method to find a root.</p>
 </li>
-<li><p>when called with a starting point, as in <code>fzero&#40;f, a&#41;</code>, it will use an iterative algorithm to search for a root.</p>
+<li><p>when called with a starting point, as in <code>find_zero&#40;f, a&#41;</code>, it will use an iterative algorithm to search for a root.</p>
 </li>
-</ul><p>Many bracketing methods (like bisection) are guaranteed to converge, but can be slow. The iterative algorithm used by default with <code>fzero</code> tries to speed the convergence up, but if along the way it finds a bracketing interval, that will guarantee convergence.</p><p>We focus on the simplest usage of <code>fzero</code> where an initial guess is supplied and the default order is used. Here is an example to find $-\sqrt{2}$:</p><pre class="sourceCode julia">f(x) = x^2 - 2
-fzero(f, -1)</pre>
+</ul><p>Many bracketing methods (like bisection) are guaranteed to converge, but can be slow. The iterative algorithm used by default with <code>find_zero</code> tries to speed the convergence up, but if along the way it finds a bracketing interval, that will guarantee convergence.</p><p>We focus on the simplest usage of <code>find_zero</code> where an initial guess is supplied and the default order is used. Here is an example to find <span class="tex">$-\sqrt&#123;2&#125;$</span>:</p><pre class="sourceCode julia">f(x) = x^2 - 2
+find_zero(f, -1)</pre>
 <pre class="output">
 -1.414213562373095</pre>
 
-<h3>Using <code>fzero</code> and a graph to find all roots.</h3><p>Let's look, again, at the task of finding all zeros to the function $e^x - x^4$. We follow a standard approach:</p><ul>
+<h3>Using <code>find_zero</code> and a graph to find all roots.</h3><p>Let's look, again, at the task of finding all zeros to the function <span class="tex">$e^x - x^4$</span>. We follow a standard approach:</p><ul>
 <li><p>graph the function to roughly identify potential zeros</p>
 </li>
-<li><p>use these as starting points for <code>fzero</code> to improve</p>
+<li><p>use these as starting points for <code>find_zero</code> to improve</p>
 </li>
-</ul><p>The following graph suggests, perhaps, there may be $3$ zeros, one near $9$, one near $2$ and one near $-1$.</p><pre class="sourceCode julia">f(x) = exp(x) - x^4
+</ul><p>The following graph suggests, perhaps, there may be <span class="tex">$3$</span> zeros, one near <span class="tex">$9$</span>, one near <span class="tex">$2$</span> and one near <span class="tex">$-1$</span>.</p><pre class="sourceCode julia">f(x) = exp(x) - x^4
 plot(f, -5,9)</pre>
-    <div id="b0d8d29b-fdc7-45bc-8d62-97a4f5dcf635" style="width:600px;height:400px;"></div>
+    <div id="e39d0c24-9f40-406f-88bb-b4fb1fbae469" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('b0d8d29b-fdc7-45bc-8d62-97a4f5dcf635');
+        var PLOT = document.getElementById('e39d0c24-9f40-406f-88bb-b4fb1fbae469');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -1256,7 +1258,7 @@ plot(f, -5,9)</pre>
         "tickcolor": "rgb(0, 0, 0)",
         "type": "-"
     },
-    "legend": {
+    "legend_position": {
         "yanchor": "auto",
         "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
@@ -1283,32 +1285,33 @@ plot(f, -5,9)</pre>
     "width": 600
 }
 );
+
     
     </script>
-<p>We can improve these guesses with</p><pre class="sourceCode julia">fzero(f, 9), fzero(f, 2), fzero(f, -1)</pre>
+<p>We can improve these guesses with</p><pre class="sourceCode julia">find_zero(f, 9), find_zero(f, 2), find_zero(f, -1)</pre>
 <pre class="output">
 (8.6131694564414, 1.4296118247255556, -0.8155534188089607)</pre>
 
-<p>The above can be written without repeating <code>fzero</code> by using a comprehension:</p><pre class="sourceCode julia">[fzero(f, x) for x in [9, 2, -1]]</pre>
+<p>The above can be written without repeating <code>find_zero</code> by using a comprehension:</p><pre class="sourceCode julia">[find_zero(f, x) for x in [9, 2, -1]]</pre>
 <pre class="output">
 3-element Array{Float64, 1}:
   8.6131694564414
   1.4296118247255556
  -0.8155534188089607</pre>
 
-<p>Or even more compactly, using the broadcast notation:</p><pre class="sourceCode julia">fzero.(f, [-1, 2, 9])</pre>
+<p>Or even more compactly, using the broadcast notation:</p><pre class="sourceCode julia">find_zero.(f, [-1, 2, 9])</pre>
 <pre class="output">
 3-element Array{Float64, 1}:
  -0.8155534188089607
   1.4296118247255556
   8.6131694564414</pre>
 
-<hr /><p>As another illustration, let $f(x) = \cos^2(x^2)$ on $[-1,2]$. Find all the zeros of the derivative of $f(x)$.</p><p>We graph the derivative to identify starting points:</p><pre class="sourceCode julia">f(x) = cos(x^2)^2
+<hr /><p>As another illustration, let <span class="tex">$f&#40;x&#41; &#61; \cos^2&#40;x^2&#41;$</span> on <span class="tex">$&#91;-1,2&#93;$</span>. Find all the zeros of the derivative of <span class="tex">$f&#40;x&#41;$</span>.</p><p>We graph the derivative to identify starting points:</p><pre class="sourceCode julia">f(x) = cos(x^2)^2
 plot(f', -1, 2)</pre>
-    <div id="a47d0895-dc66-410a-b6f7-a4999e288fee" style="width:600px;height:400px;"></div>
+    <div id="71cfa26b-80f2-4418-913e-86f73d9d0d21" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('a47d0895-dc66-410a-b6f7-a4999e288fee');
+        var PLOT = document.getElementById('71cfa26b-80f2-4418-913e-86f73d9d0d21');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -1397,69 +1400,69 @@ plot(f', -1, 2)</pre>
         },
         "y": [
             1.8185948536513636,
-            1.8466429998090907,
+            1.846642999809091,
             1.1619475967222594,
             0.8564069031882914,
             0.5856661042763088,
             0.3974772863113508,
-            0.25048142367854614,
-            0.13580064365136935,
+            0.2504814236785462,
+            0.13580064365136932,
             0.06222121535765637,
             0.02367147000938714,
-            0.0056191656037029945,
+            0.005619165603702994,
             -0.00018326684687543172,
-            -0.035437654297830745,
+            -0.03543765429783074,
             -0.0903541808541151,
-            -0.18327971228202336,
-            -0.30224460527431324,
+            -0.18327971228202333,
+            -0.3022446052743133,
             -0.4595703010968991,
             -0.9280500561763781,
             -1.4789239323882837,
-            -1.6134866709042233,
+            -1.613486670904223,
             -1.7259851297177995,
-            -1.807087931183775,
+            -1.8070879311837753,
             -1.8468790307660008,
-            -1.837211789173679,
+            -1.8372117891736792,
             -1.7727975127255322,
             -1.646367043460303,
-            -1.4523247276893951,
-            -1.1755060691544785,
+            -1.452324727689395,
+            -1.1755060691544787,
             -0.8223780785837667,
-            -0.3978500093722391,
+            -0.39785000937223913,
             0.08760814073257768,
-            0.9933995440395023,
-            1.9023773858134156,
-            2.1563725617301026,
+            0.9933995440395021,
+            1.9023773858134159,
+            2.156372561730102,
             2.3904329312648116,
             2.5992171017888492,
-            2.7773729966178307,
-            2.919655227401812,
+            2.77737299661783,
+            2.9196552274018126,
             3.0210548072301333,
-            3.076939380300951,
+            3.0769393803009515,
             3.08320154094753,
             3.0407653167768163,
-            2.9492617886685757,
+            2.949261788668576,
             2.807272172011551,
             2.6142462764280507,
             2.3706003934481057,
             2.077802918431311,
             1.7384438571557634,
             1.3562842944725932,
-            0.6676814916111581,
+            0.6676814916111582,
             -0.09092841077698216,
             -0.8854721122623368,
             -1.6755826849359834,
             -2.055043471891893,
-            -2.416292513488062,
+            -2.4162925134880626,
             -2.753371571614867,
             -3.0603576513200643,
             -3.3314655113599914,
             -3.5611561508384346,
-            -3.744249687288948,
+            -3.7442496872889475,
             -3.876040782983913,
             -3.929846243996098,
             -3.9618067687012104,
-            -3.9712022190879073,
+            -3.9712022190879077,
             -3.957432986493527
         ],
         "type": "scatter"
@@ -1536,7 +1539,7 @@ plot(f', -1, 2)</pre>
             2.0
         ],
         "range": [
-            -4.18283433188897,
+            -4.182834331888971,
             3.294833653748593
         ],
         "domain": [
@@ -1575,7 +1578,7 @@ plot(f', -1, 2)</pre>
         "tickcolor": "rgb(0, 0, 0)",
         "type": "-"
     },
-    "legend": {
+    "legend_position": {
         "yanchor": "auto",
         "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
@@ -1602,9 +1605,10 @@ plot(f', -1, 2)</pre>
     "width": 600
 }
 );
+
     
     </script>
-<p>We see there are 3 potential zeros, one near 0, one near 1.2 and close to 1.7. Here we improve our guesses:</p><pre class="sourceCode julia">xs = fzero.(f', [0, 1.2, 1.7])   # or [fzero(f', x) for x in [0, 1.2, 1.7]]</pre>
+<p>We see there are 3 potential zeros, one near 0, one near 1.2 and close to 1.7. Here we improve our guesses:</p><pre class="sourceCode julia">xs = find_zero.(f', [0, 1.2, 1.7])   # or [find_zero(f', x) for x in [0, 1.2, 1.7]]</pre>
 <pre class="output">
 3-element Array{Float64, 1}:
  0.0
@@ -1618,7 +1622,7 @@ plot(f', -1, 2)</pre>
  2.5860584564030066e-32
  1.0</pre>
 
-<h5>fzeros</h5><p>For such tasks, <code>fzeros</code> also works well. This function looks for all zeros in the interval <code>&#91;a,b&#93;</code>:</p><pre class="sourceCode julia">fzeros(f, -1, 2)</pre>
+<h5>find_zeros</h5><p>For such tasks, <code>find_zeros</code> also works well. This function looks for all zeros in the interval <code>&#91;a,b&#93;</code>:</p><pre class="sourceCode julia">find_zeros(f, -1, 2)</pre>
 <pre class="output">
 1-element Array{Float64, 1}:
  1.2533141373155003</pre>
@@ -1626,41 +1630,41 @@ plot(f', -1, 2)</pre>
 <h3>Practice</h3><h4>Question</h4><p>Let</p>$$~
 f(x) = 4x^4 -5x^3 + 4x^2 -20x - 6
 ~$$
-<p>Apply Newton's method with $x_0=0$ using an automatic derivative. What value does it converge to?</p><form name='WeaveQuestion' data-id='vz5g7sK5' data-controltype='numeric'>
+<p>Apply Newton's method with <span class="tex">$x_0&#61;0$</span> using an automatic derivative. What value does it converge to?</p><form name='WeaveQuestion' data-id='HEzHZqVb' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="vz5g7sK5" type="number" class="form-control">
+<input id="HEzHZqVb" type="number" class="form-control">
 
 </div>
 
-<div id='vz5g7sK5_message'></div>
+<div id='HEzHZqVb_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#vz5g7sK5').on('change', function() {
-  correct = Math.abs(this.value - -0.27798094871260326) <= 1.0e-10;
-
+document.getElementById("HEzHZqVb").addEventListener("change", function() {
+  var correct = Math.abs(this.value - -0.27798094871260326) <= 1.0e-10;
+  var msgBox = document.getElementById('HEzHZqVb_message');
   if(correct) {
-     $('#vz5g7sK5_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#vz5g7sK5_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
 <h4>Question</h4><p>Let's try with a function where the derivative is not known easily. If we set</p>$$~
 f(x) = x^x - 2
 ~$$
-<p>Can we find a root using Newton's method, where $x > 0$?</p><p>We graph the function to see, using a smallish interval at first:</p><pre class="sourceCode julia">f(x) = x^x - 2
+<p>Can we find a root using Newton's method, where <span class="tex">$x &gt; 0$</span>?</p><p>We graph the function to see, using a smallish interval at first:</p><pre class="sourceCode julia">f(x) = x^x - 2
 plot(f, 0, 2)
 plot!(zero)</pre>
-    <div id="6b26da99-5d97-400b-9ad6-257199802689" style="width:600px;height:400px;"></div>
+    <div id="100eaff6-66da-4794-ae51-9412324b049a" style="width:600px;height:400px;"></div>
     <script>
     
-    PLOT = document.getElementById('6b26da99-5d97-400b-9ad6-257199802689');
+        var PLOT = document.getElementById('100eaff6-66da-4794-ae51-9412324b049a');
     Plotly.plot(PLOT, [
     {
         "xaxis": "x",
@@ -1771,27 +1775,27 @@ plot!(zero)</pre>
         },
         "yaxis": "y",
         "x": [
-            -0.06,
-            -0.03929646367804916,
-            0.1521376243969504,
-            0.2671815319679226,
-            0.36444969167742336,
-            0.47011017647006903,
-            0.5675197976134116,
-            0.6719532063817585,
-            0.7929495519976885,
-            0.9004768249553655,
-            0.9947685534652664,
-            1.0975718481092773,
-            1.2009861309559615,
-            1.3153238447637372,
-            1.424113294379068,
-            1.5372290802440631,
-            1.6324484777737116,
-            1.748700569491092,
-            1.857980964512862,
-            2.033056631714047,
-            2.06
+            0.0,
+            0.019531638039576263,
+            0.20012983433674567,
+            0.30866182261124775,
+            0.4004242374315315,
+            0.5001039400661028,
+            0.5919998090692563,
+            0.6905218928129796,
+            0.8046693886770646,
+            0.9061102122220429,
+            0.99506467308044,
+            1.092048913310639,
+            1.1896095575056242,
+            1.2974753252488085,
+            1.4001068814896869,
+            1.506819887022701,
+            1.5966495073336904,
+            1.7063212919727282,
+            1.809416004257417,
+            1.9745817280321198,
+            2.0
         ],
         "showlegend": true,
         "mode": "lines",
@@ -1844,8 +1848,8 @@ plot!(zero)</pre>
             2.0
         ],
         "range": [
-            -0.1236,
-            2.1236
+            -0.06,
+            2.06
         ],
         "domain": [
             0.03619130941965587,
@@ -1943,7 +1947,7 @@ plot!(zero)</pre>
         "tickcolor": "rgb(0, 0, 0)",
         "type": "-"
     },
-    "legend": {
+    "legend_position": {
         "yanchor": "auto",
         "xanchor": "auto",
         "bordercolor": "rgba(0, 0, 0, 1.000)",
@@ -1970,80 +1974,81 @@ plot!(zero)</pre>
     "width": 600
 }
 );
+
     
     </script>
-<p>Eyeing this, we pick an initial point, $1$, for Newton's method (<code>newton&#40;f, 1&#41;</code>) to the right of the minimum, which appears to be around $x=0.35$.</p><p>What is the value of the approximate zero?</p><form name='WeaveQuestion' data-id='5Qr7gxWw' data-controltype='numeric'>
+<p>Eyeing this, we pick an initial point, <span class="tex">$1$</span>, for Newton's method (<code>newton&#40;f, 1&#41;</code>) to the right of the minimum, which appears to be around <span class="tex">$x&#61;0.35$</span>.</p><p>What is the value of the approximate zero?</p><form name='WeaveQuestion' data-id='M0wgFJ7I' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="5Qr7gxWw" type="number" class="form-control">
+<input id="M0wgFJ7I" type="number" class="form-control">
 
 </div>
 
-<div id='5Qr7gxWw_message'></div>
+<div id='M0wgFJ7I_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#5Qr7gxWw').on('change', function() {
-  correct = Math.abs(this.value - 1.5596104694623694) <= 1.0e-8;
-
+document.getElementById("M0wgFJ7I").addEventListener("change", function() {
+  var correct = Math.abs(this.value - 1.5596104694623694) <= 1.0e-8;
+  var msgBox = document.getElementById('M0wgFJ7I_message');
   if(correct) {
-     $('#5Qr7gxWw_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#5Qr7gxWw_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
-<h4>Question</h4><p>Use <code>fzero</code> to find the one root of <code>x^5 &#43; x - 1</code>. First plot to get an estimate.</p><form name='WeaveQuestion' data-id='YFzaKiUb' data-controltype='numeric'>
+<h4>Question</h4><p>Use <code>find_zero</code> to find the one root of <code>x^5 &#43; x - 1</code>. First plot to get an estimate.</p><form name='WeaveQuestion' data-id='bKiTYYXu' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="YFzaKiUb" type="number" class="form-control">
+<input id="bKiTYYXu" type="number" class="form-control">
 
 </div>
 
-<div id='YFzaKiUb_message'></div>
+<div id='bKiTYYXu_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#YFzaKiUb').on('change', function() {
-  correct = Math.abs(this.value - 1.1673039782614187) <= 1.0e-8;
-
+document.getElementById("bKiTYYXu").addEventListener("change", function() {
+  var correct = Math.abs(this.value - 1.1673039782614187) <= 1.0e-8;
+  var msgBox = document.getElementById('bKiTYYXu_message');
   if(correct) {
-     $('#YFzaKiUb_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#YFzaKiUb_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
-<h4>Question</h4><p>Let $f(x) = 5/\sin(x) + 8/\cos(x)$, Starting at $x=\pi/4$, use <code>fzero</code> to find a root of the derivative of $f(x)$ given by <code>f&#39;</code>.</p><form name='WeaveQuestion' data-id='mGW0c4I3' data-controltype='numeric'>
+<h4>Question</h4><p>Let <span class="tex">$f&#40;x&#41; &#61; 5/\sin&#40;x&#41; &#43; 8/\cos&#40;x&#41;$</span>, Starting at <span class="tex">$x&#61;\pi/4$</span>, use <code>find_zero</code> to find a root of the derivative of <span class="tex">$f&#40;x&#41;$</span> given by <code>f&#39;</code>.</p><form name='WeaveQuestion' data-id='gzMVSF3d' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="mGW0c4I3" type="number" class="form-control">
+<input id="gzMVSF3d" type="number" class="form-control">
 
 </div>
 
-<div id='mGW0c4I3_message'></div>
+<div id='gzMVSF3d_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#mGW0c4I3').on('change', function() {
-  correct = Math.abs(this.value - 0.7073827215431158) <= 1.0e-8;
-
+document.getElementById("gzMVSF3d").addEventListener("change", function() {
+  var correct = Math.abs(this.value - 0.7073827215431158) <= 1.0e-8;
+  var msgBox = document.getElementById('gzMVSF3d_message');
   if(correct) {
-     $('#mGW0c4I3_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#mGW0c4I3_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
@@ -2051,44 +2056,44 @@ $('#mGW0c4I3').on('change', function() {
 <pre class="output">
 tangent (generic function with 1 method)</pre>
 
-<p>Let $f(x) = x^2 - 3x + 5$. Use <code>fzero</code> to find the intersection point of the tangent line at $1$ and the tangent line at $3$. Where does this happen?</p><p>(Hint, apply <code>fzero</code> to <code>h&#40;x&#41; &#61; tangent&#40;f, 1&#41;&#40;x&#41; -  tangent&#40;f, 3&#41;&#40;x&#41;</code> starting at 1.)</p><form name='WeaveQuestion' data-id='uIKjTkpc' data-controltype='numeric'>
+<p>Let <span class="tex">$f&#40;x&#41; &#61; x^2 - 3x &#43; 5$</span>. Use <code>find_zero</code> to find the intersection point of the tangent line at <span class="tex">$1$</span> and the tangent line at <span class="tex">$3$</span>. Where does this happen?</p><p>(Hint, apply <code>find_zero</code> to <code>h&#40;x&#41; &#61; tangent&#40;f, 1&#41;&#40;x&#41; -  tangent&#40;f, 3&#41;&#40;x&#41;</code> starting at 1.)</p><form name='WeaveQuestion' data-id='ZvtnrdeO' data-controltype='numeric'>
 <div class='form-group '>
 <div class='controls'>
 
 
 <div class="input-group">
-<input id="uIKjTkpc" type="number" class="form-control">
+<input id="ZvtnrdeO" type="number" class="form-control">
 
 </div>
 
-<div id='uIKjTkpc_message'></div>
+<div id='ZvtnrdeO_message'></div>
 </div>
 </div>
 </form>
 <script text='text/javascript'>
-$('#uIKjTkpc').on('change', function() {
-  correct = Math.abs(this.value - 2.0) <= 1.0e-8;
-
+document.getElementById("ZvtnrdeO").addEventListener("change", function() {
+  var correct = Math.abs(this.value - 2.0) <= 1.0e-8;
+  var msgBox = document.getElementById('ZvtnrdeO_message');
   if(correct) {
-     $('#uIKjTkpc_message').html('<div class="alert alert-success"><span class="glyphicon glyphicon-thumbs-up">&nbsp;Correct</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $('#uIKjTkpc_message').html('<div class="alert alert-danger"><span class="glyphicon glyphicon-thumbs-down">&nbsp;Incorrect</span></div>');
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
 });
 </script>
 <h2>Various issues with Newton's method</h2><p>As great as Newton's method is, it won't always work for various reasons, some of which are described in the following. Here is what you need to keep in mind. Newton's method works well if</p><ul>
 <li><p>The zero is a simple root – that is of multiplicity 1</p>
 </li>
-<li><p>The magnitude, $|f'(x)|$, is not too small (If the tangent line is nearly flat, the next guess is far from the previous)</p>
+<li><p>The magnitude, <span class="tex">$|f&#39;&#40;x&#41;|$</span>, is not too small (If the tangent line is nearly flat, the next guess is far from the previous)</p>
 </li>
-<li><p>The magnitude, $|f''(x)|$, is not too big (function doesn't have so much curve that the tangent line is a poor approximation)</p>
+<li><p>The magnitude, <span class="tex">$|f&#39;&#39;&#40;x&#41;|$</span>, is not too big (function doesn't have so much curve that the tangent line is a poor approximation)</p>
 </li>
 <li><p>The initial guess is not to far from a zero</p>
 </li>
 </ul><p>The above points come from the following formula which you can find in many texts.</p>$$~
 \Delta x_{i+1} = \frac{f' '(\alpha)}{f'(\alpha)}(\Delta x_i)^2 + \text{error}
 ~$$
-<p>which is valid when $f(x)$ satisfies $f(\alpha) = 0$, the third derivative exists near $\alpha$, and $\Delta x_i = x_i - \alpha$ is the error between the zero and the $i$ th estimate.  When the derivative at $\alpha$ is non-zero, the error is basically a constant times $\Delta x_i^2$. This is interpreted as saying there is quadratic convergence in the error, as the next one is related to the previous one squared.</p><p>Now we look at some cases where the above three points do not hold.</p><h3>The initial guess is no where near the end results</h3><p>Let $f(x) = \sin(x) - x/4$ and $x_0 = 2\pi$. This value is deliberately a poor choice:</p><pre class="sourceCode julia">f(x) = sin(x) - x/4
+<p>which is valid when <span class="tex">$f&#40;x&#41;$</span> satisfies <span class="tex">$f&#40;\alpha&#41; &#61; 0$</span>, the third derivative exists near <span class="tex">$\alpha$</span>, and <span class="tex">$\Delta x_i &#61; x_i - \alpha$</span> is the error between the zero and the <span class="tex">$i$</span> th estimate.  When the derivative at <span class="tex">$\alpha$</span> is non-zero, the error is basically a constant times <span class="tex">$\Delta x_i^2$</span>. This is interpreted as saying there is quadratic convergence in the error, as the next one is related to the previous one squared.</p><p>Now we look at some cases where the above three points do not hold.</p><h3>The initial guess is no where near the end results</h3><p>Let <span class="tex">$f&#40;x&#41; &#61; \sin&#40;x&#41; - x/4$</span> and <span class="tex">$x_0 &#61; 2\pi$</span>. This value is deliberately a poor choice:</p><pre class="sourceCode julia">f(x) = sin(x) - x/4
 fp(x) = cos(x) - 1/4
 newton(f, fp, 2pi, verbose=true)</pre>
 <pre class="output">
@@ -2103,85 +2108,75 @@ newton(f, fp, 2pi, verbose=true)</pre>
 </div>
 
 
-<h4>Question</h4><p>When $|f'(x)|$ is too close to $0$, the path can jump alot. In the figure, what was the longest jump?</p><form name="WeaveQuestion" data-id="Ck2vARLz" data-controltype="radio">
+<h4>Question</h4><p>When <span class="tex">$|f&#39;&#40;x&#41;|$</span> is too close to <span class="tex">$0$</span>, the path can jump alot. In the figure, what was the longest jump?</p><form name="WeaveQuestion" data-id="4yh1RL3s" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_Ck2vARLz" value="1"><div class="markdown"><p>From about -12 to -3</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_Ck2vARLz" value="2"><div class="markdown"><p>From about 17 to -10</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_Ck2vARLz" value="3"><div class="markdown"><p>From about 0 to -5</p>
-</div>
-    </label>
-    </div>
+  <input type="radio" name="radio_4yh1RL3s" id="1" value="1">
+  <label for="1">From about 0 to -5</label>
+  <br>
+  <input type="radio" name="radio_4yh1RL3s" id="2" value="2">
+  <label for="2">From about -12 to -3</label>
+  <br>
+  <input type="radio" name="radio_4yh1RL3s" id="3" value="3">
+  <label for="3">From about 17 to -10</label>
+  <br>
 
-<div id="Ck2vARLz_message"></div>
+<div id="4yh1RL3s_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_Ck2vARLz']").on("change", function() {
-  correct = this.value == 2;
-
-  if(correct) {
-     $("#Ck2vARLz_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+_.forEach(document.querySelectorAll('input[name="radio_4yh1RL3s"]'), function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 3;
+    var msgBox = document.getElementById('4yh1RL3s_message');
+    if (correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $("#Ck2vARLz_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
-});
+})});
+
+
+
 
 </script>
-<h4>Question</h4><p>The method did find a zero, but the initial guess was nowhere near the final zero. How close was the closest zero to the initial guess?</p><form name="WeaveQuestion" data-id="pukWXcIH" data-controltype="radio">
+<h4>Question</h4><p>The method did find a zero, but the initial guess was nowhere near the final zero. How close was the closest zero to the initial guess?</p><form name="WeaveQuestion" data-id="wukTavSh" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_pukWXcIH" value="1"><div class="markdown"><p><code>3.8</code></p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_pukWXcIH" value="2"><div class="markdown"><p><code>2pi</code></p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_pukWXcIH" value="3"><div class="markdown"><p><code>8.75</code></p>
-</div>
-    </label>
-    </div>
+  <input type="radio" name="radio_wukTavSh" id="1" value="1">
+  <label for="1"><code>8.75</code></label>
+  <br>
+  <input type="radio" name="radio_wukTavSh" id="2" value="2">
+  <label for="2"><code>2pi</code></label>
+  <br>
+  <input type="radio" name="radio_wukTavSh" id="3" value="3">
+  <label for="3"><code>3.8</code></label>
+  <br>
 
-<div id="pukWXcIH_message"></div>
+<div id="wukTavSh_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_pukWXcIH']").on("change", function() {
-  correct = this.value == 1;
-
-  if(correct) {
-     $("#pukWXcIH_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+_.forEach(document.querySelectorAll('input[name="radio_wukTavSh"]'), function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 3;
+    var msgBox = document.getElementById('wukTavSh_message');
+    if (correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $("#pukWXcIH_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
-});
+})});
+
+
+
 
 </script>
-<h3>Function has a poor shape</h3><p>Let $f(x) = x^{1/3}$. We know the root is 0. Let's see what happens if we use Newton's method. We have to be careful though as <code>julia</code> thinks that cube roots of negative numbers (via <code>x^&#40;1/3&#41;</code> are <code>NaN</code>, not a number. (You can avoid this, by making your number complex, e.g. <code>x &#43; 0*im</code>, but then the real answer is not given as an answer. It is just one of three and not the chosen one.)</p><p>So we define our function using <code>julia</code>'s <code>cbrt</code> function, which works as we desire for negative numbers, as follows:</p><pre class="sourceCode julia">f(x) = cbrt(x)
+<h3>Function has a poor shape</h3><p>Let <span class="tex">$f&#40;x&#41; &#61; x^&#123;1/3&#125;$</span>. We know the root is 0. Let's see what happens if we use Newton's method. We have to be careful though as <code>julia</code> thinks that cube roots of negative numbers (via <code>x^&#40;1/3&#41;</code> are <code>NaN</code>, not a number. (You can avoid this, by making your number complex, e.g. <code>x &#43; 0*im</code>, but then the real answer is not given as an answer. It is just one of three and not the chosen one.)</p><p>So we define our function using <code>julia</code>'s <code>cbrt</code> function, which works as we desire for negative numbers, as follows:</p><pre class="sourceCode julia">f(x) = cbrt(x)
 xstar = newton(f, 2)</pre>
 <pre class="output">
-Roots.ConvergenceFailed("Stopped at: xn = -4.398046511104e12. Too many steps taken. ")
+Roots.ConvergenceFailed("Algorithm failed to converge")
 </pre>
 
-<p>Still an issue. Why?</p><h4>Question</h4><p>Despite all our care with the derivative, the method did not converge in $200$ steps. Can you see why from this trace?</p>
+<p>Still an issue. Why?</p><h4>Question</h4><p>Despite all our care with the derivative, the method did not converge in <span class="tex">$200$</span> steps. Can you see why from this trace?</p>
 <div class="well well-sm">
 <figure>
 <img src="data:image/gif;base64,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Dz30kO299942ZcoU23777WvUXSnuJUuWZLxGOVIbNGiQ8TsOQgACECgFgX/+85/24IMPmtJFHnPMMU4JkyKyFKTjWWckFLDymL755psuvu3yyy+3Xr162UEHHeS2z6oJVs2kdcNnKrNmzbLGjRtn+opjEIAABHwl8Oqrr5pmuSra/m/IkCFWq1YkDI6+9pPKiiMQCQUshavZ71577eV6oyfFlStXuvymp512Wt491JqK/mUqq1evdk+hmb7jGAQgAIFiCchf5eWXX7aHH37YPez/z//8j+2+++7FVsv1CSYQCQU8YsQIGzZsmAs4HzlypMOt9ZF169a5Y4cffniCh4CuQQACcSagbQC1BaBMzVpKO++886xv375x7hKyB0QgEgr4wAMPtMWLF9uHH36Y1u1LL73U9tlnH/dd2hd8gAAEIBAyAc14ten9/fff7/IyX3jhhda7d++QpaL5OBGIhAIWsIYNG1qfPn2qsNPaif5RIAABCESBgGa8Urzjxo1zileJM9j0PgojEz8ZIqOA44cOiSEAgXIisHnzZps4caLdd999bitAbXov/xUKBAolgAIulBzXQQACZUNg+vTpdvfdd7tcBeeffz5rvGUz8qXtKAq4tHypHQIQiDGBt956y+644w7Teq+cRQcNGhTj3iB61AiggKM2IsgDAQiETkAJfaR4ly5daqeccortt99+ocuEAMkjgAJO3pjSIwhAoEACa9ascdsAzpw500444QS76qqrrHbt2gXWxmUQyE0ABZybD99CAAJlQGD9+vX2t7/9ze1QdOihh7qUuGwAUwYDH3IXUcAhDwDNQwAC4RJ46aWX7M4777SBAwc6R6utt946XIFovWwIoIDLZqjpKAQgkEpgwYIFdtNNN9kWW2xhV155pe2www6pX/MeAiUngAIuOWIagAAEokTg888/dw5W2gBGDlbaApUCgTAIoIDDoE6bEIBA4ASUwerpp592iTR++tOfukxWrPMGPgw0mEIABZwCg7cQgEAyCbz33ns2evRoa9q0qY0dO9Y6dOiQzI7Sq1gRQAHHargQFgIQqAmBb775xpmbp02bZmeccUbW7UprUifnQsAvAuwQ7RdJ6oEABCJF4NVXX7WTTjrJOVlp44Rse4VHSmiEKSsCzIDLarjpLASST0DJNG644QZbvny5825mp6Lkj3lce8gMOK4jh9wQ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91j3YqFewBkrjvBB9Vkm2KZNm/oy46+JAmY/4AjfGIgWawJVTND6Q3/44Ydtxx13tHPOOccmTZrk1tjGjx9vxx9/vMnJZfTo0SYFTYFAGASkdLt06VI2yleM5d29evVqX5Sv6pMCljKPUyEOOE6jhaz5EEhTwIqhPOSQQ+xf//qXzZgxw15//XV74IEHnMJ99NFH7e2333bbnum8/fbbz1auXJlPG5wDgaIIyNSs9b9yLdo+cfny5dapUyffEEgB57sN45lnnul+E3xrvMCKiAMuEByXRZZAmglazh1/+9vfXHxgNon1R3vRRRfZueeeaz/88EO20zgOAV8IKF71/fffd5YXXyqMYSVyNpPHcsOGDX2TPl8T9KxZs2zs2LEuacdf//pX39qnIghAwCxtBiwFrOB8leeee86tOaVCWrx4sZsN65jW4Pz8QUhth/cQEAHt3auUkvI/aNOmTVlC0ZKQQo66d+/ua//zMUGr7f/93/917d533302Z84cX2WgMggUS0DWsT/+8Y9uSUq6a5999rFXX3212GoDuz5NAae2KjN0//79bcqUKe7wPffcY7vuumuFgk4918/3yuOrGEUKBL777ju3g1G+ptIkEtN6d4MGDXxf784nDOnBBx+0f/zjHxVYPWVccSDgN8QBBww8Bs0de+yxdtlll9lHH33kHthfe+01+8lPfmKvvPJKDKSvNANOlfiUU06xv/zlL3biiSfaoEGD7LbbbnPK+NRTT009zZf3cui68MILrUOHDs7JpEWLFm523bt3b7v33nt9aYNK4kFAT7ReadmypUuB6H3m1T8CUsC5nLC+/vpru+CCC9IanD59unPQTDsY4AfigAOEHYOmpk2bZk888UQVSeUzcf7551c5HsUDaWvAmQRUZiE5XSm5fa1aWSfMmS7N+5icPFatWmV///vfXR5fmba19qdYz7PPPtu1f/rpp1db37PPPmsvv/xyxvOmTp1qa9euNbVFiSYBWT8062Vp4z/jo7875V/2O7uXHnilzHLNaDXz1dpz5aIHcJn4/JapcjuZPn/66aduLVy/RRQIvPHGG1khzJ0716Qz8klaoyWuXH8LWRvx4YusCviWW26xK664wu6++27nGS0TtOzr11xzjWl27Gd56aWXnNd1anJ5PZ3vvvvudtNNN9mll17qYFbXpmbqSsSfqWjNS6Ecp512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2Mmer8BDhgyxKVOm5Ht67M7785//7H64Dz300NjJnq/ASR/Du+++27bccks7/vjj80USu/MwQcduyBAYAhCAAASSQAAFnIRRpA8QgAAEIBA7Aijg2A0ZAkMAAhCAQBIIoICTMIr0AQIQgAAEYkcABRy7IUNgCEAAAhBIAgEUcBJGkT5AAAIQgEDsCBCG5POQrV271ho1amT16tXzueboVLdq1SrbdtttoyOQz5J8/vnnLvyhQYMGPtccneo++eQTa9OmTXQE8lmSL7/80hQDvNVWW/lcc3SqS/oYrlu3zrbYYgv3exod6v5KggL2lye1QQACEIAABPIigAk6L0ycBAEIQAACEPCXAArYX57UBgEIQAACEMiLAAo4L0ycBAEIQAACEPCXAArYX57UBgEIQAACEMiLAAo4L0ycBAEIQAACEPCXAArYX57UBgEIQAACEMiLAAo4L0ycBAEIQAACEPCXAArYR57arP7777/3scboVbVp0yZTPykQgEDwBJL+91cOv6Gpdw0KOJVGEe9/+OEHO/roo+36669Pq2WXXXaxjh07Vvy744470r6P04dly5ZZp06d7MMPP6wQW1mj1O/u3btbnz597PXXX6/4Lq5vZs+eXTFe3titWLEirt1Jk3vKlCm25557WpcuXeyII44wjV+SSpLHLul/f+XwG1r5bw0FXJlIAZ/nzJlj++yzj02cODHt6jVr1tjixYvtvffeswULFrh/J598cto5cflwzz332L777murV69OE/m0006zvn372gcffGBjxoyxI4880r799tu0c+L2QT/iBxxwQMWYaezatm0bt25Ukfezzz6z4447zm699VY3XlLC5513XpXz4nwgqWOX9L+/cvgNzfR3hQLORKWGx+677z4766yz7Nhjj027cu7cuTZgwABnsl24cKHLD12nTp20c+LwYcOGDfboo4/a+PHjrVmzZmkiT5gwwX7zm9+4nK1Dhgyx9u3b27Rp09LOidsHjdugQYPs008/dQ8cyiesnLRxL1JOPXv2dA9MypN85pln2pNPPhn3bqXJn8SxK4e/v6T/hqbdpCkfUMApMAp9e/PNN9uwYcOqXK4fg3fffdcGDhxoe+yxh+266672xRdfVDkv6ge0scSLL75o22+/fZqoMl9+99131qJFi4rj2qRBiivOReM2atQoO/DAA61z5842cuTIOHenQvalS5embcDQunVr06YFGsOklCSOXTn8/SX9NzTb3xcKOBsZH45LGZ199tnOlKn1G82kNJNMSpGJvWHDhmnd2XLLLe3f//532rG4fZDVQiY/mdXfeOMNZ1qvbHqPW58kb+Xx0lipfPPNN+41Cf8ldewyjU3l8dQ5Sfj7S+1r0n9DUcCpo53H+1//+tfOlKynUr3PVY4//nj7/e9/707RLPHEE0+MhQKWrOqf/snEnK20atXKvvrqq7Sv9TlO66Wa2Xt9bd68uevLLbfcYnvttZd7379/fxs8eHAiTLWVx0vbvWnLRa/faQMZ0w9JHbtMw1F5PHVO3P7+MvUr9Vhcf0NT+5DrffwWJHP1JoDvLr74Yjv99NNdSy1btszZ4oMPPujMtvKEVpFz0tZbb53zmih8OXny5Ipwqm7dumUVSevBeuJevny5W/vViR999JHzIM56UcS+2H333e0f//iHk6p27dq2fv16u/baa53Z2dsPWDPEOIxbdWi1Pq/x8Yred+jQwfsY+9ckj12mwUnC31+mfqUei+tvaGofcr1nBpyLTobvFJay8847u38KyclVtEZ64YUX2saNG5357/7777fDDjss1yWR+K5fv34VfWzSpElOmRSCdN1115niE5944gmrVauW9erVK+c1UfpS/fPGU/2W0p00aZIzQUvOmTNn2ptvvunWg6MkdyGy7Lfffi6ETN76WvcdPXq0HXXUUYVUFclrkjx22YDH/e8vW7+843H9DfXkr+6VGXB1hIr4/pe//KVNnz7deZ5qvUYhOkn6wRMaWQQOPfRQFx+s2fDdd99t8rCNc7n66qvt/PPPt5tuusl5QWs9uFGjRnHukpO9fv36NnbsWDv88MOtadOmzjojk22SSlLHLtsYJfHvL7WvSf8N3eLHzCOkNUod8RK895xc5ISV1CInpSSYaVPHZ+3atS7sSrP6JBVZK7T+m6S138rjk9Sxq9xP73MS//68vuk1qb+hKODUUeY9BCAAAQhAICACyXq0DwgazUAAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AAAhCAAASKJYACLpYg10MAAhCAAAQKIIACLgAal0AgjgSWLFliffr0sUWLFjnx7733Xhs2bJht3rw5jt1BZgjEnsAWP/7x8dcX+2GkAxDIj8C5555rCxcutDvuuMP69u1rEyZMsIEDB+Z3MWdBAAK+EkAB+4qTyiAQbQJff/217bjjjtakSRP72c9+ZldffXW0BUY6CCSYACboBA8uXYNAZQINGza0008/3d555x0744wzKn/NZwhAIEACzIADhE1TEAibwBdffGG9evVy/9q0aWP3339/2CLRPgTKlgAz4LIdejpejgTOO+88Gzp0qD3xxBP2yiuvuDXgcuRAnyEQBQJ1oiAEMkAAAqUnMGnSJHvmmWdswYIF1rRpUxs9erSNGDHCmaMbNWpUegFoAQIQSCOACToNBx8gAAEIQAACwRDABB0MZ1qBAAQgAAEIpBFAAafh4AMEIAABCEAgGAIo4GA40woEIAABCEAgjQAKOA0HHyAAAQhAAALBEEABB8OZViAAAQhAAAJpBFDAaTj4AAEIQAACEAiGAAo4GM60AgEIQAACEEgjgAJOw8EHCEAAAhCAQDAEUMDBcKYVCEAAAhCAQBoBFHAaDj5AAAIQgAAEgiGAAg6GM61AAAIQgAAE0giggNNw8AECEIAABCAQDAEUcDCcaQUCEIAABCCQRgAFnIaDDxCAAAQgAIFgCKCAg+FMKxCAAAQgAIE0AijgNBx8gAAEIAABCARDAAUcDGdagQAEIAABCKQR+P8k/B9FAuZTLQAAAABJRU5ErkJggg=="/>
@@ -2190,196 +2185,168 @@ Roots.ConvergenceFailed("Stopped at: xn = -4.398046511104e12. Too many steps tak
 </div>
 
 
-<form name="WeaveQuestion" data-id="Io2Rg66u" data-controltype="radio">
+<form name="WeaveQuestion" data-id="tyNOYi06" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_Io2Rg66u" value="1"><div class="markdown"><p><code>|f&#39;&#40;x&#41;|</code> gets too small</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_Io2Rg66u" value="2"><div class="markdown"><p><code>|f&#39;&#39;&#40;x&#41;|</code> gets too big at 0</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_Io2Rg66u" value="3"><div class="markdown"><p>Initial guess is too far from a zero.</p>
-</div>
-    </label>
-    </div>
+  <input type="radio" name="radio_tyNOYi06" id="1" value="1">
+  <label for="1"><code>|f&#39;&#40;x&#41;|</code> gets too small</label>
+  <br>
+  <input type="radio" name="radio_tyNOYi06" id="2" value="2">
+  <label for="2"><code>|f&#39;&#39;&#40;x&#41;|</code> gets too big at 0</label>
+  <br>
+  <input type="radio" name="radio_tyNOYi06" id="3" value="3">
+  <label for="3">Initial guess is too far from a zero.</label>
+  <br>
 
-<div id="Io2Rg66u_message"></div>
+<div id="tyNOYi06_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_Io2Rg66u']").on("change", function() {
-  correct = this.value == 2;
-
-  if(correct) {
-     $("#Io2Rg66u_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+_.forEach(document.querySelectorAll('input[name="radio_tyNOYi06"]'), function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 2;
+    var msgBox = document.getElementById('tyNOYi06_message');
+    if (correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $("#Io2Rg66u_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
-});
+})});
+
+
+
 
 </script>
-<h4>Questions <small>Solve by hand</small></h4><p>For $f(x) = x^{1/3}$, simplify the expression by hand:</p>$$~
+<h4>Questions <small>Solve by hand</small></h4><p>For <span class="tex">$f&#40;x&#41; &#61; x^&#123;1/3&#125;$</span>, simplify the expression by hand:</p>$$~
 x - f(x)/f'(x)
 ~$$
-<p>What do you get?</p><form name="WeaveQuestion" data-id="66myRw7d" data-controltype="radio">
+<p>What do you get?</p><form name="WeaveQuestion" data-id="qlE8Tifr" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_66myRw7d" value="1"><div class="markdown"><p><code>x - &#40;1/3&#41;x^&#123;-1/3&#125;</code></p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_66myRw7d" value="2"><div class="markdown"><p><code>x - 3/x</code></p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_66myRw7d" value="3"><div class="markdown"><p><code>-2x</code></p>
-</div>
-    </label>
-    </div>
+  <input type="radio" name="radio_qlE8Tifr" id="1" value="1">
+  <label for="1"><code>x - 3/x</code></label>
+  <br>
+  <input type="radio" name="radio_qlE8Tifr" id="2" value="2">
+  <label for="2"><code>-2x</code></label>
+  <br>
+  <input type="radio" name="radio_qlE8Tifr" id="3" value="3">
+  <label for="3"><code>x - &#40;1/3&#41;x^&#123;-1/3&#125;</code></label>
+  <br>
 
-<div id="66myRw7d_message"></div>
+<div id="qlE8Tifr_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_66myRw7d']").on("change", function() {
-  correct = this.value == 3;
-
-  if(correct) {
-     $("#66myRw7d_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+_.forEach(document.querySelectorAll('input[name="radio_qlE8Tifr"]'), function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 2;
+    var msgBox = document.getElementById('qlE8Tifr_message');
+    if (correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $("#66myRw7d_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
-});
+})});
+
+
+
 
 </script>
-<h4>Question</h4><p>Apply Newton's method to $f(x) = (x-2)^7 \cdot (x-3) \cdot (x-4)$ starting at 1.9981. The algorithm does not converge to 2 – an obvious root. From a plot of $f(x)$ explain why not:</p><form name="WeaveQuestion" data-id="Nytgk2fe" data-controltype="radio">
+<h4>Question</h4><p>Apply Newton's method to <span class="tex">$f&#40;x&#41; &#61; &#40;x-2&#41;^7 \cdot &#40;x-3&#41; \cdot &#40;x-4&#41;$</span> starting at 1.9981. The algorithm does not converge to 2 – an obvious root. From a plot of <span class="tex">$f&#40;x&#41;$</span> explain why not:</p><form name="WeaveQuestion" data-id="UnBjLnkM" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_Nytgk2fe" value="1"><div class="markdown"><p><code>|f&#39;&#40;x&#41;|</code> gets too small</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_Nytgk2fe" value="2"><div class="markdown"><p><code>|f&#39;&#39;&#40;x&#41;|</code> gets too big at 0</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_Nytgk2fe" value="3"><div class="markdown"><p>Initial guess is to far from a zero.</p>
-</div>
-    </label>
-    </div>
+  <input type="radio" name="radio_UnBjLnkM" id="1" value="1">
+  <label for="1"><code>|f&#39;&#40;x&#41;|</code> gets too small</label>
+  <br>
+  <input type="radio" name="radio_UnBjLnkM" id="2" value="2">
+  <label for="2"><code>|f&#39;&#39;&#40;x&#41;|</code> gets too big at 0</label>
+  <br>
+  <input type="radio" name="radio_UnBjLnkM" id="3" value="3">
+  <label for="3">Initial guess is to far from a zero.</label>
+  <br>
 
-<div id="Nytgk2fe_message"></div>
+<div id="UnBjLnkM_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_Nytgk2fe']").on("change", function() {
-  correct = this.value == 1;
-
-  if(correct) {
-     $("#Nytgk2fe_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+_.forEach(document.querySelectorAll('input[name="radio_UnBjLnkM"]'), function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 1;
+    var msgBox = document.getElementById('UnBjLnkM_message');
+    if (correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $("#Nytgk2fe_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
-});
+})});
+
+
+
 
 </script>
-<h4>Question</h4><p>The function <code>f&#40;x&#41; &#61; atan&#40;x&#41;</code> is a strictly increasing function with one zero, $0$. Yet it can pose problems with Newton's method. For which values of $x$ does Newton's method converge:</p><form name="WeaveQuestion" data-id="cPrIWFBR" data-controltype="radio">
+<h4>Question</h4><p>The function <code>f&#40;x&#41; &#61; atan&#40;x&#41;</code> is a strictly increasing function with one zero, <span class="tex">$0$</span>. Yet it can pose problems with Newton's method. For which values of <span class="tex">$x$</span> does Newton's method converge:</p><form name="WeaveQuestion" data-id="ITgoPtu3" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_cPrIWFBR" value="1"><div class="markdown"><p>For each of $1$, $2$ and $\pi$</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_cPrIWFBR" value="2"><div class="markdown"><p>For $1$ and $2$ but not $\pi$</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_cPrIWFBR" value="3"><div class="markdown"><p>For $1$ but not $2$ or $\pi$</p>
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_cPrIWFBR" value="4"><div class="markdown"><p>For none of  $1$, $2$ and $\pi$</p>
-</div>
-    </label>
-    </div>
+  <input type="radio" name="radio_ITgoPtu3" id="1" value="1">
+  <label for="1">For each of <span class="tex">$1$</span>, <span class="tex">$2$</span> and <span class="tex">$\pi$</span></label>
+  <br>
+  <input type="radio" name="radio_ITgoPtu3" id="2" value="2">
+  <label for="2">For <span class="tex">$1$</span> and <span class="tex">$2$</span> but not <span class="tex">$\pi$</span></label>
+  <br>
+  <input type="radio" name="radio_ITgoPtu3" id="3" value="3">
+  <label for="3">For <span class="tex">$1$</span> but not <span class="tex">$2$</span> or <span class="tex">$\pi$</span></label>
+  <br>
+  <input type="radio" name="radio_ITgoPtu3" id="4" value="4">
+  <label for="4">For none of  <span class="tex">$1$</span>, <span class="tex">$2$</span> and <span class="tex">$\pi$</span></label>
+  <br>
 
-<div id="cPrIWFBR_message"></div>
+<div id="ITgoPtu3_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_cPrIWFBR']").on("change", function() {
-  correct = this.value == 3;
-
-  if(correct) {
-     $("#cPrIWFBR_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+_.forEach(document.querySelectorAll('input[name="radio_ITgoPtu3"]'), function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 3;
+    var msgBox = document.getElementById('ITgoPtu3_message');
+    if (correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $("#cPrIWFBR_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
-});
+})});
+
+
+
 
 </script>
-<h3>Cycles</h3><p>Sometimes, the process can cycle even for reasonable functions.</p><h4>Question</h4><p>Let $f(x) = x^3 - 5x$. Starting with $x_0=1$, compute three steps of Newton's method. What are the terms in the series produced?</p><form name="WeaveQuestion" data-id="mipWkAbu" data-controltype="radio">
+<h3>Cycles</h3><p>Sometimes, the process can cycle even for reasonable functions.</p><h4>Question</h4><p>Let <span class="tex">$f&#40;x&#41; &#61; x^3 - 5x$</span>. Starting with <span class="tex">$x_0&#61;1$</span>, compute three steps of Newton's method. What are the terms in the series produced?</p><form name="WeaveQuestion" data-id="UwVT847L" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_mipWkAbu" value="1"><div class="markdown">$-1.0, 1.0, -1.0, ...$
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_mipWkAbu" value="2"><div class="markdown">$-1.0, 0.6666666666666667, -0.2850952524822228, ...$
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_mipWkAbu" value="3"><div class="markdown">$1, -2, -4,  ...$
-</div>
-    </label>
-    </div>
+  <input type="radio" name="radio_UwVT847L" id="1" value="1">
+  <label for="1"><p class="tex">$$-1.0, 0.6666666666666667, -0.2850952524822228, ...$$</label>
+  <br>
+  <input type="radio" name="radio_UwVT847L" id="2" value="2">
+  <label for="2"><p class="tex">$$-1.0, 1.0, -1.0, ...$$</label>
+  <br>
+  <input type="radio" name="radio_UwVT847L" id="3" value="3">
+  <label for="3"><p class="tex">$$1, -2, -4,  ...$$</label>
+  <br>
 
-<div id="mipWkAbu_message"></div>
+<div id="UwVT847L_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_mipWkAbu']").on("change", function() {
-  correct = this.value == 1;
-
-  if(correct) {
-     $("#mipWkAbu_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+_.forEach(document.querySelectorAll('input[name="radio_UwVT847L"]'), function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 2;
+    var msgBox = document.getElementById('UwVT847L_message');
+    if (correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $("#mipWkAbu_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
-});
+})});
+
+
+
 
 </script>
-<h4>Question <small>Always cycles...</small></h4><p>Here is a pathological example where the value always cycles no matter where you start unless you start at $0$.</p><p>Let $f(x) = \sqrt{|x|}$. This is the one-sided square root function turned into an even function. We could also have defined it by:</p><pre class="sourceCode julia">f(x) = x >= 0 ? sqrt(x) : sqrt(-x)</pre>
+<h4>Question <small>Always cycles...</small></h4><p>Here is a pathological example where the value always cycles no matter where you start unless you start at <span class="tex">$0$</span>.</p><p>Let <span class="tex">$f&#40;x&#41; &#61; \sqrt&#123;|x|&#125;$</span>. This is the one-sided square root function turned into an even function. We could also have defined it by:</p><pre class="sourceCode julia">f(x) = x >= 0 ? sqrt(x) : sqrt(-x)</pre>
 <pre class="output">
 f (generic function with 1 method)</pre>
 
@@ -2387,47 +2354,42 @@ f (generic function with 1 method)</pre>
 <pre class="output">
 fp (generic function with 2 methods)</pre>
 
-<p>To see what happens when using Newton's method, lets start at $x=2$</p><pre class="sourceCode julia">x = 2
+<p>To see what happens when using Newton's method, lets start at <span class="tex">$x&#61;2$</span></p><pre class="sourceCode julia">x = 2
 x = x - f(x)/fp(x)
 x = x - f(x)/fp(x)
 x = x - f(x)/fp(x)</pre>
 <pre class="output">
 -2.0</pre>
 
-<p>Try again with $x=3.0$ What sequence do you get:</p><form name="WeaveQuestion" data-id="UCyVQ361" data-controltype="radio">
+<p>Try again with <span class="tex">$x&#61;3.0$</span> What sequence do you get:</p><form name="WeaveQuestion" data-id="1MKu3I3D" data-controltype="radio">
 <div class="form-group ">
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_UCyVQ361" value="1"><div class="markdown">$2, -2.0, 2.0, -2.0$
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_UCyVQ361" value="2"><div class="markdown">$3, 2.0, 1.0, 0.0, -1.0, ...$
-</div>
-    </label>
-    </div>
-    <div  class="radio">
-    <label>
-      <input type="radio" name="radio_UCyVQ361" value="3"><div class="markdown">$3, -3.0, 3.0, -3.0, ...$
-</div>
-    </label>
-    </div>
+  <input type="radio" name="radio_1MKu3I3D" id="1" value="1">
+  <label for="1"><p class="tex">$$3, 2.0, 1.0, 0.0, -1.0, ...$$</label>
+  <br>
+  <input type="radio" name="radio_1MKu3I3D" id="2" value="2">
+  <label for="2"><p class="tex">$$2, -2.0, 2.0, -2.0$$</label>
+  <br>
+  <input type="radio" name="radio_1MKu3I3D" id="3" value="3">
+  <label for="3"><p class="tex">$$3, -3.0, 3.0, -3.0, ...$$</label>
+  <br>
 
-<div id="UCyVQ361_message"></div>
+<div id="1MKu3I3D_message"></div>
 </div>
 </form>
 <script text="text/javascript">
-$("input:radio[name='radio_UCyVQ361']").on("change", function() {
-  correct = this.value == 3;
-
-  if(correct) {
-     $("#UCyVQ361_message").html("<div class='alert alert-success'><span class='glyphicon glyphicon-thumbs-up'>&nbsp;Correct</span></div>");
+_.forEach(document.querySelectorAll('input[name="radio_1MKu3I3D"]'), function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 3;
+    var msgBox = document.getElementById('1MKu3I3D_message');
+    if (correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note'><span class='glyphicon glyphicon-thumbs-up'>👍&nbsp;Correct</span></div>";
   } else {
-     $("#UCyVQ361_message").html("<div class='alert alert-warning'><span class='glyphicon glyphicon-thumbs-down'>&nbsp;Incorrect</span></div>");
+    msgBox.innerHTML = "<div class='pluto-output admonition'><span class='glyphicon glyphicon-thumbs-down'>👎&nbsp; Incorrect</span></div>";
   }
-});
+})});
+
+
+
 
 </script>
 

@@ -384,6 +384,13 @@ Your browser should open to the Jupyter interface.
 
 The first time you do this, the projects will be downloaded and installed into your home directory.
 
+----
+
+A screen recording of these commands can be seen here:
+
+[![asciicast](https://asciinema.org/a/gZEFAScWVh6trEy9bGo92vmT0.svg)](https://asciinema.org/a/gZEFAScWVh6trEy9bGo92vmT0)
+
+
 ### Pluto instead of Jupyter
 
 Alternatively, the `Pluto` notebook interface can be used. You install `Pluto` as above:

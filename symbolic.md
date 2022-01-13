@@ -512,7 +512,7 @@ This limit matches the chain rule:
 
 ```
 g(x) = sin(x)
-ex = limit( (f(g(x+h)) - f(g(x)))/h, h => 0) 
+ex = limit( (f(g(x+h)) - f(g(x)))/h, h => 0)
 ex(x => 1)
 ```
 
@@ -569,7 +569,7 @@ ex = top/bottom
 Now find the limit.
 
 ```
-choices = [L"16a/9", L"0", L"9\sqrt{a}", "Does not exist"]
+choices = [L" 16a/9", L" 0", L" 9\sqrt{a}", "Does not exist"]
 ans = 1
 radioq(choices, ans)
 ```

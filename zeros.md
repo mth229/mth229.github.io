@@ -40,7 +40,7 @@ We will use the add-on package `Roots`  which
 provides implementations of a few zero- and root-finding algorithms.
 
 ```
-using MTH229    
+using MTH229
 using Plots
 ```
 
@@ -478,6 +478,7 @@ f(x) = x^2 - 2
 a, b = 1, 2
 
 c = (a + b) /2
+
 if f(a) * f(c) < 0
   a, b = a, c
 else
@@ -485,6 +486,8 @@ else
 end
 a,b
 ```
+
+Though some check if `f(c) == 0` is also needed.
 
 Here $c=1.5$ and the new interval is $[1.0, 1.5]$, as we had graphically. We just need to repeat the above.
 
@@ -507,34 +510,10 @@ the following condition is no longer true:
 a < c < b
 ```
 
-A `while` loop is used to repeat the central step until the above is
-`false`. Our code looks like this:
+A `while` loop is used to repeat the central step until the above (or some variant) is `false`.
 
-```verbatim
-function bisection(f::Function, a, b)
 
-	if f(a) * f(b) > 0
-      stop("[a,b] is not a bracket")
-    end
-
-    c = a + (b-a) / 2
-
-    while a < c < b
-        if f(c) == 0.0
-	  break
-        end
-        ## update step
-	if f(a) * f(c) < 0
-	   a, b = a, c
-	else
-	   a, b = c, b
-	end
-    end
-    c
-end
-```
-
-Such a function is already defined in the `MTH229` package.
+The `MTH229` package has a `bisection` method implemented for this which also outputs a graphical indication of the first few steps taken.
 
 
 Okay, let's look at the function $f(x) = -16x^2 + 32x$. We know that 0
@@ -581,6 +560,35 @@ floating point value just smaller. We can't realistically expect to get any clos
 than that.
 
 
+### The Roots package and find_zero
+
+The bisection method, while easy to describe and understand, can be
+made a bit more efficient. The `find_zero` function from
+the `Roots` package does so. This package is loaded when `MTH229` is. This function uses a tuple to specify the bracketing interval.
+but does not need to typed in.
+
+For example, to find a root of $f(x) = 2x \cdot \exp(-20) - 2 \cdot
+\exp(-20x) + 1$ in the interval $[0,1]$ we have:
+
+```
+using Roots
+f(x) = 2x*exp(-20) - 2*exp(-20x) + 1
+find_zero(f, (0, 1))
+```
+
+
+The `find_zero` function is actually an interface to various root-finding
+algorithms. When called as above -- with two intial starting points --
+it uses a bracketing approach as discussed here, though with a
+different notion of the midpoint.
+
+
+A slightly different interface is given by the `fzero` function, where that above would be:
+
+```
+fzero(f, 0, 1)
+```
+
 
 ```
 example("Graphical and numerical answers")
@@ -625,36 +633,15 @@ plot(f, 8, 9)
 So we find the values of the zero in the bracketed region $[8,9]$:
 
 ```
-bisection(f, 8, 9)
+find_zero(f, (8, 9))
 ```
 
 The root within $[0, 3]$ is found with:
 
 ```
-bisection(f, 0, 3)
+find_zero(f, (0, 3))
 ```
 
-### The Roots package and fzero
-
-The bisection method, while easy to describe and understand, can be
-made a bit more efficient. The `fzero` (**f**unction **zero**) function In
-the `Roots` package does so. It is used like our `bisection` method --
-but does not need to typed in.
-
-For example, to find a root of $f(x) = 2x \cdot \exp(-20) - 2 \cdot
-\exp(-20x) + 1$ in the interval $[0,1]$ we have:
-
-```
-using Roots
-f(x) = 2x*exp(-20) - 2*exp(-20x) + 1
-fzero(f, 0, 1)
-```
-
-
-The `fzero` function is actually an interface to various root-finding
-algorithms. When called as above -- with two intial starting points --
-it uses a bracketing approach as discussed here, though with a
-different notion of the midpoint.
 
 ### Problems
 
@@ -681,7 +668,7 @@ $f(x) = e^x - x^4$. Find its value numerically:
 
 ```
 f(x) = exp(x) - x^2
-val = fzero(f, -10, 0);
+val = find_zero(f, (-10, 0));
 numericq(val, 1e-3)
 ```
 
@@ -698,7 +685,7 @@ zeros on the positive $x$ axis. You are asked to find the largest
 ```
 b = 10
 f(x) =  x^2 - b * x * log(x)
-val = fzero(f, 10, 500)
+val = find_zero(f, (10, 500))
 numericq(val, 1e-3)
 ```
 #### Question
@@ -708,7 +695,7 @@ The `airyai` function has infinitely many negative roots, as the function oscill
 
 
 ```
-val = fzero(airyai, -5, -4);
+val = find_zero(airyai, (-5, -4))
 numericq(val, 1e-8)
 ```
 
@@ -770,8 +757,8 @@ ground.
 
 ```
 t0 = 0.0
-tf = fzero(h, 10, 20)
-ta = fzero(D(h), t0, tf)
+tf = find_zero(h, (10, 20))
+ta = find_zero(D(h), (t0, tf))
 choices = [L"(0, 13.187, 30.0)",
 	L"(0, 32.0, 390.0)",
 	L"(0, 2.579, 13.187)"]
@@ -781,29 +768,32 @@ radioq(choices, ans)
 
 
 
-## The `fzeros` function
+## The `find_zeros` function
 
-So, `fzero` finds one value within a bracket. But this suggests a
+So, `find_zero` finds one value within a bracket. But this suggests a
 means to find all (most?) of the zeros within an interval -- split the
 interval up into many pieces; identify those that bracket a zero; use
-`fzero` on those intervals; accumulate the results.
+`find_zero` on those intervals; accumulate the results.
 
-This is basically implemented in the `fzeros(f, a, b)` function.
+This is basically implemented in the `find_zeros(f, a, b)` function.
 So, to find the zeros of $e^x - x^4$ over $[-10, 10]$ we have:
 
 ```
 f(x) = exp(x) - x^4
-fzeros(f, -10, 10)
+find_zeros(f, -10, 10)
 ```
 
-The above description will only work for zeros which cross the $x$ axis, but `fzeros` tries a bit more. So, it will find the zero of $f(x) = x^2 \cdot e^x$:
+The above description will only work for zeros which cross the $x$ axis, but `find_zeros` tries a bit more. So, it will find the zero of $f(x) = x^2 \cdot e^x$:
 
 ```
 f(x) = x^2 * exp(x)
-fzeros(f, -1, 1)
+find_zeros(f, -1, 1)
 ```
 
-That being said, `fzeros` can miss zeros, so a graph is always suggested to verify the zeros are exhausted.
+That being said, `find_zeros` can miss zeros, so a graph is always suggested to verify the zeros are exhausted.
+
+
+The `fzeros` function is an alternate name for `find_zeros`.
 
 
 
@@ -852,7 +842,7 @@ and the additional *args...* are not necessary--if only complex values
 are desired.
 
 
-For some problems only the possible real roots are desired. 
+For some problems only the possible real roots are desired.
 
 The following polynomial has both real roots and complex roots. The real one are
 
@@ -865,7 +855,7 @@ Compare to
 
 ```
 sympy.roots(f(x))
-``` 
+```
 
 The word "algebraic" was used, as some problems have answers, but not readily expressible ones. For example, `x^5 -x - 1`:
 
@@ -877,13 +867,13 @@ sympy.roots(f(x))
 However, the `solve` function (which solves `f(x)=0`) does hint at answers:
 
 ```
-sympy.solve(f(x))
+solve(f(x))
 ```
 
 These can be revealed, but converting them to numeric with `N`:
 
 ```
-N.(sympy.solve(f(x)))
+N.(solve(f(x)))
 ```
 
 
@@ -971,6 +961,3 @@ change. This means there is one *negative* real root. What is it?
 val = fzeros(x -> x^5 - x +1, -5, 5)[1]
 numericq(val, 1e-2)
 ```
-
-
-

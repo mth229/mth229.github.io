@@ -158,7 +158,7 @@ can we say?
 
 We previously mentioned two basic relationships:
 
-> If $f'(x) > 0$ on an interval $(a,b)$ then the function $f(x)$ is *increasing* on $(a,b)$. (It may also increase when $f(x)=0$, but it isn't guaranteed.)
+> If $f'(x) > 0$ on an interval $(a,b)$ then the function $f(x)$ is *increasing* on $(a,b)$. (It may also increase when $f'(x)=0$, but it isn't guaranteed.)
 
 
 
@@ -278,13 +278,14 @@ local extrema:
 > If $c$ is a critical point *and*
 > $f'(x)$ changes sign at $x=c$, then $(c,f( c))$ will be a local
 > extrema. (If the sign change is from positive to negative, it will
-> be a local maximum.)
+> be a local maximum.) If there is *no* sign change, the critical point
+> is *not* a local extrema.
 
 > **The second derivative test**
 >
 > If $c$ is a critical point *and* $f''(x) \neq 0$ then $(c,f( c))$ will
 > be a local extrema. If $f''( c) > 0$ this will be a local minimum and
-> if $f''( c) < 0$ a local maximum.
+> if $f''( c) < 0$ a local maximum. (Nothing conclusive can be said when $f''(c)=0$.)
 
 ----
 
@@ -300,10 +301,10 @@ plot(f', 0, 2pi)
 ```
 
 We see four: one near 0.8, one near 1.5, one near 2.5 and one near
-5. We use `fzeros` to identify:
+5. We use `find_zeros` to identify:
 
 ```
-cps = fzeros(f', 0, 6)
+cps = find_zeros(f', 0, 6)
 ```
 
 Use the first derivative test to classify these values as relative

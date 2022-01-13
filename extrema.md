@@ -141,7 +141,7 @@ multiple dispatch feature to reduce the need for sometimes unwieldy algebra.
 
 Here is a similar, though more complicated, example where the analytic
 approach can be a bit more tedious, but the graphical one mostly
-satisfying, though we do use  the `fzero` function to find
+satisfying, though we do use  the `find_zero` function to find
 the exact final answer.
 
 Let a "Norman" window consist of a rectangular window of top length
@@ -240,22 +240,22 @@ plot(A', 5.5, 5.7)     # uses A' notation defined in MTH229
 We confirm that the critical point is around $5.6$.
 
 
-### Using fzero to locate critical points.
+### Using find_zero to locate critical points.
 
 Rather than zoom in graphically, we now use a root-finding algorithm,
 to find a more precise value. We know that the maximum will occur at a
 critical point, a zero of the derivative. Newton's method, for
-example, can locate the precise values of these zeros. The `fzero`
+example, can locate the precise values of these zeros. The `find_zero`
 function from the `Roots` package provides a non-linear root-finding
 algorithm similar to Newton's method. The only thing to keep
 track of is that solving $f'(x) = 0$ means we use the derivative and
 not the original function.
 
 Our initial guess will be taken from the graph we made, or
-$x=5.6$. Here is how we use `fzero`:
+$x=5.6$. Here is how we use `find_zero`:
 
 ```
-x = fzero(A', 5.6)
+x = find_zero(A', 5.6)
 ```
 
 The value `x` is the critical point, and in this case gives
@@ -285,7 +285,7 @@ made?
 
 ```
 Area(y) = (20-2y)*y;
-val = fzero(Area',  10) |> Area;
+val = find_zero(Area',  10) |> Area;
 numericq(val, 1e-3)
 ```
 
@@ -377,7 +377,7 @@ plot(l, delta, pi/2 - delta)
 The minimum occurs between 0.5 and 1.0 radins, we will use a bracketing method:
 
 ```
-x = fzero(l', [0.5, 1.0])
+x = find_zero(l', (0.5, 1.0))
 ```
 
 So the minimum of the function $l$ is
@@ -393,7 +393,7 @@ That is, any ladder less than this length can get around the hallway.
 #### Question
 
 Rather than use a bracketing method to solve for the root of
-$l'(t)=0$, we might have tried using `fzero(l', 0.8)`. Do so. What
+$l'(t)=0$, we might have tried using `find_zero(l', 0.8)`. Do so. What
 do you find?
 
 
@@ -430,7 +430,7 @@ function A(t)
 	 adj = 10 * cos(t)
 	 2 * opp * adj/2 + opp * 10
 end
-t = fzero(A', pi/4, order=16);	## Has issues with order=8 algorithm, tol > 1e-14 is needed
+t = find_zero(A', pi/4, Roots.Order16());	## Has issues with order=8 algorithm, tol > 1e-14 is needed
 val = t * 180/pi;
 numericq(val, 1e-3)
 ```
@@ -449,7 +449,7 @@ What is the value of theta in degrees?
 
 ```
 theta(x) = atan(30/x) - atan(10/x)
-val = fzero(theta', 20); ## careful where one starts
+val = find_zero(theta', 20); ## careful where one starts
 val = theta(val) * 180/pi
 numericq(val, 1e-1)
 ```
@@ -505,11 +505,11 @@ The minimum happens way out near 8. We zoom in a bit:
 plot(T, 7, 9)
 ```
 
-It appears to be around 8.3. We now use `fzero` to refine our
+It appears to be around 8.3. We now use `find_zero` to refine our
 guess at the critical point using a bracketing algorithm:
 
 ```
-x = fzero(T', [7, 9])
+x = find_zero(T', (7, 9))
 ```
 
 Okay, got it. Around 8.23. So is  our minimum time
@@ -534,7 +534,7 @@ Then $L(t)$ is continuous and has single peak, so the maximum occurs
 at the lone critical point. It turns out that this problem is bit sensitive to an initial condition, so we bracket
 
 ```
-x = fzero(L',  [0.1, 0.5])
+x = find_zero(L',  (0.1, 0.5))
 ```
 
 Now if $L(t) = \exp(-3t) \cdot \exp(-2t) \cdot \exp(-4t), \quad 0 \leq t \leq 10$, explain why the same approach won't work:
@@ -582,10 +582,10 @@ derivative near that area:
 plot(f', 0, 5)
 ```
 
-This shows the value near $0.7$. We use `fzero` starting there:
+This shows the value near $0.7$. We use `find_zero` starting there:
 
 ```
-x = fzero(f', 0.7)
+x = find_zero(f', 0.7)
 ```
 
 The convergence is quick. The maximum is at
@@ -655,11 +655,11 @@ is somewhere near a real life answer, or around 3-5 cms in radius:
 plot(SA, 2, 10)
 ```
 
-The minimum looks to be around 4cm. We can use `fzero` to zero
+The minimum looks to be around 4cm. We can use `find_zero` to zero
 in on the answer:
 
 ```
-r0 = fzero(SA', 4)
+r0 = find_zero(SA', 4)
 ```
 
 Okay, $3.837...$ is our computation for $r$. To get $h$, we use:
@@ -683,7 +683,7 @@ Minimize the function $f(x) = 2x + 3/x$ over $(0, \infty)$.
 
 ```
 f(x) = 2x + 3/x;
-val = fzero(f', 1);
+val = find_zero(f', 1);
 numericq(val, 1e-3)
 ```
 
@@ -695,7 +695,7 @@ Of all rectangles of area 4, find the one with largest perimeter. What is the pe
 ```
 # 4 = xy
 P(x) = 2x + 2*(4/x);
-val = fzero(P', 1);
+val = find_zero(P', 1);
 numericq(P(val), 1e-3)		## a square!
 ```
 
@@ -801,7 +801,7 @@ We can define it with:
 ```
 function g(x)
    h(y) = f(x, y) - Len
-   fzero(h, 0)
+   find_zero(h, zero(x))  # not 0, but zero(x) to get type right
 end
 ```
 
@@ -834,16 +834,16 @@ we can find a function to return $y$ provided a certain derivative is not $0$
 and the equation is reasonably behaved.)
 
 Okay, now to find the lowest point. This is what we minimize to find
-the resting position of the ring. Again, we turn to `fzero`, but for
+the resting position of the ring. Again, we turn to `find_zero`, but for
 minimization we use the first derivative, as we are finding critical
-points. Here, `D`  doesn't work without some
-adjustments, so we use a numeric derivative:
+points.
 
 ```
-deriv(g; h=1e-4) =  x -> (g(x+h) - g(x-h))/(2h)
-x = fzero(deriv(g), [0.3, 0.6])
+x = find_zero(g', (0.3, 0.6))
 ```
 
+
+(The above only works due to how we defined `g` using `zero(x)` and *not* `0` for technical reasons related to automatic differentiation.)
 
 The point where the ring rests is:
 

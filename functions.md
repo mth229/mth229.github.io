@@ -4,7 +4,7 @@
 
 
 We see in this section how to easily create functions in `Julia`. In
-the following section we begin to do things with function, by learning
+the following sections we begin to do things with function, such as learning
 how to graph functions with `Julia`.
 
 For basic things creating a new function and plotting it is as familiar as this:
@@ -378,7 +378,7 @@ $$~
 h(x) = f(x) + g(x).
 ~$$
 
-The former treats $f$ and $f$ as function objects, the latter ties more closely to the concept of a function as a rule that operates on $x$.
+The former treats $f$ and $g$ as function objects, the latter ties more closely to the concept of a function as a rule that operates on $x$.
 
 With `Julia` the latter representation is more useful for defining combinations of functions. For example, if $f(x) = \sin(x)$ and $g(x) = x^2$, then we can combine these in several ways. The following illustrates several ways to combine the two functions $f$ and $g$:
 
@@ -704,14 +704,23 @@ note("Nesting the ternary operator")
 It can be convenient to nest ternary operators. In particular, when the cases involve have more than 2 possibilities. The following does something depending on whether `x` is positive, negative or zero:
 
 ```
-heavyside(x) = x > 0 ? 1.0 : x == 0.0 ? 0.0 : -1.0
+heaviside(x) = x > 0 ? 1.0 : x == 0.0 ? 0.0 : -1.0
 ```
 
 That is a mess to read, but easy to write. It can be made a bit clearer by using parentheses around the case where `x` is not greater than 0:
 
 ```
-heavyside(x) = x > 0 ? 1.0 : (x == 0.0 ? 0.0 : -1.0)
+heaviside(x) = x > 0 ? 1.0 : (x == 0.0 ? 0.0 : -1.0)
 ```
+
+Similarly, new lines can clear up the flow:
+
+```
+heaviside(x) = x > 0 ? 1.0 :
+               x == 0.0 ? 0.0 :
+			   -1.0
+```
+
 
 
 
@@ -932,6 +941,18 @@ place. (Scoping rules determine where variables that are not passed in
 as arguments are found when referred to within a function.)
 
 
+An alternate idiom for `Julia` is to pass parameters in through a *named* tuple typically denoted by `p`. For example:
+
+```
+function mxplusb(x, p)
+   m, x = p.m, p.x
+   m * x + b
+end
+p = (m=2, b=1)
+mxplusb(10, p)  # computes 2*10 + 1
+```
+
+
 
 ### Practice
 
@@ -1040,7 +1061,13 @@ immediately forgotten. Such functions without a name are known as
 
 
 
-Anonymous functions are very useful when working with functions defined by parameters.
+Anonymous functions are very useful when working with functions defined by parameters as they can fix values of a parameter.
+
+
+```
+f(x, p) = cos(x) - x/p
+fn = x -> f(x, 2)  # fn fixes p=2 (a "closure")
+```
 
 ### Operators
 

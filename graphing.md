@@ -10,7 +10,7 @@ and perhaps more will be generated before a dominant one is arrived
 at. As such, we don't try to teach the details of any one of them.
 
 Currently, the  the `Plots` package  provides a unified interface
-to many backend plotting packages. The `SimplePlots` package *mostly* follows the syntax and provides a package for quickly producing plots. We will use the `Plots` package in these examples, but save for a few details, the same commands will work with `SimplePlots`, provided `MTH229` is loaded.
+to many backend plotting packages.  We will use the `Plots` package in these examples.
 
 ```
 note("""Packages are described a bit more [here](http://mth229.github.io/index.html/#_packages_).""")
@@ -20,12 +20,13 @@ For the impatient, this is all that is needed to know to get up and running.
 
 
 ```
-using MTH229 
+using MTH229
 using Plots
 ```
 
 ```nocode
 plotly()
+nothing
 ```
 
 
@@ -48,15 +49,6 @@ plot!(g)        #  the domain to plot is optional if adding a layer
 ```
 
 
-
-Graphing two or more functions can also be done by combining two together into a container of functions using `[]`:
-
-
-```
-f(x) = sin(x)
-g(x) = x
-plot([f, g], 0, pi/2)
-```
 
 
 For the more patient, the rest of the sections cover some additional
@@ -155,24 +147,26 @@ that can be plotted can be defined as follows:
 trim(f; val=10) = x -> abs(f(x)) > val ? NaN : f(x)
 ```
 
-(This is somewhat related to [clamping](http://en.wikipedia.org/wiki/Clamping_(graphics)).)
-Using `trim` is fairly simple. The output
+This action is very similar to  [clamping](http://en.wikipedia.org/wiki/Clamping_(graphics)).
+
+The `MTH229` package implements this in the function `rangeclamp(f, hi=20, lo=-hi)`. (Base `julia` has a `clamp` function.)
+
+Using `rangeclamp` is fairly simple. The output
 is a function, so can be passed directly to the `plot` call:
 
 ```
 f(x) = 1/x
-plot(trim(f), -3, 3)
+plot(rangeclamp(f), -3, 3)
+```
+
+Or
+
+```
+plot(rangeclamp(f, 100), -3, 3)
 ```
 
 This trimming also works when `Inf` and `-Inf` values are encountered,
 as both can be ordered by `>`.
-
-
-The `trim` function above is not very robust, as not all plotting packages work will with `NaN` values. Use the `trimplot` function from `MTH229` for trimming:
-
-```
-trimplot(f, -3, 3)
-```
 
 
 
@@ -205,6 +199,7 @@ plot(x -> g(x, theta=pi/3), 0, 100)
 There are many instances where plotting with anonymous functions are
 convenient. It can be hard to get used to seeing that arrow, but it
 can simplify many expressions if used properly.
+
 
 
 ### Practice
@@ -283,7 +278,7 @@ A rational function is nothing more than a ratio of polynomial
 functions, say $f(x) = p(x)/q(x)$. One interesting thing about such function is
 there can be asymptotes. These can be vertical (which can happen when
 $q(x)=0$), horizontal (as $x$ gets large or small), or even
-slant.
+slanted.
 
 The vertical asymptotes require care when plotting, as the naive style
 of plotting where a collection of points is connected by straight
@@ -388,13 +383,13 @@ of a small amount and makes it huge.  Clearly we need to really avoid
 the issue. It isn't hard -- just add a little bit more to $0$.
 
 
-One solution to avoiding this issue is to use the `trimplot` function that
+One solution to avoiding this issue is to use the `rangeclamp` function that
 was previously described. This just caps off really large values so that
 the vertical asymptotes don't affect the scale of the graph. We can
 see the asymptotes pretty clearly with:
 
 ```
-trimplot(f, -10, 10)    # use trimplot(f, -10, 10, c) for different trim values
+plot(rangeclamp(f), -10, 10)
 ```
 
 
@@ -590,7 +585,7 @@ Here are 5 evenly spaced numbers from $0$ to $\pi/2$ given by
 `range`
 
 ```
-range(0, pi/2, length=5) 
+range(0, pi/2, length=5)
 ```
 
 The values are not displayed, but will be if `collect`ed:
@@ -928,29 +923,6 @@ xs = range(0, 2.0, length=5)
 ```
 
 
-In this example we still get a container of type `Any`. While not critical, we would really like to have this be of
-type "float", as some math functions care about this
-distinction. Converting can be done a few ways:
-
-* by converting the values with `float` (which coerces the values):
-
-```
-map(float, [ f(x) for x in xs ] )
-```
-
-* By using square brackets and declaring the type:
-
-```
-Float64[f(x) for x in xs]
-```
-
-* Doing this inside a function, where things work a bit differently than at the command line:
-
-```
-g(xs) = [f(x) for x in xs]
-g(xs)
-```
-
 
 The two approaches, broadcasting/maps and comprehensions, are equally
 useful. Perhaps `map` is a bit less trouble, but comprehensions mirror
@@ -1018,11 +990,11 @@ Related to a `for` loop is the `while` loop. This will repeat as long
 as some condition is true. The following pattern reproduces a `for`
 loop:
 
-```
+```verbatim
 i, n = 1, length(x)
 while (i <= n)
   print( x[i], " " )			## do something ...
-  global i = i + 1              ## global may be necesary here
+  i = i + 1
 end
 ```
 
@@ -1072,6 +1044,8 @@ end
 [xs ys]
 ```
 
+
+Many options, but the shortest to type is simply `[xs f.(xs)]`, so that is what is used most commonly.
 
 
 
@@ -1151,14 +1125,13 @@ scatter!(xs, ys, markersize=5)
 
 ## Two functions at once
 
-Now that we know about vectors, we can use them to illustrate how to
-graph two (or more) functions at once over the same interval -- just
-make a vector of functions and hand this off to `plot`.
+We use layering to plot two or more functions at once, though there are alternatives (plotting a vector of functions will do the same).
 
 For example, to graph both the sine and cosine function we have:
 
 ```
-plot([sin, cos], 0, 2pi)
+plot(sin, 0, 2pi)
+plot!(cos)
 ```
 
 
@@ -1167,17 +1140,19 @@ Or to compare the effects of a simple transformation:
 ```
 f(x) = x^2
 g(x) = 15 + f(x-3)
-plot([f, g], -10, 10)
+plot(f, -10, 10)
+plot!(g)
 ```
 
 To print a heavier $x$-axis, we can graph the function $y=0$, specified through the anonymous function `x -> 0`:
 
 ```
 f(x) = x^2 - 2
-plot([f, x -> 0], -2, 2)
+plot(f, -2, 2)
+plot!(x -> 0)
 ```
 
-With `Plots`, it is also possible to use the mutating form `plot!` to add a graph to the current graph. The above, may also be done with:
+The above, may also be done with `zero`:
 
 ```
 plot(f, -2, 2)
@@ -1257,10 +1232,11 @@ radioq(choices, ans)
 #### Question
 
 
-We saw that this command will produce two graphs:
+We saw that this  will produce two graphs:
 
 ```
-plot([sin, x -> cos(x) > 0 ? 0.0 : NaN], 0, 2pi)
+plot(sin, 0, 2pi)
+plot!(x -> cos(x) > 0 ? 0.0 : NaN)
 ```
 
 What is the sine curve doing when the flat line is drawn?
@@ -1286,11 +1262,10 @@ the following below seems correct?
 
 ```
 choices = [
-	L"f < g < h",
-	L"g < f < h",
-	L"h < f < g",
-	L"h < g < f"
-	   ];
+	L" f < g < h",
+	L" g < f < h",
+	L" h < f < g",
+	L" h < g < f"];
 ans = 3;
 radioq(choices, ans)
 ```

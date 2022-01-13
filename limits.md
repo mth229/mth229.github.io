@@ -118,6 +118,7 @@ using Plots
 
 ```nocode
 plotly()
+nothing
 ```
 
 ```
@@ -199,7 +200,7 @@ removable singularity.
 By graphing near $1$, find the limit:
 
 $$~
-L = \lim_{x->1}  \frac{x^2−3x+2}{x^2−6x+5}
+L = \lim_{x \rightarrow 1}  \frac{x^2−3x+2}{x^2−6x+5}
 ~$$
 
 ```
@@ -248,7 +249,7 @@ numericq(val, 1e-1)
 Graphically investigate the limit
 
 $$~
-\lim{x \rightarrow 0} \frac{\cos(x) - 1}{x}.
+\lim_{x \rightarrow 0} \frac{\cos(x) - 1}{x}.
 ~$$
 
 The limit exists, what is the value?
@@ -543,7 +544,7 @@ We see the same phenomenon -- $f(x)$ gets close to $-0.2$ as $x$ gets close to $
 
 The three steps above are  bit tedious to type for each problem, so
 for convenience we encapsulate them into a function (available in the
-`MTH229` package):
+`MTH229` package) call `lim` defined along these lines:
 
 ```verbatim
 function lim(f::Function, c::Real; n::Int=6, dir="+")
@@ -1202,7 +1203,7 @@ language. This package is loaded by the `MTH229` package. The SymPy package
 provides symbolic math features. One such feature is the ability to
 perform symbolically the limit of $f(x)$ as $x$ approaches $c$.
 
-The `limit` function accesses these features. Its basic use is straightforward, just pass a symbolica expression, and indicate the variable going to `c`:
+The `limit` function accesses these features. Its basic use is straightforward, just pass a symbolic expression, and indicate the variable going to `c`:
 
 ```
 @syms x
@@ -1229,7 +1230,7 @@ The `limit` function has one named argument, `dir`, used to adjust if
 a left, right (the default) limit is sought. For example, this function has different left and right limits at 0:
 
 ```
-f(h) = abs(h) / h
+f(h) = sign(h)
 @syms h
 limit(f(h), h=>0, dir="-"), limit(f(h), h=>0, dir="+")
 ```
@@ -1249,7 +1250,7 @@ f(x) = 1/ x^(log(log(log(log(1/x)))) - 1)
 It has a right limit at $c=0$, but not what is expected, which might appear to be 0:
 
 ```
-xs = [0 + (1/10)^i for i in 2:6]
+xs = [0 + 1/10^i for i in 2:6]
 ys = f.(xs)
 [xs ys]
 ```
@@ -1257,7 +1258,7 @@ ys = f.(xs)
 But in fact the limit is quite different from $0$:
 
 ```
-limit(f(x), x->0, dir="+")
+limit(f(x), x => 0, dir="+")
 ```
 
 ### limits with parameters
