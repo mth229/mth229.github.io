@@ -356,6 +356,8 @@ Binder takes between 30 seconds and one minute to get up and running. Once a not
 
 ### Installing `Julia` on a personal laptop or computer.
 
+[This was recently changed!]
+
 This is not terribly difficult, but does involve a few additional steps:
 
 * Download and install `Julia` from [julialang.org/](https://julialang.org/downloads/). This will install like any other software for you system.
@@ -368,28 +370,39 @@ First, the `MTH229` package must be installed. This only needs to be done once. 
 
 ```
 using Pkg
-Pkg.add(["MTH229", "Plots", "IJulia"])
+Pkg.add(["MTH229", "Plots", "IJulia", "ZipFile"])
 Pkg.build("IJulia")
 ```
 
 
+* Now download the projects by copying and pasting the following commands:
+
+```
+using ZipFile
+dirnm = homedir()  # This is where the project files will be installed
+zf = "https://www.github.com/mth229/229-projects/archive/master.zip"
+zarchive = ZipFile.Reader(download(zf))
+!isdir(dirnm) && mkdir(dirnm)
+cd(dirnm)
+
+for f in zarchive.files
+  nm = basename(f.name)
+  occursin("ipynb", nm) || continue
+  @info "installing $nm"
+  open(nm, "w") do io
+    write(io, read(f, String))
+  end
+end
+```
+
 * Then, each session where you want to use Julia, open the terminal and issue these two case-sensitive commands:
 
 ```
-using MTH229
-mth229()
+using IJulia
+notebook()
 ```
 
-Your browser should open to the Jupyter interface.
-
-The first time you do this, the projects will be downloaded and installed into your home directory.
-
-----
-
-A screen recording of these commands can be seen here:
-
-[![asciicast](https://asciinema.org/a/gZEFAScWVh6trEy9bGo92vmT0.svg)](https://asciinema.org/a/gZEFAScWVh6trEy9bGo92vmT0)
-
+Your browser should open to the Jupyter interface and the projects should among those listed.
 
 ### Pluto instead of Jupyter
 
