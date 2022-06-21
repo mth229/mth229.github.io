@@ -13,15 +13,20 @@
 ##     end
 ## end
 
-using WeavePynb
+using Weave
 
-md_files = filter(x-> occursin(r"\.md$", x), readdir())
-html_files = map(x -> replace(x, r"md$" => "html"), md_files)
-
-for (m,h) in zip(md_files, html_files)
-    occursin("index", m) && continue
-    if mtime(h) == 0.0 || (mtime(m) > mtime(h))
-        println("process $m")
-        markdownToHTML(m)
-    end
+jmd_files = filter(x-> occursin(r"\.jmd$", x), readdir())
+for f ∈ jmd_files
+    weave(f, css="admonition.css", cache=:off, fig_path=tempdir())
 end
+
+#html_files = map(x -> replace(x, r"md$" => "html"), md_files)
+
+# using WeavePynb
+# for (m,h) in zip(md_files, html_files)
+#     occursin("index", m) && continue
+#     if mtime(h) == 0.0 || (mtime(m) > mtime(h))
+#         println("process $m")
+#         markdownToHTML(m)
+#     end
+# end
