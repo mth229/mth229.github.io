@@ -59,7 +59,7 @@ Basics of  order of operations, assignment, and variables.
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/01-calculator.ipynb)
 [(Pluto html)](./229-projects/01-calculator.html)
-[(With commentary)](./229-projects/01-calculator-commentary.html)
+[(With commentary)](./229-projects/01-calculator-pluto-commentary.html)
 
 ----
 
@@ -72,7 +72,7 @@ the ternary operator, multiple arguments, and return values (tuples).
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/02-functions.ipynb)
 [(Pluto html)](./229-projects/02-functions.html)
-[(With commentary)](./229-projects/02-functions-commentary.html)
+[(With commentary)](./229-projects/02-functions-pluto-commentary.html)
 
 ----
 
@@ -88,7 +88,7 @@ functions.
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/03-graphics.ipynb)
 [(Pluto html)](./229-projects/03-graphics.html)
-[(With commentary)](./229-projects/03-graphics-commentary.html)
+[(With commentary)](./229-projects/03-graphics-pluto-commentary.html)
 
 ----
 
@@ -102,7 +102,7 @@ The add-on `Roots` package provides some convenient functionality.
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/04-zeros.ipynb)
 [(Pluto html)](./229-projects/04-zeros.html)
-[(With commentary)](./229-projects/04-zeros-commentary.html)
+[(With commentary)](./229-projects/04-zeros-pluto-commentary.html)
 
 ----
 
@@ -115,7 +115,7 @@ Basics of limits presented graphically, numerically, and symbolically.
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/05-limits.ipynb)
 [(Pluto html)](./229-projects/05-limits.html)
-[(With commentary)](./229-projects/05-limits-commentary.html)
+[(With commentary)](./229-projects/05-limits-pluto-commentary.html)
 
 ----
 
@@ -128,7 +128,7 @@ Derivatives presented by the forward difference quotient, automatic differentiat
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/06-derivatives.ipynb)
 [(Pluto html)](./229-projects/06-derivatives.html)
-[(With commentary)](./229-projects/06-derivatives-commentary.html)
+[(With commentary)](./229-projects/06-derivatives-pluto-commentary.html)
 
 
 ----
@@ -142,7 +142,7 @@ derivatives.
 A notebook for this material:
 [ipynb](http://mth229.github.io/229-projects/07-first_second_derivatives.ipynb)
 [(Pluto html)](./229-projects/07-first_second_derivatives.html)
-[(With commentary)](./229-projects/07-first_second_derivatives-commentary.html)
+[(With commentary)](./229-projects/07-first_second_derivatives-pluto-commentary.html)
 
 
 ----
@@ -158,7 +158,7 @@ The `fzero` function of the `Roots` package is discussed.
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/08-newton.ipynb)
 [(Pluto html)](./229-projects/08-newton.html)
-[(With commentary)](./229-projects/08-newton-commentary.html)
+[(With commentary)](./229-projects/08-newton-pluto-commentary.html)
 
 ----
 
@@ -170,7 +170,7 @@ A project on minimization and maximization. Some standard applied problems are p
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/09-extrema.ipynb)
 [(Pluto html)](./229-projects/09-extrema.html)
-[(With commentary)](./229-projects/09-extrema-commentary.html)
+[(With commentary)](./229-projects/09-extrema-pluto-commentary.html)
 
 ----
 
@@ -184,7 +184,7 @@ length and volumes of solids of revolution.
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/10-integration.ipynb)
 [(Pluto html)](./229-projects/10-integration.html)
-[(With commentary)](./229-projects/10-integration-commentary.html)
+[(With commentary)](./229-projects/10-integration-pluto-commentary.html)
 
 
 ----
