@@ -1,6 +1,6 @@
 # MTH 229 Projects
 
-> These project use version v1.7 of Julia.
+> These projects use version v1.7 of Julia.
 
 ## Introduction
 
