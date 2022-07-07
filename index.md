@@ -1,15 +1,20 @@
 # MTH 229 Projects
 
-
-
-> These project use version v1.6 of Julia.
+> These project use version v1.7 of Julia.
 
 ## Introduction
 
 
-MTH229 at the College of Staten Island is a course intended to introduce the use of a computer to assist in solving problems from a first semester calculus course.
+MTH229 at the College of Staten Island is a course to introduce a
+programming language to reinforce concepts of a first-semester
+calculus course from numerical and graphical points of view.
 
-Some sections use the [Julia](http://julialang.org) programming the language. For `Julia`, the "projects" are on WeBWorK and there *should* be sufficient background material therein to work through the details. Here can be found additional detail for those seeking it. For a more thorough introduction, visit [Calculus with Julia](http://calculuswithjulia.github.io).
+Some sections use the [Julia](http://julialang.org) programming the
+language. For `Julia`, the "projects" are on WeBWorK and there
+*should* be sufficient background material therein to work through the
+details. Here can be found additional detail for those seeking it. For
+a more thorough introduction, visit [Calculus with
+Julia](http://calculuswithjulia.github.io).
 
 Installation details for `Julia` are at the end of this page
 
@@ -26,15 +31,19 @@ The notes mostly follow topics of a standard first-semester
 calculus course after some background material is presented for
 learning `julia` within a mathematical framework.
 
-Each topic is followed by a project. At CSI, these projects are completed during computer labs. These projects are available as `IJulia` notebooks or `Pluto` notebooks.
+Each topic is followed by a project. At CSI, these projects are
+completed during computer labs. These projects are available as
+`IJulia` notebooks or `Pluto` notebooks.
 
 
 ## The projects for MTH 229
 
-There are ten "projects" for this class.
-See all projects at [https://github.com/mth229/229-projects](https://github.com/mth229/229-projects).
+There are ten "projects" for this class.  See all projects at
+[https://github.com/mth229/229-projects](https://github.com/mth229/229-projects).
 
-The projects provide some background details *and* are notebooks for you to answer the accompanying questions. The questions are asked and answered through your `WeBWorK` login.
+The projects provide some background details *and* are notebooks for
+you to answer the accompanying questions. The questions are asked and
+answered through your `WeBWorK` login.
 
 
 There are some longer notes available for each project, linked to below.
@@ -44,84 +53,82 @@ There are some longer notes available for each project, linked to below.
 
 * [Calculator](http://mth229.github.io/calculator.html)
 
-Basics of types, order of operations, assignment and variables.
+Basics of  order of operations, assignment, and variables.
 
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/01-calculator.ipynb)
 [(Pluto html)](./229-projects/01-calculator.html)
+[(With commentary)](./229-projects/01-calculator-pluto-commentary.html)
 
 ----
 
 * [Functions](http://mth229.github.io/functions.html)
 
 Shows how to define and call a function. Technical parts include
-ternary operator, multiple arguments, and return values (tuples).
+the ternary operator, multiple arguments, and return values (tuples).
 
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/02-functions.ipynb)
 [(Pluto html)](./229-projects/02-functions.html)
+[(With commentary)](./229-projects/02-functions-pluto-commentary.html)
 
 ----
 
 * [Graphing](http://mth229.github.io/graphing.html)
 
 
-This demonstrates the use of the `Plots` package for plotting. This
-package provides a very simple `plot` interface for graphing one or more
+This demonstrates the use of the `Plots` package for plotting which
+provides a very simple interface for graphing one or more
 functions.
 
-As well, a discussion about arrays and mapping a function over an
-array is given. This will be useful later on with limits, ...
 
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/03-graphics.ipynb)
 [(Pluto html)](./229-projects/03-graphics.html)
+[(With commentary)](./229-projects/03-graphics-pluto-commentary.html)
 
 ----
 
 * [Zeros](http://mth229.github.io/zeros.html)
 
 
-Finding zeros for polynomials, graphically finding zeros, and using
-the bisection method.
-
+This section discusses finding zeros using the bisection method.
 The add-on `Roots` package provides some convenient functionality.
 
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/04-zeros.ipynb)
 [(Pluto html)](./229-projects/04-zeros.html)
+[(With commentary)](./229-projects/04-zeros-pluto-commentary.html)
 
 ----
 
 * [Limits](http://mth229.github.io/limits.html)
 
-Basics of limits.
+Basics of limits presented graphically, numerically, and symbolically.
 
-Discussion on floating point representation and potential issues.
 
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/05-limits.ipynb)
 [(Pluto html)](./229-projects/05-limits.html)
+[(With commentary)](./229-projects/05-limits-pluto-commentary.html)
 
 ----
 
 * [Derivatives](http://mth229.github.io/derivatives.html)
 
-Explore forward differences with a bit on error
-analysis.
+Derivatives presented by the forward difference quotient, automatic differentiation, and symbolic differentiation.
 
-We end with a brief discussion on automatic differentiation, as
-implemented in the `ForwardDiff` add-on package.
 
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/06-derivatives.ipynb)
 [(Pluto html)](./229-projects/06-derivatives.html)
+[(With commentary)](./229-projects/06-derivatives-pluto-commentary.html)
 
 
 ----
@@ -135,6 +142,7 @@ derivatives.
 A notebook for this material:
 [ipynb](http://mth229.github.io/229-projects/07-first_second_derivatives.ipynb)
 [(Pluto html)](./229-projects/07-first_second_derivatives.html)
+[(With commentary)](./229-projects/07-first_second_derivatives-pluto-commentary.html)
 
 
 ----
@@ -144,14 +152,13 @@ A notebook for this material:
 
 Basics of Newton's method.
 
-Discusses iterative algorithms, approximation, some analysis.
-
 The `fzero` function of the `Roots` package is discussed.
 
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/08-newton.ipynb)
 [(Pluto html)](./229-projects/08-newton.html)
+[(With commentary)](./229-projects/08-newton-pluto-commentary.html)
 
 ----
 
@@ -163,19 +170,21 @@ A project on minimization and maximization. Some standard applied problems are p
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/09-extrema.ipynb)
 [(Pluto html)](./229-projects/09-extrema.html)
+[(With commentary)](./229-projects/09-extrema-pluto-commentary.html)
 
 ----
 
 * [Integration](http://mth229.github.io/integration.html)
 
-Basics of Riemann integration with applications including
-trapezoid and  Simpson's methods. The `quaggk` function. Applications to volumes
-of solids of revolution.
+Basics of Riemann integration with applications including trapezoid
+and Simpson's methods. The `quaggk` function. Applications to arc
+length and volumes of solids of revolution.
 
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/10-integration.ipynb)
 [(Pluto html)](./229-projects/10-integration.html)
+[(With commentary)](./229-projects/10-integration-pluto-commentary.html)
 
 
 ----
@@ -302,13 +311,14 @@ An assignment for this material:
 
 ## Basic ideas
 
-`Julia` makes an excellent choice for this material as its syntax is
-very similar to standard mathematical syntax. The ability to define
-mathematical functions using the familiar `f(x) = ...` notation makes
-getting started really easy. Further, the fact that functions are
-*first-class objects* means that it is possible to create *higher-order* julia
-functions that mirror the standard operators of calculus. The
-following pattern is used throughout:
+`Julia` makes an excellent choice as a computer supplement for this
+material as its syntax is very similar to standard mathematical
+syntax. The ability to define mathematical functions using the
+familiar `f(x) = ...` notation makes getting started really
+easy. Further, the fact that functions are *first-class objects* means
+that it is possible to create *higher-order* julia functions that
+mirror the standard operations of calculus. The following pattern is
+used throughout:
 
 ```verbatim
 action(function_object, args...)
@@ -337,26 +347,13 @@ With just this basic set of actions, akin to buttons on the calculator, a rich v
 ## How to use `Julia` in MTH 229
 
 
-Using `Julia` to complete the projects of MTH 229 can be done in several ways. The following lists four possible manners in order of ease of setup:
+Using `Julia` to complete the projects of MTH 229 can be done in several ways.
 
-### Using the image in the lab:
+### Using the `juliabox` server
 
-In the computer labs in 1S, the desktop images have julia installed along with the packages. Simply click on the icon and  wait. If things work to plan, a small terminal screen will appear  with many  lines of commands.  After a few moments, a  browser  tab should open with a listing of  projects. Click on your project  and proceed. Your work will be erased  when you log off.
-
-
-### Using binder to run the projects  remotely:
-
-[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mth229/229-projects/HEAD)
-
-The link above allows the projects for MTH229 to be run through the web.
-
-* `binder` is a service that runs interactive notebooks through the web. Each notebook is limited in memory and has a 10 minute *inactivity* timeout. Binder notebooks are not persistent, though they do have a button to save to local storage.
-
-Binder takes between 30 seconds and one minute to get up and running. Once a notebook is selected, it takes another 30ish seconds to get the typical packages started.
+CSI students have access to a server that gives access to the jupyter notebooks.
 
 ### Installing `Julia` on a personal laptop or computer.
-
-[This was recently changed!]
 
 This is not terribly difficult, but does involve a few additional steps:
 
@@ -366,7 +363,7 @@ This is not terribly difficult, but does involve a few additional steps:
 
 This opens a  terminal. Commands are typed after the prompt (`> julia`) and executed when the return key is pressed.
 
-First, the `MTH229` package must be installed. This only needs to be done once. Copy and paste these commands to the terminal and press return to run them:
+First, the `MTH229` package must be installed. This only needs to be done once. Copy  these commands to the terminal and press return to run them:
 
 ```
 using Pkg
@@ -374,6 +371,13 @@ Pkg.add(["MTH229", "Plots", "IJulia", "ZipFile"])
 Pkg.build("IJulia")
 ```
 
+(If using version 1.7 or higher of `Julia`, you can type:
+
+```
+using MTH229, Plots, IJulia, ZipFile
+```
+
+and follow the prompts.)
 
 * Now download the projects by copying and pasting the following commands:
 
@@ -404,31 +408,37 @@ notebook()
 
 Your browser should open to the Jupyter interface and the projects should among those listed.
 
-### Pluto instead of Jupyter
+#### Using Pluto notebooks locally
 
-Alternatively, the `Pluto` notebook interface can be used. You install `Pluto` as above:
-
-```
-using Pkg
-Pkg.add("Pluto")
-```
-
-To use `Pluto` in a new session run these commands:
+`Pluto` notebooks are easier to install. At the terminal (assuming version 1.7 or higher) run:
 
 ```
 using Pluto
 Pluto.run()
 ```
 
-The links to Pluto notebooks open web pages. These pages have a "Edit or run this notebook" link allowing them to be run within your `Pluto` session.
+This will open a `Pluto` landing page in a browser tab.
+The html notebooks linked herein offer a means to "Edit or run this notebook." Download the notebook (it will make a `.jl` file) and then open this within `Pluto`.
+
+
+### Using binder to run the projects  remotely:
+
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mth229/229-projects/HEAD)
+
+The link above allows the projects for MTH229 to be run through the web.
+
+* `binder` is a service that runs interactive notebooks through the web. Each notebook is limited in memory and has a 10 minute *inactivity* timeout. Binder notebooks are not persistent, though they do have a button to save to local storage.
+
+Binder takes between 30 seconds and one minute to get up and running. Once a notebook is selected, it takes another 30ish seconds to get the typical packages started.
+
 
 
 ----
 
 This table covers pros and cons for the  approaches mentioned above:
 
-```verbatim
-                         Using Lab       Binder       Local Installation
+```
+                         Using server    Binder       Local Installation
 Setup ease                  ✓              ✓                 ×
 
 Speed                       ✓              ×                 ✓
@@ -437,5 +447,5 @@ Persistence of work         ×              ×                 ✓
 
 Free                        ✓              ✓                 ✓
 
-Use at home                 ×              ✓                 ✓
+Use at home                 ✓              ✓                 ✓
 ```

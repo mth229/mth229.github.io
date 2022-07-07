@@ -8,9 +8,9 @@ $[a,b]$. The area under the graph of $f(x)$ is given by the definite
 integral:
 
 
-$$~
+```math
 \text{Area under f} = \int_a^b f(x) dx
-~$$
+```
 
 Computing this area is *often* made easier with the Fundamental
 Theorem of Calculus which states in one form that one can compute a
@@ -19,23 +19,25 @@ particular, if $F(x)$ is an antiderivative for $f(x)$, a continuous
 function, then
 
 
-$$~
+```math
 \int_a^b f(x) dx = F(b) - F(a).
-~$$
+```
 
 
 This is great as long as some antiderivative is known. There are several different techniques for finding antiderivatives. The `integrate` function in the `SymPy` package can do many of them:
 
-```
+```julia
 using MTH229
 using Plots
-```
-
-```nocode, noout
 plotly()
 ```
 
+```julia; echo=false
+using QuizQuestions
+using LaTeXStrings
 ```
+
+```julia
 f(x) = x^3 - cos(x) + x*log(x)
 @syms x
 integrate(f(x), x)
@@ -43,7 +45,7 @@ integrate(f(x), x)
 
 To find the definite integral, say from $1$ to $10$ we have:
 
-```
+```julia
 integrate(f(x), (x, 1, 10))
 ```
 
@@ -97,9 +99,7 @@ function on $[a,b]$, any of the choices will yield the same value as
 the partition's mesh shrinks to $0$.
 
 
-```
-ImageFile("figures/integration/riemann_choice.png")
-```
+![Riemann](figures/integration/riemann_choice.png)
 
 As with other limits, we can numerically approximate the limit by
 computing the Riemann sum for some partition. The steps for this
@@ -120,7 +120,7 @@ length $\delta = (b-a)/n$ and so the points are separated by this
 amount. As such, we can choose our $a = x_0 < x_1 < \dots < x_n = b$ with
 commands like:
 
-```
+```julia
 a, b, n = 1, 3, 5;
 delta = (b-a)/n;
 xs = a .+ (0:n) * delta
@@ -128,27 +128,27 @@ xs = a .+ (0:n) * delta
 
 To apply a function to a range of values, we may use a map, a comprehension, a `for` loop or the "dot" notation. We will use broadcasting here. Recall, the syntax:
 
-```
+```julia
 f(x) = x^2
 fxs = f.(xs)
 ```
 
 Now to add the numbers up. For this task, the `sum` function is available
 
-```
+```julia
 sum(fxs)
 ```
 
 
 Okay, just one subtlety, we really only want the points
 
-```
+```julia
 [ a .+ (0:n-1) * delta ]
 ```
 
 for the left Riemann sum and the points
 
-```
+```julia
 [ a .+ (1:n) * delta ]
 ```
 
@@ -156,18 +156,18 @@ for the right.
 
 Putting this together, here are commands to approximate the area under the curve $f(x)=x^2$ using 10 left Riemann sums:
 
-```
+```julia
 f(x) = x^2
 a, b, n = 1, 3, 10;		   ## note n=10
 delta = (b - a)/n;		   ## nothing to change below here
 xs = a .+ (0:n-1) * delta;          ## n, right is 1:n * delta
 fxs = f.(xs);
-sum(fx) * delta
+sum(fxs) * delta
 ```
 
 We compare this value to the known value from the Fundamental Theorem of Calculus, as $F(x) = x^3/3$ is an antiderivative:
 
-```
+```julia
 F(x) = x^3/3
 F(b) - F(a)
 ```
@@ -184,7 +184,7 @@ Repeat with n=100
 
 For the same problem, let $n=100$. What do you get?
 
-```
+```julia; echo=false
 f(x) = x.^2
 a=1; b=3; n=100;
 x = range(a, stop=b, length=n+1);
@@ -199,7 +199,7 @@ Repeat with n=1,000
 For the same problem, let $n=1000$. What do you get?
 
 
-```
+```julia; echo=false
 f(x) = x.^2
 a=1; b=3; n=1000;
 x = range(a, stop=b, length=n+1);
@@ -214,7 +214,7 @@ Repeat with n=10,000
 For the same problem, let $n=10,000$. is the difference between the
 answer and the actual answer within $0.001$?
 
-```
+```julia; echo=false
 f(x) = x.^2
 a=1; b=3; n=10_000;
 x = range(a, stop=b, length=n+1);
@@ -231,7 +231,7 @@ Let $f(x) = (10 + \cos(2\pi x))^{-1}$. For the integral over $[0,1]$,
 the known answer is $1/\sqrt{99}$. How big must $n$ be so that the
 error in the Riemann sum is less than $10^{-8}$?
 
-```
+```julia; echo=false
 ## This integral converges very fast, as the function is symmetric over the interval so the errors cancel out.
 choices = [5, 10, 100, 1_000, 10_000];
 radioq(choices, 2)
@@ -257,7 +257,7 @@ Different possibilities are:
 
 This function is defined in `MTH229`:
 
-```verbatim
+```julia; eval=false
 function riemann(f::Function, a::Real, b::Real, n::Int; method="right")
   if method == "right"
      meth = (f,l,r) -> f(r) * (r-l)
@@ -269,8 +269,9 @@ function riemann(f::Function, a::Real, b::Real, n::Int; method="right")
      meth = (f,l,r) -> (1/6) * (f(l) + 4*(f((l+r)/2)) + f(r)) * (r-l)
   end
 
-  xs = a .+ (0:n) * (b-a)/n
-  sum(meth(f, l, r) for (l,r) in zip(xs[1:end-1], xs[2:end]))
+  xs = range(a, b, length=n+1)
+  lrs = zip(Iterators.take(xs, n), Iterators.rest(xs, 1))
+  sum(meth(f, l, r) for (l,r) in lrs)
 
 end
 ```
@@ -281,7 +282,7 @@ The basic usage of the `riemann` function is straightforward. Here
 we approximate the integral of $e^{-x^2}$ from $0$ to $3$ using $10,000$
 subintervals:
 
-```
+```julia
 f(x) =  exp(-x^2)
 riemann(f, 0, 3, 10_000)
 ```
@@ -290,7 +291,7 @@ How big should the number of intervals be? More intervals will give
 better answers, but unlike Newton's method we have no stopping
 criteria.  For this problem, we look at various values based on `n`:
 
-```
+```julia
 [riemann(f, 0, 3, n) for n in [100, 1000, 10000, 100000]]   ## or use 10.^(2:5)
 ```
 
@@ -301,7 +302,7 @@ We see a value around $0.886$ as the answer.
 
 Using different methods allows us to compare the right and left Riemann sums. Let's do so for the monotonic function $e^x$ over the interval $[0,2]$.
 
-```
+```julia
 f(x) = exp(x)
 ns = [10^i for i in 1:5]
 ys = [riemann(f, 0, 2, n, method="right") - riemann(f, 0, 2, n, method="left") for n in ns];
@@ -320,7 +321,7 @@ Since these are also the minimum and maximum Riemann sums, the above gives a bou
 Compute the integral of $e^{-x^2}$ over $[0,1]$ using a right Riemann sum with $n=1000$. What is your answer?
 
 
-```
+```julia; echo=false
 f(x) = exp(-x^2)
 a,b,n = 0, 1, 10_000
 val = riemann(f, a, b, n, method="right")
@@ -333,7 +334,7 @@ numericq(val, 1e-8)
 
 Compute the integral of $(1 + \cos(x)^2)^(1/2)$ over the interval $[0, \pi]$ using a right Riemann sum with $n=10,000$. What is your answer?
 
-```
+```julia; echo=false
 f(x) = sqrt(1 + cos(x)^2)
 a, b, n = 0, pi, 10_000
 val = riemann(f, a, b, n, method="right")
@@ -345,7 +346,7 @@ numericq(val, 1e-8)
 
 Repeat the above analysis comparing the right and left Riemann sums for $f(x)=e^x$ over $[0,2]$. However, this time multiply by $n$, as follows:
 
-```
+```julia
 ns = [10^i for i in 1:5]
 f(x) = exp(x)
 [n * (riemann(f, 0, 2, n, method="right") - riemann(f, 0, 2, n, method="left")) for n in ns]
@@ -354,7 +355,7 @@ f(x) = exp(x)
 This shows what?
 
 
-```
+```julia; echo=false
 choices = ["That it is constant says the difference between right and left Riemann sums never goes to 0",
 	    "That it is constant says the difference between right and left Riemann sums goes to 0 like 1/n",
 	    "That it is constant says the difference between right and left Riemann sums is constant."
@@ -388,7 +389,7 @@ subinterval by a trapezoid, as opposed to a rectangle.
 We can use this as follows. Let's approximate the area under the curve
 $y=5x^4$ between $0$ and $1$ (with known answer $1$):
 
-```
+```julia
 f(x) = 5x^4
 riemann(f, 0, 1, 1000, method="trapezoid")
 ```
@@ -397,7 +398,7 @@ Pretty close to 1 with just 1,000 subintervals.
 
 We now compare the error with the left Riemann sum for the same size $n$:
 
-```
+```julia
 ns = [10^i for i in 1:5]
 left_r = [riemann(f, 0, 1, n) for n in ns];
 trapezoid_r = [riemann(f, 0, 1, n, method="trapezoid") for n in ns];
@@ -420,7 +421,7 @@ and $b$.
 
 We compare how accurate we get with this rule for the same `f` as before:
 
-```
+```julia
 simpsons_r = [riemann(f, 0, 1, n, method="simpsons") for n in ns];
 [ns (1).-left_r (1).-trapezoid_r (1).-simpsons_r]
 
@@ -436,9 +437,9 @@ be fewer, that would require some analysis.)
 
 It can be shown that the [error for Simpson's method](http://en.wikipedia.org/wiki/Simpson%27s_rule#Error) is bounded by
 
-$$~
+```math
 \frac{1}{90}\frac{1}{2^5} M (b-a)^5 \frac{1}{n^4},
-~$$
+```
 
 where $M$ is a bound on the fourth derivative. As we increase $n$, the
 error gets small at a quick rate.  By contrast, the error for the
@@ -453,14 +454,14 @@ The trapezoid rule has no error for linear functions and Simpson's
 rule has no error for quadratic functions. Verify the latter by
 computing the following:
 
-```
+```julia
 f(x) = x^2; F(x) = x^3/3
 riemann(f, 0, 10, 100, method="simpsons") - (F(10) - F(0));
 ```
 
 How accurate is the approximation? Around
 
-```
+```julia; echo=false
 choices = [`1e-8`, `1e-10`, `1e-12`, `1e-14`, `1e-16`, `0`];
 ans = 4;
 radioq(choices, ans, keep_order=true)
@@ -492,7 +493,7 @@ radioq(choices, ans, keep_order=true)
 
 Using Simpson's rule and `n=1000` compute the integral of $f(x) = 1/(1+x^2)$ between $0$ and $1$.
 
-```
+```julia; echo=false
 a,b,n = 0, 1, 1000
 val = riemann(x -> 1/(1+x^2), a, b, n, method="simpsons");
 numericq(val, 1e-5)
@@ -512,7 +513,7 @@ limits of integration. You don't specify $n$ -- as this is computed
 adaptively -- but you can optionally specify a tolerance which
 controls the accuracy, though we don't do so here. For example, a typical usage might be:
 
-```
+```julia
 a, err = quadgk(sin, 0, pi)		## 2 is exact
 ```
 
@@ -524,7 +525,7 @@ the second value, $1.78 \cdot 10^{-12}$.
 
 If just the answer is of interest, then it can be extracted using *index notation*:
 
-```
+```julia
 quadgk(sin, 0, pi)[1]		# [1] picks out the first component or two
 ```
 
@@ -532,7 +533,7 @@ quadgk(sin, 0, pi)[1]		# [1] picks out the first component or two
 
 For another illustration, since Archimedes the known answer for $\int_0^1 x^2 dx$ is $1/3$. We see that `quadgk` gets it right for all the digits:
 
-```
+```julia
 quadgk(x -> x^2, 0, 1)
 ```
 
@@ -542,18 +543,13 @@ The `riemann` function is good for pedagogical purposes, but the `quadgk` functi
 
 (That `quadgk` is exact with polynomials is no surprise, as the underlying choice of nodes and weights makes it so for polynomials of certain degree.)
 
-```
-alert("""
-
-For other integration routines, the `Cubature` package is an interface
-to the Cubature library (http://ab-initio.mit.edu/wiki/index.php/Cubature)
-which provides serveral. Cubature is the term for higher dimensional
-integrals, quadrature refers to finding area. In that package, the
-function `hquadrature` is similar to `quadgk`. (The two are written by
-the same author.)
-
-""", class=:info)
-```
+!!! note "Info"
+	For other integration routines, the `Cubature` package is an interface
+	to the Cubature library (http://ab-initio.mit.edu/wiki/index.php/Cubature)
+	which provides serveral. Cubature is the term for higher dimensional
+	integrals, quadrature refers to finding area. In that package, the
+	function `hquadrature` is similar to `quadgk`. (The two are written by
+	the same author.)
 
 ### Practice
 
@@ -561,8 +557,7 @@ the same author.)
 
 Let $f(x) = \exp(-4 \cdot  |x-1/2|)$. Find the integral over $[0,1]$ using `quadgk`:
 
-
-```
+```julia; echo=false
 f(x) = exp(-4*abs(x-1/2))
 val = quadgk(f, 0, 1)[1];
 numericq(val, 1e-5)
@@ -575,7 +570,7 @@ numericq(val, 1e-5)
 Let $f(x) = \sin(100\pi x)/(\pi x)$. Find the integral over $[0,1]$ using `quadgk`:
 
 
-```
+```julia; echo=false
 f(x) = sin(100pi *x)/(pi*x);
 val = quadgk(f, 0, 1)[1];
 numericq(val, 1e-4)
@@ -586,7 +581,7 @@ numericq(val, 1e-4)
 
 Let $f(x) = \sin(100\pi x)/(100\pi x)$. Using $1,000$ points, find the right-Riemann integral over $[0,1]$.
 
-```
+```julia; echo=false
 f(x) = sin(100*pi*x)/(100*pi*x)
 a, b, n = 0, 1, 1000
 val = riemann(f, a, b, n, method="right")
@@ -601,13 +596,13 @@ due to the highly oscillatory nature of the function.)
 
 How far off is this Riemann estimate, when $n=100,000$?
 
-```
+```julia
 f(x) = 1/(1 + x^4)
 quadgk(f, 0, 1)[1] - riemann(f, 0, 1, 100_000);
 ```
 
 
-```
+```julia; echo=false
 choices = ["Roughly `1e-4`",
 	     "Roughly `1e-6`",
 	     "Roughly `1e-12`"
@@ -621,7 +616,7 @@ radioq(choices, ans)
 The `quadgk` function allows you to specify issues where there are troubles. For example, we know that $f(x) = \sin(x)/x$ has an issue at 0. Directly trying this integral `quadgk(x->sin(x)/x, -pi, pi)` will fail, but you can specify the issue at $0$ as follows `quadgk(x -> sin(x)/x, -pi, 0, pi)`. Do so. What is the value of the result:
 
 
-```
+```julia; echo=false
 val = quadgk(x -> sin(x)/x, -pi, 0, pi)[1];
 numericq(val, 1e-4)
 ```
@@ -635,14 +630,14 @@ over a closed domain exists.) However, some such integrals do exist,
 and the `quadgk` function can integrate around such singularities by
 spelling them out in the domain of integration. Just specify the trouble spots between the endpoints:
 
-```
+```julia
 f(x) = abs(x - 0.3)^(-1/4)
 val = quadgk(f, 0, 0.3, 1);
 ```
 
 Following the above, what answer do you get?
 
-```
+```julia; echo=false
 numericq(val[1], 1e-4)
 ```
 
@@ -666,16 +661,16 @@ The volume of a solid of revolution about the $y$-axis is illustrated [here](htt
 
 This figure shows a volume of revolution (a glass) with an emphasis on the radius of the solid. The volume can be determined if the radius is known.
 
-```
-ImageFile("figures/integration/integration-glass.jpg")
-```
+
+![Glass](figures/integration/integration-glass.jpg)
+
 
 
 The basic formula requires the description of the radius as a function of $x$ (if oriented as the figure) or the height, $h$, (if oriented as in real life). Suppose we specify the radius with $r(h)$, then the following formula holds with $b$ the total height.
 
-$$~
+```math
 V(b) = \int_0^b \pi r(h)^2 dh.
-~$$
+```
 
 
 
@@ -685,9 +680,9 @@ describing the radius is known. For a given glass, let $r(h)$ give the
 radius as a function of height. Then, as above, the volume of the vessel as a
 function of height, $b$, is given by an integral:
 
-$$~
+```math
 V(b) = \int_0^b \pi (r(h))^2 dh
-~$$
+```
 
 We wish to look at our intuition relating the height of the fluid in
 the vessel compared to the percentage of fluid of the whole. A basic
@@ -700,9 +695,7 @@ The answer, of course, depends on the shape of the glass.  That is the shape of 
 
 For a standard measuring cup, the answer for different `b`'s is printed on the side:
 
-```
-ImageFile("figures/integration/measuring_cup.png")
-```
+![Measuring cup](figures/integration/measuring_cup.png)
 
 With the formula for the volume of a solid of revolution we can compute this marks numerically if we know the radius as a function of height.
 
@@ -718,9 +711,7 @@ This figure shows some of the wide variety of beer-serving glasses:
 
 
 
-```
-ImageFile("figures/integration/beer_glasses.jpg")
-```
+[Beer glasses](figures/integration/beer_glasses.jpg)
 
 
 
@@ -729,20 +720,19 @@ We work with metric units, as there is a natural relation between volume in cm$^
 
 Let two glasses be given as follows. A typical pint glass with linearly increasing radius:
 
-$$~
+```math
 r(h) = 3 + \frac{1}{5}h, \quad 0 \leq h \leq b;
-~$$
+```
 
 and a curved edge one:
 
-$$~
+```math
 s(h) = 3 + \log(1 + h), \quad 0 \leq h \leq b
-~$$
+```
 
 
-```
-ImageFile("figures/integration/glass-half-full.png")
-```
+[Half full](figures/integration/glass-half-full.png)
+
 
 One could also consider a fluted one, such as appears in the comparison noted in the article.
 
@@ -751,7 +741,7 @@ One could also consider a fluted one, such as appears in the comparison noted in
 
 Which of these functions might describe a fluted glass where the radius changes faster as the height gets bigger, that is the radius is a *concave up* function?
 
-```
+```julia; echo=false
 choices = ["`r(h) = 2 + (x/10)^2, 0 <= x <= 10`",
 	     "`r(h) = 2 + sqrt(x/10), 0 <= x <= 10`",
 	     "`r(h) = 2 + x/10, 0 <= x <= 10`"
@@ -765,7 +755,7 @@ radioq(choices, ans)
 
 For the two types of glasses in the figure, we create functions in `julia` as follows:
 
-```
+```julia
 r(h) = 3 + h/5
 s(h) = 2 + log(1 + h)
 r_vol(b) = quadgk(x -> pi*r(x)^2, 0, b)[1]
@@ -774,16 +764,16 @@ s_vol(b) = quadgk(x -> pi*s(x)^2, 0, b)[1]
 
 Then we can easily find the volume as a function of height. For example at 10cm we have:
 
-```
+```julia
 (r_vol(10), s_vol(10))
 ```
 
 
 However, to find $b$ that makes the glass $450$ cm$^3$ requires us to solve an equation involving an integral for $b$:
 
-$$~
+```math
 V(b) = \int_0^b \pi r(h)^2 dh = 450.
-~$$
+```
 
 
 Not to worry, we can use `find_zero` from the `Roots` package for
@@ -791,20 +781,20 @@ that (again, this is loaded with the `MTH229` package).
 To solve for when `V(b) = r_vol(b) - 450 = 0` we have
 
 
-```
+```julia
 r_b = find_zero(x -> r_vol(x) - 450,  10)
 ```
 
 
 So $b$ is basically $9.17$.  Given this, how much volume is left at `b/2`?
 
-```
+```julia
 r_vol(r_b/2)
 ```
 
 Which is what percent of the whole?
 
-```
+```julia
 r_vol(r_b/2) / r_vol(r_b) * 100
 ```
 
@@ -813,13 +803,13 @@ As this height is often mistaken for the half-way by volume mark, people tend to
 
 Now compare to the height to get half the volume (225 ml):
 
-```
+```julia
 r_half = find_zero(x -> r_vol(x) - 225,  5)
 ```
 
 This value is more than half of $b$:
 
-```
+```julia
 r_half / r_b
 ```
 
@@ -839,7 +829,7 @@ Compare the above for the curved glass, where $s(h) = 3 + \log(1 + h)$.
 What is the height of the glass, `b`, needed to make the volume 450?
 
 
-```
+```julia; echo=false
 s(h) = 3 + log(1 + h)
 s_vol(b) = quadgk(x -> pi*s(x)^2, 0, b)[1]
 b = find_zero(x -> s_vol(x) - 450, 8);
@@ -856,7 +846,7 @@ Find the volume of the glass represented by $s(h) = 3 + \log(1 + h), 0
 the value as a percentage of the total volume.
 
 
-```
+```julia; echo=false
 val = s_vol(b/2) / s_vol(b) * 100;
 numericq(val,1)
 ```
@@ -869,7 +859,7 @@ Now, what height of filling will produce half the volume when? Report
 your answer in terms of a percentage of $b$, height of the glass.
 
 
-```
+```julia; echo=false
 b12 = find_zero(x -> s_vol(x) - 450/2, 4)
 val = b12/b*100;
 numericq(val, .1)
@@ -881,10 +871,8 @@ numericq(val, .1)
 Consider this big Solo cup:
 
 
+![Solo cup](figures/integration/big-solo-cup.jpg)
 
-```
-ImageFile("figures/integration/big-solo-cup.jpg")
-```
 
 It has approximate dimensions: smaller radius 5 feet, upper radius 8 feet and height 15 feet. How many gallons is it?
 At $8$ pounds a gallon this would be pretty heavy!
@@ -894,7 +882,7 @@ Two facts are useful:
 * a cubic foot is 7.48052 gallons
 * the radius as a function of height is $r(h) = 5  + (3/15)\cdot h$
 
-```
+```julia; echo=false
 gft = 7.48052
 r(h) = 5 + (3/15)*h
 a,err = quadgk(h -> pi*r(h)^2, 0, 15)
@@ -908,7 +896,7 @@ numericq(val, 1e1)
 
 The basic indefinite integral for a positive function answers the amount of area under the curve over a given interval. However, the integral can be interpreted in many different ways. For example, one can use an integral to answer how long a curve is. Of course one can estimate this answer. For example, consider this curve:
 
-```
+```julia
 plot(x -> x^2, 0, 1)
 ```
 
@@ -921,9 +909,9 @@ distance between the two endpoints. But how long is it?
 In general, the *arc length* of the curve $y=f(x)$ between $a \leq x
 \leq b$ (or how long is the curve) is given through the formula
 
-$$~
+```math
 l = \int_a^b \sqrt{1 + f'(x)^2} dx
-~$$
+```
 
 
 
@@ -931,16 +919,14 @@ The formula is from the length of the hypotenuse of a right triangle with length
 This image suggests an approximation for the length and why the hypotenuse of some triangle might be involved.
 
 
-```
-ImageFile("figures/integration/arclength.gif")
-```
+[Arc length](figures/integration/arclength.gif)
 
 
 
 
 Rather than focus on a derivation, we do some examples illustrating that to compute the arclength of the graph of a function is relatively straightforward  using numeric integration. For example, our answer for $f(x) = x^2$ is given by
 
-```
+```julia
 f(x) = x^2
 quadgk(x -> sqrt(1 + f'(x)^2), 0, 1)      # using f' notation defined in MTH229
 ```
@@ -951,7 +937,7 @@ quadgk(x -> sqrt(1 + f'(x)^2), 0, 1)      # using f' notation defined in MTH229
 
 Whereas, the length of the $f(x) = \sin(x)$ over $[0, \pi]$ would be:
 
-```
+```julia
 f(x) = sin(x)
 quadgk(x -> sqrt(1 + f'(x)^2), 0, pi)
 ```
@@ -964,13 +950,13 @@ A [caternary shape](http://en.wikipedia.org/wiki/Catenary) is the shape a hangin
 as it is suspended between two posts. It appears elsewhere, for example, power wires will also have this shape as they are suspended between towers.
 A formula for a caternary can be written in terms of the hyperbolic cosine, `cosh` in `julia` or exponentials.
 
-$$~
+```math
 y = a \cosh(x/a) = a \cdot \frac{e^{x/a} + e^{-x/a}}{2}.
-~$$
+```
 
 Suppose we have the following wire hung between $x=-1$ and $x=1$ with $a = 2$:
 
-```
+```julia
 f(x; a=2) = a * cosh(x/a)
 plot(f, -1, 1)
 ```
@@ -979,7 +965,7 @@ How long is the chain? Looking at the graph we can guess an answer is
 between $2$ and $2.5$, say, but it isn't much work to get
 the answer:
 
-```
+```julia
 quadgk(x -> sqrt(1 + f'(x)^2), -1, 1)
 ```
 
@@ -993,7 +979,7 @@ The sag in the chain is adjusted through the parameter $a$ -- chains with larger
 Suppose your chain has parameter `a=3` what is the length? (Use `quadgk`)
 
 
-```
+```julia; echo=false
 f(x; a=3) = a*cosh(x/a);
 val <- quadgk(x -> sqrt(1 + f'(x)^2), -1, 1)[1];
 numericq(val, .001)
@@ -1001,12 +987,10 @@ numericq(val, .001)
 
 #### Question: in the artist studio
 
-This picture of Jasper John's [Near the Lagoon](http://www.artic.edu/aic/collections/artwork/184095) was taken at The Art Institute Chicago.
+This picture of Jasper Johns [Near the Lagoon](http://www.artic.edu/aic/collections/artwork/184095) was taken at The Art Institute Chicago.
 
 
-```
-ImageFile("figures/integration/johns-catenary.jpg")
-```
+[Jasper Johns](figures/integration/johns-catenary.jpg)
 
 
 
@@ -1021,20 +1005,20 @@ The museum notes have
 This particular catenary has a certain length. The basic dimensions
 are 78in wide and 118in drop. If our shifted function is
 
-$$~
+```math
 f(x; a, b) = a \cosh(x/a) - b
-~$$
+```
 
 Then we have $f(0) = -118$ and $f(78/2) = 0$ using the origin midway
 between the two tops of the curve. Solving the first gives
 
-$$~
+```math
 -118 = a - b \text{ or } b = a + 118.
-~$$
+```
 
 The second gives $a \cdot \cosh(78/(2a)) - (a + 118) = 0$. This can be solved numerically for a:
 
-```
+```julia
 catenary(x; a=1, b=0) = a*cosh(x/a) - b
 a = newton(a -> catenary(78/2, a=a, b=118 + a), 1)
 ```
@@ -1042,7 +1026,7 @@ a = newton(a -> catenary(78/2, a=a, b=118 + a), 1)
 Rounding, we take $a=13$. With these parameters ($a=13$, $b = 131$),
 compute the length of John's catenary.
 
-```
+```julia; echo=false
 a = 13
 b = 118 + a
 f(x) = catenary(x, a=13, b=118+13)
@@ -1071,15 +1055,15 @@ span. Then the cable itself can be modeled as a parabola with
 
 The parabola that fits these three points is
 
-$$~
+```math
 y = \frac{-b}{a^2}(x^2 - a^2)
-~$$
+```
 
 Find the arc length of the cable in meters.
 
 
 
-```
+```julia; echo=false
 a = 1298/2;
 b = -147;
 f(x) = (-b/a^2)*(x^2 - a^2);
@@ -1091,7 +1075,7 @@ numericq(val, 1e-3)
 In the picture of the Verrazano-Narrows
 [bridge](http://observer.com/2012/09/staten-island/s-i-8/), would the shape during construction be a parabola or a cateneary?
 
-```
+```julia; echo=false
 choices = ["A parabola, as just mentioned",
 "A catenary, basically, as in the picture there is basically no load on the cables."
 ]
@@ -1104,13 +1088,13 @@ radioq(choices, ans)
 A boat sits at the point $(a, 0)$ and a man holds a rope taut attached to the boat at the origin $(0,0)$. The man walks on the $y$ axis. The position $y$ depends then on the position $x$ of the boat, and if the rope is taut, the position satisfies:
 
 
-$$~
+```math
 y = a \ln\frac{a + \sqrt{a^2 - x^2}}{x} - \sqrt{a^2 - x^2}
-~$$
+```
 
 This can be entered into `julia` as:
 
-```
+```julia
 g(x, a) = a * log((a + sqrt(a^2 - x^2))/x) - sqrt(a^2 - x^2)
 ```
 
@@ -1118,7 +1102,7 @@ g(x, a) = a * log((a + sqrt(a^2 - x^2))/x) - sqrt(a^2 - x^2)
 Let $a=12$, $f(x) = g(x, a)$. Compute the length the bow of the
 boat has traveled between $x=1$ and $x=a$ using `quadgk`.
 
-```
+```julia; echo=false
 a = 12
 f(x) = g(x, a);
 val =quadgk(x -> sqrt(1 + f'(x)^2), 1, a)[1];
@@ -1128,11 +1112,8 @@ numericq(val, 1e-3)
 (The most elementary description of this curve is in terms
 of the relationship $dy/dx = -\sqrt{a^2-x^2}/x$ which could be used in place of `f'` in your work.)
 
-```
-note("More on the tractrix")
-```
-
-Watch this [video](https://simonsfoundation.org/multimedia/mathematical-impressions-bicycle-tracks/">"bicycle tracks) to see an example of how the tractrix can be found in an everyday observation. Also [here](http://calteches.library.caltech.edu/4007/1/Calculus.pdf).
+!!! note "More on the tractrix"
+	Watch this [video](https://simonsfoundation.org/multimedia/mathematical-impressions-bicycle-tracks/">"bicycle tracks) to see an example of how the tractrix can be found in an everyday observation. Also [here](http://calteches.library.caltech.edu/4007/1/Calculus.pdf).
 
 
 
@@ -1142,9 +1123,9 @@ What components go into the `quadgk` function? This section covers some of the b
 
 The trapezoid rule can be rearranged to become:
 
-$$~
+```math
 \delta f(x_0) + 2\delta f(x_2) + 2 \delta f(x_3) + \cdots + 2 \delta f(x_{n}) + \delta f(x_{n})
-~$$
+```
 
 where $\delta = (b-a)/n$.
 
@@ -1152,24 +1133,24 @@ Whereas for even $n$, Simpson's rule can be written with:
 
 
 
-$$~
+```math
 \delta f(x_0) + 4\delta f(x_1) + 2 \delta f(x_2) + \cdots +  4 \delta f(x_{n-2}) + 2 \delta f(x_{n-1}) + \delta f(x_{n})
-~$$
+```
 
 with $\delta = (b-a)/n \cdot (1/6)$.
 
 These both have the general form of
 
-$$~
+```math
 \sum_k w_k \cdot f(x_k)
-~$$
+```
 
 where $w_k$ are weights and the $x_k$ some choice of points (nodes) -- not
 necessarily evenly spaced, though that is so in the examples we've
 seen. So, an alternative way to do the trapezoid formula in `julia`
 for $n=4$ might be:
 
-```
+```julia
 a, b, n = 0, 1, 4
 delta = (b-a)/n
 f(x) = x^2
@@ -1191,15 +1172,16 @@ The Gauss nodes and weights are computable
 the so-called Legendre polynomials, which can be defined recursively
 with Bonnet's formula:
 
-$$~
+```math
 P_0(x) = 1; P_1(x) = x; \quad  n P_{n}(x)  = (2(n-1)+1) x P_{n-1}(x) -(n-1) P_{n-2}(x).
-~$$
+```
 
 Using `julia`'s `Polynomials` package this can be
 implemented almost verbatim:
 
-```
-using Polynomials
+```julia
+import Polynomials
+import Polynomials: Polynomial
 function lgp(n::Integer)
     if n == 0 return Polynomial([1]) end
     if n == 1 return Polynomial([0, 1]) end
@@ -1210,7 +1192,7 @@ end
 
 This is used as,
 
-```
+```julia
 p4 = lgp(4)
 ```
 
@@ -1222,7 +1204,7 @@ long time.
 The nodes are the roots of the right polynomial. Here we have the
 values for `p4`
 
-```
+```julia
 xs = Polynomials.roots(p4)
 ```
 
@@ -1231,14 +1213,14 @@ during the refinement.)
 
 Finally, the weights  involve the derivative of $P_n$ through:
 
-$$~
+```math
 w_i = \frac{2}{(1 - x_i^2) \cdot(P^{'}_n(x_i)/P_n(1))^2}
-~$$
+```
 
 These can be done simply with:
 
-```
-weights(x) = 2 / ((1 - x^2) * (derivative(p4)(x)/p4(1))^2 )
+```julia
+weights(x) = 2 / ((1 - x^2) * (Polynomials.derivative(p4)(x)/p4(1))^2 )
 ws = [weights(xi) for xi in xs]
 ```
 
@@ -1274,9 +1256,12 @@ where it is well approximated it just moves on. This approach works
 well for poorly behaved functions, as it has a more refined grid
 there.
 
-<!-- from the MASS function adapt -->
-
+```julia; echo=false
+#from the MASS function adapt
+nothing
 ```
+
+```julia
 function adapt(f, a, b, limit)
 
     h = b-a

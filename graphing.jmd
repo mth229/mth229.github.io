@@ -12,28 +12,25 @@ at. As such, we don't try to teach the details of any one of them.
 Currently, the  the `Plots` package  provides a unified interface
 to many backend plotting packages.  We will use the `Plots` package in these examples.
 
-```
-note("""Packages are described a bit more [here](http://mth229.github.io/index.html/#_packages_).""")
-```
 
 For the impatient, this is all that is needed to know to get up and running.
 
 
-```
+```julia
 using MTH229
 using Plots
-```
-
-```nocode
 plotly()
-nothing
 ```
 
+```julia; echo=false
+using QuizQuestions
+using LaTeXStrings
+```
 
 Then, graphing a function is as easy as specifying the function and the domain to graph over,
 e.g.:
 
-```
+```julia
 f(x) = exp(-x^2/2)
 plot(f, -3, 3) 			# plot f over [-3,3]
 ```
@@ -41,7 +38,7 @@ plot(f, -3, 3) 			# plot f over [-3,3]
 
 Graphs can be layered by using the `plot!` function (with an exclamation point indicating a current graph is begin modified):
 
-```
+```julia
 f(x) = cos(x)
 g(x) = 1 - x^2/2
 plot(f, -pi/2, pi/2)
@@ -60,13 +57,13 @@ are used to make the plot.
 
 The most basic usage for plotting a function follows this pattern:
 
-```verbatim
+```julia; eval=false
 plot(function_object, from, to)     # or plot(f, a, b)
 ```
 
 as in
 
-```
+```julia
 plot(sin, 0, 2pi)
 ```
 
@@ -79,24 +76,18 @@ and pan with the mouse.
 
 
 
-
-```
-alert("""
-
-This is another example of a general template **action(function_object,
-args...)** for performing some action on a function. In this case, the
-action is to plot a function
-and the additional *args...* indicate the domain to plot over.)
-
-""")
-```
+!!! note "Alert"
+	This is another example of a general template **action(function_object,
+	args...)** for performing some action on a function. In this case, the
+	action is to plot a function
+	and the additional *args...* indicate the domain to plot over.)
 
 
 
 
 Again, we plot a function, this time a basic polynomial:
 
-```
+```julia
 f(x) = x^2 - 2x + 2
 plot(f, -3, 3)
 ```
@@ -105,7 +96,7 @@ plot(f, -3, 3)
 
 A graph can have layers added to it using `plot!` or other such functions. For example, adding the function `zero` will emphasize the `x` axis:
 
-```
+```julia
 f(x) = x^2 - 2x + 2
 plot(f, -3, 3)
 plot!(zero)     # x axis
@@ -115,7 +106,7 @@ The automatic legend can be supressed by passing the argument `legend=false` to 
 
 Adding points can be done with the `scatter!` command. We put the `x` and `y` values into containers defined by `[]`. For example, the polynomial $x^2 - 3x +2$ has roots at $2$ and $1$, we emphasize this through:
 
-```
+```julia
 f(x) = x^2 - 3x + 2
 rts = [1, 2]
 plot(f, 0, 3)
@@ -143,7 +134,7 @@ values and replace them with `NaN`. A function that can be used to
 modify an arbitrary function (like $f(x) = 1/x$) and return a function
 that can be plotted can be defined as follows:
 
-```
+```julia
 trim(f; val=10) = x -> abs(f(x)) > val ? NaN : f(x)
 ```
 
@@ -154,14 +145,14 @@ The `MTH229` package implements this in the function `rangeclamp(f, hi=20, lo=-h
 Using `rangeclamp` is fairly simple. The output
 is a function, so can be passed directly to the `plot` call:
 
-```
+```julia
 f(x) = 1/x
 plot(rangeclamp(f), -3, 3)
 ```
 
 Or
 
-```
+```julia
 plot(rangeclamp(f, 100), -3, 3)
 ```
 
@@ -174,7 +165,7 @@ as both can be ordered by `>`.
 
 Consider a function with a parameter, `theta`, defined by:
 
-```
+```julia
 function g(x; theta=pi/4)
 	 a = 200*cos(theta)
 	 tan(theta)*x + (32/a)*x - 32*log(a/(a-x))
@@ -184,7 +175,7 @@ end
 Plotting `g` will use the default value of $\pi/4$. To plot with a
 different value, say $\pi/3$ we can create a new function:
 
-```
+```julia
 f(x) = g(x, theta=pi/3)
 plot(f, 0, 100)
 ```
@@ -192,7 +183,7 @@ plot(f, 0, 100)
 Which works, but is a bit verbose. It would be more convenient to use
 an anonymous function, to bypass the creation of a throwaway function:
 
-```
+```julia
 plot(x -> g(x, theta=pi/3), 0, 100)
 ```
 
@@ -209,7 +200,7 @@ can simplify many expressions if used properly.
 
 Plot the function $f(x) = x^3 - x$ over $[-2,2]$. How many zeros are there?
 
-```
+```julia; echo=false
 val = 3;
 numericq(val, 1e-16)
 ```
@@ -220,7 +211,7 @@ numericq(val, 1e-16)
 
 Plot the function $f(x) = x^3 - x$. When is the function positive?
 
-```
+```julia; echo=false
 choices = ["`(-Inf, -1)` and `(0,1)`",
 	"`(-Inf, -0.577)` and `(0.577, Inf)`",
 	"`(-1, 0)` and `(1, Inf)`"
@@ -236,7 +227,7 @@ Plot the function $f(x) = 3x^4 + 8x^3 - 18x^2$. Where (what $x$ value)
 is the smallest value? (That is, for which input $x$ is the output
 $f(x) as small as possible.
 
-```
+```julia; echo=false
 f(x) = 3x^4 + 8x^3 - 18x^2
 val = -3;
 numericq(val, 0.25)
@@ -250,7 +241,7 @@ numericq(val, 0.25)
 
 Plot the function $f(x) = 3x^4 + 8x^3 - 18x^2$. What is the smallest value?
 
-```
+```julia; echo=false
 x = -3;
 val = f(x)
 numericq(val, 10)
@@ -261,7 +252,7 @@ numericq(val, 10)
 
 Plot the function $f(x) = 3x^4 + 8x^3 - 18x^2$. When is the function increasing?
 
-```
+```julia; echo=false
 choices = ["`(-Inf, -3)` and `(0, 1)`",
 	"`(-3, 0)` and `(1, Inf)`",
 	"`(-Inf, -4.1)` and `(1.455, Inf)`"
@@ -316,7 +307,7 @@ asymptote at $0$.
 
 One can try a simple plot:
 
-```
+```julia
 plot(x -> 1/x, -3, 3)
 ```
 
@@ -329,7 +320,7 @@ that is plotted. (Alternatively, you can use `NaN` values or multiple
 functions on one.) For this example, we can easily draw the positive
 part:
 
-```
+```julia
 plot(x -> 1/x, 0, 3)
 ```
 
@@ -337,20 +328,20 @@ It is best to avoid the asymptote at $0$ completely by backing away by
 enough to avoid the large range on the $y$ axis. In this case,
 starting around $1/10$ is reasonable:
 
-```
+```julia
 plot(x -> 1/x, 1/10,  3)
 ```
 
 
 Let's look at the rational function
 
-$$~
+```math
 f(x) = \frac{(x-2)(x-3)}{x-1}
-~$$
+```
 
 This will have a vertical asymptote at $1$, zeros at $2$ and $3$ and a slant asymptote. A quick graph from $-10$ to $10$ shows just some of this:
 
-```
+```julia
 f(x) = (x-2)*(x-3)/(x-1)
 plot(f, -10, 10)
 ```
@@ -361,7 +352,7 @@ the domain to plot over.
 
 For example, to graph to the right of the asymptote can be done with:
 
-```
+```julia
 plot(f, 1 + 0.5, 4)
 ```
 
@@ -369,7 +360,7 @@ This shows the two zeros and gives an idea of the relative
 minimum. Similarly, a plot of the left of the asymptote can be
 illustrative. Here we step back by a bit:
 
-```
+```julia
 plot(f, -3, 1 - 0.1)
 ```
 
@@ -388,27 +379,25 @@ was previously described. This just caps off really large values so that
 the vertical asymptotes don't affect the scale of the graph. We can
 see the asymptotes pretty clearly with:
 
-```
+```julia
 plot(rangeclamp(f), -10, 10)
 ```
 
+##### Example Trigonometric functions
 
-```
-example("Trigonometric functions")
-```
 
 Let
 
-$$~
+```math
 f(x) = \frac{5}{\cos x} + \frac{10}{\sin x}.
-~$$
+```
 
 Estimate graphically the minimum value over $(0, \pi/2)$.
 
 The domain comes from the fact that $\sin(0) = 0$ and $\cos(\pi/2) =
 0$, so we will have asymptotes at each. A simple graph shows there are issues:
 
-```
+```julia
 f(x) = 5/cos(x) + 10/sin(x)
 plot(f, 0, pi/2)
 ```
@@ -418,7 +407,7 @@ the graph when the asymptotes are drawn. To remedy, we again back off
 from the boundaries. Since $\sin(x)$ behaves like $x$ near $0$, we pick
 `delta = 0.3` again and expect a max near $10/(3/10) \approx 33$.
 
-```
+```julia
 delta = 0.3;
 plot(f, 0 + delta, pi/2 - delta)
 ```
@@ -435,7 +424,7 @@ with issues when $2x^2 = 10$, or $x = -\sqrt{5}$ or $\sqrt{5}$.
 
 Plot this function from $-5$ to $5$. How many times does it cross the $x$ axis?
 
-```
+```julia
 val = 3;
 numericq(val, .2)
 ```
@@ -448,14 +437,14 @@ The function $f(x) = (x^3 - 2x) / (2x^2 -10)$ has a slant
 asymptote. One can find the slope of this line using algebra, but if
 you prefer the computer, you can graph. Define both
 
-```
+```julia
 f(x) = (x^3 - 2x) / (2x^2 -10)
 g(x) = abs(x) > 5 ? f(x) : NaN
 ```
 
 then plot `g` over $[-20, 20]$. Using algebra or this graph, estimate the slope?
 
-```
+```julia; echo=false
 val = 1/2;
 numericq(val, 5e-1)
 ```
@@ -465,7 +454,7 @@ numericq(val, 5e-1)
 The rational function $f(x) = (x^2 - 3x - 2) / (x^2 - 4)$ has issues
 at $-2$ and $2$. How many times does its graph cross the $x$ axis?
 
-```
+```julia
 val = 2;
 numericq(val, 1e-16)
 ```
@@ -481,7 +470,7 @@ called as we draw a "T" and fill in values to plot for $x$ and $y$.
 For example, a chalkboard after the instructor shows how to plot $f(x)
 = x^2$ might have this drawn on it:
 
-```verbatim
+```julia; eval=false
 x |  y
 ------
 1 |  1
@@ -521,20 +510,20 @@ In many different contexts, `julia` uses `[]` to create collections from individ
 For example, to directly create a 1-dimensional array with the `[]`
 syntax one simply types in the values separated by commas:
 
-```
+```julia
 [1, 2, 3, 4, 5]
 ```
 
 Or
 
-```
+```julia
 [1, 1, 2, 3, 5, 8]
 ```
 
 These create "vectors."  Row vectors (which are arrays, but not of
 type `Vector`) are created when no commas are specified:
 
-```
+```julia
 [13 21 34 55]
 ```
 
@@ -558,7 +547,7 @@ value, though sometimes this happens by a silent conversion. So,
 mixing integer and floating point numbers will produce a container of
 just floating point values:
 
-```
+```julia
 [1, 2.0]
 ```
 
@@ -568,9 +557,9 @@ A basic set of numbers used in programming are the values `1`,`2`,
 ..., `n`. These are the simplest example of an *arithmetic progression* or sequence, which in general can start in a different
 place and have steps of a size different from $1$:
 
-$$~
+```math
 a, a + h, a+2h, a+3h, ..., a + nh
-~$$
+```
 
 It should be possible to specify arithmetic sequences either by
 
@@ -584,13 +573,13 @@ operator the latter.
 Here are 5 evenly spaced numbers from $0$ to $\pi/2$ given by
 `range`
 
-```
+```julia
 range(0, pi/2, length=5)
 ```
 
 The values are not displayed, but will be if `collect`ed:
 
-```
+```julia
 collect(range(0, pi/2, length=5))
 ```
 
@@ -601,7 +590,7 @@ The "range" operator, `:`, is used to specify a step size, like $h$ in
 the definition above. To get values which step by 1 we simply specify
 the start and end values:
 
-```
+```julia
 1:4
 ```
 
@@ -609,7 +598,7 @@ That isn't so impressive. The description `julia` uses to show this
 value is exactly how we defined it, but this range is specifying the
 values 1, 2, 3, 4. To see that, we `collect` the values to make an array:
 
-```
+```julia
 collect(1:4)
 ```
 
@@ -621,7 +610,7 @@ they are not generated.)
 
 The range operator can also work with a step size:
 
-```
+```julia
 a=0; b=10; h=3
 a:h:b
 collect(a:h:b)
@@ -644,7 +633,7 @@ to use.
 
 Which command will produce the sequence $1,3,5,7,9,11, ..., 99$?
 
-```
+```julia; echo=false
 choices=["`range(1, 99, length=2)`",
        "`[1,3,5,7,9,11, ..., 99]`",
        "`1:2:99`",
@@ -657,11 +646,11 @@ radioq(choices, ans)
 
 Which command produces 10 numbers between 0 and 10 that are evenly spaced?
 
-```
+```julia; echo=false
 choices=[
 "`range(0, 10, length=10)`",
 "`0:10`",
-"`0:1:101",
+"`0:1:101`",
 "`[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]`"
 ];
 ans=1;
@@ -673,7 +662,7 @@ radioq(choices, ans)
 Which command does not produce the numbers $1, 2, 3, 4, 5$?
 
 
-```
+```julia; echo=false
 choices=[
 "`range(1, 5, length=5)`",
 "`[1, 2, 3, 4, 5]`",
@@ -690,7 +679,7 @@ radioq(choices, ans)
 Which command does  produces the numbers $1, 1, 2, 3, 5, 8, 13$?
 
 
-```
+```julia; echo=false
 choices=[
 "`[1,1,2,3,5,8,13]`",
 "`1:2:13`",
@@ -711,7 +700,7 @@ element. This allows `julia` to refer to the values by index
 array, `x[1]` is the first value in that array. One can extract and
 *assign* values using indices. A simple example is:
 
-```
+```julia
 x = [2, 3, 5, 7, 11, 13, 17]
 x[1]
 x[3]
@@ -719,43 +708,37 @@ x[3]
 
 There are some special values. The `end` value refers to the last ($n$ th):
 
-```
+```julia
 x[end]
 ```
 
 The $n$ -- or number of elements -- can be returned by `length`:
 
-```
+```julia
 length(x)
 ```
 
 A range object can be used for indices:
 
-```
+```julia
 x[1:3]
 ```
 
 The value `end` can be used in a range when indexing:
 
-```
+```julia
 x[2:end]
 ```
 
 (But not without indexing, as you can see by typing `2:end` by itself.)
 
-
-```
-note("""**Left side of an `=` sign**: `Julia` allows only three
-different types of expressions on the left side of an equals sign:
-
-* a variable name, as in `x = 42`,
-* a function definition, as in `f(x) = x^2 - 2`, or
-* a assignment setting an index, as in `x[1] = 2`.
-
-The left side is quite unlike a math equation, where arbitray
-expressions are typical.
-""")
-```
+!!! note "Left side of an equals sign"
+	`Julia` allows only three
+    different types of expressions on the left side of an equals sign:
+	* a variable name, as in `x = 42`,
+    * a function definition, as in `f(x) = x^2 - 2`, or
+    * a assignment setting an index, as in `x[1] = 2`.
+	The left side is quite unlike a math equation, where arbitrary expressions are typical.
 
 
 ### Practice
@@ -764,13 +747,13 @@ expressions are typical.
 
 Let
 
-```
+```julia;
 x = [1, 1, 2, 3, 5, 8, 13]
 ```
 
 What is the value of `x[end - 1] + x[end]`?
 
-```
+```julia; echo=false
 val = x[end - 1] + x[end];
 numericq(val, 1e-16)
 ```
@@ -779,13 +762,13 @@ numericq(val, 1e-16)
 
 Let
 
-```
+```julia
 x = [1, 1, 2, 3, 5, 8, 13]
 ```
 
 What is the value of `x[3]`?
 
-```
+```julia; echo=false
 val = x[3];
 numericq(val, 1e-16)
 ```
@@ -795,14 +778,14 @@ numericq(val, 1e-16)
 
 When a vector is created, if possible, the resulting values are converted to be the same type.  Let
 
-```
+```julia
 x = [1, 2.0]
 y = [1, 2.0, "three"]
 ```
 
 For   `x[1]` and `y[1]` what does `typeof` return?
 
-```
+```julia; echo=false
 choices = ["(Float, Integer)",
 	"(Integer, Integer)",
 	"(Integer, ASCIIString)"
@@ -816,7 +799,7 @@ radioq(choices, ans)
 
 
 
-## Mapping <small>a function to multiple values</small>
+## Mapping a function to multiple values
 
 To specify the $y$ values we wish to "map" the function `f` to each
 $x$ value.  In `julia` there are many different ways to do this, we
@@ -837,20 +820,20 @@ basically taking `[x1, x2, ..., xn]` and returning `[f(x1), f(x2),
 For example, let's look at the simple polynomial $f(x) = -16x^2 +
 32x$. We define our `julia` function with:
 
-```
+```julia
 f(x) = -16x^2 + 32x
 ```
 
 If we want to look at this function for $x$ values between $0$ and $2$
 we might define the $x$ values with:
 
-```
+```julia
 x = range(0, 2, length=5)
 ```
 
 Then the `map` function will create the corresponding $y$ values:
 
-```
+```julia
 map(f, x)
 ```
 
@@ -862,7 +845,7 @@ vector.
 
 It is also quite common to use anonymous functions with `map`. For example:
 
-```
+```julia
 map(u -> 10 * u^2, x)
 ```
 
@@ -876,7 +859,7 @@ is not necessary.
 with a simple notational trick or inserting a "." *before* the
 parenthesis. To see, we have:
 
-```
+```julia
 sin.([1,2,3])
 ```
 
@@ -887,19 +870,14 @@ possible by replication. For example, this command find the logarithm
 of 5 for different bases. The value 5 is replicated once for each of
 the bases:
 
-```
+```julia
 log.([2,pi,5,10], 5)
 ```
 
 
-
-```
-note("""
-The "dot" broadcasting is very succinct and useful, but using `map` is
-more explicit and easier to reason about. We will mostly use broadcasting due to the simplicity.
-""")
-```
-
+!!! note
+	The "dot" broadcasting is very succinct and useful, but using `map` is
+	more explicit and easier to reason about. We will mostly use broadcasting due to the simplicity.
 
 
 ### Comprehensions
@@ -907,9 +885,9 @@ more explicit and easier to reason about. We will mostly use broadcasting due to
 Mathematicians are fond of set notation, as in this way to describe
 the $y$ values in a graph:
 
-$$~
+```math
 y = \{ f(x): x \text{ in } [0, 2] \},
-~$$
+```
 
 This is read: "the values $f(x)$ *for* each $x$ in the interval $[0,2]$."
 
@@ -917,7 +895,7 @@ Here we define values `xs` to represent the continuum of values in
 the interval $[0,2]$, then use a "comprehension" to create the set
 notation above. The syntax is similar:
 
-```
+```julia
 xs = range(0, 2.0, length=5)
 [f(x) for x in xs]
 ```
@@ -952,7 +930,7 @@ container to hold the new values, using the `similar` function to make a
 vector of the same size as `x` below (but fills it with
 nonsense):
 
-```
+```julia
 y = similar(x);
 for i in 1:length(x)
    y[i] = f( x[i] )
@@ -978,7 +956,7 @@ when we need to refer to more than one index. An example of that is
 the following way to create a Fibonacci pattern from the formula $x_i
 = x_{i-1} + x_{i-2}$:
 
-```
+```julia
 x = zeros(Int, 10); 		## pre-allocate an integer array
 x[1:2] = [1,1]
 for i in 3:length(x)
@@ -990,7 +968,7 @@ Related to a `for` loop is the `while` loop. This will repeat as long
 as some condition is true. The following pattern reproduces a `for`
 loop:
 
-```verbatim
+```julia; eval=false
 i, n = 1, length(x)
 while (i <= n)
   print( x[i], " " )			## do something ...
@@ -1008,7 +986,7 @@ until some computed value gets close to $0$.
 Putting this altogether, to create the "T"-table used to graph $y=x^2$,
 we could do any of these:
 
-```
+```julia
 f(x) = x^2
 xs = 1:4
 ys = map(f, xs)
@@ -1017,7 +995,7 @@ ys = map(f, xs)
 
 or
 
-```
+```julia
 f(x) = x^2
 xs = 1:4
 ys = f.(xs)
@@ -1026,7 +1004,7 @@ ys = f.(xs)
 
 or
 
-```
+```julia
 xs = [1, 2, 3, 4]
 ys = [x^2 for x in xs]
 [xs ys]
@@ -1035,7 +1013,7 @@ ys = [x^2 for x in xs]
 or
 
 
-```
+```julia
 xs = 1:4
 ys = similar(xs)
 for i in 1:length(xs)
@@ -1055,11 +1033,11 @@ Many options, but the shortest to type is simply `[xs f.(xs)]`, so that is what 
 
 Does this command produce the values $\{.1, .01, .001, .0001\}$?
 
-```noout
+```julia; eval=false
 x = [(1/10)^i for i in 1:4]
 ```
 
-```
+```julia; echo=false
 booleanq(true)
 ```
 
@@ -1069,7 +1047,7 @@ booleanq(true)
 Let $f(x) = x^2 - 2x$. Which command will produce the $y$ values for plotting $f$ over $[0, 2]$?
 
 
-```
+```julia; echo=false
 choices=[
 "`[f(x) for x in [0,2]]`",
 "`map(f(x), [0,2])`",
@@ -1083,12 +1061,12 @@ radioq(choices, ans)
 
 Will this command produce $y$ values for plotting $f(x)$ over $[0,1]$?
 
-```noout
+```julia; eval=false
 f(x) = x^2 - 2x
 [f(x) for x in 0:1/100:1];
 ```
 
-```
+```julia; echo=false
 booleanq(true)
 ```
 
@@ -1098,13 +1076,13 @@ booleanq(true)
 If one has two vectors `xvals` and `yvals` of equal size then creating
 a graphic for them is straightforward. The basic syntax is
 
-```verbatim
+```julia; eval=false
 plot(xvals, yvals)
 ```
 
 For example, to plot $y=x^2$ over $[-1,1]$ we might do:
 
-```
+```julia
 f(x) = x^2
 xs = range(-1, 1, length=101)
 ys = f.(xs)
@@ -1114,7 +1092,7 @@ plot(xs, ys)
 
 One can place both to get both points and lines. The `scatter` function will plot the points, but not connect the lines. In the following, the `scatter!` function is used. (Not the `!` at the end.) This form adds the plot of the lines to the last graph, rather than make a new one.
 
-```
+```julia
 xs = range(-2, 2, length=5)
 ys = f.(xs)
 plot(xs, ys)
@@ -1129,7 +1107,7 @@ We use layering to plot two or more functions at once, though there are alternat
 
 For example, to graph both the sine and cosine function we have:
 
-```
+```julia
 plot(sin, 0, 2pi)
 plot!(cos)
 ```
@@ -1137,7 +1115,7 @@ plot!(cos)
 
 Or to compare the effects of a simple transformation:
 
-```
+```julia
 f(x) = x^2
 g(x) = 15 + f(x-3)
 plot(f, -10, 10)
@@ -1146,7 +1124,7 @@ plot!(g)
 
 To print a heavier $x$-axis, we can graph the function $y=0$, specified through the anonymous function `x -> 0`:
 
-```
+```julia
 f(x) = x^2 - 2
 plot(f, -2, 2)
 plot!(x -> 0)
@@ -1154,16 +1132,14 @@ plot!(x -> 0)
 
 The above, may also be done with `zero`:
 
-```
+```julia
 plot(f, -2, 2)
 plot!(zero, -2, 2)   # zero is a function returning 0, useful for programming in general.
 ```
 
 
 
-```
-example("Operators, aka. derived functions")
-```
+##### Example: Operators, aka. derived functions"
 
 Often we wish to plot a function derived from another function. For
 example, this is used to add a secant line to a graph. The following
@@ -1171,7 +1147,7 @@ function (which is in the `MTH229` package) will create a function
 which represents the secant line of $f(x)$ between two points, $a$ and
 $b$:
 
-```verbatim
+```julia; eval=false
 function secant(f, a, b)
 	 m =  (f(b) - f(a)) / (b-a)	# slope of secant line
 	 x -> f(a) + m * (x - a)
@@ -1188,7 +1164,7 @@ an argument and returns a function.
 
 Using this function makes it simple to add a secant line to a graph.
 
-```
+```julia
 f(x) = sin(x)
 a, b = 0, pi/2
 plot(f, a, b)
@@ -1203,15 +1179,15 @@ plot!(secant(f, a, b))
 
 Define $f(x)$ to be a triangular function as follows:
 
-```
+```julia
 f(x) = max(0, 1.0 - abs(x))
 ```
 
 In many applications, the following transformation is employed:
 
-$$~
+```math
 g(x, c, h) = \frac{1}{h} f(\frac{x - c}{h})
-~$$
+```
 
 For constants $h$ and $c$.
 
@@ -1219,7 +1195,7 @@ Make a graph of both $f(x)$ and $g(x, 1, 1/2)$ over the interval $[-2,3]$. Consu
 
 
 
-```
+```julia; echo=false
 choices = ["The graph of g is centered at c=1 and has maximum height h=1/2",
 	   "The graph of g is centered at c=1 and has area h=1/2",
 	   "The graph of g is centered at c=1 and has area 1/h=2",
@@ -1234,7 +1210,7 @@ radioq(choices, ans)
 
 We saw that this  will produce two graphs:
 
-```
+```julia
 plot(sin, 0, 2pi)
 plot!(x -> cos(x) > 0 ? 0.0 : NaN)
 ```
@@ -1242,7 +1218,7 @@ plot!(x -> cos(x) > 0 ? 0.0 : NaN)
 What is the sine curve doing when the flat line is drawn?
 
 
-```
+```julia; echo=false
 choices = ["Oscillating: Going up and down",
 	   "Only decreasing",
 	   "Only increasing",
@@ -1260,7 +1236,7 @@ Make a graph of $f(x) = x$, $g(x) = \tan(x)$, and $h(x) =
 the following below seems correct?
 
 
-```
+```julia; echo=false
 choices = [
 	L" f < g < h",
 	L" g < f < h",

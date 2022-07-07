@@ -17,11 +17,9 @@ The following definitions describe features of functions over an interval:
   above the graph of $f(x)$.
 
 
-```
-note("""
-There are similar definitions for *negative*, *decreasing*, and *concave down*.
-""")
-```
+!!! note
+	There are similar definitions for *negative*, *decreasing*, and *concave down*.
+
 
 ### Consequences
 
@@ -42,16 +40,11 @@ You may be more familiar with these implications for functions with derivatives:
   increasing on $I$, and so $f(x)$ is concave up on $I$.
 
 
-```
-alert("""
-
-Pay attention to the difference between positive and non-negative. For
-example, an increasing, differentiable function on *I=(a,b)* is only
-guaranteed to have a *non-negative* derivative -- not a *positive*
-derivative on *I*.
-
-""", title="Positive and negative.")
-```
+!!! note "Positive and negative"
+	Pay attention to the difference between positive and non-negative. For
+	example, an increasing, differentiable function on *I=(a,b)* is only
+	guaranteed to have a *non-negative* derivative -- not a *positive*
+	derivative on *I*.
 
 
 
@@ -60,13 +53,15 @@ derivative on *I*.
 
 We load `MTH229` to provide access to graphing, the `'` notation, and the `plotif` function:
 
-```
+```julia
 using MTH229
 using Plots
+plotly()
 ```
 
-```nocode, noout
-plotly()
+```julia; echo=false
+using QuizQuestions
+using LaTeXStrings
 ```
 
 
@@ -78,7 +73,7 @@ twice over `[a,b]`, the second time doing so only *if* $g(x) \geq 0$.
 
 We can plot when a function is positive by using `f` for `g`. For example, when $f(x) = x^3 - 2x - 1/2$ we make the plot
 
-```
+```julia
 f(x) = x^3 - 2x - 1/2
 plotif(f, f, -2, 2)
 ```
@@ -92,7 +87,7 @@ window.
 We can do the same with the derivative, then our graph will show when
 the function is increasing:
 
-```
+```julia
 plotif(f, f', -2, 2)
 ```
 
@@ -103,7 +98,7 @@ $(-2, -0.8)$ and $(0.8, 2)$.
 
 And of course, using when the second derivative is positive shows where `f` is concave up:
 
-```
+```julia
 plotif(f,  f'', -2, 2)
 ```
 
@@ -115,7 +110,7 @@ We can see the function is concave up on $(0, 2)$.
 
 Graphically identify when the function $f(x) = x^x$ is increasing on $(0,2)$
 
-```
+```julia; echo=false
 choices = ["(0,2)", "(0.4, 2)"];
 ans = 2;
 radioq(choices, ans)
@@ -125,7 +120,7 @@ radioq(choices, ans)
 
 Graphically identify when the function $f(x) = \sqrt{|1 - x^2|}$ is increasing on the interval $[-2, 2]$.
 
-```
+```julia; echo=false
 choices = ["(-2, -1) and (0,1)",
 	"(-1, 0) and (1, 2)",
 	"(-2, 2)"];
@@ -140,7 +135,7 @@ radioq(choices, ans)
 
 Graphically identify when the function $f(x) = x^2 \cdot e^{-x}$ is concave up on the interval $(0,10)$.
 
-```
+```julia; echo=false
 choices = ["(0, 0.6) and (3.5, 10)",
 	"(0.6, 3.5)",
 	"(0, 2)",
@@ -174,13 +169,13 @@ $(0,4)$?
 
 We make two graphs:
 
-```
+```julia
 fp(x) = exp(x)
 plotif(fp, fp, 0, 4)
 ```
 
 
-```
+```julia
 plotif(fp, fp', 0, 4)
 ```
 
@@ -205,7 +200,7 @@ $f(x)$ on the interval $(-1,3)$?
 A plot to see where the second derivative is positive will show that this
 $f''(x)$ is positive on $(-1, 0)$ and $(2,3)$:
 
-```
+```julia
 fpp(x) = x^2 - 2x
 plotif(fpp, fpp, -1, 3)
 ```
@@ -224,7 +219,7 @@ derivative.
 
 You know that $f'(x) = |x|$. Over $[-1,1]$ where if $f(x)$ increasing and where is it concave up?
 
-```
+```julia; echo=false
 choices=["You don't know -- the derivative of |x| does not exist",
 	 L"f is increasing on $(0,1)$ and concave up on $(-1,1)$",
  L"f is increasing on $(-1,1)$ and concave up on $(0,1)$"];
@@ -237,7 +232,7 @@ radioq(choices, ans)
 
 Suppose $f'(x) = (x^4 - x^2 + 2)/(x^4 - 2x^2 + 1)$. When is $f(x)$ increasing on $(-2, 2)$?
 
-```
+```julia; echo=false
 choices = ["On (-2, -1) and (0, 1)",
 	"On (-1, 1)",
 	"Wherever it is defined"];
@@ -252,10 +247,10 @@ If $f'(x) = \tan(x) - 3x/2$. When is $f(x)$ concave down on the
 interval $(-\pi/3, \pi/3)$?
 
 
-```
-choices = ["(-pi/3, pi/3)",
-	"(-0.6, 0.6)",
-	"(-pi/3, 0)"];
+```julia; echo=false
+choices = ["``(-\pi/3, \pi/3)``",
+	"``(-0.6, 0.6)``",
+	"``(-\pi/3, 0)``"];
 ans = 2;
 radioq(choices, ans)
 ```
@@ -295,7 +290,7 @@ As $f(x)$ is everywhere differentiable, these critical points would be
 where the derivative is $0$. A plot helps us identify how many and
 roughly where:
 
-```
+```julia
 f(x) = 2sin(x) + cos(2x)
 plot(f', 0, 2pi)
 ```
@@ -303,23 +298,32 @@ plot(f', 0, 2pi)
 We see four: one near 0.8, one near 1.5, one near 2.5 and one near
 5. We use `find_zeros` to identify:
 
-```
+```julia
 cps = find_zeros(f', 0, 6)
 ```
 
 Use the first derivative test to classify these values as relative
 maximum or minimum. From the graph of `f'` we see at the first one
 the derivative is changing sign from positive to negative at the first
-one (hence a local maximum), and this alternates as we go along. So we
+one (hence a local maximum), and this alternates as we go along.
+
+The `MTH229` package has a `sign_chart` function to do check numerically for sign changes of a function:
+
+```julia
+sign_chart(f', 0, 4)
+```
+
+
+So by the first derivative test we
 have a max, min, max, min which we see when we plot `f`:
 
-```
+```julia
 plot(f, 0, 2pi)
 ```
 
 To get the same from the second derivative test, we evaluate $f''(x)$ at these four points:
 
-```
+```julia
 f''.(cps)
 ```
 
@@ -327,7 +331,7 @@ f''.(cps)
 
 If you wanted something fancy, you could convert using `sign`:
 
-```
+```julia
 ["max", "can't tell", "min"][2 .+ Int.(sign.(f''.(cps)))]
 ```
 
@@ -336,7 +340,7 @@ If you wanted something fancy, you could convert using `sign`:
 
 Let $f'(x) = x^4 - 4x^2 + 1$. Classify all relative extrema of $f(x)$ on the interval $(-1, 1)$.
 
-```
+```julia; echo=false
 choices =[
 	"at 0 there is a maximum",
 	"Near -1.93185 and 0.51763 there are relative maxima, near 1.93185 and -0.51763 there are relative minima",
@@ -353,7 +357,7 @@ Let `fp(x) = (2x-1)/cbrt(x^2 - x - 2)^2)`. Over the interval $(-1.5,1.5)$
 identify all relative maxima and minima of $f(x)$.
 
 
-```
+```julia; echo=false
 choices=["-1 is a relative min and 0.5 is a maximum",
 	"-1 is a critical point but not an extram, 0.5 is a relative minimum",
 	"This function only has an asymptote at -1, no relative extrema"];
@@ -372,7 +376,7 @@ radioq(choices, ans)
 Suppose, $f(x)$ has a critical  at $0$ and $1$. If possible, classify them as relative maximum or minimum assuming $f''(x) = 1 - 2x - \sin(x)$
 
 
-```
+```julia; echo=false
 choices = ["0 is  relative minimum, 1 is a relative max",
 	"0 is a relative maximum, 1 is a relative minimum",
 	"both are relative maximum",

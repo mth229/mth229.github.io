@@ -15,18 +15,18 @@ numbers is as well.
 However, in general, the problem of finding one
 (or all) solutions to the equation
 
-$$~
+```math
 f(x) = 0.
-~$$
+```
 
 for an arbitrary $f$ has no well-defined process.
 
 A related problem is to find one (or all) solutions to an equation of
 this type:
 
-$$~
+```math
 f(x) = g(x)
-~$$
+```
 
 Conceptually this is identical to the above, as we just set $h(x) =
 f(x) - g(x)$ and solve for when $h(x)$ is $0$.
@@ -39,13 +39,15 @@ Here we discuss a few different elementary means to do find zeros with
 We will use the add-on package `Roots`  which
 provides implementations of a few zero- and root-finding algorithms.
 
-```
+```julia
 using MTH229
 using Plots
+plotly()
 ```
 
-```nocode, noout
-plotly()
+```julia; echo=false
+using QuizQuestions
+using LaTeXStrings
 ```
 
 
@@ -58,22 +60,20 @@ relatively simple form allows for many explicit things to be known. A
 famous example is the **quadratic formula** which for polynomials of
 degree 2 gives an explicit formula for the *roots*:
 
-$$~
+```math
 \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}.
-~$$
+```
 
-```
-alert("""
-A "root" of a polynomial is just a polynomial-specific
-name for a zero of the polynomial viewed as a function.
-""")
-```
+!!! note "Alert"
+	A "root" of a polynomial is just a polynomial-specific
+	name for a zero of the polynomial viewed as a function.
+
 
 
 For example, if we have the quadratic polynomial $2x^2 + 3x - 2$ we can solve
 for the roots with:
 
-```
+```julia
 a = 2; b = 3; c = -2
 discr = b^2 - 4*a*c
 (-b + sqrt(discr))/(2a), (-b - sqrt(discr))/(2a)
@@ -84,7 +84,7 @@ If you wanted to write a function to do this, it would be
 straightforward, save the detail of needing to make a negative number
 complex in order to take its square root:
 
-```
+```julia
 ## find roots of ax^2 + bx + c
 function quadratic(a, b, c)
   discr = b^2 - 4*a*c
@@ -95,18 +95,16 @@ end
 ```
 
 
-```
-alert("""
-This is an example where the function is not *type-stable* as it
-returns either real-valued answers or complex-valued answers depending
-on the *values* of the input variables. In general, `Julia` functions
-avoid this behaviour, as it leads to less performant code.
-""")
-```
+!!! note "Alert"
+	This is an example where the function is not *type-stable* as it
+	returns either real-valued answers or complex-valued answers depending
+	on the *values* of the input variables. In general, `Julia` functions
+	avoid this behaviour, as it leads to less performant code.
+
 
 To find the roots of $x^2 + x - 1$ we could simply use:
 
-```
+```julia
 quadratic(1, 1, -1)
 ```
 
@@ -135,9 +133,7 @@ bisection algorithm for root finding.
 
 
 
-```
-example("Finding a zero")
-```
+##### Finding a zero
 
 The flight of an arrow can be modeled using various functions,
 depending on assumptions. Suppose an arrow is launched in the air from
@@ -146,13 +142,13 @@ a height of 0 feet above the ground at an angle of $\theta =
 without wind resistance for the height of the arrow at a distance $x$
 units away may be:
 
-$$~
+```math
 j(x) = \tan(\theta) x - (1/2) \cdot g(\frac{x}{v_0 \cos\theta})^2.
-~$$
+```
 
 In `Julia` we have, taking $v_0=200$:
 
-```
+```julia
 j(x; theta=pi/4, g=32, v0=200) = tan(theta)*x - (1/2)*g*(x/(v0*cos(theta)))^2
 ```
 
@@ -160,16 +156,16 @@ j(x; theta=pi/4, g=32, v0=200) = tan(theta)*x - (1/2)*g*(x/(v0*cos(theta)))^2
 With a velocity-dependent wind resistance given by $\gamma$, again with some units, a similar
 equation can be constructed. It takes a different form:
 
-$$~
+```math
 y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
       \frac{g}{\gamma^2}\log(\frac{v_0\cos(\theta) - \gamma x}{v_0\cos(\theta)})
-~$$
+```
 
 Again, $v_0$ is the initial velocity and is taken to be $200$
 and $\gamma$ a resistance, which we take to be $1$. With this, we have
 the following `Julia` definition (with a slight reworking of $\gamma$):
 
-```
+```julia
 function y(x; theta=pi/4, g=32, v0=200, gamma=1)
 	 a = gamma * v0 * cos(theta)
 	 (g/a + tan(theta)) * x + g/gamma^2 * log((a-gamma^2 * x)/a)
@@ -184,14 +180,14 @@ before touching the ground?
 For the model without wind resistance, we can graph the function
 easily enough. Let's guess the distance is no more than 500 feet:
 
-```
+```julia
 plot(j, 0, 500)
 ```
 
 Well, we haven't even seen the peak yet. Plotting over a wider interval will show that
 $1250$ is the largest root. So we plot over this domain to visualize the flight:
 
-```
+```julia
 plot(j, 0, 1250)
 ```
 
@@ -199,7 +195,7 @@ plot(j, 0, 1250)
 
 As for the model with wind resistance,  a quick plot over the same interval, $[0, 1250]$ yields:
 
-```
+```julia
 plot(y, 0, 1250)
 ```
 
@@ -207,7 +203,7 @@ Oh, "Domain Error." Of course, when the argument to the logarithm is negative we
 
 We solve for when $a-\gamma^2 x$ is $0$:
 
-```
+```julia
 gamma = 1
 a = 200 * cos(pi/4)
 b = a/gamma^2
@@ -215,19 +211,19 @@ b = a/gamma^2
 We try on the reduced interval avoiding
 the obvious *asymptote* at `b`  by subtracting $1$:
 
-```
+```julia
 plot(y, 0, b - 1)
 ```
 
 
 Now we can see the zero is around 140. We re-plot:
 
-```
+```julia
 plot(y, 135, 141)
 ```
 
 
-```
+```julia
 plot(y, 140, 141)
 plot!(zero)
 ```
@@ -238,7 +234,7 @@ The answer is approximately $140.7$
 Finally, we plot both graphs at once to see that it was a very windy
 day indeed.
 
-```
+```julia
 b = 140.7
 plot(j , 0, 1250)
 plot!(y, 0, b)
@@ -246,9 +242,7 @@ plot!(y, 0, b)
 
 
 
-```
-example("Finding a zero")
-```
+##### Example: Finding a zero
 
 
 Sometimes, the equation $f(x)=0$ is actually presented as $h(x)=
@@ -266,14 +260,14 @@ There are some cases where plan 1 is cheaper and some where plan 2 is. Categoriz
 
 Both plans are *linear models* and may be expressed in *slope-intercept* form:
 
-```
+```julia
 plan1(x) = 47.49 + 0.77x
 plan2(x) = 30.00 + 2.00x
 ```
 
 Assuming this is a realistic problem and an average American household might produce 10-20 bags of trash a month (yes, that seems too much!) we plot in that range:
 
-```
+```julia
 plot(plan1, 10, 20)
 plot!(plan2)
 ```
@@ -289,7 +283,7 @@ cheaper, otherwise they should opt for plan 1.
 
 Graphically estimate the one zero of $f(x) = e^x - x^3$ over the interval $[0,4]$.
 
-```
+```julia
 val = fzero(x -> e^x - x^3, [0,4])
 numericq(val, 1e-1)
 ```
@@ -303,7 +297,7 @@ graphically. One method is to plot *both* functions and look for
 crossing points. Use this approach to graphically estimate all
 solutions to $\cos(x) = x^2$ over the interval $(-\pi/2, \pi/2)$. What are they?
 
-```
+```julia; echo=false
 choices = ["-1.57, 1.57",
 	"-0.82, 0.82",
 	"0.0"]
@@ -323,7 +317,7 @@ function are all
 negative. The first one is between $-3$ and $-1$. Find it graphically.
 
 
-```
+```julia; echo=false
 val = fzero(airyai, -3, -1);
 numericq(val, 1e-1)
 ```
@@ -338,11 +332,11 @@ The polynomial $f(x) = x^5 - 6x^3 - 6x^2 -7x - 6$ has three real
 roots. Which of the following values is one of them? Try to solve this
 graphically.
 
-```
+```julia; echo=false
 using Random
 rts =[-2, -1, 3];
 x = rts[randperm(3)[1]];
-choices = round.([x, -5 + 10*rand(2)], 3, 10);
+choices = [5, -1, 3, -2]
 ans = 1;
 radioq(choices, ans)
 ```
@@ -352,7 +346,7 @@ radioq(choices, ans)
 
 Let $y(x)$ be defined as above to model the flight of an arrow. If $\gamma=1/2$ when will the arrow strike the ground after launch?
 
-```
+```julia; echo=false
 function y(x; theta=pi/4, g=-32, v0=200, gamma=1)
 	 a = gamma * v0 * cos(theta)
 	 (g/a + tan(theta)) * x - g/gamma^2 * log((a-gamma^2 * x)/a)
@@ -370,13 +364,13 @@ numericq(val, 2)
 
 Let $y(x)$ be defined as above to model the flight of an arrow. Suppose a hill is in the path of the arrow. The hill is given by this function:
 
-```
+```julia
 hill(x) = x > 100 ? 2.0*(x-100) : 0.0
 ```
 
 By solving `y(x) = hill(x)` solve for how far the arrow will fly before hitting the hill.
 
-```
+```julia; echo=false
 function y(x; theta=pi/4, g=-32, v0=200, gamma=1)
 	 a = gamma * v0 * cos(theta)
 	 (g/a + tan(theta)) * x - g/gamma^2 * log((a-gamma^2 * x)/a)
@@ -417,13 +411,11 @@ The bisection algorithm utilizes Bolzano's observation. It is a simple *iterativ
 such a value $c$ when we have a continuous function and a bracketing
 interval.
 
-```
-alert(L"""
-The bisection method does not work when the function does not **cross**
-the $x$ axis at the root. For example, the zero at $0$ of $f(x) = x^2 e^x$
-would not be found with this method.
-""")
-```
+!!! note "Alert"
+	The bisection method does not work when the function does not **cross**
+	the $x$ axis at the root. For example, the zero at $0$ of $f(x) = x^2 e^x$
+	would not be found with this method.
+
 
 Mathematically the basic idea is simple.
 
@@ -441,7 +433,7 @@ converge to an answer.
 
 Graphically, we could do this. For example, Let's consider $f(x) = x^2 - 2$ with the bracketing interval $[1,2]$. We first plot:
 
-```
+```julia
 f(x) = x^2 - 2
 a,b = 1, 2
 plot(f, a, b)
@@ -449,21 +441,21 @@ plot(f, a, b)
 
 We can see that $c = (a + b)/2 = 3/2$ will have $f(c) > 0$, so the new bracket is $[a,c]$:
 
-```
+```julia
 a, b = a, (a + b)/2
 plot(f, a, b)
 ```
 
 Now the midpoint is negative, so we modify `a`:
 
-```
+```julia
 a, b = (a + b)/2, b
 plot(f, a, b)
 ```
 
 And again, this has a midpoint in the negative territory so again we modify `a`:
 
-```
+```julia
 a, b = (a + b)/2, b
 plot(f, a, b)
 ```
@@ -473,7 +465,7 @@ And now, as the midpoint is in positive territory we would modify $b$ ...
 
 This gets tedious to do graphically. But it can be easily programmed. The main step might look something like this:
 
-```
+```julia
 f(x) = x^2 - 2
 a, b = 1, 2
 
@@ -506,7 +498,7 @@ other -- and hence there is no midpoint. (Well, there are some cases that sugges
 So even though this doesn't make mathematical sense we can try stopping when
 the following condition is no longer true:
 
-```
+```julia
 a < c < b
 ```
 
@@ -519,12 +511,12 @@ The `MTH229` package has a `bisection` method implemented for this which also ou
 Okay, let's look at the function $f(x) = -16x^2 + 32x$. We know that 0
 and $2$ are roots. Let's see if our algorithm finds them:
 
-```
+```julia
 f(x) = -16x^2 + 32x
 bisection(f, -1, 1) ## should find 0
 ```
 
-```
+```julia
 bisection(f, 1, 3)  ## should find 2
 ```
 
@@ -532,7 +524,7 @@ Okay, it seems to work. Lets try it on a less trivial problem. We know
 $\sin(x)$ and $\cos(x)$ cross in the interval $[0, \pi/2]$. If we are
 too tired to remember where, we can simply ask:
 
-```
+```julia
 f(x) = cos(x) - sin(x)
 x = bisection(f, 0, pi/2)
 ```
@@ -540,7 +532,7 @@ x = bisection(f, 0, pi/2)
 Is `x` really a zero?
 
 
-```
+```julia
 x, f(x)
 ```
 
@@ -551,7 +543,7 @@ close to $0$ as can be possible using floating point values.
 
 The `nextfloat` and `prevfloat` functions find the floating point values just bigger than `x` and just smaller. In this case we have:
 
-```
+```julia
 f(x) * f(nextfloat(x))
 ```
 
@@ -570,9 +562,9 @@ but does not need to typed in.
 For example, to find a root of $f(x) = 2x \cdot \exp(-20) - 2 \cdot
 \exp(-20x) + 1$ in the interval $[0,1]$ we have:
 
-```
+```julia
 using Roots
-f(x) = 2x*exp(-20) - 2*exp(-20x) + 1
+f(x) = 2x * exp(-20) - 2 * exp(-20x) + 1
 find_zero(f, (0, 1))
 ```
 
@@ -585,21 +577,18 @@ different notion of the midpoint.
 
 A slightly different interface is given by the `fzero` function, where that above would be:
 
-```
+```julia
 fzero(f, 0, 1)
 ```
 
 
-```
-example("Graphical and numerical answers")
-```
+##### Example: Graphical and numerical answers
 
 
 One needs to know where to look in order to use the bisection
 method. The basic "one-two punch" is:
 
-* graph the function to identify quickly values $[a,b]$ which bound a
-zero, then
+* graph the function to identify quickly values $[a,b]$ which bound a zero, then
 
 * use the bisection method to find the zero to many decimal points.
 
@@ -616,7 +605,7 @@ problem is to find solutions to $e^x - x^4 = 0$.
 A quick plot shows that the function has such a wide range that
 looking over the entire domain at once will be problematic:
 
-```
+```julia
 f(x) = exp(x) - x^4
 plot(f, 0, 10)
 ```
@@ -626,19 +615,19 @@ Instead, we look between $[0,3]$ and $[8,9]$. A quick confirmation
 shows these are good choices to use. For example, between $8$ and $9$
 we have:
 
-```
+```julia
 plot(f, 8, 9)
 ```
 
 So we find the values of the zero in the bracketed region $[8,9]$:
 
-```
+```julia
 find_zero(f, (8, 9))
 ```
 
 The root within $[0, 3]$ is found with:
 
-```
+```julia
 find_zero(f, (0, 3))
 ```
 
@@ -651,7 +640,7 @@ In the bisection method algorithm we checked that the value of $f$ at
 $a$ and $b$ had opposite signs by looking at $f(a)\cdot f(b)$. Why did
 this work?
 
-```
+```julia; echo=false
 choices = ["The product of two numbers is never negative",
 	   "The product of 2 numbers with opposite signs is negative, the product of 2 numbers with the same signs is positive",
 	   "The product of two numbers will have the sign of the first one."
@@ -661,19 +650,19 @@ radioq(choices, ans)
 ```
 
 
-#### Question <small>Are there other roots in [-10, 0]?</small>
+#### Question: Are there other roots in [-10, 0]?
 
 There is another root in the interval $[-10, 0]$ for the function
 $f(x) = e^x - x^4$. Find its value numerically:
 
-```
+```julia
 f(x) = exp(x) - x^2
 val = find_zero(f, (-10, 0));
 numericq(val, 1e-3)
 ```
 
 
-#### Question <small>Relation between $x^2$ and $x \log(x)$</small>
+#### Question: Relation between $x^2$ and $x \log(x)$
 
 
 
@@ -682,7 +671,7 @@ zeros on the positive $x$ axis. You are asked to find the largest
 (graph and bracket...):
 
 
-```
+```julia; echo=false
 b = 10
 f(x) =  x^2 - b * x * log(x)
 val = find_zero(f, (10, 500))
@@ -694,14 +683,14 @@ The `airyai` function has infinitely many negative roots, as the function oscill
 
 
 
-```
+```julia; echo=false
 val = find_zero(airyai, (-5, -4))
 numericq(val, 1e-8)
 ```
 
-#### Question <small>What goes up must come down...</small>
+#### Question: What goes up must come down...
 
-<img src="http://ej.iop.org/images/0143-0807/33/1/149/Full/ejp405251f1_online.jpg" height="200" width="300" />
+![Up and down](http://ej.iop.org/images/0143-0807/33/1/149/Full/ejp405251f1_online.jpg)
 
 In 1638, according to [Amir
 D. Aczel](http://books.google.com/books?id=kvGt2OlUnQ4C&pg=PA28&lpg=PA28&dq=mersenne+cannon+ball+tests&source=bl&ots=wEUd7e0jFk&sig=LpFuPoUvODzJdaoug4CJsIGZZHw&hl=en&sa=X&ei=KUGcU6OAKJCfyASnioCoBA&ved=0CCEQ6AEwAA#v=onepage&q=mersenne%20cannon%20ball%20tests&f=false),
@@ -722,7 +711,7 @@ function, but later will be known as the derivative.
 
 Let $v_0= 390$. The three times in question can be found from the zeros of `f` and `f'`. What are they?
 
-```
+```julia; echo=false
 choices = [L"(0.0, 12.1875, 24.375)",
 	L"(-4.9731, 0.0, 4.9731)",
 	L"(0.0, 625.0, 1250.0)"]
@@ -730,15 +719,15 @@ ans = 1
 radioq(choices, ans)
 ```
 
-#### Question <small>What goes up must come down... (again)</small>
+#### Question: What goes up must come down... (again)<
 
 For simple ballistic motion you find that the time to go up is the
 time to come down. For motion within a resistant medium, such as air,
 this isn't the case. Suppose a model for the height as a function of time is given by
 
-$$~
+```math
 h(t) = (\frac{g}{\gamma^2} + \frac{v_0}{\gamma})(1 - e^{-\gamma t}) - \frac{gt}{\gamma}
-~$$
+```
 
 ([From "On the trajectories of projectiles depicted in early ballistic Woodcuts"](http://www.researchgate.net/publication/230963032_On_the_trajectories_of_projectiles_depicted_in_early_ballistic_woodcuts))
 
@@ -747,7 +736,7 @@ coefficient that we will take to be $1$.  This is valid when $h(t)
 \geq 0$.  In `Julia`, rather than hard-code the parameter values, for
 added flexibility we can pass them in as keyword arguments:
 
-```
+```julia
 h(t; g=32, v0=390, gamma=1) = (g/gamma^2 + v0/gamma)*(1 - exp(-gamma*t)) - g*t/gamma
 ```
 
@@ -755,7 +744,7 @@ Now find the three times: $t_0$, the starting time; $t_a$, the time at
 the apex of the flight; and $t_f$, the time the object returns to the
 ground.
 
-```
+```julia; echo=false
 t0 = 0.0
 tf = find_zero(h, (10, 20))
 ta = find_zero(D(h), (t0, tf))
@@ -778,14 +767,14 @@ interval up into many pieces; identify those that bracket a zero; use
 This is basically implemented in the `find_zeros(f, a, b)` function.
 So, to find the zeros of $e^x - x^4$ over $[-10, 10]$ we have:
 
-```
+```julia
 f(x) = exp(x) - x^4
 find_zeros(f, -10, 10)
 ```
 
 The above description will only work for zeros which cross the $x$ axis, but `find_zeros` tries a bit more. So, it will find the zero of $f(x) = x^2 \cdot e^x$:
 
-```
+```julia
 f(x) = x^2 * exp(x)
 find_zeros(f, -1, 1)
 ```
@@ -802,7 +791,7 @@ The `fzeros` function is an alternate name for `find_zeros`.
 For Polynomials of higher degree, there are some specific methods that can be used to identify the roots.
 We will demonstrate the methods from the `SymPy` package. These work on symbolic expressions. These will be described in more detail later, but for now, we have to make a *symbolic* variable, `x` to proceed:
 
-```
+```julia
 @syms x
 ```
 
@@ -811,7 +800,7 @@ The two functions we discuss are `sympy.roots` and `sympy.real_roots`.
 First consider the quadratic equation below. We can identify the real roots of algebraic type with:
 
 
-```
+```julia
 f(x) = x^2 + x - 1
 sympy.real_roots(f(x))
 ```
@@ -821,14 +810,14 @@ sympy.real_roots(f(x))
 That was so easy, we'll do it again. What are the roots of the
 polynomial $f(x) = -16x^2 + 32x + 6$?
 
-```
+```julia
 f(x) = -16x^2 + 32x + 6
 sympy.real_roots(f(x))
 ```
 
 As can be seen, $f$ has two real roots. This next polynomial has none:
 
-```
+```julia
 f(x) = x^2 + x + 1
 sympy.real_roots(f(x))
 ```
@@ -846,33 +835,33 @@ For some problems only the possible real roots are desired.
 
 The following polynomial has both real roots and complex roots. The real one are
 
-```
+```julia
 f(x) = (x^2 + x + 1) * (x^2 + x - 1)
 sympy.real_roots(f(x))
 ```
 
 Compare to
 
-```
+```julia
 sympy.roots(f(x))
 ```
 
 The word "algebraic" was used, as some problems have answers, but not readily expressible ones. For example, `x^5 -x - 1`:
 
-```
+```julia
 f(x) = x^5 - x - 1
 sympy.roots(f(x))
 ```
 
 However, the `solve` function (which solves `f(x)=0`) does hint at answers:
 
-```
+```julia
 solve(f(x))
 ```
 
 These can be revealed, but converting them to numeric with `N`:
 
-```
+```julia
 N.(solve(f(x)))
 ```
 
@@ -884,7 +873,7 @@ N.(solve(f(x)))
 
 Find all roots of the function $f(x) = x^4 - 4x^2 -4x + 2$. Are they all real numbers?
 
-```
+```julia; echo=false
 choices = ["Yes, the are all real", "No, some are real, some are complex", "No, none are real"]
 ans = 2
 radioq(choices, ans)
@@ -897,7 +886,7 @@ Find the largest real root of the
 polynomial $x^2 + x - 5$
 
 
-```
+```julia; echo=false
 @syms x
 p = N.(sympy.real_roots(x^2 + x - 5))
 val = maximum(p);
@@ -908,7 +897,7 @@ numericq(val, 1e-3)
 
 Find the largest real root of the polynomial $x^3 - x - 17$
 
-```
+```julia; echo=false
 @syms x
 zs = N.(sympy.real_roots(x^2 - x - 17))
 val = maximum(zs)
@@ -930,7 +919,7 @@ For example, the polynomial $x^3 -x^2 -x - 1$ has signs `+ - - -`, so
 there is just one sign change. This implies there must be exactly one *positive*
 real root, which is identifyied with:
 
-```
+```julia
 f(x) = x^3 -x^2 -x - 1
 N.(sympy.real_roots(f(x)))
 ```
@@ -940,7 +929,7 @@ N.(sympy.real_roots(f(x)))
 
 For the polynomial $f(x) = x^5 -x + 1$ has potentially 2 *positive*, real roots? Are there $0$ or $2$ positive, real roots?
 
-```
+```julia; echo=false
 choices = ["zero", "two"]
 ans = 1
 radioq(choices, ans)
@@ -957,7 +946,7 @@ If $f(x) = x^5 - x +1$ we have $g(x) = -x^5 +x + 1$ (just change the
 signs of the coefficients of the odd powers). Then $g(x)$ has one sign
 change. This means there is one *negative* real root. What is it?
 
-```
+```julia; echo=false
 val = fzeros(x -> x^5 - x +1, -5, 5)[1]
 numericq(val, 1e-2)
 ```

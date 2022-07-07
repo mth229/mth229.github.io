@@ -5,9 +5,9 @@
 Newton's method is an old method for *approximating* a zero of a
 function, $f(x)$:
 
-$$~
+```math
 f(x) = 0
-~$$
+```
 
 
 Previously we discussed the *bisection method* which applied for some
@@ -31,13 +31,15 @@ Newton's method.
 
 To begin, we load `MTH229` and `Plots`. In the background this loads `Roots`:
 
-```
+```julia
 using MTH229
 using Plots
+plotly()
 ```
 
-```nocode, noout
-plotly()
+```julia; echo=false
+using QuizQuestions
+using LaTeXStrings
 ```
 
 
@@ -49,25 +51,22 @@ approximated by the tangent line at that point. If we have a good
 guess $x_n$, then we can improve this guess iteratively by replacing
 it with the zero, $x_{n+1}$, of the tangent line at $(x_n, f(x_n))$.
 
-```
-ImageFile("figures/newton/newton-one-step.png")
-```
-
+![Newton, one step](figures/newton/newton-one-step.png)
 
 
 A simple picture shows that we have a triangle with base $x_{n+1} -
 x_{n}$, rise $0 - f(x_n)$ and slope $f'(x_n)$, using the "rise over
 run" formula:
 
-$$~
+```math
 f'(x_n) = \frac{-f(x_n)}{x_{n+1} - x_{n}}.
-~$$
+```
 
 The basic algorithm of Newton's methods solves this to get:
 
-$$~
+```math
 x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}.
-~$$
+```
 
 Some books write the right-hand side as $x_n - f'(x_n)^{-1} f(x_n)$, a
 form that generalizes to different settings.
@@ -85,7 +84,7 @@ computed and assigned to the left hand side. This is exactly what is
 done in assignment within `julia`, so  the above simply
 becomes:
 
-```verbatim
+```julia; eval=false
 x = x - f(x)/f'(x)
 ```
 
@@ -106,7 +105,7 @@ Here is an example to find a zero of the function: $f(x) = x^3 - 2x -
 
 A quick graph shows a root near 2:
 
-```
+```julia
 f(x) = x^3 - 2x - 5
 plot(f, -3, 3)
 ```
@@ -114,7 +113,7 @@ plot(f, -3, 3)
 Here we improve the estimate for the root near 2 using Newton's method.
 We will need the first derivative, which we denote `fp`
 
-```
+```julia
 fp(x) = 3x^2 - 2
 x = 2				# starting value, x_0
 x = x - f(x)/fp(x)		# new value, x_1
@@ -124,7 +123,7 @@ x, f(x)
 We can visualize our progress as follows, noting that `x` holds $x_1$,
 and zooming into the domain $[1,3]$:
 
-```
+```julia
 x0, x1 = 2, x
 plot(f, 1, 3, legend=false)
 plot!([x0, x0, x1], [0, f(x0), 0])  # why these values?
@@ -135,28 +134,28 @@ scatter!([x0, x1], [0, 0])
 
 Continuing, though without visualizing the progress, this next step will compute $x_2$:
 
-```
+```julia
 x = x - f(x)/fp(x)
 x, f(x)
 ```
 
 This next step will compute $x_3$:
 
-```
+```julia
 x = x - f(x)/fp(x)
 x, f(x)
 ```
 
 This next step will compute $x_4$:
 
-```
+```julia
 x = x - f(x)/fp(x)
 x, f(x)
 ```
 
 This next step will compute $x_5$:
 
-```
+```julia
 x = x - f(x)/fp(x)		# x stopped changing
 x, f(x)
 ```
@@ -202,7 +201,7 @@ The above approach -- basically repeating steps -- can be tedious.
 There will be a function to do this for you (`newton`). One can use copy and paste to do much of this though:
 
 
-```
+```julia
 f(x) = x^3 - 2x - 5
 x = 2
 x = x - f(x)/f'(x)
@@ -217,21 +216,15 @@ x = x - f(x)/f'(x)
 
 
 
-```
-alert("""
-
-Newton looked at this same example in 1699 (B.T. Polyak,
-*Newton's method and its use in optimization*, European Journal of Operational
-Research. 02/2007; 181(3):1086-1096.) though his technique was
-slightly different as he did not use the derivative, *per se*, but
-rather an approximation based on the fact that his function was a
-polynomial (though identical to the derivative). Raphson (1690)
-proposed the general form, hence the usual name of Newton-Raphson
-method.
-
-
-""")
-```
+!!! note
+	Newton looked at this same example in 1699 (B.T. Polyak,
+	*Newton's method and its use in optimization*, European Journal of Operational
+	Research. 02/2007; 181(3):1086-1096.) though his technique was
+	slightly different as he did not use the derivative, *per se*, but
+	rather an approximation based on the fact that his function was a
+	polynomial (though identical to the derivative). Raphson (1690)
+	proposed the general form, hence the usual name of Newton-Raphson
+	method.
 
 
 ----
@@ -245,9 +238,9 @@ Using Newton's method to find $\sqrt{k}$ (by solving for roots of
 $f(x) = x^2 - k$) is also referred to as the Babylonian method, due to
 its origins. The resulting method
 
-$$~
+```math
 x_{n+1} = \frac{1}{2}(x_n + \frac{k}{x_n})
-~$$
+```
 
 is described by the first-century [Greek mathematician Hero of
 Alexandria](http://en.wikipedia.org/wiki/Babylonian_method).
@@ -256,7 +249,7 @@ Alexandria](http://en.wikipedia.org/wiki/Babylonian_method).
 Let $k=15$ and $x_0$ be $4$. What is the value of $x_3$?
 
 
-```
+```julia; echo=false
 x0 = 4
 f(x) =  1/2*(x + 15/x)
 val = f(f(f(x0)))
@@ -269,7 +262,7 @@ The function $f(x) = \sin(x)$ has derivative $f'(x) = \cos(x)$. Use
 Newton's method to solve $f(x) = 0$ starting at $3$. Repeat 5 times.
 What value do you get for `x`?
 
-```
+```julia; echo=false
 f(x) = x - sin(x)/cos(x)
 x0 = 3
 val = f(f(f(f(x0))))
@@ -284,7 +277,7 @@ very fast. Here it takes 4 steps to verify.)
 Let $f(x) = x^2 - 3^x$. This has derivative $2x - 3^x \cdot
 \log(3)$. Starting with $x_0=0$, what does Newton's method converge on?
 
-```
+```julia; echo=false
 using Roots
 f(x) = x^2 - 3^x;
 fp(x) = 2x - 3^x*log(3);
@@ -318,7 +311,7 @@ A basic algorithm is to repeat a step of Newton's method until the
 above occurs. We wrap this up in a function for reuse, and employ a
 `while` loop to repeat the update step until something happens:
 
-```
+```julia;
 function nm(f, fp, x)
 	 xnew, xold = x, Inf
 	 fn, fo = f(xnew), Inf
@@ -344,7 +337,7 @@ end
 
 Here we use the `nm` function to find a zero of this polynomial:
 
-```
+```julia
 f(x) = x^3 - 5x + 1
 fp(x) = 3x^2 - 5
 xstar, ctr = nm(f, fp, 0)	# takes 6 steps
@@ -359,7 +352,7 @@ We revisit a problem from a previous project, finding zeroes of the
 function $f(x) = \exp(x) - x^4$. We know from previous work that there
 are three of them. Let's find one near $x=2$:
 
-```
+```julia
 f(x) = exp(x) - x^4
 x = 2
 newton(f, 2)  # newton will use automatic differentiation for the derivative
@@ -367,7 +360,7 @@ newton(f, 2)  # newton will use automatic differentiation for the derivative
 
 It took 8 steps and we are this close:
 
-```
+```julia
 xstar, f(xstar)
 ```
 
@@ -384,7 +377,7 @@ tolerances?
 
 
 
-```
+```julia; echo=false
 #f(x) = exp(x) - x^4;
 #fp(x) = exp(x) - 4x^3;
 #xstar, ctr = nm(f, fp, 2);
@@ -397,7 +390,7 @@ If we repeat with $f(x) = \exp(x) - x^4$ but start now at $x=8$ where
 does the algorithm converge?
 
 
-```
+```julia; echo=false
 xstar, ctr = nm(f, fp, 8);
 numericq(xstar, 1e-6)
 ```
@@ -412,7 +405,7 @@ Let $f(x) = \sin(x) - \cos(4\cdot x)$.
 Starting at $\pi/8$, solve for the root returned by Newton's method
 
 
-```
+```julia; echo=false
 k1=4
 f(x)  = sin(x) - cos(k1*x);
 fp(x) = cos(x) + k1*sin(k1*x);
@@ -450,7 +443,7 @@ point, though not nearly as quickly as Newton's method.
 
 You can check -- if you want -- by repeating the last command until the change in `x2` is within your tolerance:
 
-```
+```julia
 x2, x1 = 1, 2			# initial guess of 2
 f(x) = x^2 - 2			# some function
 fp(x1,x2) = (f(x1) - f(x2))/(x1 - x2)
@@ -460,7 +453,7 @@ x2, x1 = x2 - f(x2)/fp(x1, x2), x2 # update step
 
 We can repeat via copy and paste:
 
-```
+```julia
 x2, x1 = x2 - f(x2)/fp(x1, x2), x2
 x2, x1 = x2 - f(x2)/fp(x1, x2), x2
 x2, x1 = x2 - f(x2)/fp(x1, x2), x2
@@ -476,9 +469,9 @@ The last line shows the algorithm has basically converged, as the values agree t
 
 Recall the forward difference approximation to the derivative:
 
-$$~
+```math
 f'(x) \approx \frac{f(x + h) - f(x)}{h}
-~$$
+```
 
 For some small $h$ (with $h=10^{-8}$ a reasonable choice for many functions). This can be used
 
@@ -487,18 +480,18 @@ in place of $f'(x)$ in the formula. Again, this won't be as fast.
 
 The update step $x - f(x)/f'(x)$ becomes
 
-$$~
+```math
 x - \frac{h \cdot f(x)}{f(x+h) - f(x)}.
-~$$
+```
 
 The issue with this approximation is when the estimated value gets
 close to the actual root, the value of $h$ becomes too
 large. Steffenson's method replaces $h$ with $f(x)$, which for values
 close to a root gets quite small. This improves the convergence rate to be on par with Newton's method. In this case, the update step looks like
 
-$$~
+```math
 x - \frac{f(x)^2}{f(x+ f(x)) - f(x)}.
-~$$
+```
 
 
 
@@ -508,28 +501,23 @@ x - \frac{f(x)^2}{f(x+ f(x)) - f(x)}.
 
 Use the secant method to find a root to $f(x) = \cos(x) - x^3$ starting with $x_0=1/2$ and $x_1=1$.
 
-```
+```julia; echo=false
+using Roots
 f(x) = cos(x) - x^3
 x1, x0 = 1, 1/2
-while abs(x1 - x0) > 1e-14
-  x = x1 - (x1 - x0) * f(x1) / (f(x1) - f(x0))
-  x1, x0 = x, x1
-end
-numericq(x1, 1e-10)
+x = find_zero(f, (x0, x1), Roots.Secant())
+numericq(x, 1e-10)
 ```
 
 
 #### Question
 Use the secant method to find a root to $f(x) = x^5 + x - 1$ starting with $x_0=1/2$ and $x_1=1$.
 
-```
+```julia; echo=false
 f(x) = x^5 + x - 1
 x1, x0 = 1, 1/2
-while abs(x1 - x0) > 1e-14
-  x = x1 - (x1 - x0) * f(x1) / (f(x1) - f(x0))
-  x1, x0 = x, x1
-end
-numericq(x1, 1e-10)
+x = find_zero(f, (x0, x1), Roots.Secant())
+numericq(x, 1e-10)
 ```
 
 
@@ -555,7 +543,7 @@ bracketing interval, that will guarantee convergence.
 
 We focus on the simplest usage of `find_zero` where an initial guess is supplied and the default order is used. Here is an example to find $-\sqrt{2}$:
 
-```
+```julia
 f(x) = x^2 - 2
 find_zero(f, -1)
 ```
@@ -572,7 +560,7 @@ x^4$. We follow a standard approach:
 The following graph suggests, perhaps, there may be $3$ zeros, one near $9$,
 one near $2$ and one near $-1$.
 
-```
+```julia
 f(x) = exp(x) - x^4
 plot(f, -5,9)
 ```
@@ -580,19 +568,19 @@ plot(f, -5,9)
 
 We can improve these guesses with
 
-```
+```julia
 find_zero(f, 9), find_zero(f, 2), find_zero(f, -1)
 ```
 
 The above can be written without repeating `find_zero` by using a comprehension:
 
-```
+```julia
 [find_zero(f, x) for x in [9, 2, -1]]
 ```
 
 Or even more compactly, using the broadcast notation:
 
-```
+```julia
 find_zero.(f, [-1, 2, 9])
 ```
 
@@ -603,20 +591,20 @@ As another illustration, let $f(x) = \cos^2(x^2)$ on $[-1,2]$. Find all the zero
 
 We graph the derivative to identify starting points:
 
-```
+```julia
 f(x) = cos(x^2)^2
 plot(f', -1, 2)
 ```
 
 We see there are 3 potential zeros, one near 0, one near 1.2 and close to 1.7. Here we improve our guesses:
 
-```
+```julia
 xs = find_zero.(f', [0, 1.2, 1.7])   # or [find_zero(f', x) for x in [0, 1.2, 1.7]]
 ```
 
 The function values at these points can be found with
 
-```
+```julia
 f.(xs)               # or map(f, xs) or [f(x) for x in xs]
 ```
 
@@ -625,7 +613,7 @@ f.(xs)               # or map(f, xs) or [f(x) for x in xs]
 
 For such tasks, `find_zeros` also works well. This function looks for all zeros in the interval `[a,b]`:
 
-```
+```julia
 find_zeros(f, -1, 2)
 ```
 
@@ -638,16 +626,16 @@ find_zeros(f, -1, 2)
 
 Let
 
-$$~
+```math
 f(x) = 4x^4 -5x^3 + 4x^2 -20x - 6
-~$$
+```
 
 Apply Newton's method with $x_0=0$ using an automatic derivative. What
 value does it converge to?
 
 
 
-```
+```julia; echo=false
 f(x) = 4x^4 -5x^3 + 4x^2 -20x - 6
 val = newton(f, 0);
 numericq(val, 1e-10)
@@ -656,15 +644,15 @@ numericq(val, 1e-10)
 #### Question
 Let's try with a function where the derivative is not known easily. If we set
 
-$$~
+```math
 f(x) = x^x - 2
-~$$
+```
 
 Can we find a root using Newton's method, where $x > 0$?
 
 We graph the function to see, using a smallish interval at first:
 
-```
+```julia
 f(x) = x^x - 2
 plot(f, 0, 2)
 plot!(zero)
@@ -675,7 +663,7 @@ right of the minimum, which appears to be around $x=0.35$.
 
 What is the value of the approximate zero?
 
-```
+```julia; echo=false
 xstar = newton(f, 1)
 numericq(xstar, 1e-8)
 ```
@@ -684,7 +672,7 @@ numericq(xstar, 1e-8)
 
 Use `find_zero` to find the one root of `x^5 + x - 1`. First plot to get an estimate.
 
-```
+```julia; echo=false
 f(x) = x^5 - x - 1
 xstar = find_zero(f, 1)
 numericq(xstar, 1e-8)
@@ -696,7 +684,7 @@ numericq(xstar, 1e-8)
 
 Let $f(x) = 5/\sin(x) + 8/\cos(x)$, Starting at $x=\pi/4$, use `find_zero` to find a root of the derivative of $f(x)$ given by `f'`.
 
-```
+```julia; echo=false
 f(x) = 5/sin(x) + 8/cos(x)
 xstar = find_zero(f', pi/4)
 numericq(xstar, 1e-8)
@@ -706,7 +694,7 @@ numericq(xstar, 1e-8)
 
 The tangent line of `f` at `c` can be computed by
 
-```
+```julia
 tangent(f, c) = x -> f(c) + f'(c) * (x - c)
 ```
 
@@ -715,7 +703,7 @@ of the tangent line at $1$ and the tangent line at $3$. Where does this happen?
 
 (Hint, apply `find_zero` to `h(x) = tangent(f, 1)(x) -  tangent(f, 3)(x)` starting at 1.)
 
-```
+```julia; echo=false
 tangent(f, c) = x -> f(c) + f'(c) * (x - c)
 f(x) = x^2 - 3x + 5
 h1(x) = tangent(f, 1)(x) - tangent(f, 3)(x)
@@ -746,9 +734,9 @@ you need to keep in mind. Newton's method works well if
 The above points come from the following formula which you can find in
 many texts.
 
-$$~
+```math
 \Delta x_{i+1} = \frac{f' '(\alpha)}{f'(\alpha)}(\Delta x_i)^2 + \text{error}
-~$$
+```
 
 which is valid when $f(x)$ satisfies $f(\alpha) = 0$, the third
 derivative exists near $\alpha$, and $\Delta x_i = x_i -
@@ -765,7 +753,7 @@ Now we look at some cases where the above three points do not hold.
 Let $f(x) = \sin(x) - x/4$ and $x_0 = 2\pi$. This value is
 deliberately a poor choice:
 
-```
+```julia
 f(x) = sin(x) - x/4
 fp(x) = cos(x) - 1/4
 newton(f, fp, 2pi, verbose=true)
@@ -776,16 +764,14 @@ steps before converging and the answer is no where near the guess. This
 trace might show why
 
 
-```
-ImageFile("figures/newton/newton-way-off.png")
-```
+![Newton, way off](figures/newton/newton-way-off.png)
 
 
 #### Question
 
 When $|f'(x)|$ is too close to $0$, the path can jump alot. In the figure, what was the longest jump?
 
-```
+```julia; echo=false
 choices = ["From about 17 to -10",
 	 "From about -12 to -3",
 	 "From about 0 to -5"
@@ -799,7 +785,7 @@ radioq(choices, ans)
 The method did find a zero, but the initial guess was nowhere near the
 final zero. How close was the closest zero to the initial guess?
 
-```
+```julia; echo=false
 choices = ["`8.75`", "`2pi`", "`3.8`"];
 ans = 3;
 radioq(choices, ans)
@@ -818,7 +804,7 @@ one of three and not the chosen one.)
 So we define our function using `julia`'s `cbrt` function, which works
 as we desire for negative numbers, as follows:
 
-```
+```julia
 f(x) = cbrt(x)
 xstar = newton(f, 2)
 ```
@@ -833,13 +819,10 @@ Despite all our care with the derivative, the method did not converge in
 $200$ steps. Can you see why from this trace?
 
 
-
-
-```
-ImageFile("figures/newton/newton-cubic.png")
+![Newton, cubic](figures/newton/newton-cubic.png)
 ```
 
-```
+```julia; echo=false
 choices = ["`|f'(x)|` gets too small",
 	     "`|f''(x)|` gets too big at 0",
 	     "Initial guess is too far from a zero."
@@ -853,14 +836,14 @@ radioq(choices, ans, keep_order=true)
 
 For $f(x) = x^{1/3}$, simplify the expression by hand:
 
-$$~
+```math
 x - f(x)/f'(x)
-~$$
+```
 
 What do you get?
 
 
-```
+```julia; echo=false
 choices =["`x - (1/3)x^{-1/3}`",
 	     "`-2x`",
 	     "`x - 3/x`"
@@ -877,7 +860,7 @@ Apply Newton's method to $f(x) = (x-2)^7 \cdot (x-3) \cdot (x-4)$ starting at
 a plot of $f(x)$ explain why not:
 
 
-```
+```julia; echo=false
 choices = ["`|f'(x)|` gets too small",
 	     "`|f''(x)|` gets too big at 0",
 	     "Initial guess is to far from a zero."
@@ -890,7 +873,7 @@ radioq(choices, ans, keep_order=true)
 
 The function `f(x) = atan(x)` is a strictly increasing function with one zero, $0$. Yet it can pose problems with Newton's method. For which values of $x$ does Newton's method converge:
 
-```
+```julia; echo=false
 choices = [
 L"For each of $1$, $2$ and $\pi$",
 L"For $1$ and $2$ but not $\pi$",
@@ -913,7 +896,7 @@ Sometimes, the process can cycle even for reasonable functions.
 Let $f(x) = x^3 - 5x$. Starting with $x_0=1$, compute three steps of
 Newton's method. What are the terms in the series produced?
 
-```
+```julia; echo=false
 choices = [L"1, -2, -4,  ...",
 	   L"-1.0, 1.0, -1.0, ...",
 	   L"-1.0, 0.6666666666666667, -0.2850952524822228, ..."
@@ -930,7 +913,7 @@ where you start unless you start at $0$.
 Let $f(x) = \sqrt{|x|}$. This is the one-sided square root function
 turned into an even function. We could also have defined it by:
 
-```
+```julia
 f(x) = x >= 0 ? sqrt(x) : sqrt(-x)
 ```
 
@@ -945,7 +928,7 @@ fp(x) = x >=0 ? (1/2)*sqrt(x)/x : -(1/2)*sqrt(-x)/(-x)
 
 To see what happens when using Newton's method, lets start at $x=2$
 
-```
+```julia
 x = 2
 x = x - f(x)/fp(x)
 x = x - f(x)/fp(x)
@@ -956,7 +939,7 @@ x = x - f(x)/fp(x)
 Try again with $x=3.0$ What sequence do you get:
 
 
-```
+```julia; echo=false
 choices = [L"3, -3.0, 3.0, -3.0, ...",
 	     L"2, -2.0, 2.0, -2.0",
 	     L"3, 2.0, 1.0, 0.0, -1.0, ..."

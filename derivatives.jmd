@@ -2,14 +2,15 @@
 
 We load our packages to begin.
 
-```
+```julia
 using MTH229
 using Plots
+plotly
 ```
 
-```nocode
-plotly()
-nothing
+```julia; echo=false
+using QuizQuestions
+using LaTeXStrings
 ```
 
 ## Introduction
@@ -40,9 +41,9 @@ derivative of a function, $f$, at a point $c$ as the slope of the
 *tangent line*, defined in terms of the *limit* of the slopes of
 approximating secant lines. The notation is:
 
-$$~
+```math
 f'( c ) = \lim_{h \rightarrow 0} \frac{f(c + h) - f( c)}{h}.\quad\text{Derivative at a point}
-~$$
+```
 
 As mentioned, intuitively, the tangent line is the best straight-line
 approximation to a function near the point $(c, f( c))$ and would have
@@ -50,7 +51,7 @@ slope given by the derivative.
 
 This graph shows $f(x) = 2 - x^2$ and various secant lines when $c=-0.75$.
 
-```
+```julia
 f(x) = 2 - x^2
 c = -0.75
 sec_line(h) = secant(f, c, c+h)                # secant in MTH229 package
@@ -72,29 +73,29 @@ $c$ above with $x$, but conceptually there is a bit more to it.
 
 
 
-## Forward differences <small>Slope of the tangent line</small>
+## Forward difference quotients, Slope of the tangent line
 
 
 The rules of derivatives allow for a mechanical approach to taking
 derivatives with the power rule, chain rule and some special cases. In
 this project we look at approaching the derivative numerically. We start by
-investigating *approximate derivatives* computed with *finite differences*.
+investigating *approximate derivatives* computed with *finite difference quotients*.
 
 The most naive approximation is simply to assume $h$ is some small
 number and use that to approximate the limit above:
 
-```
+```julia
 f(x) = x^2 - 2x; fp(x) = 2x - 2
 h = .001
 c = 3
 ( f(c + h) - f(c) ) / h
 ```
 
-This is known as the *forward difference* approximation to the
+This is known as the *forward difference quotient* approximation to the
 derivative. For this example, the difference between the approximation
 and the actual slope is:
 
-```
+```julia
 ( f(c + h) - f(c) ) / h - fp(c)
 ```
 
@@ -102,22 +103,20 @@ That is not too close, just to 3 digits of accuracy.
 
 Notationally, we may write this as:
 
-$$~
+```math
 f'( c) \approx \frac{f(c + h) - f( c) }{h}
-~$$
+```
 
 For some small value of $h$. The equals sign is replaced by an
 approximation symbol, as there is no limit expression written.
 
-```
-example("Derivative at a point")
-```
+##### Example Derivative at a point
 
 Let's try the derivative of some well known function.  We know the
 derivative of $f(x) = \sin(x)$ is $f'(x) = \cos(x)$. Let's see if the
 above works well:
 
-```
+```julia
 f(x) = sin(x); fp(x) = cos(x)
 c = pi/4; h = 0.0001
 ( f(c + h) - f(c) )/h - fp(c)
@@ -127,9 +126,7 @@ Not as good as we can get -- the error is like `1e-5`, but not too bad already.
 
 
 
-```
-example("Finding profit")
-```
+##### Example Finding profit
 
 Suppose the tractor company John Deere models its profit per units
 sold through the function $P(x) = 50 e^{x/250}/(1 - e^{x/250})$. Find
@@ -141,7 +138,7 @@ differentiating directly, or as we do here, approximating the answer
 with `julia`. We first note that the function above, is a composition, so
 it may be written using two functions:
 
-```
+```julia
 f1(x) = exp(x)/(1 - exp(x))
 f(x) = 50 * f1(x/250)
 c = 200; h = 0.0001;
@@ -150,16 +147,14 @@ res = (f(c+h) - f(c))/h
 
 If $50$ is the maximum profit, this is a percentage increase of:
 
-```
+```julia
 (res/50) * 100
 ```
 
 or a bit more than half a percent.
 
 
-```
-example("Finding the tangent line at a point")
-```
+##### Example Finding the tangent line at a point
 
 Let $f(x) = x^x$. Find the tangent line at $c=2$. Compare the
 difference between the value of the tangent line  and the function at $x=2.1$.
@@ -168,14 +163,14 @@ The tangent line is most easily expressed in terms of the
 *point-slope* formula for a line where the point is $(c, f( c))$ and
 the slope is $f'( c)$. This gives:
 
-$$~
+```math
 y = f( c) + f'( c)\cdot(x - c)
-~$$
+```
 
 In the following, the slope of the tangent line will be *approximated*
 using a numeric derivative.  We use $h=0.0001$:
 
-```
+```julia
 f(x) = x^x
 c = 2; h = 0.0001
 m = ( f(c + h) - f(c) ) / h
@@ -184,14 +179,14 @@ tangent_line(x) = f(c) + m * (x - c)
 
 To compare the difference, we have:
 
-```
+```julia
 f(2.1) - tangent_line(2.1)
 ```
 
 
 A graph shows this difference:
 
-```
+```julia
 plot([f, tangent_line], 1.85, 2.15)
 ```
 
@@ -201,9 +196,9 @@ plot([f, tangent_line], 1.85, 2.15)
 #### Question
 
 Find the slope of the tangent line of $f(x) = x\log(x)$ at the value
-$x=1$ using $h=0.0001$ and the forward difference method:
+$x=1$ using $h=0.0001$ and the forward difference quotient method:
 
-```
+```julia; echo=false
 f(x) = x*log(x)
 c, h = 1, 0.0001;
 val = (f(c+h) - f(c))/h;
@@ -214,9 +209,9 @@ numericq(val, 1e-6)
 
 
 Find the slope of the tangent line of $f(x) = x-\log(x)$ at the value
-$x=1$ using $h=0.0001$ and the forward difference method:
+$x=1$ using $h=0.0001$ and the forward difference quotient method:
 
-```
+```julia; echo=false
 f(x) = x-log(x)
 c, h = 1, 0.0001;
 val = (f(c+h) - f(c))/h;
@@ -234,7 +229,7 @@ so-called Airy function, a special function named after
 Compute the derivative at $c=-3$ using $h=0.0001$.
 
 
-```
+```julia; echo=false
 f(x) = airyai(x)
 c, h = -3, 0.0001;
 val = (f(c+h) - f(c))/h;
@@ -250,7 +245,7 @@ well known to have slope $\sqrt{2}/2$.
 Compute the forward difference quotient for $f$ at $c$ using
 $h=0.01$. What is the order of the difference between the two values?
 
-```
+```julia; echo=false
 choices=["3 parts in 100",
          "3 parts in 1000",
 	 "3 parts in 10,000",
@@ -261,13 +256,13 @@ radioq(choices, ans, hint="Look at `sqrt(2)/2` minus the computed value",keep_or
 
 #### Question
 
-For the function $f(x) = x^3 - 5x$ use a forward difference with
+For the function $f(x) = x^3 - 5x$ use a forward difference quotient with
 $h=0.0001$ to approximate the slope of the tangent line at $c=1$. Use
 this value to create a tangent line at `(c, f( c))`. Plot both the
 function and the tangent. Estimate graphically where the tangent line
 crosses the $x$ axis. The value is near:
 
-```
+```julia; echo=false
 choices = [-2, -1.5, -1, -0.5, 0, 1]
 ans = 3
 radioq(choices, ans, keep_order=true)
@@ -289,9 +284,9 @@ functions are *first class objects*: they can be passed as arguments and
 returned as values.
 
 First, let's define a function to find the derivative at a point using
-the "forward difference":
+the "forward difference quotient":
 
-```
+```julia
 forward_difference(f, x0, h) = (f(x0 + h) - f(x0))/h
 ```
 
@@ -302,7 +297,7 @@ To make an operator that takes $f$ and returns a function (an
 anonymous function in this case) that computes our approximation to
 $f'$ we can do the following:
 
-```
+```julia
 Df(f; h=1e-8) = x -> forward_difference(f, x, h)
 ```
 
@@ -311,7 +306,7 @@ We specified a default value of $h$ for convenience, but allow it to be varied i
 
 To see this work, we can find and plot the derivative of $\sin(x)$:
 
-```
+```julia
 f(x) = sin(x)
 fp(x) = Df(f)(x)
 plot(f, 0, 2pi)
@@ -322,36 +317,28 @@ Well, we already knew that should just be $\cos(x)$.  The point is we
 can easily make the an approximate derivative function from `f` with
 the definition `fp(x) = Df(f)(x)`.
 
-```
-alert("""
-
-**Parsing `Df(f)(x)`** Seeing the pair of parenthesis can lead to
-confusion, as it isn't common math notation. Here parentheses are not
-used for grouping, but rather function application. There are two
-function applications and the associativity rules for function
-application are left to right, as with most -- but not all --
-operations. So `Df(f)` is done first. This returns a function (the
-approximate derivative) which is then evaluated at `x`.
-
-""")
-```
+!!! note "Parsing Df(f)(x)"
+	Seeing the pair of parenthesis can lead to
+	confusion, as it isn't common math notation. Here parentheses are not
+	used for grouping, but rather function application. There are two
+	function applications and the associativity rules for function
+	application are left to right, as with most -- but not all --
+	operations. So `Df(f)` is done first. This returns a function (the
+	approximate derivative) which is then evaluated at `x`.
 
 
-```
-alert("""
-**Defining `fp` or `fp(x)`**
-We could also have just plotted `f` and `Df(f)` without naming `fp`. As
-well, could have written `fp = Df(f)`, but that creates `fp` as an
-*anonymous* function and we then couldn't redefine it through `fp(x) =
-...`, which would attempt to make it a *generic* function.
-""")
-```
+!!! note "Defining `fp` or `fp(x)`"
+	We could also have just plotted `f` and `Df(f)` without naming `fp`. As
+	well, could have written `fp = Df(f)`, but that creates `fp` as an
+	*anonymous* function and we then couldn't redefine it through `fp(x) =
+	...`, which would attempt to make it a *generic* function.
+
 
 
 
 Let's look at a different function, where we don't know in our heads the answer.
 
-```
+```julia
 f(x) = exp(x)/(1 + exp(x))
 plot(f, 0, 5)
 plot!(Df(f))
@@ -360,16 +347,14 @@ plot!(Df(f))
 If we look, we can see from the graph that `f` is increasing and `Df(f)` is positive -- this is no coincidence, of course.
 
 
-```
-example("Critical points")
-```
 
+##### Example: Critical points
 
 A function's *critical points* are where its derivative is $0$ or
 undefined. We can examine these by graphing the function's
 derivative. Let's do so for the polynomial $f(x) = x^3 - 5x + 4$:
 
-```
+```julia
 f(x) = x^3 -5x + 4
 fp(x) = Df(f)(x)
 plot(fp, -5, 5)
@@ -378,19 +363,19 @@ plot(fp, -5, 5)
 You can check the zeroes graphically, say by zooming in a bit and
 adding the line $y=0$:
 
-```
+```julia
 plot(fp, -2, 2)
 plot!(zero)
 ```
 
 If you want, we can find the roots numerically. For example,
 
-```
+```julia
 find_zeros(fp, -10, 10)
 ```
 
 
-### Example: When is a function increasing?
+##### Example: When is a function increasing?
 
 
 Let $f(x) = \cos(x)$ over the interval $[0, 360]$ (in degrees). When is the
@@ -404,7 +389,7 @@ quadrants). Let's see how we would do this task with `julia` and compare.
 
 First, we only need the derivative, so we just ask:
 
-```
+```julia
 f(x) = cosd(x)			# using degrees
 fp(x) = Df(f)(x)                # use default h
 ```
@@ -414,34 +399,34 @@ this by defining a function that is $0$ when that is the case and
 `NaN` otherwise (so that those points are not plotted). We do so below
 using the `plotif` function from the `MTH229` package
 
-```
+```julia
 plotif(f, fp, 0, 360)  # second color when fp > 0
 ```
 
 
 ### Practice
 
-#### question
+#### Question
 
-Let $f(x) = e^x$. Using a forward difference and $h=0.001$ graph both
+Let $f(x) = e^x$. Using a forward difference quotient and $h=0.001$ graph both
 the function and its approximate derivative over the interval $[0,
 3]$. Estimate graphically the largest difference between the function
 and its approximate derivative.
 
-```
+```julia; echo=false
 choices = ["It is about 0.1", "It is about 0.01", "It is about 0"]
 ans = 3
 radioq(choices, ans)
 ```
 
-#### question
+#### Question
 
 Let $f(x) = x^2 \exp(-x)$. Using $h=0.0001$ and an approximate
 derivative, estimate graphically where $f'(x)$ is positive on the
 interval $[0,3]$.
 
 
-```
+```julia; echo=false
 choices = ["It is for the entire interval",
 	   "Between 0 and 2",
 	   "From 0 to about 0.45"]
@@ -449,14 +434,14 @@ ans = 2
 radioq(choices, ans)
 ```
 
-#### question
+#### Question
 
 The critical points of a function are where its derivative is
 undefined or where its derivative is $0$. For the function $f(x) =
 3x^4 -28x^3 + 96x^2 - 144x$ graphically find any critical points over the
 interval $[0,10]$
 
-```
+```julia; echo=false
 choices=["There is one at 3",
 	 "There are two distinct ones: 2, 3",
 	 "There are two distinct ones: 2, 2.6667",
@@ -465,17 +450,17 @@ ans = 2
 radioq(choices, ans)
 ```
 
-## Improvements to the basic forward difference equation
+## Improvements to the basic forward difference quotient
 
 The error in the approximation of the derivative depends on the size
 of $h$. Mathematically, as $h$ gets smaller we get better
 approximations, though with the computer other complications arise. To
 see mathematically that this is the case, let's look at the difference
 between the approximate numeric derivative from the forward difference
-and a known derivative.
+quotient and a known derivative.
 
 
-```
+```julia
 f(x) = sin(x)
 fp(x) = cos(x)
 [ Df(f,h=h)(.5) - fp(.5) for h=[.1, .01, .001, .0001, .00001] ]
@@ -487,7 +472,7 @@ little deeper though. Rather than type in the values of $h$ as above,
 let's use an expression to compute them. Here we find the powers
 $10^{-1}, \dots, 10^{-16}$ at once and then compute the differences:
 
-```
+```julia
 hs = [(1/10)^i for i in 1:16];
 out = [ Df(f,h=h)(.5) - fp(.5) for h in hs ];
 [hs out]
@@ -502,31 +487,32 @@ different approximations for the derivative can improve the
 "mathematical" error.
 
 
-### Central difference
+### Central difference quotient
 
 It turns out that just by looking to the left and the right we can
 improve the mathematical error from getting better at a rate of $h$ to
 a rate of $h^2$, provided our function is smooth enough and we don't have issues on the boundaries. The formula,
-called the *central difference* approximation to the derivative is:
+called the *central difference quotient* approximation to the derivative is:
 
-$$~
+```math
 f'(x) \approx \frac{ f(x + h) - f(x - h) }{2h}
-~$$
+```
 
 For this the mathematical error is like $h^2$, not $h$.
 
 
 Let's compare. To make our life easier we again create some functions, as we did with `Df` above.
 
-```
+```julia
 central_difference(f, x0, h) = (f(x0 + h) - f(x0 - h)) / (2h)
 Dc(f; h=0.0001) = x -> central_difference(f, x, h)
 ```
 
-Now to see whether a forward difference or central difference works
-better. We can do so with a table. Again with $f(x) = \sin(x)$
+Now to see whether a forward difference quotient or central difference
+quotient works better. We can do so with a table. Again with $f(x) =
+\sin(x)$
 
-```
+```julia
 f(x) = sin(x)
 fp(x) = cos(x)
 using_D =  [ Df(f,h=h)(.5) - fp(.5) for h in hs ];
@@ -534,33 +520,31 @@ using_Dc = [ Dc(f,h=h)(.5) - fp(.5) for h in hs ];
 [hs using_D using_Dc]
 ```
 
-The errors for the central difference are either much smaller for the
+The errors for the central difference quotient are either much smaller for the
 same size $h$ or the same. We see that we can use a larger $h$ to get
 the most accuracy in this example.
 
+##### Example: When does the tangent line hit 0?
 
-```
-example("When does the tangent line hit 0?")
-```
 
 
 Let $f(x) = 10/(1+x^2) - 10\exp(-(1/2)x^2)$. The tangent line at $x=c$ is given by
 
-$$~
+```math
 y = f( c) - f'( c)(x - c)
-~$$
+```
 
 and this intersects the $x$ axis when $y=0$. Solving this gives:
 
-$$~
+```math
 c - f( c)/f'( c)
-~$$
+```
 
 Our goal is to compute this value for any $c > 0$.
 
 Doing so is easy:
 
-```
+```julia
 f(x) = 10/(1+x^2) - 10*exp(-(1/2)*x^2)
 fp(x) = Dc(f)(x)
 intersection_point(c) = c - f(c)/fp(c)
@@ -568,25 +552,20 @@ intersection_point(c) = c - f(c)/fp(c)
 
 For example, when $c=1$ we have:
 
-```
+```julia
 c = 1;
 intersection_point(c)
 ```
 
 You can tell from the graph of $f(x)$ that this value should be more than 1, as it is.
 
-```
+```julia
 plot(f, .5, 2.1, legend=false)
 plot!(zero)
 plot!(x -> f(c) + fp(c)*(x-c))
 ```
 
-<hr/>
-
-```
-note("More generally ...")
-```
-
+----
 
 We could have defined `intersection_point` to accept a
 function with:
@@ -601,7 +580,7 @@ Then it could easily be reused for other problems.
 
 ### Practice
 
-#### question
+#### Question
 
 Let
 
@@ -613,7 +592,7 @@ This defines $f$ as a Bessel function of the first kind with order
 $\alpha=1$. Plot the approximate derivative over the interval $[0,5]$. There is
 one zero. What is its approximate value:
 
-```
+```julia; echo=false
 using Roots
 val = find_zero(Dc(f), [0,5])
 numericq(val, 1e-1)
@@ -622,23 +601,23 @@ numericq(val, 1e-1)
 
 
 
-#### question
+#### Question
 
 Let $f(x) = \sin(\cos(x))$. Plot the approximate derivative of
 $f$. How many zeros are there between $5$ and $20$?
 
-```
+```julia; echo=false
 ans=5
 numericq(ans, 1e-10)
 ```
 
-#### question
+#### Question
 
 Let $f(x) = |x^2 - 2|$. Plot the derivative of $f(x)$ over the
 interval $[-2,2]$. How many critical points do you see? (A critical
 point is where the derivative is $0$ *or* undefined.)
 
-```
+```julia; echo=false
 ans = 3
 numericq(ans, 1e-10)
 ```
@@ -654,9 +633,9 @@ We discuss now [Forward Mode Automatic Differentiation](http://en.wikipedia.org/
 
 
 Automatic differentiation avoids the numeric instability issues of
-finite differences by using a different approach. Whereas finite
-differences have a long history, automatic differentiation only dates
-back to the 60s.
+finite difference quotients by using a different approach. Whereas finite
+difference quotientss have a long history, automatic differentiation only dates
+back to the 50s.
 
 The `ForwardDiff` package implements automatic differentiation.
 
@@ -664,7 +643,7 @@ The `MTH229` package overloads the idea of `'`, so uses automatic differentiatio
 
 That means, we can find derivatives, as familiarly as:
 
-```
+```julia
 f(x) = x^x
 f'(1)
 ```
@@ -672,7 +651,7 @@ f'(1)
 Here `f` is a  function, `f'` is a derived function, and `f'(1)` is this derived function evaluated at `1` -- just as with the use within a math text book.
 
 
-Unlike, finite differences automatic differentiation does not have
+Unlike, finite difference quotients automatic differentiation does not have
 issues arising from the loss of precision encountered when subtracting
 two like-sized numbers. Unlike symbolic derivatives (such as those
 found by the Wolfram Alpha website used by your iPhone's Siri) they
@@ -684,17 +663,17 @@ So what is automatic differentiation? The idea of the forward mode is
 quite intuitive. The *tangent line* approximation of a function at the
 point $c$ becomes
 
-$$~
+```math
 f(x) = f(c) + f'( c)(x-c) + O((x-c)^2)
-~$$
+```
 
 Where the notation $O(x-c)^2$ means that the last term is not precisely spelled out, but is like some constant times the difference $(x-c)^2$. This has many applications, but for this one it reduces the knowledge of the function values at this level to two values $(f(c), f'(c))$
 
 Now consider the product of two functions $f(x)$ and $g(x)$? The above formula applied to $f \cdot g$ is:
 
-$$~
+```math
 (f\cdot g)(x) = f(c) \cdot g(c) + (f'( c)g( c) + f( c)g'( c))(x-c) + O((x-c)^2)
-~$$
+```
 
 This follows by the product rule. Again we have that two values
 determine the product $f\cdot g$ at this level, these being $(f(c)
@@ -705,9 +684,9 @@ $f$ and $g$ to compute the two values for $f\cdot g$.
 
 In fact, the rules of derivatives allow us to say the same for addition, subtraction, multiplication, division, powers *and* composition. For composition this is from the chain rule:
 
-$$~
+```math
 (f \circ g)(x) = (f \circ g)(c) + f'( g(c)) g'(c) (x-c) + O((x-c)^2).
-~$$
+```
 
 
 Automatic differentiation can be implemented by extending how we store
@@ -732,7 +711,7 @@ For functions we need to use the chain rule:
 
 Using `'`, we see that plotting a function and its derivative is straightforward:
 
-```
+```julia
 f(x) = exp(-x)*sin(x)
 plot(f, 0, 2pi)
 plot!(f')
@@ -740,7 +719,7 @@ plot!(f')
 
 Second derivatives are also available:
 
-```
+```julia
 f(x) = x^2 - 2x
 plot(f, -2, 2)
 plot!(f')
@@ -752,13 +731,13 @@ plot!(f'')
 Here is an example where we plot the tangent line and the
 function. The `MTH229` package provides this function to compute a tangent line function:
 
-```verbatim
+```julia; eval=false
 tangent(f, c) = x -> f(c) + f'(c)*(x-c)
 ```
 
 This is employed as follows:
 
-```
+```julia
 f(x) = x^x
 c = 1
 plot(f, 1/2, 2)
@@ -767,13 +746,9 @@ plot!(tangent(f, c))
 
 ----
 
-```
 
-example("""
-AP Calculus question
-""")
+##### Example: AP Calculus question
 
-```
 
 The 2014 AP Calculus exam included this question:
 
@@ -803,13 +778,13 @@ We can do all this relatively quickly with the `find_zero` function from the `Ro
 
 First, we define $A(t)$:
 
-```
+```julia
 A(t) = 6.687 * (0.931)^t
 ```
 
 The first question is answered by the slope of the secant line connecting $(0,A(0))$ and $(30, A(30))$:
 
-```
+```julia
 m = (A(30) - A(0)) / (30 - 0)
 ```
 
@@ -817,7 +792,7 @@ The units are in pounds per day.
 
 The second question is done through the derivative, as follows:
 
-```
+```julia
 A'(15)
 ```
 
@@ -830,7 +805,7 @@ the instantaneous decomposition rate equals the average rate over the
 interval $[0,30]$. Thus the endpoints form a bracketing interval for
 the equation $A'(t) = m$, which we solve with:
 
-```
+```julia
 find_zero(t -> A'(t) - m, (0, 30))
 ```
 
@@ -841,7 +816,7 @@ But this doesn't really answer the question asked, which is about the
 average amount of grass clippings in the bin. For this we need the
 integral form of the mean value theorem. Skipping ahead a few lessons to solve this problem, we have:
 
-```
+```julia
 a, err = quadgk(A, 0, 30)	# area under A from 0,30
 avg = a/(30-0)
 find_zero(t -> A(t) - avg, (0, 30))
@@ -853,20 +828,20 @@ We get the same answer -- think about whether that is a coincidence.
 
 Finally, we can define $L(t)$ using the point-slope form of the line. The point is $(30, A(30))$ and the slope is $A'(30)$:
 
-```
+```julia
 L(t) = A(30) + A'(30) * (t - 30) # t > 30
 ```
 
 We could restrict $L$ to insist that $t > 30$, but this isn't necessary. We are asked to solve this. Using `find_zero` requires a bracket. We check that $L(30) > 0.5$ and that $L(100)$ is negative:
 
 
-```
+```julia
 L(30), L(100)
 ```
 
 So, we can use $[30, 100]$ as a bracket for $L(t) - 0.5 = 0$:
 
-```
+```julia
 find_zero(t -> L(t) - 0.5, (30, 100))
 ```
 
@@ -876,7 +851,7 @@ So a bit over 35 days to decompose to half a pound.
 
 Here is a picture, showing the decay:
 
-```
+```julia
 f(t) = t <= 30 ? A(t) : L(t)
 plot(f, 0, 40)
 ```
@@ -884,11 +859,11 @@ plot(f, 0, 40)
 
 ### Practice
 
-#### question
+#### Question
 
 Which definition would be right for  $(x,dx) - (y, dy)$?
 
-```
+```julia; echo=false
 choices = [
 "`(x - y, dx - y)`",
 "`(x-y, dx - dy)`",
@@ -902,27 +877,27 @@ radioq(choices, ans)
 
 
 
-#### question (Find tangent line intersection)
+#### Question (Find tangent line intersection)
 
 Redefine `intersection_point` as:
 
-```
+```julia
 intersection_point(f, c) = c - f(c)/f'(c)
 ```
 
 Now for $f(x) = 10/(1+x^2) - 10 \cdot \exp(-(1/2) \cdot x^2)$ and $c=1$ find the
 intersection point.
 
-```
+```julia; echo=false
 val = 2;
 numericq(val, 1e-4)
 ```
 
-#### question (What is the size of the error?)
+#### Question (What is the size of the error?)
 
 We can compare the error at many different points with the following construct
 
-```verbatim
+```julia; eval=false
 f(x) = exp(-x)*sin(x)
 fp(x) = exp(-x)*(cos(x) - sin(x))
 [abs(f'(x) - fp(x) ) for x in linspace(0, pi, 25)]
@@ -930,7 +905,7 @@ fp(x) = exp(-x)*(cos(x) - sin(x))
 
 What is the order (exponent) of the largest difference above?
 
-```
+```julia; echo=false
 choices = [
 "`1e-10`",
 "`1e-14`",
@@ -957,8 +932,8 @@ formula). Here we look a bit more closely at how to choose $h$.
 
 As mentioned, with a bit of work from the second semester of calculus
 one can learn that the *mathematical error* in the forward difference
-is "order $h$" whereas the mathematical error in the central
-difference is "order $h^2$. This means that as $h$ gets small the
+quotient is "order $h$" whereas the mathematical error in the central
+difference quotient is "order $h^2$. This means that as $h$ gets small the
 approximation error in the first is a multple of $h$, but for the
 second a multiple of $h^2$ -- a much smaller error in general.
 
@@ -970,14 +945,14 @@ will not get smaller, rather larger.
 
 So, how big is the floating point error? For any given number, it can
 be roughly as big as the the machine precision amount, $\epsilon$. So in the
-forward-difference approximation we could have errors in both
+forward-difference quotient approximation we could have errors in both
 terms $f(x+h)$ and $f(x)$ so the total error could be as big as
 $2\epsilon$. But this is divided by $h$ as we have:
 
-$$~
+```math
 \frac{f(x+h) - f(x)}{h} = \frac{float(f(x +h)) + \epsilon - float(f(x_) + \epsilon}{h} =
 	     \frac{float(f(x+h))-float(f(x))}{h} + \frac{2\epsilon}{h}.
-~$$
+```
 
 The errors may or *may not* cancel so the algebra with $\epsilon$ is unusual to
 the untrained eye. It basically takes into account the worse case.
@@ -987,9 +962,9 @@ The key is the $2\epsilon/h$ term -- it gets bigger as $h$ gets smaller.
 So if each floating point approximation is no more off than
 $\epsilon$, we have this bound on the error:
 
-$$~
+```math
 \text{error} \leq \frac{2\epsilon}{h} + (M/2)h
-~$$
+```
 
 Where $M$ is a constant that depends on the maximum absolute value of the
 second derivative and the $1/2$ comes from second semester
@@ -999,19 +974,19 @@ note the answer is $h=((2\epsilon)/(M/2))^{1/2}$.
 
 Taking $\epsilon$ as machine tolerance and (conveniently) $M=1$ we get
 
-$$~
+```math
 h_{min} = \sqrt((2\epsilon)/(1/2)) \approx 10^{-8}
-~$$
+```
 
 Or more precisely:
 
-```
+```julia
 sqrt( (2*eps())/(1/2) )
 ```
 
 We can check this is about right,but graphing on a different scale:
 
-```
+```julia
 f(h; M=1) = 2*eps()/h + (M/2)*h
 g(x) = log10(f(10.0^(-x)))
 plot(g, 1, 10)			# min near 8, which means h like 1e-8
@@ -1022,7 +997,7 @@ plot(g, 1, 10)			# min near 8, which means h like 1e-8
 
 Numerically, we can check how this basically works for some test function:
 
-```
+```julia
 f(x) = exp(x) - x^3
 fp(x) = exp(x) - 3x^2
 [hs [Df(f,h=h)(.5) - fp(.5) for h in hs] ]
@@ -1030,32 +1005,32 @@ fp(x) = exp(x) - 3x^2
 
 We see the best case is around $h=10^{-8}$, as expected by the theory.
 
-### Approximation errors for the central difference
+### Approximation errors for the central difference quotient
 
-For the central difference, the errors are different. The error in $h$ becomes:
+For the central difference quotient, the errors are different. The error in $h$ becomes:
 
-$$~
+```math
 \text{error} \leq (2\epsilon)/(2h) + (M/6) h^2
-~$$
+```
 
 
 This gives $(3\epsilon/M)^{1/3}$ as the choice for $h$ that minimizes the right-hand expression.
 
 Taking $\epsilon$ as the machine tolerance and (conveniently) $M=3$ we get
 
-$$~
+```math
 h_{min} \approx 10^{-6}
-~$$
+```
 
 We can again check how this works for our function and point:
 
-```
+```julia
 [hs [ Dc(f,h=h)(.5) - fp(.5) for h in hs] ]
 ```
 
 ### Practice
 
-#### question (Best depends on the function and value)
+#### Question (Best depends on the function and value)
 
 A subtle point above is that we are minimizing an upper bound in $h$
 with an assumption, not the actual error. The actual answer may differ
@@ -1063,7 +1038,7 @@ as it depends on a function and the point of evaluation. Look at the
 function $f(x) = x^2 - 2x$ and compare the values at $0.5$ as
 above:
 
-```
+```julia
 hs = [(1/10)^i for i in 1:16]
 f(x) = x^2 - 2x
 fp(x) = 2x - 2
@@ -1075,7 +1050,7 @@ What is the best value of $h$?
 
 For which of these values of $h$ is the error smallest?
 
-```
+```julia; echo=false
 choices = [
 "`1e-3`",
 "`1e-6`",
@@ -1088,17 +1063,17 @@ radioq(choices, ans, keep_order=true)
 
 
 
-#### question (Error analysis)
+#### Question (Error analysis)
 
 Consider these commands:
 
-```noout
+```julia; eval=false
 f(x) = sin(x)
 fp(x) = cos(x)
 [hs [ Dc(f,h=h)(.5) - fp(.5) for h in hs] ]
 ```
 Do they show the smallest error around $10^{-6}$ as expected?
 
-```
+```julia; echo=false
 booleanq(true)
 ```

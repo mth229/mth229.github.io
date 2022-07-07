@@ -9,22 +9,22 @@ how to graph functions with `Julia`.
 
 For basic things creating a new function and plotting it is as familiar as this:
 
-```nocode,noout
+
+We begin by loading some packages:
+
+```julia
 using MTH229
 using Plots
 plotly()
 ```
 
-We begin by loading some packages:
-
-```noeval
-using MTH229
-using Plots
+```julia; echo=false
+using QuizQuestions
 ```
 
 Then we define a function and plot it:
 
-```
+```julia
 f(x) = sin(3x^2 - 2x^3)
 plot(f, 0, pi)
 ```
@@ -47,9 +47,9 @@ Here we don't work abstractly though. For a mathematical function
 \mathbb{R}$), we typically just have some rule for what the function
 will do to $x$ to produce $y$, such as
 
-$$~
+```math
 f(x) = \sin(x) - \cos(x).
-~$$
+```
 
 In `Julia` there are a few different ways to define a function, we
 start with the most natural one which makes it very simple to work
@@ -71,15 +71,15 @@ functions, linear functions and quadratic functions.
 
 Let's look at the familiar *linear* function to convert Fahrenheit into Celsius:
 
-$$~
+```math
 f(x) = 5/9 \cdot (x - 32).
-~$$
+```
 
 That is we subtract $32$ then multiply by $5/9$
 
 We can easily turn this into a function, simply by replacing the mathematical notation $\cdot$ with `*`:
 
-```
+```julia
 f(x) = (5/9) * (x - 32)
 ```
 
@@ -88,28 +88,25 @@ of $x$ we simply use the familiar mathematical notation. Here we see
 what Celsius is for "normal" body
 temperature:
 
-```
+```julia
 f(98.6)
 ```
 
 And the Celsius equivalent to the standard boiling point:
 
-```
+```julia
 f(212)
 ```
 
-```
-alert("""
-**Calling a function**
-Evaluating a function for a given value is also known in programming languages as "calling"
-`f`. When we work with functions in `Julia`, the distinction between
-the function object and calling the function is important to keep
-straight -- though not too hard to do. In mathematical notation, it is
-sort of like the difference between writing \$f\$ -- as opposed to \$f(x)\$ --
-to describe the function, the latter implying there is some \$x\$ to be
-evaluated, so we think of \$f(x)\$ as a \$y\$-value and \$f\$ as a function.
-""")
-```
+!!! note "Alert"
+	**Calling a function**
+	Evaluating a function for a given value is also known in programming languages as "calling"
+	`f`. When we work with functions in `Julia`, the distinction between
+	the function object and calling the function is important to keep
+	straight -- though not too hard to do. In mathematical notation, it is
+	sort of like the difference between writing \$f\$ -- as opposed to \$f(x)\$ --
+	to describe the function, the latter implying there is some \$x\$ to be
+	evaluated, so we think of \$f(x)\$ as a \$y\$-value and \$f\$ as a function.
 
 ### Numeric literals
 
@@ -117,7 +114,7 @@ evaluated, so we think of \$f(x)\$ as a \$y\$-value and \$f\$ as a function.
 fact, for polynomials with numeric coefficients, one can even skip
 using `*` for multiplication:
 
-```
+```julia
 g(x) = 2x^2 - 3x + 2
 g(2)
 ```
@@ -129,7 +126,7 @@ bypass the usual order of operations, e.g.  `5/9(x-32)` is not `5/9*(x-32)`.)
 
 This can also be used when simple parentheses are involved:
 
-```
+```julia
 k(x) = 2(x - 1)^2 + 3(x+1)
 ```
 
@@ -138,26 +135,24 @@ then think the first parenthetical pair is a function and try to call
 it with a value of `x-1`.
 
 
-```
-example("Equations versus functions")
-```
+#### Example: Equations versus functions
 
 Mathematically we tend to blur the distinction between the equation
 
-$$~
+```math
 y = 5/9 \cdot (x - 32)
-~$$
+```
 
 and the function
 
-$$~
+```math
 f(x) = 5/9 \cdot (x - 32)
-~$$
+```
 
 As the graph of the function $f(x)$ is the same as the graph of the
 equation $y=f(x)$. There is a distinction in `Julia` as these commands
 
-```
+```julia
 x = -40
 y = 5/9 * (x - 32)
 ```
@@ -165,7 +160,7 @@ y = 5/9 * (x - 32)
 will evaluate the righthand side with the value of `x` bound at the
 time of assignment to `y`, whereas
 
-```
+```julia
 f(x) = 5/9 * (x - 32)
 f(72)				## room temperature
 ```
@@ -174,23 +169,19 @@ will create a function which is called with a value of `x` at a later
 time. So the value of `x` defined when the function is created is not
 important here (as `x` is passed in as an argument).
 
-</div>
-
-<hr/>
-
 
 
 ### Rational functions
 
 Rational functions are simply ratios of polynomial functions. Defining them is straightforward. For example.
 
-$$~
+```math
 f(x) = \frac{x^2 - 2}{x - 2}
-~$$
+```
 
 becomes
 
-```
+```julia
 f(x) = (x^2 - 2)/(x-2)
 ```
 
@@ -208,13 +199,13 @@ alternative.
 
 So, this
 
-$$~
+```math
 f(x) = \sqrt{x} + x^{1/3} + x^{1/4}
-~$$
+```
 
 can become:
 
-```
+```julia
 f(x) = sqrt(x) + cbrt(x) + x^(1/4)
 ```
 
@@ -236,23 +227,19 @@ translate some basic math functions into `Julia` functions:
 
 ### Trigonometric functions
 
-$$~
+```math
 f(x) = \cos(x) - \sin^2(x)
-~$$
+```
 
 becomes
 
-```
+```julia
 f(x) = cos(x) - sin(x)^2
 ```
 
-```
-note(L"""
-**About exponents and functions...**
+!!! note "About exponents and functions..."
+	The conversion from the commonly written form ($\sin^2(x)$) to the far less ambiguous $\sin(x)^2$ is very important. This is necessary with `Julia` -- as it is with calculators -- as there is no function `sin^2`. In Julia, squaring is done on values -- not functions, like `sin`. (And most likely squaring of a function is more likely to be composition, which is not the usage here.) So, to have success, learn to drop the notations $\sin^2(x)$ or for the arc sine function $\sin^{-1}(x)$. These shortcuts are best left in the age when mathematics was done just on paper.
 
-The conversion from the commonly written form ($\sin^2(x)$) to the far less ambiguous $\sin(x)^2$ is very important. This is necessary with `Julia` -- as it is with calculators -- as there is no function `sin^2`. In Julia, squaring is done on values -- not functions, like `sin`. (And most likely squaring of a function is more likely to be composition, which is not the usage here.) So, to have success, learn to drop the notations $\sin^2(x)$ or for the arc sine function $\sin^{-1}(x)$. These shortcuts are best left in the age when mathematics was done just on paper.
-""")
-```
 
 ----
 
@@ -260,7 +247,7 @@ If you want to work in degrees you can do so with the degree-based
 trigonometric functions, which follow the same naming pattern save a
 trailing "d":
 
-```
+```julia
 fd(x) = cosd(x) - sind(x)^2
 ```
 
@@ -271,19 +258,19 @@ fd(x) = cosd(x) - sind(x)^2
 
 A mathematical definition like
 
-$$~
+```math
 f(x) = 2\tan^{-1}(\frac{\sqrt{1 - x^2}}{1 + x})
-~$$
+```
 
 becomes
 
-```
+```julia
 f(x) = 2atan( sqrt(1-x^2) / (1 + x) )
 ```
 
 This particular function is just an alternative expression for the arc cosine (mathematically $\cos^{-1}$ but in `Julia` `acos`) using the arctan function, as seen here:
 
-```
+```julia
 f(.5) - acos(.5) ## nearly 0
 ```
 
@@ -301,13 +288,13 @@ mathematical notation for the longer expression "arctan" or
 
 The math function
 
-$$~
+```math
 f(x) = e^{-\frac{1}{2}x^2}
-~$$
+```
 
 Can be expressed as
 
-```
+```julia
 f(x) = e^(-(1/2)*x^2)
 ```
 
@@ -316,7 +303,7 @@ But $e$ can be inadvertently
 redefined. As such, it is a safer practice to use the `exp` function,
 as in:
 
-```
+```julia
 f(x) = exp(-(1/2)*x^2)
 ```
 
@@ -331,30 +318,31 @@ $\log$ for natural log and log base 10. With computers, there is
 typically just `log` for natural log, or with an extra argument the
 logarithm to other bases.
 
-$$~
+```math
 f(x) = \ln(1 - x)
-~$$
+```
 
 becomes just
 
-```
+```julia
 f(x) = log(1 - x)
 ```
 
 Whereas, the base 10 log:
 
-$$~
+```math
 f(x) = \log_{10}(1 + x)
-~$$
+```
 
 can be done through:
 
-```
+```julia
 f(x) = log(10, 1 + x)
 ```
 
-where the *first* argument expresses the base.  For convenience, `Julia` also gives the
-functions `log10` and `log2` for base 10 and 2 respectively.
+where the *first* argument expresses the base.  For convenience,
+`Julia` also gives the functions `log10` and `log2` for base 10 and 2
+respectively.
 
 
 ## Algebra of functions
@@ -368,21 +356,21 @@ think of the sum of functions, $h(x) = f(x) + g(x)$. The rule for each
 $x$ is simply to *add* the results of the two rules for $f$ and $g$
 applied to $x$. Notationally, we might write this as either:
 
-$$~
+```math
 h = f + g
-~$$
+```
 
 or
 
-$$~
+```math
 h(x) = f(x) + g(x).
-~$$
+```
 
 The former treats $f$ and $g$ as function objects, the latter ties more closely to the concept of a function as a rule that operates on $x$.
 
 With `Julia` the latter representation is more useful for defining combinations of functions. For example, if $f(x) = \sin(x)$ and $g(x) = x^2$, then we can combine these in several ways. The following illustrates several ways to combine the two functions $f$ and $g$:
 
-```
+```julia
 f(x) = sin(x)
 g(x) = x^2
 h(x) = f(x) + g(x)		# f + g
@@ -394,7 +382,7 @@ h(x) = f(x)^g(x)		# f^g
 
 All these are based on underlying mathematical operators. In addition, for functions there is the operation of *composition*, where the output of one function is the input to another. For example:
 
-```
+```julia
 h(x) = f(g(x))			# f ∘ g or sin(x^2)
 h(x) = g(f(x))			# g ∘ f or (sin(x))^2
 ```
@@ -407,7 +395,7 @@ This operation is fundamentally non-commutative, as the above example illustrate
 
 Which of these functions will compute $\sin^3(x^2)$?
 
-```
+```julia; echo=false
 radioq([
 "`f(x) = sin(x^2^3)`",
 "`f(x) = sin(x^2)^3`",
@@ -420,11 +408,11 @@ radioq([
 
 Which of these functions will compute
 
-$$~
+```math
 \frac{1}{\sqrt{2\pi}} e^{-\frac{1}{2}x^2}?
-~$$
-
 ```
+
+```julia; echo=false
 radioq([
 "`f(x) = 1/(2pi) * exp(-(1/2)*x^2)`",
 "`f(x) = 1/(2pi) * exp^(-(1/2)*x^2)`",
@@ -442,7 +430,7 @@ Define the function $f(x) = -16x^2 + 100$.
 Is $f(4)$ positive?
 
 
-```
+```julia; echo=false
 f(x) = -16x^2 + 100
 booleanq(f(4) > 0, labels=["yes", "no"])
 ```
@@ -455,7 +443,7 @@ Define the function $f(x) = x^3 - 3x + 2$
 What is the value of $f(10)$?
 
 
-```
+```julia; echo=false
 f(x) =  x^3 - 3x + 2
 numericq(f(10))
 ```
@@ -469,7 +457,7 @@ Define the function $f(x) = x^5 + x^4 + x^3$
 What is the value of $f(2)$?
 
 
-```
+```julia; echo=false
 f(x) =  x^5 + x^4 + x^3
 numericq(f(2))
 ```
@@ -479,7 +467,7 @@ numericq(f(2))
 
 Which of these functions will compute $f(x) = x^2 -2x + 1$?
 
-```
+```julia; echo=false
 radioq([
 "`f(x) = x^2 + 2*x + 1`",
 "`f(x) = x^2 - 2x + 1`",
@@ -494,11 +482,11 @@ radioq([
 
 Which of these functions will compute
 
-$$~
+```math
 f(x) = \frac{x^2 - 2x}{x^2 - 3x}?
-~$$
-
 ```
+
+```julia; echo=false
 radioq([
 "`f(x) = x^2 - 2x / x^2 - 3x`",
 "`f(x) = (x^2 - 2x) / x^2 - 3x`",
@@ -509,11 +497,11 @@ radioq([
 
 Which of these functions will compute
 
-$$~
+```math
 f(x) = e^{-x} \sin(x)?
-~$$
-
 ```
+
+```julia; echo=false
 radioq([
 "`f(x) = exp(x) * sin(x)`",
 "`f(x) = exp(sin(x))`",
@@ -521,7 +509,7 @@ radioq([
 ], 3)
 ```
 
-<hr/>
+
 
 
 ## Multi-step functions
@@ -531,7 +519,7 @@ If you want to define a more complicated function, say one with a few
 steps to compute, an alternate form for defining a function can be
 used:
 
-```verbatim
+```
 function function_name(function_arguments)
   ...function_body...
 end
@@ -542,7 +530,7 @@ contains a `return` call.
 
 For example, the following is a more verbose way to define $f(x) = x^2$:
 
-```
+```julia;
 function f(x)
   return(x^2)
 end
@@ -551,23 +539,21 @@ end
 The line `return(x^2)`, could have just been `x^2` as it is the last (and) only line evaluated.
 
 
-```
-example("Many parts")
-```
+##### Example: Many parts
 
 Imagine we have a complicated function, such as:
 
-$$~
+```math
  g(x) = \tan(\theta) x + \frac{32}{200 \cos\theta} x -
     32 \log\left(\frac{200 \cos\theta}{200\cos\theta - x}\right).
-~$$
+```
 
 where $k$ is the constant 1/2 and $\theta=\pi/4$. To avoid errors in
 transcribing, it can be be useful to break such definitions up into
 steps. Here we note the repeated use of $200\cos(\theta)$ in the defintion of $g(x)$,
 so we give that value the intermediate name of `a`
 
-```
+```julia
 function g(x)
 	 theta = pi/4
 	 a = 200*cos(theta)
@@ -582,9 +568,7 @@ defined.
 
 ## Functions defined by cases
 
-```
-example("Hockey-stick functions")
-```
+##### Example Hockey-stick functions
 
 Here is a different example, where we define a "hockey stick"
 function, a name for functions that are flat then increase linearly after some threshold.
@@ -597,7 +581,7 @@ Here we need to do one of two things depending if $x$ is greater or
 less than $500$. There are different ways to do this, here we  use
 an `if-else-end` statement, which takes the following form:
 
-```
+```julia
 function cell_phone(x)
 	 if x < 500
 	   return(30.0)
@@ -609,43 +593,39 @@ end
 
 To see what it would cost to talk for 720 minutes in a month, we have:
 
-```
+```julia
 cell_phone(720)
 ```
 
-```
-note("A subtlety")
-```
-
-
-We return `30.0` above -- and not the integer `30` -- when $x<500$ so
-that the function always returns a floating point value and not an
-integer if less than 0 and a floating point value if bigger.  In
-general it is a good programming practice to have functions return
-only one type of variable for a given type of input. In this case, as
-the answer could be real-valued -- and not just integer-valued, we
-want to return floating point values.
+!!! note "A subtlety"
+	We return `30.0` above -- and not the integer `30` -- when $x<500$ so
+	that the function always returns a floating point value and not an
+	integer if less than 0 and a floating point value if bigger.  In
+	general it is a good programming practice to have functions return
+	only one type of variable for a given type of input. In this case, as
+	the answer could be real-valued -- and not just integer-valued, we
+	want to return floating point values.
 
 
 A quick plot will show why the above function is called a "hockey stick" function:
 
-```
+```julia
 plot(cell_phone, 0, 1000)
 ```
 
 When functions that have different rules based on the specific value of $x$ that is input, the
  use "cases" notation is common. For example,
 
-$$~
+```math
 f(x) = \begin{cases}
 \cos(x) & x \geq 0\\
 1 - e^{-1/x^2} & \text{otherwise}.
 \end{cases}
-~$$
+```
 
 Translating this notation to `Julia` can also be done with the `if-else-end` construct:
 
-```
+```julia
 function f(x)
   if x >= 0
     cos(x)
@@ -672,7 +652,7 @@ One can use the so-called *ternary operator* `a ? b : c` for simple
 
 Basically, `a ? b : c` is the same as the more verbose
 
-```verbatim
+```
 if a
    b
 else
@@ -687,7 +667,7 @@ end
 So the cell-phone example could have been a
 one-liner:
 
-```
+```julia
 cell_phone(x) = x < 500 ? 30.0 : 30.0 + 0.25*(x - 500)
 ```
 
@@ -697,25 +677,25 @@ For mathematical functions, the directness of the ternary operator usually makes
 
 
 
-```
-note("Nesting the ternary operator")
-```
+
+##### Example: Nesting the ternary operator
+
 
 It can be convenient to nest ternary operators. In particular, when the cases involve have more than 2 possibilities. The following does something depending on whether `x` is positive, negative or zero:
 
-```
+```julia
 heaviside(x) = x > 0 ? 1.0 : x == 0.0 ? 0.0 : -1.0
 ```
 
 That is a mess to read, but easy to write. It can be made a bit clearer by using parentheses around the case where `x` is not greater than 0:
 
-```
+```julia
 heaviside(x) = x > 0 ? 1.0 : (x == 0.0 ? 0.0 : -1.0)
 ```
 
 Similarly, new lines can clear up the flow:
 
-```
+```julia
 heaviside(x) = x > 0 ? 1.0 :
                x == 0.0 ? 0.0 :
 			   -1.0
@@ -733,7 +713,7 @@ heaviside(x) = x > 0 ? 1.0 :
 
 Which of these definitions will be the equivalent of $f(x) = |x|$? (The `abs` function is already one):
 
-```
+```julia; echo=false
 choices =  ["`f(x) = x`",
 	    "`f(x) = x > 0 ? x : 0.0`",
 	    "`f(x) =   x > 0.0 ? x : -x`",
@@ -750,7 +730,7 @@ radioq(choices, ans)
 The `sign` function returns $-1$ for negative numbers $1$ for positive
 numbers and $0$ for 0. Which of these functions could do the same?
 
-```
+```julia; echo=false
 radioq(["`f(x) = x/x`",
 	      "`f(x) = x/abs(x)`",
 	      "`f(x) = x > 0 ? 1 : (x < 0 ? -1 : 0)`"],
@@ -770,14 +750,13 @@ T-Mobile has a pay as you go cell phone plan with the following terms:
 Which of these functions will model this?
 
 
-```
+```julia; echo=false
 radioq(["`f(x) = x > 30   ? 13*x + 1500.0        : 30.0`",
  	      "`f(x) = x > 1500 ? 30.0                 : 30.0 + 0.13*x`",
 	      "`f(x) = x > 1500 ? 30.0 + 0.13*(x-1500) : 30.0`"
 	     ], 3)
 ```
 
-<hr/>
 
 ## Functions of multiple arguments
 
@@ -787,7 +766,7 @@ natural application comes from describing basic properties of
 geometric objects. The following function definitions likely will
 cause no great concern when skimmed over:
 
-```
+```julia;
 Area(w, h) = w * h		                   # of a rectangle
 Volume(r, h) = pi * r^2 * h	                   # of a cylinder
 SurfaceArea(r, h) = pi * r * (r + sqrt(h^2 + r^2)) # of a right circular cone
@@ -821,7 +800,7 @@ scenes. As an example, to see how many different definitions ("methods") are def
 in the base `Julia` language for the `log` operator, we can execute:
 
 
-```
+```julia;
 methods(log)
 ```
 
@@ -838,13 +817,13 @@ The start of this problem is to represent the area in terms of one variable. We 
 
 Representing the area of a rectangle in terms of two variables is easy:
 
-```
+```julia;
 Area(w, h) = w * h
 ```
 
 But the other fact about this problem -- that the perimeter is 20 -- means that height depends on width. For this question, we can see that $P=2w + 2h$ so that
 
-```
+```julia;
 h(w) = (20  - 2*w)/2
 ```
 
@@ -854,7 +833,7 @@ we can let composition do the substitution and leave algebraic
 simplification for `Julia` to do:
 
 
-```
+```julia;
 Area(w) = Area(w, h(w))
 ```
 
@@ -870,7 +849,7 @@ decide which rule to call.
 For example, the `plot` function expects functions of a single numeric
 variable. Behind the scenes, then the function `A(w)` will be used in this graph:
 
-```
+```julia;
 plot(Area, 0, 10)
 ```
 
@@ -888,13 +867,13 @@ A simple case is a function which computes the $y$ value on a line
 $y=mx+b$ from a given $x$ value. Here $m$ and $b$ are parameters. We
 will give them a default of $1$ and $0$:
 
-```
+```julia
 mxplusb(x; m=1, b=0) = m*x + b
 ```
 
 The syntax is to use a semicolon  to separate regular arguments from those with keywords. This is not needed when calling the function:
 
-```
+```julia
 mxplusb(2)				## 1*2 + 0, using defaults
 mxplusb(2, m=2, b=3)		        ## 2*2 + 3, using passed in values
 ```
@@ -903,16 +882,16 @@ mxplusb(2, m=2, b=3)		        ## 2*2 + 3, using passed in values
 
 For a more complicated example, we revisit this function
 
-$$~
+```math
  g(x) = \tan(\theta) x + \frac{32}{200 \cos\theta} x -
      32 \log\left(\frac{200 \cos\theta}{200\cos\theta - x}\right).
-~$$
+```
 
 
 Rather than define the value of and $\theta$ outside the function, we can pass in the value
 for this *parameter* in this definition
 
-```
+```julia
 function g(x; theta=pi/4)
 	 a = 200*cos(theta)
 	 tan(theta)*x + (32/a)*x - 32*log(a/(a-x))
@@ -921,7 +900,7 @@ end
 
 The default means `g(50, theta=pi/4)` would be the same as
 
-```
+```julia
 g(50)
 ```
 
@@ -929,7 +908,7 @@ The parameter make it easy to look at other types of problems. For
 example, if the angle were less, would the value of $f$ be smaller or
 larger?
 
-```
+```julia
 g(50, theta=pi/8)		## smaller in this case.
 ```
 
@@ -941,11 +920,18 @@ place. (Scoping rules determine where variables that are not passed in
 as arguments are found when referred to within a function.)
 
 
-An alternate idiom for `Julia` is to pass parameters in through a *named* tuple typically denoted by `p`. For example:
+A common pattern in the `Julia` ecosystem is to use two positional
+arguments to pass in the function value(s) *and* the parameter(s)
+(through `f(x, p)`). A container is typically used for each, but in
+this example we pass in `x` as a number, and use a *named* tuple
+container to pass the parameters. The unpacking of parameters can be
+done in different ways, here we just access the named fields using
+`Julia`'s access notation (e.g. `p.b` gets the value named `b` from
+the tuple):
 
-```
+```julia
 function mxplusb(x, p)
-   m, x = p.m, p.x
+   m, b = p.m, p.b
    m * x + b
 end
 p = (m=2, b=1)
@@ -962,7 +948,7 @@ mxplusb(10, p)  # computes 2*10 + 1
 Which of these function definitions corresponds to shifting the
 function `f` to the right by `c` units and up by `d` units with a default of $0$ and $0$:
 
-```
+```julia; echo=false
 choices = [
 	"`g(x; c=0, d=0) = f(c * (x - d))`",
 	"`g(x; c=0, d=0) = c + f(x - d)`",
@@ -978,7 +964,7 @@ radioq(choices, ans)
 Which of these definitions will lengthen the period of a periodic
 function $f$ by a factor of $c$, with a default of $1$?
 
-```
+```julia; echo=false
 choices = [
 	"`g(x; c=1) = f(c * x))`",
 	"`g(x; c=1) = f(x / c)`",
@@ -994,25 +980,25 @@ radioq(choices, ans)
 The following transform of a function is at the core of wavelet
 theory:
 
-```
+```julia
 g(t; a=1, b=0) = (1/sqrt(a)) * f((t - b)/a)
 ```
 
 If $f(x) = \sin(x)/x$ and $a=2$ and $b=1$ compute $g(0, a=2, b=1)$.
 
 
-```
+```julia; echo=false
 f(x)  = sin(x)/x;
 g(t; a=1, b=0) =  (1/sqrt(a)) * f((t - b)/a);
 val = g(0, a=2, b=1);
 numericq(val)
 ```
 
-#### Question <small>what angle?</small>
+#### Question
 
 Let $g$ be defined by:
 
-```
+```julia
 function g(x; theta=pi/4)
 	 a = 200*cos(theta)
 	 tan(theta)*x + (32/a)*x + 32*log((a-x)/a)
@@ -1023,7 +1009,7 @@ For `x` in 20, 25, 30, 35, 40, 45 degrees, what value will maximize
 `g(125, theta=x*pi/180)`?
 
 
-```
+```julia; echo=false
 function g(x; theta=pi/4)
 	 a = 200*cos(theta)
 	 tan(theta)*x + (32/a)*x + 32*log((a-x)/a)
@@ -1034,7 +1020,6 @@ ans, ind = findmax(out)
 numericq(x[ind])
 ```
 
-<hr/>
 
 
 ## Anonymous functions
@@ -1043,14 +1028,14 @@ A common mathematical notation for a function that emphasizes the fact
 that $f$ maps $x$ to some value $y$ involving the rule of $f$ is to
 use an arrow as:
 
-$$~
+```math
 x \rightarrow -16x^2 + 32x
-~$$
+```
 
 
 You can do the exact thing in `Julia` to create a function:
 
-```
+```julia
 x -> -16x^2 + 32x
 ```
 
@@ -1064,7 +1049,7 @@ immediately forgotten. Such functions without a name are known as
 Anonymous functions are very useful when working with functions defined by parameters as they can fix values of a parameter.
 
 
-```
+```julia
 f(x, p) = cos(x) - x/p
 fn = x -> f(x, 2)  # fn fixes p=2 (a "closure")
 ```
@@ -1100,7 +1085,7 @@ focus on $d$ and $b$ which shift up and right.
 
 Let's make a function that takes $f$, some specifications, and returns $g$:
 
-```
+```julia
 function tform(f; shift_up=0, shift_right=0)
   x -> shift_up + f(x - shift_right)
 end
@@ -1112,7 +1097,7 @@ function. (The "arrow" in the last line is defining an anonymous function for re
 
 Here we look at $1/(x-2)$ evaluated at $3$:
 
-```
+```julia
 f(x) = 1/x
 tf(x) = tform(f, shift_right=2)(x) ## returns a function
 tf(3)
@@ -1133,7 +1118,7 @@ certain values of its parameters.
 What anonymous function will create $\sin(x^2)$?
 
 
-```
+```julia; echo=false
 choices = [
 "`x -> sin(x)^2`",
 "`x -> sin(x^2)`",
@@ -1150,7 +1135,7 @@ radioq(choices, ans)
 What anonymous function of $x$ will return the polynomial $x^2 - 2x$:
 
 
-```
+```julia; echo=false
 choices = [
 "`x ->x^2 - 2x`",
 "`() -> x^2 - 2x`",
@@ -1165,7 +1150,7 @@ radioq(choices, ans)
 
 What does this operator do?
 
-```
+```julia;
 function secant(f, a, b)
   m = (f(b) - f(a)) / (b-a)
   x -> f(a) - m * (x - a)
@@ -1174,7 +1159,7 @@ end
 
 
 
-```
+```julia; echo=false
 choices = [
 "It computes the slope of the secant line.",
 "It returns a function to compute the secant line between a and b.",
@@ -1190,13 +1175,13 @@ radioq(choices, ans)
 
 What does this function do?
 
-```
+```julia
 function mystery(f)
    x -> -f(x)
 end
 ```
 
-```
+```julia; echo=false
 choices=[
  "It is a mystery",
  "It returns a function whose graph is that of `f` reflected through the \$x\$ axis",
@@ -1222,7 +1207,7 @@ useful:
 A *tuple* is a container for holding different objects at once. They
 are made quite simply by enclosing the values in parentheses:
 
-```
+```julia
 (1, "one")
 ```
 
@@ -1233,7 +1218,7 @@ ensure $x$ is positive, as otherwise there will be an error. You can
 do this, where we return a value of `NaN` and a message when the user
 tries to use a negative number:
 
-```
+```julia
 f(x) = x > 0 ?  (x^x, "") : (NaN, "You can't use non-positive numbers")
 ```
 
@@ -1243,7 +1228,7 @@ same type of object, regardless the input.
 
 A simple call would be:
 
-```
+```julia
 f(-1)
 ```
 
@@ -1251,7 +1236,7 @@ We get a tuple back. `Julia` makes working with tuple return values
 very easy. We can *destructure* them by simply placing two variable
 names on the left-hand side:
 
-```
+```julia
 a, msg = f(-1)			# alternatively: (a, b) = f(-1)
 ```
 
@@ -1271,14 +1256,15 @@ variable. The easiest way to use these is to just mimic the regular
 mathematical notation as much as possible. However, there are times
 where we want to be specific about what possible values a user can
 place into a function. For example, a naive function to compute the
-binomial coefficients ,
-$$~
+binomial coefficients,
+
+```math
 { n \choose k } = \frac{n!}{(n-k)! k!},
-~$$
+```
 
 can be specialized to just integer values with:
 
-```
+```julia
 binom(n::Integer, k::Integer) = factorial(n)/(factorial(n-k) * factorial(k))
 ```
 
@@ -1288,13 +1274,13 @@ function only is called with both `n` and `k` are of this type.
 
 Then we can call our `binom` function as:
 
-```
+```julia
 binom(10,4)
 ```
 
 But not as follows, as $\pi$ is not an integer:
 
-```
+```julia
 binom(10, pi)
 ```
 
@@ -1321,20 +1307,20 @@ In `Julia` there are really two types of functions: *generic functions*
 and *anonymous functions*. A generic function is created when we use this form
 to create a function:
 
-```
+```julia
 g1(x) = sin(3x^2 - 2x^3)
 ```
 
 
 An anonymous function is made when we do something like
 
-```
+```julia
 g2 = x -> sin(3x^2 - 2x^3)
 ```
 
 For the most part the end user can't tell the difference:
 
-```
+```julia
 (g1(1), g2(1))
 ```
 
@@ -1342,7 +1328,7 @@ But, there are times when there can be a conflict, in particular when
 you try to redefine a generic function as an anonymous function:
 
 
-```
+```julia
 g1 = x -> sin(2x^2)
 ```
 
