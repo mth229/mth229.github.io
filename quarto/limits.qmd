@@ -1,0 +1,1304 @@
+# Investigating limits with Julia
+
+
+{{< include _common_code.qmd >}}
+
+<br/>
+A notebook for this material:
+[ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/05-limits.ipynb)
+[(Pluto html)](./229-projects/05-limits.html)
+[(With commentary)](./229-projects/05-limits-pluto-commentary.html)
+
+
+## Introduction
+
+
+The concept of a limit is what makes calculus possible. Limits are used to define the two main concepts of calculus: derivatives and integrals.  The *formal definition* of a limit is a bit difficult to appreciate and grasp. It involves an  "$\epsilon-\delta$" formulation:
+
+
+> The limit of $f(x)$ as $x$ approaches $c$ is $L$ if for every $\epsilon > 0$ there exists a $\delta > 0$ such that whenever $0 < |x - c| < \delta$ then $|f(x) - L| < \epsilon$.
+
+
+
+When a limit exists, we write:
+
+
+$$
+\lim_{x \rightarrow c} f(x) = L.
+$$
+
+However the *intuition* of limits is more accessible. This intuition was known as early as the Greeks: Archimedes figured out the area under a parabola over 2000 years ago by the method of exhaustion, a limiting process. Fermat in 1629 essentially took a limit to find the slope of a tangent line to a polynomial curve. Newton in the late 1600s, exploited the idea in his development of calculus (as did Leibnez). Yet it wasn't until the 1800s that [Bolzano, Cauchy, and Weierstrass](http://en.wikipedia.org/wiki/Limit_of_a_function#History) put the idea on a firm footing, as above.
+
+
+To get the intuition behind a limit we replace the absolute value inequalities in the definition with "close" and read as follows: as $x$ gets "close" to $c$ (but not equal), then $f(x)$ should get "close" to $L$.
+
+
+## Many limits are found just by evaluating the function
+
+
+Before beginning, it should be noted that for most values of $c$, the answer is simply $L=f(c)$. This is because *most* all the functions encountered will be continuous which is basically a statement that for any $c$ the limit is given through $L=f(c)$.
+
+
+For example, let $f(x) = \sin(x)/x$. For any $c$ *except* $0$, $f(x)$ is continuous and the limit exists and is simply $f(c)$. In particular, at $c=1$ we have
+
+
+$$
+\lim_{x \rightarrow 1} \frac{\sin(x)}{x} = \frac{\sin(1)}{1}.
+$$
+
+However, at $c=0$ we can't say $f(x)$ is continuous – it isn't even defined. When $c$ is non-zero, the function $f(x)$ is simply the ratio of two continuous functions. Such a ratio will be continuous except when dividing by $0$, as is the case when $c=0$
+
+
+When discussing limits of combinations of continuous functions it is generally true that the limit is found by evaluating the function at $c$ unless this yields an **indeterminate form** which is of the type: $0/0$, $\infty/\infty$, $0 \cdot \infty$, $\infty - \infty$, $0^0$, $1^\infty$, and $\infty^0$. Such forms can have limits of many different values, depending on the functions involved.
+
+
+For this particular problem what does `Julia` return when we try to evaluate $f(c)$?
+
+
+```{julia}
+f(x) = sin(x)/x
+c = 0
+f(c)
+```
+
+The value `NaN` arises when a floating-point computation is indeterminate.
+
+
+So, does $\sin(x)/x$ have a limit at $c=0$? If it does, it isn't simply $f(0)$.
+
+
+:::{.callout-note}
+## `NaN` values
+Operations involving `NaN` will also return `NaN`.  In this example, the ratio defining $f(x)$ is like $0/0$ when $c=0$ – an indeterminate form. The value `NaN` is returned by *most* of the indeterminate forms listed above, but not all. For example, `0^0` is `1` to `Julia`:
+
+"It proved more useful to adhere to the simply stated rule *anything raised to the $0$ gives $1$ then special case $0^0$. Some comments by the "father of floating point" can be read [near the end of this](http://people.freebsd.org/~das/kahan86branch.pdf)."
+
+:::
+
+## Graphical approach to limits
+
+
+A graphical approach to this problem can show if a function is likely to have a limit. The basic idea is to simply make a graph around $c$ and look to see if $f(x)$ gets close to some value as $x$ gets close to $c$:
+
+
+```{julia}
+using MTH229
+using Plots
+```
+
+```{julia}
+#| echo: false
+using QuizQuestions
+using LaTeXStrings
+```
+
+```{julia}
+f(x) = sin(x)/x
+c, delta = 0, pi/2
+plot(f, c - delta, c + delta)
+```
+
+From the graph it looks like the function value should be $1$ at $0$. Which is indeed the case, as was understood as early as 1735 by Euler.
+
+
+Recall that the graph is made by choosing a large number of points between the limits and then evaluating the function at each of these points. The values $(x,f(x))$ are then connected like a dot-to-dot figure. If a value is `NaN`, the line will break to indicate this. In the above graph, it appears that $0$ is not one of the points sampled, as no break is indicated. The graph gives the appearance that $f(x)$ is continuous, though we know that isn't the case, as $f(x)$ is undefined at $x=0$.
+
+
+### Removable singularities
+
+
+Consider now the following limit
+
+
+$$
+\lim_{x \rightarrow 2} \frac{x^2 - 5x + 6}{x^2 +x - 6}
+$$
+
+Noting that this is a ratio of continuous functions, we first check whether there is anything to do:
+
+
+```{julia}
+f(x) = (x^2 - 5x + 6) / (x^2 + x - 6)
+c = 2
+f(c)
+```
+
+The `NaN` indicates that this function is indeterminate at $c=2$. A quick plot gives us an idea that the limit exists and is roughly $-0.2$:
+
+
+```{julia}
+c, delta = 2, 1
+plot(f, c - delta, c + delta)
+```
+
+The graph looks continuous. In fact, the value $c=2$ is termed a **removable discontinuity** as redefining $f(x)$ to be $-0.2$ when $x=2$ results in a continuous function.
+
+
+As an aside, you can redefine `f` using the "ternary operator":
+
+
+```{julia}
+f(x) = x == 2.0 ? -0.2 :  (x^2 - 5x + 6) / (x^2 + x - 6)
+```
+
+This particular case is a textbook example: one can easily factor $f(x)$ to get:
+
+
+$$
+f(x) = \frac{(x-2)(x-3)}{(x-2)(x+3)}
+$$
+
+Written in this form, we clearly see that this is the same function as $g(x) = (x-3)/(x+3)$ when $x \neq 2$. The function $g(x)$ is continuous at $x=2$. So were one to redefine $f(x)$ at $x=2$ to be $g(2) = (2-3)/(2+3) = -0.2$ it would be made continuous, hence the term removable singularity.
+
+
+### Problems
+
+
+#### Question
+
+
+By graphing near $1$, find the limit:
+
+
+$$
+L = \lim_{x \rightarrow 1}  \frac{x^2−3x+2}{x^2−6x+5}
+$$
+
+```{julia}
+#| echo: false
+answer = 1/4
+numericq(answer, 1e-1)
+```
+
+#### Question
+
+
+Graphically look at the following limit
+
+
+$$
+L = \lim_{x \rightarrow -2} \frac{x}{x+1} \frac{x^2}{x^2 + 4}
+$$
+
+What is the value?
+
+
+```{julia}
+#| echo: false
+f(x) = x/(x+1)*x^2/(x^2+4)
+val = f(-2)
+numericq(val, 1e-3)
+```
+
+#### Question
+
+
+Graphically investigate the limit
+
+
+$$
+L = \lim_{x \rightarrow 0} \frac{e^x - 1}{x}.
+$$
+
+What is the value of $L$?
+
+
+```{julia}
+#| echo: false
+val = exp(0)
+numericq(val, 1e-1)
+```
+
+#### Question
+
+
+Graphically investigate the limit
+
+
+$$
+\lim_{x \rightarrow 0} \frac{\cos(x) - 1}{x}.
+$$
+
+The limit exists, what is the value?
+
+
+```{julia}
+#| echo: false
+val = 0
+numericq(val, 1e-2)
+```
+
+#### Question
+
+
+The following limit is commonly used:
+
+
+$$
+L = \lim_{h \rightarrow 0} \frac{e^{x + h} - e^x}{h}.
+$$
+
+Factoring out $e^x$ from the top and using rules of limits this becomes,
+
+
+$$
+L = e^x \lim_{h \rightarrow 0} \frac{e^h - 1}{h}.
+$$
+
+What is $L$?
+
+
+```{julia}
+#| echo: false
+choices = [L"0", L"1", L"e^x"]
+answer = 3
+buttonq(choices, answer, explanation="The limit part is ``1`` not the limit.")
+```
+
+#### Question
+
+
+The following limit is commonly used:
+
+
+$$
+\lim_{h \rightarrow 0} \frac{\sin(x + h) - \sin(x)}{h} = L.
+$$
+
+The answer should depend on $x$, though it is possible it is a constant.  Using a double angle formula and the rules of limits, this can be written as:
+
+
+$$
+L = \cos(x) \lim_{h \rightarrow 0}\frac{\sin(h)}{h} + \sin(x) \lim_{h \rightarrow 0}\frac{\cos(h)-1}{h}.
+$$
+
+Using the last result, what is the value of $L$?
+
+
+```{julia}
+#| echo: false
+choices = [L"\cos(x)", L"\sin(x)", L"1", L"0", L"\sin(h)/h"]
+answer = 1
+buttonq(choices, answer, explanation="""
+The two limits are ``1`` and ``0``, respectively, leaving just ``\\cos(x)`` for the answer.
+""")
+```
+
+#### Question
+
+
+The function $f(x) = (x^2 - 4)/(x-2)$ has a removable singularity at $x=2$. What value would you redefine $f(2)$ to be, to make $f$ a continuous function?
+
+
+```{julia}
+#| echo: false
+f(x) = (x^2 -4)/(x-2);
+numericq(f(2.00001), .001)
+```
+
+#### Question: Squeeze theorem
+
+
+Let's look at the function $f(x) = x \sin(1/x)$. A graph around $0$ can be made with:
+
+
+```{julia}
+f(x) = x == 0 ? NaN : x * sin(1/x)
+c, delta = 0, 1/4
+plot(f, c - delta, c + delta)
+g(x) = abs(x); h(x) = - abs(x)
+plot!(g)
+plot!(h)
+```
+
+This graph clearly oscillates near $0$. To the graph of $f$, we added graphs of both $g(x) = |x|$ and $h(x) = - |x|$. From this graph it is easy to see by the "squeeze theorem" that the limit at $x=0$ is $0$. Why?
+
+
+```{julia}
+#| echo: false
+choices=["The functions g and h both have a limit of 0 at x=0 and the function f is in between both g and h, so must to have a limit of 0.",
+         "The functions g and h squeeze each other as g(x) > h(x)",
+         "The function f has no limit -- it oscillates too much near 0"]
+answer = 1
+radioq(choices, answer)
+```
+
+#### Question
+
+
+The highly oscillatory function
+
+
+$$
+f(x) = x^2 (\cos(1/x) - 1)
+$$
+
+has a removable singularity at $x=0$. What value would you redefine $f(0)$ to be, to make $f$ a continuous function?
+
+
+```{julia}
+#| echo: false
+numericq(0, .001)
+```
+
+#### Question: No limit
+
+
+Some functions do not have a limit. Make a graph of $\sin(1/x)$ from $0.0001$ to $1$ and look at the output. Why does a limit not exist?
+
+
+```{julia}
+#| echo: false
+choices=["The limit does exist -- it is any number from -1 to 1",
+  "Err, the limit does exists and is 1",
+  "The function oscillates too much and its y values do not get close to any one value",
+  "Any function that oscillates does not have a limit."]
+answer = 3
+radioq(choices, answer)
+```
+
+## Getting close graphically
+
+
+Consider again the limit of $f(x) = \sin(x)/x$, whose answer is not obvious from the formula, but from the graph we could see that $f(x)$ goes to $L=1$ as $x$ goes to $0$.
+
+
+We can further illustrate how the function gets close to the limit of $1$ by restricting the graph to values near $c$:
+
+
+```{julia}
+f(x) = sin(x) / x
+c, delta = 0, 1e-1
+plot(f, c-delta, c+delta)
+```
+
+We see a similar picture, with an answer of $1$. A smaller $\delta$ yields a similar picture:
+
+
+```{julia}
+c, delta = 0, 1e-3
+plot(f, c-delta, c+delta)
+```
+
+The graphs have a similar shape – but different scales. A closer look at the $y$ axis shows that for `delta = 1e-1` (or $1/10$) the range of $y$ values is about $1/1000$ and for `delta = 1e-3` it is about $1/10,000,000$.
+
+
+We can be more precise. The following function estimate the length of the range of the plotted values:
+
+
+```{julia}
+function epsilon(f, c, delta)
+	 xs = range(c - delta, stop=c + delta, length=100)
+	 ys = f.(xs)    	# like drawing a plot
+	 m, M = extrema(ys)	# minimum and maximum
+	 M - m
+end
+
+(epsilon(f, 0, 1e-1), epsilon(f, 0, 1e-3))
+```
+
+Numerically we see as $x$ gets close to $0$ (`delta` gets small) $f(x)$ gets close to a limit (`epsilon` gets small).
+
+
+In fact for this problem we can be a bit more precise, as one can infer that $\epsilon/(1/6 \cdot\delta^2)$ is basically 1.
+
+
+We can empirically verify this for one value of $\delta$ with
+
+
+```{julia}
+delta = 1e-2
+epsilon(f, 0, delta) / (1/6*delta^2)
+```
+
+The ratio is basically $1$, as advertised.
+
+
+Of course, using a comprehension we can do this comparison for different sized values of $\delta$ at once:
+
+
+```{julia}
+deltas = [1/10, 1/10^2, 1/10^3, 1/10^4, 1/10^5]
+[epsilon(f, 0, delta)/(1/6*delta^2) for delta in deltas]
+```
+
+This isn't quite what needs to be shown in the proof of a limit: we are essentially finding an epsilon for a given delta rather than a delta for a given epsilon. It does suggest that were we to attempt a formal proof, we should look at $\delta$ which is basically $\sqrt{6 \epsilon}$.
+
+
+### Problem
+
+
+#### Question
+
+
+Consider the limit
+
+
+$$
+L = \lim_{h \rightarrow 0} \frac{(1 + h)^2 - 1^2}{h}
+$$
+
+Guess the relationship between `epsilon` and `delta`
+
+
+```{julia}
+#| echo: false
+choices = [
+L" $\epsilon/\delta$ is constant",
+L" $\epsilon/\delta^2$ is constant",
+L" $\epsilon/\delta^3$ is constant"]
+answer = 1
+radioq(choices, answer, keep_order=true)
+```
+
+## Using a table to investigate limits
+
+
+A table can be used to investigate limits of functions. The basic idea is that if
+
+
+$$
+\lim_{x \rightarrow c} f(x) = L
+$$
+
+then for values of $x$ close to $c$, we should have that the values of $f$ for these $x$ are close to $L$. For example, let's look at this limit again:
+
+
+$$
+\lim_{x \rightarrow 2} \frac{(x+2)(x-3)}{(x+2)(x+3)}
+$$
+
+which we know is simply $-1/5$. To approach this problem using a table we would first need to produce some values of $x$ getting close to $2$. Here we get values approaching 2 from above:
+
+
+```{julia}
+hs = [1/10, 1/100, 1/1000, 1/10000, 1/100000]  # or [1/10^i for i in 1:5]
+xs = 2 .+ hs
+```
+
+The corresponding $y$ values are found by applying $f$ to each:
+
+
+```{julia}
+f(x) = ((x+2)*(x-3)) / ((x+2)*(x+3))
+ys = f.(xs)
+```
+
+The `ys` are clearly getting closer to $-0.2$, as expected.
+
+
+The pairs of values `xs` and `ys` can be more naturally displayed with a table, the square-bracket notation is useful here to put the values into two columns:
+
+
+```{julia}
+[xs ys]
+```
+
+The above investigates the right limit, as the values chosen for `xs` are always more than 2 but getting closer. The left limit might have used `xs` defined with:
+
+
+```{julia}
+xs = [2 - 1/10, 2 - 1/100, 2 - 1/1000, 2 - 1/10000, 2 - 1/100000]
+ys = f.(xs)
+[xs ys]
+```
+
+We see the same phenomenon – $f(x)$ gets close to $-0.2$ as $x$ gets close to $c=2$ from the left or the right.
+
+
+The three steps above are  bit tedious to type for each problem, so for convenience we encapsulate them into a function (available in the `MTH229` package) call `lim` defined along these lines:
+
+
+```{julia}
+#| eval: false
+function lim(f::Function, c::Real; n::Int=6, dir="+")
+	hs =  [(1/10)^i for i in 1:n]
+	 if dir == "+"
+	   xs = c .+ hs
+	 else
+	   xs = c .- hs
+	 end
+	 ys = f.(xs)
+	 [xs ys]
+end
+```
+
+We used keywords, `n`, to allow the user to change how close the `xs` get to $c$ and `dir` to indicate the direction. The default direction is from the right.
+
+
+Now consider the limit of $x^x$ as $x$ goes to $0$ from the right. Though `julia` – following a standard – defines this function at $0$, it is of indeterminate form so should be investigated.
+
+
+```{julia}
+f(x) = x^x
+c = 0
+f(c)
+```
+
+And we see that the output from `lim` agrees with an answer of $1$ for the *right* limit:
+
+
+```{julia}
+lim(f, c; dir="+")
+```
+
+For our next example, we compute numerically (a tedious problem to do algebraically)
+
+
+$$
+\lim_{x \rightarrow 25} \frac{\sqrt{x} - 5}{\sqrt{x-16} - 3}
+$$
+
+```{julia}
+f(x) = (sqrt(x) - 5) / (sqrt(x-16) - 3)
+c = 25
+lim(f, c)
+```
+
+A quick investigation of the table demonstrates the limit should be $0.6$.
+
+
+##### Example: The slope of the secant line
+
+
+A very important limit in calculus is the derivative formula, written here to emphasize the secant line aspect:
+
+
+$$
+\lim_{x \rightarrow c} \frac{f(x) - f( c)}{x-c}.
+$$
+
+Let's take $c = 1$ and $f(x) = x^x$ and compute the limit above:
+
+
+```{julia}
+f(x) = x^x
+c = 1;
+g(x) = (f(x) - f(c)) / (x - c)
+lim(g, c)
+```
+
+The left limit has a similar tale.  We take this as strong evidence that the limit is $1$
+
+
+### Practice
+
+
+#### Question
+
+
+Find the limit as $x$ goes to $2$ of
+
+
+$$
+f(x) = \frac{3x^2 - x -10}{x^2 - 4}
+$$
+
+```{julia}
+#| echo: false
+f(x) = (3x^2 - x - 10)/(x^2 - 4);
+numericq(f(2.00001), .001)
+```
+
+#### Question
+
+
+Find the limit as $x$ goes to $-2$ of
+
+
+$$
+f(x) = \frac{\frac{1}{x} + \frac{1}{2}}{x^3 + 8}
+$$
+
+```{julia}
+#| echo: false
+f(x) = ((1/x) + (1/2))/(x^3 + 8)
+numericq(-1/48, .001)
+```
+
+#### Question
+
+
+Find the limit as $x$ goes to $27$ of
+
+
+$$
+f(x) = \frac{x - 27}{x^{1/3} - 3}
+$$
+
+```{julia}
+#| echo: false
+f(x) = (x - 27)/(x^(1/3) - 3)
+numericq(0, 0.001)
+```
+
+#### Question
+
+
+Find the limit
+
+
+$$
+L = \lim_{x \rightarrow 0}(1+x)^{1/x}.
+$$
+
+```{julia}
+#| echo: false
+numericq(exp(1), 0.001)
+```
+
+#### Question
+
+
+Find the limit
+
+
+$$
+L = \lim_{x \rightarrow \pi/2} \frac{\tan (2x)}{x - \pi/2}
+$$
+
+```{julia}
+#| echo: false
+f(x) = tan(2x)/(x-pi/2)
+numericq(f(pi/2-.0001), 0.001)
+```
+
+#### Question: limit properties
+
+
+There are several properties of limits that allow one to break down more complicated problems into smaller subproblems. For example,
+
+
+$$
+\lim (f(x) + g(x)) = \lim f(x) + \lim g(x)
+$$
+
+is notation to indicate that one can take a limit of the sum of two function or take the limit of each first, then add and the answer will be unchanged, provided all the limits in question exist.
+
+
+Use one or the either to find the limit of $f(x) = \sin(x) + \tan(x) + \cos(x)$ as $x$ goes to $0$.
+
+
+```{julia}
+#| echo: false
+f(x) = sin(x) + tan(x) + cos(x)
+numericq(f(0), 1e-5)
+```
+
+#### Question: From Strang, attributed to Stein
+
+
+Look at the figure of a sector of a circle of radius 1 and the subtended section.
+
+
+![subtended angle](figures/limits/subtended-angle.png)
+
+
+```{julia}
+#| echo: false
+# <script>
+# // theta = pi/6
+# // r = 1
+# // plot.new()
+# // plot.window(xlim=c(0,1), ylim=c(0,sin(theta)))
+# // polygon(c(0, cos(theta), cos(theta)), c(0, 0, sin(theta)))
+
+# // t = seq(0, theta, length=100)
+# // polygon(c(cos(theta), 1, cos(t)), c(0, 0, sin(t)), col="gray")
+# // text(.15 * cos(theta/2), .15 * sin(theta/2), "theta")
+# // text(.5, 0, "1", pos=1)
+# </script>
+nothing
+```
+
+Let $f(\theta)$ be the area of the triangle and $g(\theta)$ the shaded region. What is the limit
+
+
+$$
+\lim_{\theta \rightarrow 0+} \frac{f(\theta)}{g(\theta)}?
+$$
+
+```{julia}
+#| echo: false
+numericq(1, 1e-3)
+```
+
+#### Question
+
+
+Does this function have a limit as $h$ goes to $0$ from the right (that is, assume $h>0$)?
+
+
+$$
+\frac{h^h - 1}{h}
+$$
+
+```{julia}
+#| echo: false
+choices = [
+"Yes, the value is `-9.2061`",
+"Yes, the value is `-11.5123`",
+"No, the value heads to negative infinity"
+];
+answer = 3;
+radioq(choices, answer)
+```
+
+### Practice
+
+
+#### Question: $0^0$
+
+
+Is the form $0^0$ really indeterminate?
+
+
+Consider this limit:
+
+
+$$
+\lim_{x \rightarrow 0+} x^{1/\log_k(x)} = L.
+$$
+
+In `julia`, $\log_k(x)$ is found with `log(k,x)`. The default, `log(x)` takes $k=e$ so gives the natural log. So, we would define `f`, for a given `k`, with
+
+
+```{julia}
+k = 10				# say. Replace with actual value
+f(x) = x^(1/log(k, x))
+```
+
+Consider different values of $k$ to see if the limit depends on $k$ or not. What is $L$?
+
+
+```{julia}
+#| echo: false
+choices = [L"1", L"k", L"\log(k)", "The limit does not exist"]
+answer = 2
+radioq(choices, answer)
+```
+
+#### Question $0^0$
+
+
+Next, consider this limit:
+
+
+$$
+\lim_{x \rightarrow 0+} x^{k\cdot x} = L.
+$$
+
+Consider different values of $k$ to see if this limit depends on $k$ or not. What is $L$?
+
+
+```{julia}
+#| echo: false
+choices = [L"1", L"k", L"\log(k)", "The limit does not exist"]
+answer = 1
+radioq(choices, answer)
+```
+
+## Limits at infinity
+
+
+The concept of a limit can be extended. For example, the concept of a limit as $n$ goes to infinity for some sequence of values parameterized by $n$.
+
+
+Let's compute $\pi$ as the circumference of a circle of radius 1 by approximating the circle by an inscribed regular polygon with $n$ sides. The legnth, $k$, of a given side is
+
+
+$$
+k = 2 \sin(\frac{2\pi}{2n})
+$$
+
+As can be seen by taking the isoceles triangle with angle $2\pi/n$ and dropping a horizontal with opposite length 1/2 the entire length.
+
+
+![inscribed](figures/limits/gauss-inscribed.png)
+
+
+```{julia}
+#| echo: false
+# <script>
+# // plot.new()
+# // plot.window(xlim=c(-1,1), ylim=c(-1,1))
+# // n <- 17
+# // plot_circ = function(n, ...) {
+# //   theta <- seq(0, 2*pi, length=n)
+# //   x <- cos(theta); y <- sin(theta)
+# //   lines(x, y, ...)
+# // }
+# // plot_circ(1000, col="gray")
+# // plot_circ(n+1, col="black")
+
+# // t <- 2*pi/17
+# // lines(c(1, 0, cos(t)), c(0,0, sin(t)))
+# // text(cos(t/2), sin(t/2), expression(k), pos=4)
+# </script>
+nothing
+```
+
+Thus the total length is
+
+
+$$
+l_n = n \cdot 2 \sin(\frac{2\pi}{2n})
+$$
+
+As $n$ goes to $\infty$ this should go to the circumference of the circle of radius 1 or $2\pi$. (This was used as early as the [Egyptians](http://en.wikipedia.org/wiki/Approximations_of_%CF%80#Early_history) with an octagon to approximate $\pi$.)
+
+
+Let's see.
+
+
+```{julia}
+n_to_infinity = [10^i for i in 1:15]
+l(n) =  n * 2sin( (2pi)/(2n) )
+[l(n) for n in n_to_infinity]
+```
+
+To compare to $2\pi$ we can divide instead:
+
+
+```{julia}
+[ l(n)/(2pi) for n in n_to_infinity ]
+```
+
+As the ratio has a limit of $1$ we conclude that $l(n)$ goes to $2\pi$.
+
+
+There isn't much difference to the above than what we did before, except we take increasing larger values for $n$, not values getting close to 0 for $x$.
+
+
+### Practice
+
+
+#### Question
+
+
+Use an *inscribed* octagon to approximate $\pi$ (e.g., take $n=8$ and look at $l(n)/2$, with $l$ defined above). What do you get?
+
+
+```{julia}
+#| echo: false
+numericq(l(8)/2, .0001)
+```
+
+#### Question
+
+
+Archimedes used interior $96$-gons and exterior ones to estimate $\pi$ from above and below. The circumference of the exterior polygon is:
+
+
+```{julia}
+L(n) = n*2*tan((2*pi)/(2*n))
+```
+
+What is the difference between $L(96)/2$ and $l(96)/2$?
+
+
+```{julia}
+#| echo: false
+numericq(L(96/2) - l(96/2), .0001)
+```
+
+#### Question: (and why not call it [b](http://en.wikipedia.org/wiki/E_(mathematical_constant)#History)?)
+
+
+Jacob Bernoulli looked at the limit
+
+
+$$
+\lim_{x \rightarrow \infty} (1 + \frac{1}{x})^x
+$$
+
+What value did he find?
+
+
+```{julia}
+#| echo: false
+numericq(exp(1), .001)
+```
+
+#### Question: The Basel problem
+
+
+Euler looked at $\sin(x)/x$ in his solution to the "Basel" problem, that is finding the sum of:
+
+
+$$
+1 + \frac{1}{2^2} + \frac{1}{3^2} + \frac{1}{4^2} + \frac{1}{5^2} + \cdots =
+\lim_{n \rightarrow \infty} \sum_n \frac{1}{i^2}.
+$$
+
+Euler rewrote a series expansion for $\sin(x)/x$ to get his famous answer of $\pi^2/6$. Using this function
+
+
+```{julia}
+basel(n) = sum( [1/i^2 for i in 1:n] )
+```
+
+how big must $n$ be so that `pi^2/6 - basel(n) < 1e-3`?
+
+
+```{julia}
+#| echo: false
+choices=[
+"`10`",
+"`100`",
+"`1000`",
+"`10_000`"
+];
+answer=3;
+radioq(choices, answer, keep_order=true)
+```
+
+#### Question
+
+
+The sum $1 + 1/2 + 1/3 + 1/4 + \cdots$ does not converge. In fact, the sum of the first $n$ terms gets closer and closer to $\log(n)$ plus a constant. That is, this function does have a [limit](http://en.wikipedia.org/wiki/Euler%E2%80%93Mascheroni_constant) as $n$ goes to $\infty$:
+
+
+```{julia}
+euler_mascheroni(n) = sum([1/i for i in 1:n]) - log(n)
+```
+
+Use this:
+
+
+```{julia}
+#| eval: false
+[euler_mascheroni(i) for i in (10.0).^(1:7)]
+```
+
+to find an answer to $6$ decimal points.
+
+
+```{julia}
+#| echo: false
+numericq(euler_mascheroni(10^7), 1e-4)
+```
+
+## Floating point uncertainties
+
+
+A related limit to $\sin(x)/x \rightarrow 0$ is:
+
+
+$$
+\lim_{x \rightarrow 0} \frac{1-\cos(x)}{x^2} = \frac{1}{2}.
+$$
+
+Related in that they are used to approximate related functions near $0$: $\sin(x) \approx x$ and $1 - \cos(x) \approx (1/2) x^2$. A graphic shows the latter approximation:
+
+
+```{julia}
+plot([x -> 1 - cos(x), x -> x^2/2], -pi, pi)
+```
+
+Note in the figure how the parabola tracks the shape of the transformed cosine function very well near $x=0$ but not necessarily far from $0$.
+
+
+Numerically, we have a different story. We see that there are limitations to our approach to finding limits that show up in analyzing this.
+
+
+Here is a first attempt
+
+
+```{julia}
+f(x) = (1 - cos(x))/x^2
+c = 0
+xs = [c + (1/10)^i for i in 1:10]
+ys = f.(xs)
+[xs ys]
+```
+
+We notice something odd – the values ultimately become $0$ when we just said they should become $1/2$. At least for most of the output things look okay, but then something goes terribly wrong.
+
+
+The culprit? Floating point approximation involves round off errors.
+
+
+Let's look at the two pieces. First the denominator:
+
+
+```{julia}
+denominator = [ x^2 for x in xs ]
+```
+
+There is nothing here to speak of. `Julia`'s `Float64` type follows the IEEE 754 floating point standard. Of the 64 bits, 1 is used for the sign (plus or minus) and 11 are used to store the exponent. See this informative blog post for more [Anatomy of a floating-point number](http://www.johndcook.com/blog/2009/04/06/anatomy-of-a-floating-point-number/). As $2^{11} = 2048$ roughly half are used for negative exponents, the other half for positive exponents. The range is from `1e-1022` to `1e1023`. We aren't even close to the lower range with `1e-20`.
+
+
+Now, let's look at the numerator. The issue is the difference between $\cos(x)$ and 1. Let's look with the small values printed:
+
+
+```{julia}
+numerator = [ 1-cos(x) for x in xs ]
+[xs numerator]
+```
+
+Instead of giving a value that is roughly $5 \cdot 10^{-(2n+1)}$, the value becomes $0$ – not just numbers close to $0$. Hence, when the numerator is divided by even the smallest of numbers, the answer is simply $0$.
+
+
+In general, we add to our few rules of thumb for computation with floating-point numbers:
+
+
+> If we subtract two like-sized quantities our answer may have dramatically reduced precision.
+
+
+
+In this specific case by the time we get to $10^{-8}$, the difference between $\cos(x)$ and $1$ is looking to be around `5e-17`. However, in floating point representation there are fundamental limits to how close different things can be. Of the 64 bits representing a number, 52 are used for the precision. (A number, $s \cdot p \cdot 10^e$, is represented with a sign, the precision and an exponent.) This puts the restriction on what can be represented and ultimately gives a granularity if one looks too closely – without working harder. In this particular case, the floating point approximation for $1$ and that for $\cos(x)$ are eventually the same value – even if they are different mathematically.
+
+
+The value
+
+
+```{julia}
+eps()
+```
+
+measures how much larger the next representable number *after* $1.0$ is from $1.0$. (Of course, this has no answer in the real numbers, but floating point is a discrete approximation.)
+
+
+What has happened with $1-\cos(x)$ is the mathematical value of $\cos(x)$ gets too close to 1 when $x = 10^{-8}$ and so the difference is treated as $0$ as the two numbers have the same representation. Since $0$ divided by any non-zero number is zero, we get a reasonable answer for the at-first unexpected behavior.
+
+
+So be careful, we can  get *too* close when looking "close."
+
+
+:::{.callout-note}
+## Investigating how numbers are represented in floating point: prevfloat
+`Julia` has some functions for working with floating point numbers. Some of you might be thinking that since `eps` is the difference to the next representable number larger than 1, what is the same for the next representable number *less* than one. The `prevfloat` value gives this. Here we see the issue between $10^{-7}$ and $10^{-8}$:
+
+:::
+
+```
+prevfloat(1.0) < cos(1e-7)
+prevfloat(1.0) < cos(1e-8)
+```
+
+Floating point approximations differ depending on the location. Look at the difference between `1.0- prevfloat(1.0)` and `nextfloat(1.0) - 1`. Then look at how small `nextfloat(0.0)` is.
+
+
+### Practice
+
+
+#### Questions
+
+
+is `eps() == nextfloat(1.0)`?
+
+
+```{julia}
+#| echo: false
+booleanq(true)
+```
+
+#### Question (bitstring etc)
+
+
+The `bitstring` function prints the bit representation of a number. For real numbers, the first bit is the sign, the next 11 the exponent and the last 52 are for the precision. Let's look at the values for a few:
+
+
+```{julia}
+bitstring(cos(1e-7))
+bitstring(cos(1e-8))
+bitstring(1.0)
+```
+
+We see here how two different real numbers have the same floating point representation.
+
+
+For fun, what is the difference between `bitstring(-1.0)` and `bitstring(1.0)`?
+
+
+```{julia}
+#| echo: false
+choices = ["The last bit on the right is different",
+     	   "The first bit on the left is different",
+	   "The 2 through 12th bit (on the left) are all 1."
+	   ];
+answer = 2;
+radioq(choices, answer)
+```
+
+#### Question: bitstring etc.
+
+
+What is the difference between `bitstring(NaN)` and `bitstring(Inf)`? (These two are coded specially in floating point.)
+
+
+```{julia}
+#| echo: false
+choices= ["The first bit on the right is different",
+	  "Bits 2-12 are the same, but bit 13 differs, that's all",
+	  "They are identical, both are not numbers"];
+answer = 2;
+radioq(choices, answer)
+```
+
+## Symbolic answers
+
+
+The `SymPy` package for `Julia` provides a means to for `Julia` users to interact with the `SymPy` add-on for the `Python` programming language. This package is loaded by the `MTH229` package. The SymPy package provides symbolic math features. One such feature is the ability to perform symbolically the limit of $f(x)$ as $x$ approaches $c$.
+
+
+The `limit` function accesses these features. Its basic use is straightforward, just pass a symbolic expression, and indicate the variable going to `c`:
+
+
+```{julia}
+@syms x
+f(x) = sin(x)/x
+c = 0
+limit(f(x), x=>c)
+```
+
+Or, with a limit at infinity
+
+
+```{julia}
+f(x) = (1 + 1/x)^x
+c = oo                 # oo is symbolic infinity. Can also use Inf.
+limit(f(x), x=>c)
+```
+
+The latter shows the results are not quite real numbers. Rather, they are symbolic values. We aren't discussing these here, but the values are readily apparent.
+
+
+The command `@syms x` creates `x` as a symbolic variable. The call `f(x)` returns a symbolic expression. These can also be created directly, as with `sin(x)/x`.
+
+
+The `limit` function has one named argument, `dir`, used to adjust if a left, right (the default) limit is sought. For example, this function has different left and right limits at 0:
+
+
+```{julia}
+f(x) = sign(x)
+@syms x
+limit(f(x), x=>0, dir="-"), limit(f(x), x=>0, dir="+")
+```
+
+The [algorithm](http://www.cybertester.com/data/gruntz.pdf) implemented in `SymPy` for symbolic limits is quite powerful. It does not suffer from the floating point issues described before and gives exact values (though some coercion to floating point is possible). The following example shows this:
+
+
+This function is pretty devious:
+
+
+```{julia}
+f(x) = 1/ x^(log(log(log(log(1/x)))) - 1)
+```
+
+It has a right limit at $c=0$, but not what is expected, which might appear to be 0:
+
+
+```{julia}
+xs = [0 + 1/10^i for i in 2:6]
+ys = f.(xs)
+[xs ys]
+```
+
+But in fact the limit is quite different from $0$:
+
+
+```
+limit(f(x), x => 0, dir="+")
+```
+
+### limits with parameters
+
+
+Consider the limit
+
+
+$$
+L = \lim_{x \rightarrow 0} \frac{b^x - 1}{x}.
+$$
+
+It's answer depends on the value of $b$. How would we approach this with `SymPy`? The interface described above where functions are used is not the only one `SymPy` knows of, and indeed is not typical of how one works with `SymPy`. Typically, symbolic values are defined and then symbolic expressions are used.
+
+
+Here is how we define a symbolic value (in fact two):
+
+
+```{julia}
+@syms x b
+```
+
+And here is how we use them:
+
+
+```{julia}
+limit((b^x - 1) / x, x=>0)
+```
+
+We see the $\log(b)$ value "magically" appearing. That may not have been expected.
+
+
+### Problem
+
+
+#### Question
+
+
+What value is symbolically computed for
+
+
+$$
+\lim_{h \rightarrow 0} \frac{1 - \cos(x)}{x^2}?
+$$
+
+```{julia}
+#| echo: false
+choices = ["Inf", "0", "1/2", "1", "NaN"]
+answer = 3
+radioq(choices, answer)
+```
+
+#### Question
+
+
+What value is symbolically computed for
+
+
+$$
+\lim_{x \rightarrow 0+} \frac{x^x - 1}{x}?
+$$
+
+```{julia}
+#| echo: false
+choices = ["Inf", "0", "1", "NaN"]
+answer = 1
+radioq(choices, answer)
+```
+
+#### Question
+
+
+What value is  symbolically computed for
+
+
+$$
+\lim_{x \rightarrow 0+} \frac{x^x - 1}{x}?
+$$
+
+```{julia}
+#| echo: false
+choices = ["Inf", "0", "1", "NaN"]
+answer = 1
+radioq(choices, answer)
+```
+
+#### Question
+
+
+What value is symbolically computed for
+
+
+$$
+\lim_{h \rightarrow 0} \frac{\ln(1 + h)}{h}?
+$$
+
+```{julia}
+#| echo: false
+val = 1
+numericq(val)
+```
