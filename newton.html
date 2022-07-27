@@ -1,0 +1,2153 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>MTH229 with Julia - 8&nbsp; Newton’s method using julia</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./extrema.html" rel="next">
+<link href="./first-second-derivatives.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Newton’s method using julia</span></h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">MTH229 with Julia</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/mth229l/tree/main/quarto/" title="Source Code" class="sidebar-tool px-1"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">Preface</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">MTH229 notes</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./calculator.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Julia as a calculator</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./functions.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Functions in Julia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./graphing.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Graphing functions with Julia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./zeros.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Solving for zeros with julia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./limits.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Investigating limits with Julia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./derivatives.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Approximate derivatives in Julia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./first-second-derivatives.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Exploring first and second derivatives with Julia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./newton.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Newton’s method using julia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./extrema.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Maximization and minimization with Julia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./integration.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Numeric integration with Julia</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">MTH232 and 233</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mth232.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Notes on MTH 232 and Julia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mth233.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Notes on MTH 233 and Julia</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"> <span class="header-section-number">8.1</span> Introduction</a></li>
+  <li><a href="#basic-idea" id="toc-basic-idea" class="nav-link" data-scroll-target="#basic-idea"> <span class="header-section-number">8.2</span> Basic idea</a>
+  <ul class="collapse">
+  <li><a href="#repeating-steps" id="toc-repeating-steps" class="nav-link" data-scroll-target="#repeating-steps"> <span class="header-section-number">8.2.1</span> Repeating steps</a></li>
+  <li><a href="#practice" id="toc-practice" class="nav-link" data-scroll-target="#practice"> <span class="header-section-number">8.2.2</span> Practice</a></li>
+  </ul></li>
+  <li><a href="#implementing-a-newtons-method-function" id="toc-implementing-a-newtons-method-function" class="nav-link" data-scroll-target="#implementing-a-newtons-method-function"> <span class="header-section-number">8.3</span> Implementing a Newton’s method function</a>
+  <ul class="collapse">
+  <li><a href="#practice-1" id="toc-practice-1" class="nav-link" data-scroll-target="#practice-1"> <span class="header-section-number">8.3.1</span> Practice</a></li>
+  </ul></li>
+  <li><a href="#numeric-derivatives" id="toc-numeric-derivatives" class="nav-link" data-scroll-target="#numeric-derivatives"> <span class="header-section-number">8.4</span> Numeric derivatives</a>
+  <ul class="collapse">
+  <li><a href="#the-secant-method" id="toc-the-secant-method" class="nav-link" data-scroll-target="#the-secant-method"> <span class="header-section-number">8.4.1</span> The secant method</a></li>
+  <li><a href="#using-forward-differences" id="toc-using-forward-differences" class="nav-link" data-scroll-target="#using-forward-differences"> <span class="header-section-number">8.4.2</span> Using forward differences</a></li>
+  <li><a href="#problems" id="toc-problems" class="nav-link" data-scroll-target="#problems"> <span class="header-section-number">8.4.3</span> Problems</a></li>
+  </ul></li>
+  <li><a href="#the-find_zero-function" id="toc-the-find_zero-function" class="nav-link" data-scroll-target="#the-find_zero-function"> <span class="header-section-number">8.5</span> The <code>find_zero</code> function</a>
+  <ul class="collapse">
+  <li><a href="#using-find_zero-and-a-graph-to-find-all-roots." id="toc-using-find_zero-and-a-graph-to-find-all-roots." class="nav-link" data-scroll-target="#using-find_zero-and-a-graph-to-find-all-roots."> <span class="header-section-number">8.5.1</span> Using <code>find_zero</code> and a graph to find all roots.</a></li>
+  <li><a href="#practice-2" id="toc-practice-2" class="nav-link" data-scroll-target="#practice-2"> <span class="header-section-number">8.5.2</span> Practice</a></li>
+  </ul></li>
+  <li><a href="#various-issues-with-newtons-method" id="toc-various-issues-with-newtons-method" class="nav-link" data-scroll-target="#various-issues-with-newtons-method"> <span class="header-section-number">8.6</span> Various issues with Newton’s method</a>
+  <ul class="collapse">
+  <li><a href="#the-initial-guess-is-no-where-near-the-end-results" id="toc-the-initial-guess-is-no-where-near-the-end-results" class="nav-link" data-scroll-target="#the-initial-guess-is-no-where-near-the-end-results"> <span class="header-section-number">8.6.1</span> The initial guess is no where near the end results</a></li>
+  <li><a href="#function-has-a-poor-shape" id="toc-function-has-a-poor-shape" class="nav-link" data-scroll-target="#function-has-a-poor-shape"> <span class="header-section-number">8.6.2</span> Function has a poor shape</a></li>
+  <li><a href="#cycles" id="toc-cycles" class="nav-link" data-scroll-target="#cycles"> <span class="header-section-number">8.6.3</span> Cycles</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/mth229l/edit/main/quarto/newton.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/mth229l/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Newton’s method using julia</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<p><br> A notebook for this material: <a href="https://raw.githubusercontent.com/mth229/229-projects/master/09-extrema.ipynb">ipynb</a> <a href="./229-projects/09-extrema.html">(Pluto html)</a> <a href="./229-projects/09-extrema-pluto-commentary.html">(With commentary)</a></p>
+<section id="introduction" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">8.1</span> Introduction</h2>
+<p>Newton’s method is an old method for <em>approximating</em> a zero of a function, <span class="math inline">\(f(x)\)</span>:</p>
+<p><span class="math display">\[
+f(x) = 0
+\]</span></p>
+<p>Previously we discussed the <em>bisection method</em> which applied for some continuous function <span class="math inline">\(f(x)\)</span> which changed signs between <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>, points which bracket a zero. Not only did we need to find these bracketing points – which wasn’t hard from a graph, more importantly the actual algorithm is pretty slow.</p>
+<p>If the function <span class="math inline">\(f\)</span> is sufficiently differentiable, then Newton’s method may work to find a zero. Unlike the bisection method which is slow but guaranteed to find a root by the intermediate value theorem, Newton’s method is fast (once it is close) but has no such guarantee of converging. In this project, we’ll see how to implement the algorithm, try some examples, and then look at what can go wrong.</p>
+<p>The <code>MTH229</code> package provides a function <code>newton</code> for easily performing Newton’s method, utilizing a function from the <code>Roots</code> package. More usefully, we will see that <code>find_zero</code>, which we used for bisection, can also be used for root finding with an algorithm that is a bit more robust than Newton’s method.</p>
+<p>To begin, we load <code>MTH229</code> and <code>Plots</code>. In the background this loads <code>Roots</code>:</p>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MTH229</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Plots</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="basic-idea" class="level2" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="basic-idea"><span class="header-section-number">8.2</span> Basic idea</h2>
+<p>The idea behind Newton’s method is simple – <em>linear approximation</em>. That is, most functions at any given point are well approximated by the tangent line at that point. If we have a good guess <span class="math inline">\(x_n\)</span>, then we can improve this guess iteratively by replacing it with the zero, <span class="math inline">\(x_{n+1}\)</span>, of the tangent line at <span class="math inline">\((x_n, f(x_n))\)</span>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/newton/newton-one-step.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Newton, one step</figcaption><p></p>
+</figure>
+</div>
+<p>A simple picture shows that we have a triangle with base <span class="math inline">\(x_{n+1} - x_{n}\)</span>, rise <span class="math inline">\(0 - f(x_n)\)</span> and slope <span class="math inline">\(f'(x_n)\)</span>, using the “rise over run” formula:</p>
+<p><span class="math display">\[
+f'(x_n) = \frac{-f(x_n)}{x_{n+1} - x_{n}}.
+\]</span></p>
+<p>The basic algorithm of Newton’s methods solves this to get:</p>
+<p><span class="math display">\[
+x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}.
+\]</span></p>
+<p>Some books write the right-hand side as <span class="math inline">\(x_n - f'(x_n)^{-1} f(x_n)\)</span>, a form that generalizes to different settings.</p>
+<p>Like the bisection method, Newton’s method is an <em>iterative method</em>. One begins with a (suitable) guess <span class="math inline">\(x_0\)</span>. From that the algorithm produces <span class="math inline">\(x_1\)</span> which is used to produce <span class="math inline">\(x_2\)</span>, etc. The idea is that one eventually will settle on a value <span class="math inline">\(x_n\)</span> sufficiently close to the desired root.</p>
+<p>Mathematically, the indices indicate that the right hand side is computed and assigned to the left hand side. This is exactly what is done in assignment within <code>julia</code>, so the above simply becomes:</p>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x <span class="op">-</span> <span class="fu">f</span>(x)<span class="op">/</span>f<span class="op">'</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Where <code>f(x)</code> is the function and <code>f'(x)</code> its derivative. (In this case found by automatic differentiation.) This line starts with a previously defined value of <code>x</code> and updates it accordingly.</p>
+<p>The updating is continued – by executing the exact same command – until either the algorithm has gotten close enough to an answer (i.e., it has converged) or we have given up on it converging.</p>
+<p>Here is an example to find a zero of the function: <span class="math inline">\(f(x) = x^3 - 2x - 5\)</span>.</p>
+<p>A quick graph shows a root near 2:</p>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">3</span> <span class="op">-</span> <span class="fl">2</span>x <span class="op">-</span> <span class="fl">5</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(f, <span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<p><img src="newton_files/figure-html/cell-6-output-1.svg" class="img-fluid"></p>
+</div>
+</div>
+<p>Here we improve the estimate for the root near 2 using Newton’s method. We will need the first derivative, which we denote <code>fp</code></p>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fp</span>(x) <span class="op">=</span> <span class="fl">3</span>x<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">2</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fl">2</span>               <span class="co"># starting value, x_0</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x <span class="op">-</span> <span class="fu">f</span>(x)<span class="op">/</span><span class="fu">fp</span>(x)      <span class="co"># new value, x_1</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>x, <span class="fu">f</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>(2.1, 0.06100000000000083)</code></pre>
+</div>
+</div>
+<p>We can visualize our progress as follows, noting that <code>x</code> holds <span class="math inline">\(x_1\)</span>, and zooming into the domain <span class="math inline">\([1,3]\)</span>:</p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>x0, x1 <span class="op">=</span> <span class="fl">2</span>, x</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(f, <span class="fl">1</span>, <span class="fl">3</span>, legend<span class="op">=</span><span class="cn">false</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot!</span>([x0, x0, x1], [<span class="fl">0</span>, <span class="fu">f</span>(x0), <span class="fl">0</span>])  <span class="co"># why these values?</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>([x0, x1], [<span class="fl">0</span>, <span class="fl">0</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<p><img src="newton_files/figure-html/cell-8-output-1.svg" class="img-fluid"></p>
+</div>
+</div>
+<p>Continuing, though without visualizing the progress, this next step will compute <span class="math inline">\(x_2\)</span>:</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x <span class="op">-</span> <span class="fu">f</span>(x)<span class="op">/</span><span class="fu">fp</span>(x)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>x, <span class="fu">f</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>(2.094568121104185, 0.00018572317327247845)</code></pre>
+</div>
+</div>
+<p>This next step will compute <span class="math inline">\(x_3\)</span>:</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x <span class="op">-</span> <span class="fu">f</span>(x)<span class="op">/</span><span class="fu">fp</span>(x)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>x, <span class="fu">f</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>(2.094551481698199, 1.7397612239733462e-9)</code></pre>
+</div>
+</div>
+<p>This next step will compute <span class="math inline">\(x_4\)</span>:</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x <span class="op">-</span> <span class="fu">f</span>(x)<span class="op">/</span><span class="fu">fp</span>(x)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>x, <span class="fu">f</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>(2.0945514815423265, -8.881784197001252e-16)</code></pre>
+</div>
+</div>
+<p>This next step will compute <span class="math inline">\(x_5\)</span>:</p>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x <span class="op">-</span> <span class="fu">f</span>(x)<span class="op">/</span><span class="fu">fp</span>(x)      <span class="co"># x stopped changing</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>x, <span class="fu">f</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>(2.0945514815423265, -8.881784197001252e-16)</code></pre>
+</div>
+</div>
+<p>We see that <span class="math inline">\(x_4=x_5\)</span>, so the algorithm has stabilized. We also see that <span class="math inline">\(f(x_4)\)</span> is basically <span class="math inline">\(0\)</span> (Recall, <code>eps()</code> is the machine precision, or the size of the difference between floating point values at <span class="math inline">\(1.0\)</span> is basically <span class="math inline">\(10^{-16}\)</span>, the size of <span class="math inline">\(f(x_4)\)</span>.)</p>
+<p>You can see in this case that the convergence happens quickly as soon as the algorithm gets close.</p>
+<p>The approximate root is <span class="math inline">\(x_4\)</span>. It is important to realize that the actual, <em>exact</em>, answer is not likely to be the value computed by Newton’s method, which we call <code>xstar</code> at times. In most cases, the true answer will be irrational and <code>xstar</code> a floating point number, which ultimately can never be better than an approximation to an irrational number.</p>
+<p>The above example iterated until it was clear the algorithm does not improve itself, as the values returned did not change. This need not be the case for every problem.</p>
+<p>Rather, we can determine two ways that the number is close enough to the answer:</p>
+<ul>
+<li>The sequence of <code>x</code>’s stop changing by much</li>
+<li>the values <code>f(x)</code> get close enough to zero.</li>
+</ul>
+<p>In the above, the first one was used. In either case, rather than look for values to be equal (e.g.&nbsp;<span class="math inline">\(x_{n+1} = x_{n}\)</span> or <span class="math inline">\(f(x_n) = 0\)</span>, we look at whether these two things are close enough to be so. That means for some tolerance, we stop when the change in the <code>x</code>’s is smaller than the tolerance or <code>f(x)</code> is smaller – in absolute value – than the tolerance.</p>
+<section id="repeating-steps" class="level3" data-number="8.2.1">
+<h3 data-number="8.2.1" class="anchored" data-anchor-id="repeating-steps"><span class="header-section-number">8.2.1</span> Repeating steps</h3>
+<p>The above approach – basically repeating steps – can be tedious. There will be a function to do this for you (<code>newton</code>). One can use copy and paste to do much of this though:</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">3</span> <span class="op">-</span> <span class="fl">2</span>x <span class="op">-</span> <span class="fl">5</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fl">2</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x <span class="op">-</span> <span class="fu">f</span>(x)<span class="op">/</span>f<span class="op">'</span>(x)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x <span class="op">-</span> <span class="fu">f</span>(x)<span class="op">/</span>f<span class="op">'</span>(x)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x <span class="op">-</span> <span class="fu">f</span>(x)<span class="op">/</span>f<span class="op">'</span>(x)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x <span class="op">-</span> <span class="fu">f</span>(x)<span class="op">/</span>f<span class="op">'</span>(x)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x <span class="op">-</span> <span class="fu">f</span>(x)<span class="op">/</span>f<span class="op">'</span>(x)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>(x, <span class="fu">f</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>(2.0945514815423265, -8.881784197001252e-16)</code></pre>
+</div>
+</div>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Newton looked at this same example in 1699 (B.T. Polyak, <em>Newton’s method and its use in optimization</em>, European Journal of Operational Research. 02/2007; 181(3):1086-1096.) though his technique was slightly different as he did not use the derivative, <em>per se</em>, but rather an approximation based on the fact that his function was a polynomial (though identical to the derivative). Raphson (1690) proposed the general form, hence the usual name of Newton-Raphson method.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="practice" class="level3" data-number="8.2.2">
+<h3 data-number="8.2.2" class="anchored" data-anchor-id="practice"><span class="header-section-number">8.2.2</span> Practice</h3>
+<section id="question" class="level4">
+<h4 class="anchored" data-anchor-id="question">Question</h4>
+<p>Using Newton’s method to find <span class="math inline">\(\sqrt{k}\)</span> (by solving for roots of <span class="math inline">\(f(x) = x^2 - k\)</span>) is also referred to as the Babylonian method, due to its origins. The resulting method</p>
+<p><span class="math display">\[
+x_{n+1} = \frac{1}{2}(x_n + \frac{k}{x_n})
+\]</span></p>
+<p>is described by the first-century <a href="http://en.wikipedia.org/wiki/Babylonian_method">Greek mathematician Hero of Alexandria</a>.</p>
+<p>Let <span class="math inline">\(k=15\)</span> and <span class="math inline">\(x_0\)</span> be <span class="math inline">\(4\)</span>. What is the value of <span class="math inline">\(x_3\)</span>?</p>
+<div class="cell" data-execution_count="13">
+<div class="cell-output cell-output-display" data-execution_count="13">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="12619641208223004082" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_12619641208223004082">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="12619641208223004082" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="12619641208223004082_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("12619641208223004082").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 3.8729833462074525) <= 0.0001);
+  var msgBox = document.getElementById('12619641208223004082_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_12619641208223004082")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_12619641208223004082")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
+</div>
+</div>
+</section>
+<section id="question-1" class="level4">
+<h4 class="anchored" data-anchor-id="question-1">Question</h4>
+<p>The function <span class="math inline">\(f(x) = \sin(x)\)</span> has derivative <span class="math inline">\(f'(x) = \cos(x)\)</span>. Use Newton’s method to solve <span class="math inline">\(f(x) = 0\)</span> starting at <span class="math inline">\(3\)</span>. Repeat 5 times. What value do you get for <code>x</code>?</p>
+<div class="cell" data-execution_count="14">
+<div class="cell-output cell-output-display" data-execution_count="14">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="4971477038670238150" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_4971477038670238150">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="4971477038670238150" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="4971477038670238150_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("4971477038670238150").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 3.141592653589793) <= 1.0e-14);
+  var msgBox = document.getElementById('4971477038670238150_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_4971477038670238150")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_4971477038670238150")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
+</div>
+</div>
+<p>(This can be used to compute <span class="math inline">\(\pi\)</span> numerically, as the convergence is very fast. Here it takes 4 steps to verify.)</p>
+</section>
+<section id="question-2" class="level4">
+<h4 class="anchored" data-anchor-id="question-2">Question</h4>
+<p>Let <span class="math inline">\(f(x) = x^2 - 3^x\)</span>. This has derivative <span class="math inline">\(2x - 3^x \cdot \log(3)\)</span>. Starting with <span class="math inline">\(x_0=0\)</span>, what does Newton’s method converge on?</p>
+<div class="cell" data-execution_count="15">
+<div class="cell-output cell-output-display" data-execution_count="15">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="8176276530764507049" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_8176276530764507049">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="8176276530764507049" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="8176276530764507049_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("8176276530764507049").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - -0.6860267245362514) <= 1.0e-14);
+  var msgBox = document.getElementById('8176276530764507049_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_8176276530764507049")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_8176276530764507049")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="implementing-a-newtons-method-function" class="level2" data-number="8.3">
+<h2 data-number="8.3" class="anchored" data-anchor-id="implementing-a-newtons-method-function"><span class="header-section-number">8.3</span> Implementing a Newton’s method function</h2>
+<p>For iterative algorithms it is better to repeat the expression until something happens – not a fixed number of times. In this case, we need a criteria to decide if the algorithm has converged. We shall use the following:</p>
+<ul>
+<li>If the value of <span class="math inline">\(|x_{n+1} - x_n| &lt; tol\)</span> the algorithm has converged</li>
+<li>If the value of <span class="math inline">\(|f(x_n)| &lt; tol\)</span> the algorithm has converged</li>
+<li>If the above hasn’t happened by <span class="math inline">\(n=100\)</span> the algorithm fails to converge</li>
+</ul>
+<p>This isn’t perfect, but will be sufficient. (Well, in fact no stopping rule can be perfect, but this one doesn’t account for the relative size of the <span class="math inline">\(x_n\)</span>s which can be important.)</p>
+<p>The first two steps require a tolerance. We will use <code>1e-14</code> for this. This is about 100 times the machine precision, <code>eps()</code>, which is sufficient when the answers are moderate in size. This is not very good if the answers are very large.</p>
+<p>A basic algorithm is to repeat a step of Newton’s method until the above occurs. We wrap this up in a function for reuse, and employ a <code>while</code> loop to repeat the update step until something happens:</p>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">nm</span>(f, fp, x)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>     xnew, xold <span class="op">=</span> x, <span class="cn">Inf</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>     fn, fo <span class="op">=</span> <span class="fu">f</span>(xnew), <span class="cn">Inf</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>     tol <span class="op">=</span> <span class="fl">1e-14</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>     ctr <span class="op">=</span> <span class="fl">1</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>     <span class="cf">while</span> (ctr <span class="op">&lt;</span> <span class="fl">100</span>) <span class="op">&amp;&amp;</span> (<span class="fu">abs</span>(xnew <span class="op">-</span> xold) <span class="op">&gt;</span> tol) <span class="op">&amp;&amp;</span> ( <span class="fu">abs</span>(fn <span class="op">-</span> fo) <span class="op">&gt;</span> tol )</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>       x <span class="op">=</span> xnew <span class="op">-</span> <span class="fu">f</span>(xnew)<span class="op">/</span><span class="fu">fp</span>(xnew) <span class="co"># update step</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>       xnew, xold <span class="op">=</span> x, xnew</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>           fn, fo <span class="op">=</span> <span class="fu">f</span>(xnew), fn</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>       ctr <span class="op">=</span> ctr <span class="op">+</span> <span class="fl">1</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>     <span class="cf">end</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>     <span class="cf">if</span> ctr <span class="op">==</span> <span class="fl">100</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>        <span class="fu">error</span>(<span class="st">"Did not converge in 100 steps"</span>)</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>         <span class="cf">else</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>       xnew, ctr</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>         <span class="cf">end</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>nm (generic function with 1 method)</code></pre>
+</div>
+</div>
+<p>Here we use the <code>nm</code> function to find a zero of this polynomial:</p>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">3</span> <span class="op">-</span> <span class="fl">5</span>x <span class="op">+</span> <span class="fl">1</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fp</span>(x) <span class="op">=</span> <span class="fl">3</span>x<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">5</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>xstar, ctr <span class="op">=</span> <span class="fu">nm</span>(f, fp, <span class="fl">0</span>)   <span class="co"># takes 6 steps</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>(0.20163967572340466, 6)</code></pre>
+</div>
+</div>
+<p>However, the <code>MTH229</code> package provides the <code>newton</code> function. So we shall use that in the sequel. To see the number of steps, the argument <code>verbose=true</code> may be given.</p>
+<hr>
+<p>We revisit a problem from a previous project, finding zeroes of the function <span class="math inline">\(f(x) = \exp(x) - x^4\)</span>. We know from previous work that there are three of them. Let’s find one near <span class="math inline">\(x=2\)</span>:</p>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">exp</span>(x) <span class="op">-</span> x<span class="op">^</span><span class="fl">4</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fl">2</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">newton</span>(f, <span class="fl">2</span>)  <span class="co"># newton will use automatic differentiation for the derivative</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<pre><code>1.4296118247255556</code></pre>
+</div>
+</div>
+<p>It took 8 steps and we are this close:</p>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>xstar, <span class="fu">f</span>(xstar)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>(0.20163967572340466, 1.2217539869961238)</code></pre>
+</div>
+</div>
+<p>In this case, the answer is exact up to floating point round off.</p>
+<section id="practice-1" class="level3" data-number="8.3.1">
+<h3 data-number="8.3.1" class="anchored" data-anchor-id="practice-1"><span class="header-section-number">8.3.1</span> Practice</h3>
+<section id="question-3" class="level4">
+<h4 class="anchored" data-anchor-id="question-3">Question</h4>
+<p>Repeat the problem of finding a root of <span class="math inline">\(f(x) = \exp(x) - x^4\)</span> starting at <span class="math inline">\(x=2\)</span>. (<code>newton(f, 2, verbose=true)</code>). How many iterations does it take with the default tolerances?</p>
+<div class="cell" data-execution_count="20">
+<div class="cell-output cell-output-display" data-execution_count="20">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="6959156008602673852" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_6959156008602673852">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="6959156008602673852" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="6959156008602673852_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("6959156008602673852").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 6) <= 0.1);
+  var msgBox = document.getElementById('6959156008602673852_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_6959156008602673852")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_6959156008602673852")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
+</div>
+</div>
+</section>
+<section id="question-4" class="level4">
+<h4 class="anchored" data-anchor-id="question-4">Question</h4>
+<p>If we repeat with <span class="math inline">\(f(x) = \exp(x) - x^4\)</span> but start now at <span class="math inline">\(x=8\)</span> where does the algorithm converge?</p>
+<div class="cell" data-execution_count="21">
+<div class="cell-output cell-output-display" data-execution_count="21">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="5391285918448936773" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_5391285918448936773">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="5391285918448936773" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="5391285918448936773_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("5391285918448936773").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - NaN) <= 1.0e-6);
+  var msgBox = document.getElementById('5391285918448936773_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_5391285918448936773")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_5391285918448936773")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
+</div>
+</div>
+</section>
+<section id="question-5" class="level4">
+<h4 class="anchored" data-anchor-id="question-5">Question</h4>
+<p>Let <span class="math inline">\(f(x) = \sin(x) - \cos(4\cdot x)\)</span>.</p>
+<p>Starting at <span class="math inline">\(\pi/8\)</span>, solve for the root returned by Newton’s method</p>
+<div class="cell" data-execution_count="22">
+<div class="cell-output cell-output-display" data-execution_count="22">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="6596070073069432023" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_6596070073069432023">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="6596070073069432023" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="6596070073069432023_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("6596070073069432023").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 0.3141592653589793) <= 0.001);
+  var msgBox = document.getElementById('6596070073069432023_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_6596070073069432023")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_6596070073069432023")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="numeric-derivatives" class="level2" data-number="8.4">
+<h2 data-number="8.4" class="anchored" data-anchor-id="numeric-derivatives"><span class="header-section-number">8.4</span> Numeric derivatives</h2>
+<p>In order to use Newton’s method we need to evaluate <span class="math inline">\(f'(x)\)</span>. We have used automatic differentiation above through <code>f'(x)</code>. Automatic differentiation returns a numerically accurate value for the derivative.</p>
+<p>However, Newton’s method is actually fairly robust to using other related values to the derivative. That is the method will converge, though perhaps not as fast as with the derivative.</p>
+<section id="the-secant-method" class="level3" data-number="8.4.1">
+<h3 data-number="8.4.1" class="anchored" data-anchor-id="the-secant-method"><span class="header-section-number">8.4.1</span> The secant method</h3>
+<p>The <a href="http://en.wikipedia.org/wiki/Secant_method">secant method</a> is perhaps the oldest numerical linear algebra tool dating back over <a href="http://scholarship.rice.edu/bitstream/handle/1911/20568/1442093.PDF?sequence=1">3000 years</a> well before Newton’s method. Rather than use the derivative at <span class="math inline">\(x_i\)</span> to compute <span class="math inline">\(x_{i+1}\)</span>, the secant line is used between <span class="math inline">\(x_{i-1}\)</span> and <span class="math inline">\(x_i\)</span>. This method will also converge to a zero with a good starting point, though not nearly as quickly as Newton’s method.</p>
+<p>You can check – if you want – by repeating the last command until the change in <code>x2</code> is within your tolerance:</p>
+<div class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>x2, x1 <span class="op">=</span> <span class="fl">1</span>, <span class="fl">2</span>           <span class="co"># initial guess of 2</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">2</span>          <span class="co"># some function</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">fp</span>(x1,x2) <span class="op">=</span> (<span class="fu">f</span>(x1) <span class="op">-</span> <span class="fu">f</span>(x2))<span class="op">/</span>(x1 <span class="op">-</span> x2)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>x2, x1 <span class="op">=</span> x2 <span class="op">-</span> <span class="fu">f</span>(x2)<span class="op">/</span><span class="fu">fp</span>(x1, x2), x2 <span class="co"># update step</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<pre><code>(1.3333333333333333, 1)</code></pre>
+</div>
+</div>
+<p>We can repeat via copy and paste:</p>
+<div class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>x2, x1 <span class="op">=</span> x2 <span class="op">-</span> <span class="fu">f</span>(x2)<span class="op">/</span><span class="fu">fp</span>(x1, x2), x2</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>x2, x1 <span class="op">=</span> x2 <span class="op">-</span> <span class="fu">f</span>(x2)<span class="op">/</span><span class="fu">fp</span>(x1, x2), x2</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>x2, x1 <span class="op">=</span> x2 <span class="op">-</span> <span class="fu">f</span>(x2)<span class="op">/</span><span class="fu">fp</span>(x1, x2), x2</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>x2, x1 <span class="op">=</span> x2 <span class="op">-</span> <span class="fu">f</span>(x2)<span class="op">/</span><span class="fu">fp</span>(x1, x2), x2</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>x2, x1 <span class="op">=</span> x2 <span class="op">-</span> <span class="fu">f</span>(x2)<span class="op">/</span><span class="fu">fp</span>(x1, x2), x2</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>x2, <span class="fu">f</span>(x2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="24">
+<pre><code>(1.4142135623730947, -8.881784197001252e-16)</code></pre>
+</div>
+</div>
+<p>The last line shows the algorithm has basically converged, as the values agree to <span class="math inline">\(10^{-14}\)</span>. We have</p>
+</section>
+<section id="using-forward-differences" class="level3" data-number="8.4.2">
+<h3 data-number="8.4.2" class="anchored" data-anchor-id="using-forward-differences"><span class="header-section-number">8.4.2</span> Using forward differences</h3>
+<p>Recall the forward difference approximation to the derivative:</p>
+<p><span class="math display">\[
+f'(x) \approx \frac{f(x + h) - f(x)}{h}
+\]</span></p>
+<p>For some small <span class="math inline">\(h\)</span> (with <span class="math inline">\(h=10^{-8}\)</span> a reasonable choice for many functions). This can be used</p>
+<p>One can also use approximate derivatives based on forward differences in place of <span class="math inline">\(f'(x)\)</span> in the formula. Again, this won’t be as fast.</p>
+<p>The update step <span class="math inline">\(x - f(x)/f'(x)\)</span> becomes</p>
+<p><span class="math display">\[
+x - \frac{h \cdot f(x)}{f(x+h) - f(x)}.
+\]</span></p>
+<p>The issue with this approximation is when the estimated value gets close to the actual root, the value of <span class="math inline">\(h\)</span> becomes too large. Steffenson’s method replaces <span class="math inline">\(h\)</span> with <span class="math inline">\(f(x)\)</span>, which for values close to a root gets quite small. This improves the convergence rate to be on par with Newton’s method. In this case, the update step looks like</p>
+<p><span class="math display">\[
+x - \frac{f(x)^2}{f(x+ f(x)) - f(x)}.
+\]</span></p>
+</section>
+<section id="problems" class="level3" data-number="8.4.3">
+<h3 data-number="8.4.3" class="anchored" data-anchor-id="problems"><span class="header-section-number">8.4.3</span> Problems</h3>
+<section id="question-6" class="level4">
+<h4 class="anchored" data-anchor-id="question-6">Question</h4>
+<p>Use the secant method to find a root to <span class="math inline">\(f(x) = \cos(x) - x^3\)</span> starting with <span class="math inline">\(x_0=1/2\)</span> and <span class="math inline">\(x_1=1\)</span>.</p>
+<div class="cell" data-execution_count="25">
+<div class="cell-output cell-output-display" data-execution_count="25">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="9264697217008458423" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_9264697217008458423">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="9264697217008458423" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="9264697217008458423_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("9264697217008458423").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 0.8654740331016144) <= 1.0e-10);
+  var msgBox = document.getElementById('9264697217008458423_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_9264697217008458423")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_9264697217008458423")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
+</div>
+</div>
+</section>
+<section id="question-7" class="level4">
+<h4 class="anchored" data-anchor-id="question-7">Question</h4>
+<p>Use the secant method to find a root to <span class="math inline">\(f(x) = x^5 + x - 1\)</span> starting with <span class="math inline">\(x_0=1/2\)</span> and <span class="math inline">\(x_1=1\)</span>.</p>
+<div class="cell" data-execution_count="26">
+<div class="cell-output cell-output-display" data-execution_count="26">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="13960830472534632068" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_13960830472534632068">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="13960830472534632068" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="13960830472534632068_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("13960830472534632068").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 0.7548776662466927) <= 1.0e-10);
+  var msgBox = document.getElementById('13960830472534632068_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_13960830472534632068")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_13960830472534632068")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="the-find_zero-function" class="level2" data-number="8.5">
+<h2 data-number="8.5" class="anchored" data-anchor-id="the-find_zero-function"><span class="header-section-number">8.5</span> The <code>find_zero</code> function</h2>
+<p>There are also very fast algorithms which do not require a derivative. The <code>Roots</code> package provides an interface to these through the <code>find_zero</code> function.</p>
+<p>The <code>find_zero</code> function has two interfaces:</p>
+<ul>
+<li>when called with a bracketing interval, as in <code>find_zero(f, (a,b))</code>, it will use a bisection method to find a root.</li>
+<li>when called with a starting point, as in <code>find_zero(f, a)</code>, it will use an iterative algorithm to search for a root.</li>
+</ul>
+<p>Many bracketing methods (like bisection) are guaranteed to converge, but can be slow. The iterative algorithm used by default with <code>find_zero</code> tries to speed the convergence up, but if along the way it finds a bracketing interval, that will guarantee convergence.</p>
+<p>We focus on the simplest usage of <code>find_zero</code> where an initial guess is supplied and the default order is used. Here is an example to find <span class="math inline">\(-\sqrt{2}\)</span>:</p>
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">2</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zero</span>(f, <span class="op">-</span><span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
+<pre><code>-1.414213562373095</code></pre>
+</div>
+</div>
+<section id="using-find_zero-and-a-graph-to-find-all-roots." class="level3" data-number="8.5.1">
+<h3 data-number="8.5.1" class="anchored" data-anchor-id="using-find_zero-and-a-graph-to-find-all-roots."><span class="header-section-number">8.5.1</span> Using <code>find_zero</code> and a graph to find all roots.</h3>
+<p>Let’s look, again, at the task of finding all zeros to the function <span class="math inline">\(e^x - x^4\)</span>. We follow a standard approach:</p>
+<ul>
+<li>graph the function to roughly identify potential zeros</li>
+<li>use these as starting points for <code>find_zero</code> to improve</li>
+</ul>
+<p>The following graph suggests, perhaps, there may be <span class="math inline">\(3\)</span> zeros, one near <span class="math inline">\(9\)</span>, one near <span class="math inline">\(2\)</span> and one near <span class="math inline">\(-1\)</span>.</p>
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">exp</span>(x) <span class="op">-</span> x<span class="op">^</span><span class="fl">4</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(f, <span class="op">-</span><span class="fl">5</span>,<span class="fl">9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<p><img src="newton_files/figure-html/cell-29-output-1.svg" class="img-fluid"></p>
+</div>
+</div>
+<p>We can improve these guesses with</p>
+<div class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zero</span>(f, <span class="fl">9</span>), <span class="fu">find_zero</span>(f, <span class="fl">2</span>), <span class="fu">find_zero</span>(f, <span class="op">-</span><span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="29">
+<pre><code>(8.6131694564414, 1.4296118247255556, -0.8155534188089607)</code></pre>
+</div>
+</div>
+<p>The above can be written without repeating <code>find_zero</code> by using a comprehension:</p>
+<div class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>[<span class="fu">find_zero</span>(f, x) for x <span class="kw">in</span> [<span class="fl">9</span>, <span class="fl">2</span>, <span class="op">-</span><span class="fl">1</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="30">
+<pre><code>3-element Vector{Float64}:
+  8.6131694564414
+  1.4296118247255556
+ -0.8155534188089607</code></pre>
+</div>
+</div>
+<p>Or even more compactly, using the broadcast notation:</p>
+<div class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zero</span>.(f, [<span class="op">-</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">9</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<pre><code>3-element Vector{Float64}:
+ -0.8155534188089607
+  1.4296118247255556
+  8.6131694564414</code></pre>
+</div>
+</div>
+<hr>
+<p>As another illustration, let <span class="math inline">\(f(x) = \cos^2(x^2)\)</span> on <span class="math inline">\([-1,2]\)</span>. Find all the zeros of the derivative of <span class="math inline">\(f(x)\)</span>.</p>
+<p>We graph the derivative to identify starting points:</p>
+<div class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">cos</span>(x<span class="op">^</span><span class="fl">2</span>)<span class="op">^</span><span class="fl">2</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(f<span class="op">'</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="32">
+<p><img src="newton_files/figure-html/cell-33-output-1.svg" class="img-fluid"></p>
+</div>
+</div>
+<p>We see there are 3 potential zeros, one near 0, one near 1.2 and close to 1.7. Here we improve our guesses:</p>
+<div class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> <span class="fu">find_zero</span>.(f<span class="op">'</span>, [<span class="fl">0</span>, <span class="fl">1.2</span>, <span class="fl">1.7</span>])   <span class="co"># or [find_zero(f', x) for x in [0, 1.2, 1.7]]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="33">
+<pre><code>3-element Vector{Float64}:
+ 0.0
+ 1.2533141373155003
+ 1.772453850905516</code></pre>
+</div>
+</div>
+<p>The function values at these points can be found with</p>
+<div class="cell" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>.(xs)               <span class="co"># or map(f, xs) or [f(x) for x in xs]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="34">
+<pre><code>3-element Vector{Float64}:
+ 1.0
+ 2.5860584564030066e-32
+ 1.0</code></pre>
+</div>
+</div>
+<section id="find_zeros" class="level5">
+<h5 class="anchored" data-anchor-id="find_zeros">find_zeros</h5>
+<p>For such tasks, <code>find_zeros</code> also works well. This function looks for all zeros in the interval <code>[a,b]</code>:</p>
+<div class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zeros</span>(f, <span class="op">-</span><span class="fl">1</span>, <span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="35">
+<pre><code>1-element Vector{Float64}:
+ 1.2533141373155003</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="practice-2" class="level3" data-number="8.5.2">
+<h3 data-number="8.5.2" class="anchored" data-anchor-id="practice-2"><span class="header-section-number">8.5.2</span> Practice</h3>
+<section id="question-8" class="level4">
+<h4 class="anchored" data-anchor-id="question-8">Question</h4>
+<p>Let</p>
+<p><span class="math display">\[
+f(x) = 4x^4 -5x^3 + 4x^2 -20x - 6
+\]</span></p>
+<p>Apply Newton’s method with <span class="math inline">\(x_0=0\)</span> using an automatic derivative. What value does it converge to?</p>
+<div class="cell" data-execution_count="36">
+<div class="cell-output cell-output-display" data-execution_count="36">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="6676786612714122046" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_6676786612714122046">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="6676786612714122046" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="6676786612714122046_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("6676786612714122046").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - -0.27798094871260326) <= 1.0e-10);
+  var msgBox = document.getElementById('6676786612714122046_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_6676786612714122046")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_6676786612714122046")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
+</div>
+</div>
+</section>
+<section id="question-9" class="level4">
+<h4 class="anchored" data-anchor-id="question-9">Question</h4>
+<p>Let’s try with a function where the derivative is not known easily. If we set</p>
+<p><span class="math display">\[
+f(x) = x^x - 2
+\]</span></p>
+<p>Can we find a root using Newton’s method, where <span class="math inline">\(x &gt; 0\)</span>?</p>
+<p>We graph the function to see, using a smallish interval at first:</p>
+<div class="cell" data-execution_count="37">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span>x <span class="op">-</span> <span class="fl">2</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(f, <span class="fl">0</span>, <span class="fl">2</span>)</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot!</span>(zero)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="37">
+<p><img src="newton_files/figure-html/cell-38-output-1.svg" class="img-fluid"></p>
+</div>
+</div>
+<p>Eyeing this, we pick an initial point, <span class="math inline">\(1\)</span>, for Newton’s method (<code>newton(f, 1)</code>) to the right of the minimum, which appears to be around <span class="math inline">\(x=0.35\)</span>.</p>
+<p>What is the value of the approximate zero?</p>
+<div class="cell" data-execution_count="38">
+<div class="cell-output cell-output-display" data-execution_count="38">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="153594207727821170" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_153594207727821170">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="153594207727821170" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="153594207727821170_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("153594207727821170").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 1.5596104694623694) <= 1.0e-8);
+  var msgBox = document.getElementById('153594207727821170_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_153594207727821170")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_153594207727821170")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
+</div>
+</div>
+</section>
+<section id="question-10" class="level4">
+<h4 class="anchored" data-anchor-id="question-10">Question</h4>
+<p>Use <code>find_zero</code> to find the one root of <code>x^5 + x - 1</code>. First plot to get an estimate.</p>
+<div class="cell" data-execution_count="39">
+<div class="cell-output cell-output-display" data-execution_count="39">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="1203213390162490071" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_1203213390162490071">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="1203213390162490071" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="1203213390162490071_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("1203213390162490071").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 1.1673039782614187) <= 1.0e-8);
+  var msgBox = document.getElementById('1203213390162490071_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_1203213390162490071")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_1203213390162490071")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
+</div>
+</div>
+</section>
+<section id="question-11" class="level4">
+<h4 class="anchored" data-anchor-id="question-11">Question</h4>
+<p>Let <span class="math inline">\(f(x) = 5/\sin(x) + 8/\cos(x)\)</span>, Starting at <span class="math inline">\(x=\pi/4\)</span>, use <code>find_zero</code> to find a root of the derivative of <span class="math inline">\(f(x)\)</span> given by <code>f'</code>.</p>
+<div class="cell" data-execution_count="40">
+<div class="cell-output cell-output-display" data-execution_count="40">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="13291738583179056449" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_13291738583179056449">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="13291738583179056449" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="13291738583179056449_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("13291738583179056449").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 0.7073827215431158) <= 1.0e-8);
+  var msgBox = document.getElementById('13291738583179056449_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_13291738583179056449")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_13291738583179056449")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
+</div>
+</div>
+</section>
+<section id="question-12" class="level4">
+<h4 class="anchored" data-anchor-id="question-12">Question</h4>
+<p>The tangent line of <code>f</code> at <code>c</code> can be computed by</p>
+<div class="cell" data-execution_count="41">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tangent</span>(f, c) <span class="op">=</span> x <span class="op">-&gt;</span> <span class="fu">f</span>(c) <span class="op">+</span> f<span class="op">'</span>(c) <span class="op">*</span> (x <span class="op">-</span> c)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="41">
+<pre><code>tangent (generic function with 1 method)</code></pre>
+</div>
+</div>
+<p>Let <span class="math inline">\(f(x) = x^2 - 3x + 5\)</span>. Use <code>find_zero</code> to find the intersection point of the tangent line at <span class="math inline">\(1\)</span> and the tangent line at <span class="math inline">\(3\)</span>. Where does this happen?</p>
+<p>(Hint, apply <code>find_zero</code> to <code>h(x) = tangent(f, 1)(x) -  tangent(f, 3)(x)</code> starting at 1.)</p>
+<div class="cell" data-execution_count="42">
+<div class="cell-output cell-output-display" data-execution_count="42">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="12158200969629604644" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_12158200969629604644">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="12158200969629604644" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="12158200969629604644_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("12158200969629604644").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 2.0) <= 1.0e-8);
+  var msgBox = document.getElementById('12158200969629604644_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_12158200969629604644")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_12158200969629604644")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="various-issues-with-newtons-method" class="level2" data-number="8.6">
+<h2 data-number="8.6" class="anchored" data-anchor-id="various-issues-with-newtons-method"><span class="header-section-number">8.6</span> Various issues with Newton’s method</h2>
+<p>As great as Newton’s method is, it won’t always work for various reasons, some of which are described in the following. Here is what you need to keep in mind. Newton’s method works well if</p>
+<ul>
+<li>The zero is a simple root – that is of multiplicity 1</li>
+<li>The magnitude, <span class="math inline">\(|f'(x)|\)</span>, is not too small (If the tangent line is nearly flat, the next guess is far from the previous)</li>
+<li>The magnitude, <span class="math inline">\(|f''(x)|\)</span>, is not too big (function doesn’t have so much curve that the tangent line is a poor approximation)</li>
+<li>The initial guess is not to far from a zero</li>
+</ul>
+<p>The above points come from the following formula which you can find in many texts.</p>
+<p><span class="math display">\[
+\Delta x_{i+1} = \frac{f' '(\alpha)}{f'(\alpha)}(\Delta x_i)^2 + \text{error}
+\]</span></p>
+<p>which is valid when <span class="math inline">\(f(x)\)</span> satisfies <span class="math inline">\(f(\alpha) = 0\)</span>, the third derivative exists near <span class="math inline">\(\alpha\)</span>, and <span class="math inline">\(\Delta x_i = x_i - \alpha\)</span> is the error between the zero and the <span class="math inline">\(i\)</span> th estimate. When the derivative at <span class="math inline">\(\alpha\)</span> is non-zero, the error is basically a constant times <span class="math inline">\(\Delta x_i^2\)</span>. This is interpreted as saying there is quadratic convergence in the error, as the next one is related to the previous one squared.</p>
+<p>Now we look at some cases where the above three points do not hold.</p>
+<section id="the-initial-guess-is-no-where-near-the-end-results" class="level3" data-number="8.6.1">
+<h3 data-number="8.6.1" class="anchored" data-anchor-id="the-initial-guess-is-no-where-near-the-end-results"><span class="header-section-number">8.6.1</span> The initial guess is no where near the end results</h3>
+<p>Let <span class="math inline">\(f(x) = \sin(x) - x/4\)</span> and <span class="math inline">\(x_0 = 2\pi\)</span>. This value is deliberately a poor choice:</p>
+<div class="cell" data-execution_count="43">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">sin</span>(x) <span class="op">-</span> x<span class="op">/</span><span class="fl">4</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fp</span>(x) <span class="op">=</span> <span class="fu">cos</span>(x) <span class="op">-</span> <span class="fl">1</span><span class="op">/</span><span class="fl">4</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="fu">newton</span>(f, fp, <span class="fl">2</span>pi, verbose<span class="op">=</span><span class="cn">true</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>Results of univariate zero finding:
+
+* Converged to: -2.4745767873698292
+* Algorithm: Roots.Newton()
+* iterations: 21
+* stopped as |f(x_n)| ≤ max(δ, |x|⋅ϵ) using δ = atol, ϵ = rtol
+
+Trace:
+x_0 =  6.2831853071795862,   fx_0 = -1.5707963267948968
+x_1 =  8.3775804095727828,   fx_1 = -1.2283696986087573
+x_2 =  6.7397541447611076,   fx_2 = -1.2440675381169748
+x_3 =  8.6608848638032576,   fx_3 = -1.4734831418043957
+x_4 =  7.1451872496698430,   fx_4 = -1.0271496267351363
+x_5 =  9.7071751202999792,   fx_5 = -2.7054524356150202
+x_6 =  7.4719848359402210,   fx_6 = -0.9400740775668593
+x_7 =  15.1289271125939990,  fx_7 = -3.2350143158338276
+x_8 =  12.1528068967848881,  fx_8 = -3.4400768736735046
+x_9 =  17.3204581594883038,  fx_9 = -5.3292452806856589
+x_10 = -8.2623524312131380,  fx_10 =  1.1478190870135017
+x_11 = -6.4886031684043539,  fx_11 =  1.4181745383583302
+x_12 = -8.4340373897987018,  fx_12 =  1.2720772543609207
+x_13 = -6.8400965825145015,  fx_13 =  1.1814574151203185
+x_14 = -8.8128360727706223,  fx_14 =  1.6287509745643769
+x_15 = -7.2885505274866542,  fx_15 =  0.9777799311577077
+x_16 = -10.7099948647448411,     fx_16 =  3.6369972987156078
+x_17 = -3.8698495348738184,  fx_17 =  1.6330320788034982
+x_18 = -2.2308115333928380,  fx_18 = -0.2322800246363578
+x_19 = -2.4999254908286410,  fx_19 =  0.0264495377175690
+x_20 = -2.4747617934295065,  fx_20 =  0.0001916160487524
+x_21 = -2.4745767975896880,  fx_21 =  0.0000000105844145
+x_22 = -2.4745767873698292,  fx_22 =  0.0000000000000002
+</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>* function evaluations ≈ 44</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="43">
+<pre><code>-2.4745767873698292</code></pre>
+</div>
+</div>
+<p>Though <code>julia</code> makes this happen fast, it will take more than 20 steps before converging and the answer is no where near the guess. This trace might show why</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/newton/newton-way-off.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Newton, way off</figcaption><p></p>
+</figure>
+</div>
+<section id="question-13" class="level4">
+<h4 class="anchored" data-anchor-id="question-13">Question</h4>
+<p>When <span class="math inline">\(|f'(x)|\)</span> is too close to <span class="math inline">\(0\)</span>, the path can jump alot. In the figure, what was the longest jump?</p>
+<div class="cell" data-execution_count="44">
+<div class="cell-output cell-output-display" data-execution_count="44">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="15427241284158952003" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_15427241284158952003">
+        <div style="padding-top: 5px">
+    <div class="form-check">
+    <label class="form-check-label" for="radio_15427241284158952003_1">
+      <input class="form-check-input" type="radio" name="radio_15427241284158952003" id="radio_15427241284158952003_1" value="1">
+      
+      <span class="label-body px-1">
+        From about 17 to -10
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_15427241284158952003_2">
+      <input class="form-check-input" type="radio" name="radio_15427241284158952003" id="radio_15427241284158952003_2" value="2">
+      
+      <span class="label-body px-1">
+        From about 0 to -5
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_15427241284158952003_3">
+      <input class="form-check-input" type="radio" name="radio_15427241284158952003" id="radio_15427241284158952003_3" value="3">
+      
+      <span class="label-body px-1">
+        From about -12 to -3
+      </span>
+    </label>
+</div>
+
+    
+        </div>
+      </div>
+      <div id="15427241284158952003_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.querySelectorAll('input[name="radio_15427241284158952003"]').forEach(function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 1;
+    var msgBox = document.getElementById('15427241284158952003_message');
+      if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_15427241284158952003")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_15427241284158952003")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+})});
+
+</script>
+</div>
+</div>
+</section>
+<section id="question-14" class="level4">
+<h4 class="anchored" data-anchor-id="question-14">Question</h4>
+<p>The method did find a zero, but the initial guess was nowhere near the final zero. How close was the closest zero to the initial guess?</p>
+<div class="cell" data-execution_count="45">
+<div class="cell-output cell-output-display" data-execution_count="45">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="8251199050619645237" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_8251199050619645237">
+        <div style="padding-top: 5px">
+    <div class="form-check">
+    <label class="form-check-label" for="radio_8251199050619645237_1">
+      <input class="form-check-input" type="radio" name="radio_8251199050619645237" id="radio_8251199050619645237_1" value="1">
+      
+      <span class="label-body px-1">
+        <code>3.8</code>
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_8251199050619645237_2">
+      <input class="form-check-input" type="radio" name="radio_8251199050619645237" id="radio_8251199050619645237_2" value="2">
+      
+      <span class="label-body px-1">
+        <code>8.75</code>
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_8251199050619645237_3">
+      <input class="form-check-input" type="radio" name="radio_8251199050619645237" id="radio_8251199050619645237_3" value="3">
+      
+      <span class="label-body px-1">
+        <code>2pi</code>
+      </span>
+    </label>
+</div>
+
+    
+        </div>
+      </div>
+      <div id="8251199050619645237_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.querySelectorAll('input[name="radio_8251199050619645237"]').forEach(function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 1;
+    var msgBox = document.getElementById('8251199050619645237_message');
+      if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_8251199050619645237")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_8251199050619645237")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+})});
+
+</script>
+</div>
+</div>
+</section>
+</section>
+<section id="function-has-a-poor-shape" class="level3" data-number="8.6.2">
+<h3 data-number="8.6.2" class="anchored" data-anchor-id="function-has-a-poor-shape"><span class="header-section-number">8.6.2</span> Function has a poor shape</h3>
+<p>Let <span class="math inline">\(f(x) = x^{1/3}\)</span>. We know the root is 0. Let’s see what happens if we use Newton’s method. We have to be careful though as <code>julia</code> thinks that cube roots of negative numbers (via <code>x^(1/3)</code> are <code>NaN</code>, not a number. (You can avoid this, by making your number complex, e.g.&nbsp;<code>x + 0*im</code>, but then the real answer is not given as an answer. It is just one of three and not the chosen one.)</p>
+<p>So we define our function using <code>julia</code>’s <code>cbrt</code> function, which works as we desire for negative numbers, as follows:</p>
+<div class="cell" data-execution_count="46">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">cbrt</span>(x)</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>xstar <span class="op">=</span> <span class="fu">newton</span>(f, <span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>LoadError: Roots.ConvergenceFailed("Algorithm failed to converge")</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>WARNING: both SymPy and SpecialFunctions export "ellipk"; uses of it in module MTH229 must be qualified</code></pre>
+</div>
+</div>
+<p>Still an issue. Why?</p>
+<section id="question-15" class="level4">
+<h4 class="anchored" data-anchor-id="question-15">Question</h4>
+<p>Despite all our care with the derivative, the method did not converge in <span class="math inline">\(200\)</span> steps. Can you see why from this trace?</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/newton/newton-cubic.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Newton, cubic</figcaption><p></p>
+</figure>
+</div>
+<div class="cell" data-execution_count="47">
+<div class="cell-output cell-output-display" data-execution_count="47">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="11243062727142409288" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_11243062727142409288">
+        <div style="padding-top: 5px">
+    <div class="form-check">
+    <label class="form-check-label" for="radio_11243062727142409288_1">
+      <input class="form-check-input" type="radio" name="radio_11243062727142409288" id="radio_11243062727142409288_1" value="1">
+      
+      <span class="label-body px-1">
+        <code>|f'(x)|</code> gets too small
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_11243062727142409288_2">
+      <input class="form-check-input" type="radio" name="radio_11243062727142409288" id="radio_11243062727142409288_2" value="2">
+      
+      <span class="label-body px-1">
+        <code>|f''(x)|</code> gets too big at 0
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_11243062727142409288_3">
+      <input class="form-check-input" type="radio" name="radio_11243062727142409288" id="radio_11243062727142409288_3" value="3">
+      
+      <span class="label-body px-1">
+        Initial guess is too far from a zero.
+      </span>
+    </label>
+</div>
+
+    
+        </div>
+      </div>
+      <div id="11243062727142409288_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.querySelectorAll('input[name="radio_11243062727142409288"]').forEach(function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 2;
+    var msgBox = document.getElementById('11243062727142409288_message');
+      if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_11243062727142409288")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_11243062727142409288")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+})});
+
+</script>
+</div>
+</div>
+</section>
+<section id="questions-solve-by-hand" class="level4">
+<h4 class="anchored" data-anchor-id="questions-solve-by-hand">Questions <small>Solve by hand</small></h4>
+<p>For <span class="math inline">\(f(x) = x^{1/3}\)</span>, simplify the expression by hand:</p>
+<pre class="math"><code>x - f(x)/f'(x)</code></pre>
+<p>What do you get?</p>
+<div class="cell" data-execution_count="48">
+<div class="cell-output cell-output-display" data-execution_count="48">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="7339516663813919569" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_7339516663813919569">
+        <div style="padding-top: 5px">
+    <div class="form-check">
+    <label class="form-check-label" for="radio_7339516663813919569_1">
+      <input class="form-check-input" type="radio" name="radio_7339516663813919569" id="radio_7339516663813919569_1" value="1">
+      
+      <span class="label-body px-1">
+        <code>-2x</code>
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_7339516663813919569_2">
+      <input class="form-check-input" type="radio" name="radio_7339516663813919569" id="radio_7339516663813919569_2" value="2">
+      
+      <span class="label-body px-1">
+        <code>x - (1/3)x^{-1/3}</code>
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_7339516663813919569_3">
+      <input class="form-check-input" type="radio" name="radio_7339516663813919569" id="radio_7339516663813919569_3" value="3">
+      
+      <span class="label-body px-1">
+        <code>x - 3/x</code>
+      </span>
+    </label>
+</div>
+
+    
+        </div>
+      </div>
+      <div id="7339516663813919569_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.querySelectorAll('input[name="radio_7339516663813919569"]').forEach(function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 1;
+    var msgBox = document.getElementById('7339516663813919569_message');
+      if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_7339516663813919569")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_7339516663813919569")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+})});
+
+</script>
+</div>
+</div>
+</section>
+<section id="question-16" class="level4">
+<h4 class="anchored" data-anchor-id="question-16">Question</h4>
+<p>Apply Newton’s method to <span class="math inline">\(f(x) = (x-2)^7 \cdot (x-3) \cdot (x-4)\)</span> starting at 1.9981. The algorithm does not converge to 2 – an obvious root. From a plot of <span class="math inline">\(f(x)\)</span> explain why not:</p>
+<div class="cell" data-execution_count="49">
+<div class="cell-output cell-output-display" data-execution_count="49">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="6018429771058991159" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_6018429771058991159">
+        <div style="padding-top: 5px">
+    <div class="form-check">
+    <label class="form-check-label" for="radio_6018429771058991159_1">
+      <input class="form-check-input" type="radio" name="radio_6018429771058991159" id="radio_6018429771058991159_1" value="1">
+      
+      <span class="label-body px-1">
+        <code>|f'(x)|</code> gets too small
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_6018429771058991159_2">
+      <input class="form-check-input" type="radio" name="radio_6018429771058991159" id="radio_6018429771058991159_2" value="2">
+      
+      <span class="label-body px-1">
+        <code>|f''(x)|</code> gets too big at 0
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_6018429771058991159_3">
+      <input class="form-check-input" type="radio" name="radio_6018429771058991159" id="radio_6018429771058991159_3" value="3">
+      
+      <span class="label-body px-1">
+        Initial guess is to far from a zero.
+      </span>
+    </label>
+</div>
+
+    
+        </div>
+      </div>
+      <div id="6018429771058991159_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.querySelectorAll('input[name="radio_6018429771058991159"]').forEach(function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 1;
+    var msgBox = document.getElementById('6018429771058991159_message');
+      if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_6018429771058991159")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_6018429771058991159")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+})});
+
+</script>
+</div>
+</div>
+</section>
+<section id="question-17" class="level4">
+<h4 class="anchored" data-anchor-id="question-17">Question</h4>
+<p>The function <code>f(x) = atan(x)</code> is a strictly increasing function with one zero, <span class="math inline">\(0\)</span>. Yet it can pose problems with Newton’s method. For which values of <span class="math inline">\(x\)</span> does Newton’s method converge:</p>
+<div class="cell" data-execution_count="50">
+<div class="cell-output cell-output-display" data-execution_count="50">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="9129608132317699370" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_9129608132317699370">
+        <div style="padding-top: 5px">
+    <div class="form-check">
+    <label class="form-check-label" for="radio_9129608132317699370_1">
+      <input class="form-check-input" type="radio" name="radio_9129608132317699370" id="radio_9129608132317699370_1" value="1">
+      
+      <span class="label-body px-1">
+        For each of \(1\), \(2\) and \(\pi\)
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_9129608132317699370_2">
+      <input class="form-check-input" type="radio" name="radio_9129608132317699370" id="radio_9129608132317699370_2" value="2">
+      
+      <span class="label-body px-1">
+        For \(1\) and \(2\) but not \(\pi\)
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_9129608132317699370_3">
+      <input class="form-check-input" type="radio" name="radio_9129608132317699370" id="radio_9129608132317699370_3" value="3">
+      
+      <span class="label-body px-1">
+        For \(1\) but not \(2\) or \(\pi\)
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_9129608132317699370_4">
+      <input class="form-check-input" type="radio" name="radio_9129608132317699370" id="radio_9129608132317699370_4" value="4">
+      
+      <span class="label-body px-1">
+        For none of  \(1\), \(2\) and \(\pi\)
+      </span>
+    </label>
+</div>
+
+    
+        </div>
+      </div>
+      <div id="9129608132317699370_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.querySelectorAll('input[name="radio_9129608132317699370"]').forEach(function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 3;
+    var msgBox = document.getElementById('9129608132317699370_message');
+      if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_9129608132317699370")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_9129608132317699370")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+})});
+
+</script>
+</div>
+</div>
+</section>
+</section>
+<section id="cycles" class="level3" data-number="8.6.3">
+<h3 data-number="8.6.3" class="anchored" data-anchor-id="cycles"><span class="header-section-number">8.6.3</span> Cycles</h3>
+<p>Sometimes, the process can cycle even for reasonable functions.</p>
+<section id="question-18" class="level4">
+<h4 class="anchored" data-anchor-id="question-18">Question</h4>
+<p>Let <span class="math inline">\(f(x) = x^3 - 5x\)</span>. Starting with <span class="math inline">\(x_0=1\)</span>, compute three steps of Newton’s method. What are the terms in the series produced?</p>
+<div class="cell" data-execution_count="51">
+<div class="cell-output cell-output-display" data-execution_count="51">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="5974563889755673257" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_5974563889755673257">
+        <div style="padding-top: 5px">
+    <div class="form-check">
+    <label class="form-check-label" for="radio_5974563889755673257_1">
+      <input class="form-check-input" type="radio" name="radio_5974563889755673257" id="radio_5974563889755673257_1" value="1">
+      
+      <span class="label-body px-1">
+        \(-1.0, 1.0, -1.0, ...\)
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_5974563889755673257_2">
+      <input class="form-check-input" type="radio" name="radio_5974563889755673257" id="radio_5974563889755673257_2" value="2">
+      
+      <span class="label-body px-1">
+        \(-1.0, 0.6666666666666667, -0.2850952524822228, ...\)
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_5974563889755673257_3">
+      <input class="form-check-input" type="radio" name="radio_5974563889755673257" id="radio_5974563889755673257_3" value="3">
+      
+      <span class="label-body px-1">
+        \(1, -2, -4,  ...\)
+      </span>
+    </label>
+</div>
+
+    
+        </div>
+      </div>
+      <div id="5974563889755673257_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.querySelectorAll('input[name="radio_5974563889755673257"]').forEach(function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 1;
+    var msgBox = document.getElementById('5974563889755673257_message');
+      if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_5974563889755673257")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_5974563889755673257")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+})});
+
+</script>
+</div>
+</div>
+</section>
+<section id="question-always-cycles" class="level4">
+<h4 class="anchored" data-anchor-id="question-always-cycles">Question: <small>Always cycles…</small></h4>
+<p>Here is a pathological example where the value always cycles no matter where you start unless you start at <span class="math inline">\(0\)</span>.</p>
+<p>Let <span class="math inline">\(f(x) = \sqrt{|x|}\)</span>. This is the one-sided square root function turned into an even function. We could also have defined it by:</p>
+<div class="cell" data-execution_count="52">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x <span class="op">&gt;=</span> <span class="fl">0</span> ? <span class="fu">sqrt</span>(x) <span class="op">:</span> <span class="fu">sqrt</span>(<span class="op">-</span>x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="52">
+<pre><code>f (generic function with 1 method)</code></pre>
+</div>
+</div>
+<p>where the ternary operator <code>a ? b : c</code> looks at <code>a</code> and if true will execute <code>b</code> otherwise <code>c</code>.</p>
+<p>This makes it easier to write the derivative of the function in <code>Julia</code>:</p>
+<div class="cell" data-execution_count="53">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fp</span>(x) <span class="op">=</span> x <span class="op">&gt;=</span><span class="fl">0</span> ? (<span class="fl">1</span><span class="op">/</span><span class="fl">2</span>)<span class="fu">*sqrt</span>(x)<span class="op">/</span>x <span class="op">:</span> <span class="fu">-</span>(<span class="fl">1</span><span class="op">/</span><span class="fl">2</span>)<span class="fu">*sqrt</span>(<span class="op">-</span>x)<span class="op">/</span>(<span class="op">-</span>x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="53">
+<pre><code>fp (generic function with 2 methods)</code></pre>
+</div>
+</div>
+<p>To see what happens when using Newton’s method, lets start at <span class="math inline">\(x=2\)</span></p>
+<div class="cell" data-execution_count="54">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fl">2</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x <span class="op">-</span> <span class="fu">f</span>(x)<span class="op">/</span><span class="fu">fp</span>(x)</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x <span class="op">-</span> <span class="fu">f</span>(x)<span class="op">/</span><span class="fu">fp</span>(x)</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x <span class="op">-</span> <span class="fu">f</span>(x)<span class="op">/</span><span class="fu">fp</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="54">
+<pre><code>-2.0</code></pre>
+</div>
+</div>
+<p>Try again with <span class="math inline">\(x=3.0\)</span> What sequence do you get:</p>
+<div class="cell" data-execution_count="55">
+<div class="cell-output cell-output-display" data-execution_count="55">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="8270174729489299916" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_8270174729489299916">
+        <div style="padding-top: 5px">
+    <div class="form-check">
+    <label class="form-check-label" for="radio_8270174729489299916_1">
+      <input class="form-check-input" type="radio" name="radio_8270174729489299916" id="radio_8270174729489299916_1" value="1">
+      
+      <span class="label-body px-1">
+        \(2, -2.0, 2.0, -2.0\)
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_8270174729489299916_2">
+      <input class="form-check-input" type="radio" name="radio_8270174729489299916" id="radio_8270174729489299916_2" value="2">
+      
+      <span class="label-body px-1">
+        \(3, -3.0, 3.0, -3.0, ...\)
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_8270174729489299916_3">
+      <input class="form-check-input" type="radio" name="radio_8270174729489299916" id="radio_8270174729489299916_3" value="3">
+      
+      <span class="label-body px-1">
+        \(3, 2.0, 1.0, 0.0, -1.0, ...\)
+      </span>
+    </label>
+</div>
+
+    
+        </div>
+      </div>
+      <div id="8270174729489299916_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.querySelectorAll('input[name="radio_8270174729489299916"]').forEach(function(rb) {
+rb.addEventListener("change", function() {
+    var correct = rb.value == 2;
+    var msgBox = document.getElementById('8270174729489299916_message');
+      if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_8270174729489299916")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_8270174729489299916")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+})});
+
+</script>
+</div>
+</div>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+      }
+    }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./first-second-derivatives.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Exploring first and second derivatives with Julia</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./extrema.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Maximization and minimization with Julia</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>
