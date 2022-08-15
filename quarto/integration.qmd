@@ -302,7 +302,7 @@ Since these are also the minimum and maximum Riemann sums, the above gives a bou
 #### Question
 
 
-Compute the integral of $e^{-x^2}$ over $[0,1]$ using a right Riemann sum with $n=1000$. What is your answer?
+Compute the integral of $e^{-x^2}$ over $[0,1]$ using a right Riemann sum with $n=10_000$. What is your answer?
 
 
 ```{julia}
@@ -316,7 +316,7 @@ numericq(val, 1e-8)
 #### Question
 
 
-Compute the integral of $(1 + \cos(x)^2)^(1/2)$ over the interval $[0, \pi]$ using a right Riemann sum with $n=10,000$. What is your answer?
+Compute the integral of $(1 + \cos(x)^2)^{1/2}$ over the interval $[0, \pi]$ using a right Riemann sum with $n=10,000$. What is your answer?
 
 
 ```{julia}
@@ -435,7 +435,7 @@ The trapezoid rule has no error for linear functions and Simpson's rule has no e
 
 ```{julia}
 f(x) = x^2; F(x) = x^3/3
-riemann(f, 0, 10, 100, method="simpsons") - (F(10) - F(0));
+riemann(f, 0, 10, 100, method="simpsons") - (F(10) - F(0))
 ```
 
 How accurate is the approximation? Around
@@ -454,15 +454,16 @@ radioq(choices, answer, keep_order=true)
 Compare the difference between the trapezoid rule and Simpson's rule when integrating $\cos(x)$ from $0$ to $\pi/6$. How big is the difference when $n=10,000$?
 
 
-```
+```{julia}
 a, b, n = 0, pi/6, 10_000
-riemann(cos, a, b, n, method="trapezoid") - riemann(cos, a, b, n, method="simpsons");
+riemann(cos, a, b, n, method="trapezoid") - riemann(cos, a, b, n, method="simpsons")
 ```
 
 How big is the difference?
 
 
-```
+```{julia}
+#| echo: false
 choices = [`1e-8`, `1e-10`, `1e-12`, `1e-14`, `1e-16`, `0`];
 answer = 2;
 radioq(choices, answer, keep_order=true)
@@ -555,15 +556,15 @@ val = quadgk(f, 0, 1)[1];
 numericq(val, 1e-4)
 ```
 
-#### Question Use quadgk
+#### Question
 
 
-Let $f(x) = \sin(100\pi x)/(100\pi x)$. Using $1,000$ points, find the right-Riemann integral over $[0,1]$.
+Let $f(x) = \sin(100\pi x)/(\pi x)$. Using $1,000$ points, find the right-Riemann integral over $[0,1]$.
 
 
 ```{julia}
 #| echo: false
-f(x) = sin(100*pi*x)/(100*pi*x)
+f(x) = sin(100*pi*x)/(pi*x)
 a, b, n = 0, 1, 1000
 val = riemann(f, a, b, n, method="right")
 numericq(val, 1e-5)
@@ -718,9 +719,9 @@ Which of these functions might describe a fluted glass where the radius changes 
 
 ```{julia}
 #| echo: false
-choices = ["`r(h) = 2 + (x/10)^2, 0 <= x <= 10`",
-	     "`r(h) = 2 + sqrt(x/10), 0 <= x <= 10`",
-	     "`r(h) = 2 + x/10, 0 <= x <= 10`"
+choices = ["`r(h) = 2 + (h/10)^2, 0 <= h <= 10`",
+	     "`r(h) = 2 + sqrt(h/10), 0 <= h <= 10`",
+	     "`r(h) = 2 + h/10, 0 <= h <= 10`"
 	     ];
 answer = 1;
 radioq(choices, answer)
@@ -734,7 +735,7 @@ For the two types of glasses in the figure, we create functions in `julia` as fo
 
 ```{julia}
 r(h) = 3 + h/5
-s(h) = 2 + log(1 + h)
+s(h) = 3 + log(1 + h)
 r_vol(b) = quadgk(x -> pi*r(x)^2, 0, b)[1]
 s_vol(b) = quadgk(x -> pi*s(x)^2, 0, b)[1]
 ```
@@ -919,10 +920,10 @@ quadgk(x -> sqrt(1 + f'(x)^2), 0, pi)
 Next we look at a more practical problem.
 
 
-### Example: the caternary shape
+### Example: the catenary shape
 
 
-A [caternary shape](http://en.wikipedia.org/wiki/Catenary) is the shape a hanging chain will take as it is suspended between two posts. It appears elsewhere, for example, power wires will also have this shape as they are suspended between towers. A formula for a caternary can be written in terms of the hyperbolic cosine, `cosh` in `julia` or exponentials.
+A [catenary shape](http://en.wikipedia.org/wiki/Catenary) is the shape a hanging chain will take as it is suspended between two posts. It appears elsewhere, for example, power wires will also have this shape as they are suspended between towers. A formula for a catenary can be written in terms of the hyperbolic cosine, `cosh` in `julia` or exponentials.
 
 
 $$
@@ -959,7 +960,7 @@ Suppose your chain has parameter `a=3` what is the length? (Use `quadgk`)
 ```{julia}
 #| echo: false
 f(x; a=3) = a*cosh(x/a);
-val <- quadgk(x -> sqrt(1 + f'(x)^2), -1, 1)[1];
+val = quadgk(x -> sqrt(1 + f'(x)^2), -1, 1)[1];
 numericq(val, .001)
 ```
 
@@ -1022,11 +1023,7 @@ Suspension bridges, like the Verrazano bridge, have different loading than a cab
 The Verrazano-Narrows [bridge](http://observer.com/2012/09/staten-island/s-i-8/) has a span of 1298m. Suppose the drop of the main cables is 147 meters over this span. Then the cable itself can be modeled as a parabola with
 
 
-  * $$
-    x
-    $$
-
-    -intercepts $a = 1298/2$ and $-a$ and
+  * $x$-intercepts $a = 1298/2$ and $-a$ and
   * vertex $(0,b)$ with $b=-147$.
 
 
