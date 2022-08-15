@@ -389,7 +389,9 @@ Let $f(x) = e^x$. Using a forward difference quotient and $h=0.001$ graph both t
 ```{julia}
 #| echo: false
 choices = ["It is about 0.1", "It is about 0.01", "It is about 0"]
-answer = 3
+fp(x, h=0.001) = (exp(x+h)-exp(x))/h
+m = maximum(abs(exp(x) - fp(x)) for x ∈ range(0, 3, length=100))
+_, answer = findmin(abs.(m .- (0.1, 0.01, 0)))
 radioq(choices, answer)
 ```
 
@@ -833,7 +835,7 @@ answer = 2;
 radioq(choices, answer)
 ```
 
-#### Question (Find tangent line intersection)
+#### Question: find tangent line intersection
 
 
 Redefine `intersection_point` as:
@@ -852,7 +854,7 @@ val = 2;
 numericq(val, 1e-4)
 ```
 
-#### Question (What is the size of the error?)
+#### Question: what is the size of the error?
 
 
 We can compare the error at many different points with the following construct
@@ -983,7 +985,7 @@ We can again check how this works for our function and point:
 ### Practice
 
 
-#### Question (Best depends on the function and value)
+#### Question: best depends on the function and value
 
 
 A subtle point above is that we are minimizing an upper bound in $h$ with an assumption, not the actual error. The actual answer may differ as it depends on a function and the point of evaluation. Look at the function $f(x) = x^2 - 2x$ and compare the values at $0.5$ as above:
@@ -1014,7 +1016,7 @@ answer = 1;
 radioq(choices, answer, keep_order=true)
 ```
 
-#### Question (Error analysis)
+#### Question: error analysis
 
 
 Consider these commands:
