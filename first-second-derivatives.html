@@ -288,8 +288,36 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <div class="cell" data-execution_count="1">
 <div class="cell-output cell-output-error">
-<pre><code>LoadError: ArgumentError: Package SymPy not found in current path.
-- Run `import Pkg; Pkg.add("SymPy")` to install the SymPy package.</code></pre>
+<pre><code>LoadError: InitError: PyError (PyImport_ImportModule
+
+The Python package sympy could not be imported by pyimport. Usually this means
+that you did not install sympy in the Python version being used by PyCall.
+
+PyCall is currently configured to use the Python version at:
+
+/opt/hostedtoolcache/Python/3.10.6/x64/bin/python3
+
+and you should use whatever mechanism you usually use (apt-get, pip, conda,
+etcetera) to install the Python package containing the sympy module.
+
+One alternative is to re-configure PyCall to use a different Python
+version on your system: set ENV["PYTHON"] to the path/name of the python
+executable you want to use, run Pkg.build("PyCall"), and re-launch Julia.
+
+Another alternative is to configure PyCall to use a Julia-specific Python
+distribution via the Conda.jl package (which installs a private Anaconda
+Python distribution), which has the advantage that packages can be installed
+and kept up-to-date via Julia.  As explained in the PyCall documentation,
+set ENV["PYTHON"]="", run Pkg.build("PyCall"), and re-launch Julia. Then,
+To install the sympy module, you can use `pyimport_conda("sympy", PKG)`,
+where PKG is the Anaconda package that contains the module sympy,
+or alternatively you can use the Conda package directly (via
+`using Conda` followed by `Conda.add` etcetera).
+
+) &lt;class 'ModuleNotFoundError'&gt;
+ModuleNotFoundError("No module named 'sympy'")
+
+during initialization of module SymPy</code></pre>
 </div>
 </div>
 <p><br> A notebook for this material: <a href="http://mth229.github.io/229-projects/07-first_second_derivatives.ipynb">ipynb</a> <a href="./229-projects/07-first_second_derivatives.html">(Pluto html)</a> <a href="./229-projects/07-first_second_derivatives-pluto-commentary.html">(With commentary)</a></p>
@@ -416,7 +444,7 @@ in expression starting at /home/runner/.julia/packages/MTH229/6VRYU/src/MTH229.j
 in expression starting at stdin:1</code></pre>
 </div>
 <div class="cell-output cell-output-error">
-<pre><code>LoadError: Failed to precompile MTH229 [ebaf19f5-aa55-568f-9bb2-d6722dad893b] to /home/runner/.julia/compiled/v1.8/MTH229/jl_k7WwL7.</code></pre>
+<pre><code>LoadError: Failed to precompile MTH229 [ebaf19f5-aa55-568f-9bb2-d6722dad893b] to /home/runner/.julia/compiled/v1.8/MTH229/jl_BQZ4zZ.</code></pre>
 </div>
 </div>
 <p>The <code>plotif</code> function from the <code>MTH229</code> package makes it easy for us to highlight when a function is positive. This function (<code>plotif(f, g, a, b)</code>) plots the function <span class="math inline">\(f(x)\)</span> twice over <code>[a,b]</code>, the second time doing so only <em>if</em> <span class="math inline">\(g(x) \geq 0\)</span>.</p>
@@ -460,14 +488,14 @@ in expression starting at stdin:1</code></pre>
 <p>Graphically identify when the function <span class="math inline">\(f(x) = x^x\)</span> is increasing on <span class="math inline">\((0,2)\)</span></p>
 <div class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display" data-execution_count="8">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="KofGeJyM" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="yKQAnLDY" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_KofGeJyM">
+      <div class="form" id="controls_yKQAnLDY">
         <div style="padding-top: 5px">
     <div class="form-check">
-    <label class="form-check-label" for="radio_KofGeJyM_1">
-      <input class="form-check-input" type="radio" name="radio_KofGeJyM" id="radio_KofGeJyM_1" value="1">
+    <label class="form-check-label" for="radio_yKQAnLDY_1">
+      <input class="form-check-input" type="radio" name="radio_yKQAnLDY" id="radio_yKQAnLDY_1" value="1">
       
       <span class="label-body px-1">
         (0,2)
@@ -475,8 +503,8 @@ in expression starting at stdin:1</code></pre>
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_KofGeJyM_2">
-      <input class="form-check-input" type="radio" name="radio_KofGeJyM" id="radio_KofGeJyM_2" value="2">
+    <label class="form-check-label" for="radio_yKQAnLDY_2">
+      <input class="form-check-input" type="radio" name="radio_yKQAnLDY" id="radio_yKQAnLDY_2" value="2">
       
       <span class="label-body px-1">
         (0.4, 2)
@@ -487,25 +515,25 @@ in expression starting at stdin:1</code></pre>
     
         </div>
       </div>
-      <div id="KofGeJyM_message" style="padding-bottom: 15px"></div>
+      <div id="yKQAnLDY_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_KofGeJyM"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_yKQAnLDY"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
     var correct = rb.value == 2;
-    var msgBox = document.getElementById('KofGeJyM_message');
+    var msgBox = document.getElementById('yKQAnLDY_message');
       if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_KofGeJyM")
+    var explanation = document.getElementById("explanation_yKQAnLDY")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_KofGeJyM")
+    var explanation = document.getElementById("explanation_yKQAnLDY")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -522,14 +550,14 @@ rb.addEventListener("change", function() {
 <p>Graphically identify when the function <span class="math inline">\(f(x) = \sqrt{|1 - x^2|}\)</span> is increasing on the interval <span class="math inline">\([-2, 2]\)</span>.</p>
 <div class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display" data-execution_count="9">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="F3w93vbL" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="2KZNfGqi" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_F3w93vbL">
+      <div class="form" id="controls_2KZNfGqi">
         <div style="padding-top: 5px">
     <div class="form-check">
-    <label class="form-check-label" for="radio_F3w93vbL_1">
-      <input class="form-check-input" type="radio" name="radio_F3w93vbL" id="radio_F3w93vbL_1" value="1">
+    <label class="form-check-label" for="radio_2KZNfGqi_1">
+      <input class="form-check-input" type="radio" name="radio_2KZNfGqi" id="radio_2KZNfGqi_1" value="1">
       
       <span class="label-body px-1">
         (-2, -1) and (0,1)
@@ -537,8 +565,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_F3w93vbL_2">
-      <input class="form-check-input" type="radio" name="radio_F3w93vbL" id="radio_F3w93vbL_2" value="2">
+    <label class="form-check-label" for="radio_2KZNfGqi_2">
+      <input class="form-check-input" type="radio" name="radio_2KZNfGqi" id="radio_2KZNfGqi_2" value="2">
       
       <span class="label-body px-1">
         (-2, 2)
@@ -546,8 +574,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_F3w93vbL_3">
-      <input class="form-check-input" type="radio" name="radio_F3w93vbL" id="radio_F3w93vbL_3" value="3">
+    <label class="form-check-label" for="radio_2KZNfGqi_3">
+      <input class="form-check-input" type="radio" name="radio_2KZNfGqi" id="radio_2KZNfGqi_3" value="3">
       
       <span class="label-body px-1">
         (-1, 0) and (1, 2)
@@ -558,25 +586,25 @@ rb.addEventListener("change", function() {
     
         </div>
       </div>
-      <div id="F3w93vbL_message" style="padding-bottom: 15px"></div>
+      <div id="2KZNfGqi_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_F3w93vbL"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_2KZNfGqi"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
     var correct = rb.value == 3;
-    var msgBox = document.getElementById('F3w93vbL_message');
+    var msgBox = document.getElementById('2KZNfGqi_message');
       if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_F3w93vbL")
+    var explanation = document.getElementById("explanation_2KZNfGqi")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_F3w93vbL")
+    var explanation = document.getElementById("explanation_2KZNfGqi")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -593,23 +621,23 @@ rb.addEventListener("change", function() {
 <p>Graphically identify when the function <span class="math inline">\(f(x) = x^2 \cdot e^{-x}\)</span> is concave up on the interval <span class="math inline">\((0,10)\)</span>.</p>
 <div class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display" data-execution_count="10">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="mSsSu0Jm" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="5VVtLiVo" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_mSsSu0Jm">
+      <div class="form" id="controls_5VVtLiVo">
         <div style="padding-top: 5px">
     <div class="form-check">
-    <label class="form-check-label" for="radio_mSsSu0Jm_1">
-      <input class="form-check-input" type="radio" name="radio_mSsSu0Jm" id="radio_mSsSu0Jm_1" value="1">
+    <label class="form-check-label" for="radio_5VVtLiVo_1">
+      <input class="form-check-input" type="radio" name="radio_5VVtLiVo" id="radio_5VVtLiVo_1" value="1">
       
       <span class="label-body px-1">
-        (0.6, 3.5)
+        (0,10)
       </span>
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_mSsSu0Jm_2">
-      <input class="form-check-input" type="radio" name="radio_mSsSu0Jm" id="radio_mSsSu0Jm_2" value="2">
+    <label class="form-check-label" for="radio_5VVtLiVo_2">
+      <input class="form-check-input" type="radio" name="radio_5VVtLiVo" id="radio_5VVtLiVo_2" value="2">
       
       <span class="label-body px-1">
         (0, 2)
@@ -617,8 +645,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_mSsSu0Jm_3">
-      <input class="form-check-input" type="radio" name="radio_mSsSu0Jm" id="radio_mSsSu0Jm_3" value="3">
+    <label class="form-check-label" for="radio_5VVtLiVo_3">
+      <input class="form-check-input" type="radio" name="radio_5VVtLiVo" id="radio_5VVtLiVo_3" value="3">
       
       <span class="label-body px-1">
         (0, 0.6) and (3.5, 10)
@@ -626,11 +654,11 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_mSsSu0Jm_4">
-      <input class="form-check-input" type="radio" name="radio_mSsSu0Jm" id="radio_mSsSu0Jm_4" value="4">
+    <label class="form-check-label" for="radio_5VVtLiVo_4">
+      <input class="form-check-input" type="radio" name="radio_5VVtLiVo" id="radio_5VVtLiVo_4" value="4">
       
       <span class="label-body px-1">
-        (0,10)
+        (0.6, 3.5)
       </span>
     </label>
 </div>
@@ -638,25 +666,25 @@ rb.addEventListener("change", function() {
     
         </div>
       </div>
-      <div id="mSsSu0Jm_message" style="padding-bottom: 15px"></div>
+      <div id="5VVtLiVo_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_mSsSu0Jm"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_5VVtLiVo"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
     var correct = rb.value == 3;
-    var msgBox = document.getElementById('mSsSu0Jm_message');
+    var msgBox = document.getElementById('5VVtLiVo_message');
       if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_mSsSu0Jm")
+    var explanation = document.getElementById("explanation_5VVtLiVo")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_mSsSu0Jm")
+    var explanation = document.getElementById("explanation_5VVtLiVo")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -721,23 +749,23 @@ rb.addEventListener("change", function() {
 <p>You know that <span class="math inline">\(f'(x) = |x|\)</span>. Over <span class="math inline">\([-1,1]\)</span> where if <span class="math inline">\(f(x)\)</span> increasing and where is it concave up?</p>
 <div class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display" data-execution_count="14">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="BXJWfgBu" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="vWzuVqOz" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_BXJWfgBu">
+      <div class="form" id="controls_vWzuVqOz">
         <div style="padding-top: 5px">
     <div class="form-check">
-    <label class="form-check-label" for="radio_BXJWfgBu_1">
-      <input class="form-check-input" type="radio" name="radio_BXJWfgBu" id="radio_BXJWfgBu_1" value="1">
+    <label class="form-check-label" for="radio_vWzuVqOz_1">
+      <input class="form-check-input" type="radio" name="radio_vWzuVqOz" id="radio_vWzuVqOz_1" value="1">
       
       <span class="label-body px-1">
-        f is increasing on \((-1,1)\) and concave up on \((0,1)\)
+        You don't know – the derivative of |x| does not exist
       </span>
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_BXJWfgBu_2">
-      <input class="form-check-input" type="radio" name="radio_BXJWfgBu" id="radio_BXJWfgBu_2" value="2">
+    <label class="form-check-label" for="radio_vWzuVqOz_2">
+      <input class="form-check-input" type="radio" name="radio_vWzuVqOz" id="radio_vWzuVqOz_2" value="2">
       
       <span class="label-body px-1">
         f is increasing on \((0,1)\) and concave up on \((-1,1)\)
@@ -745,11 +773,11 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_BXJWfgBu_3">
-      <input class="form-check-input" type="radio" name="radio_BXJWfgBu" id="radio_BXJWfgBu_3" value="3">
+    <label class="form-check-label" for="radio_vWzuVqOz_3">
+      <input class="form-check-input" type="radio" name="radio_vWzuVqOz" id="radio_vWzuVqOz_3" value="3">
       
       <span class="label-body px-1">
-        You don't know – the derivative of |x| does not exist
+        f is increasing on \((-1,1)\) and concave up on \((0,1)\)
       </span>
     </label>
 </div>
@@ -757,25 +785,25 @@ rb.addEventListener("change", function() {
     
         </div>
       </div>
-      <div id="BXJWfgBu_message" style="padding-bottom: 15px"></div>
+      <div id="vWzuVqOz_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_BXJWfgBu"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_vWzuVqOz"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
     var correct = rb.value == 2;
-    var msgBox = document.getElementById('BXJWfgBu_message');
+    var msgBox = document.getElementById('vWzuVqOz_message');
       if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_BXJWfgBu")
+    var explanation = document.getElementById("explanation_vWzuVqOz")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_BXJWfgBu")
+    var explanation = document.getElementById("explanation_vWzuVqOz")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -792,14 +820,23 @@ rb.addEventListener("change", function() {
 <p>Suppose <span class="math inline">\(f'(x) = (x^4 - x^2 + 2)/(x^4 - 2x^2 + 1)\)</span>. When is <span class="math inline">\(f(x)\)</span> increasing on <span class="math inline">\((-2, 2)\)</span>?</p>
 <div class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display" data-execution_count="15">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="tIkqzCmR" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="WSkDjYYI" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_tIkqzCmR">
+      <div class="form" id="controls_WSkDjYYI">
         <div style="padding-top: 5px">
     <div class="form-check">
-    <label class="form-check-label" for="radio_tIkqzCmR_1">
-      <input class="form-check-input" type="radio" name="radio_tIkqzCmR" id="radio_tIkqzCmR_1" value="1">
+    <label class="form-check-label" for="radio_WSkDjYYI_1">
+      <input class="form-check-input" type="radio" name="radio_WSkDjYYI" id="radio_WSkDjYYI_1" value="1">
+      
+      <span class="label-body px-1">
+        Wherever it is defined
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_WSkDjYYI_2">
+      <input class="form-check-input" type="radio" name="radio_WSkDjYYI" id="radio_WSkDjYYI_2" value="2">
       
       <span class="label-body px-1">
         On (-2, -1) and (0, 1)
@@ -807,20 +844,11 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_tIkqzCmR_2">
-      <input class="form-check-input" type="radio" name="radio_tIkqzCmR" id="radio_tIkqzCmR_2" value="2">
+    <label class="form-check-label" for="radio_WSkDjYYI_3">
+      <input class="form-check-input" type="radio" name="radio_WSkDjYYI" id="radio_WSkDjYYI_3" value="3">
       
       <span class="label-body px-1">
         On (-1, 1)
-      </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label" for="radio_tIkqzCmR_3">
-      <input class="form-check-input" type="radio" name="radio_tIkqzCmR" id="radio_tIkqzCmR_3" value="3">
-      
-      <span class="label-body px-1">
-        Wherever it is defined
       </span>
     </label>
 </div>
@@ -828,25 +856,25 @@ rb.addEventListener("change", function() {
     
         </div>
       </div>
-      <div id="tIkqzCmR_message" style="padding-bottom: 15px"></div>
+      <div id="WSkDjYYI_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_tIkqzCmR"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_WSkDjYYI"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 3;
-    var msgBox = document.getElementById('tIkqzCmR_message');
+    var correct = rb.value == 1;
+    var msgBox = document.getElementById('WSkDjYYI_message');
       if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_tIkqzCmR")
+    var explanation = document.getElementById("explanation_WSkDjYYI")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_tIkqzCmR")
+    var explanation = document.getElementById("explanation_WSkDjYYI")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -863,14 +891,14 @@ rb.addEventListener("change", function() {
 <p>If <span class="math inline">\(f'(x) = \tan(x) - 3x/2\)</span>. When is <span class="math inline">\(f(x)\)</span> concave down on the interval <span class="math inline">\((-\pi/3, \pi/3)\)</span>?</p>
 <div class="cell" data-execution_count="15">
 <div class="cell-output cell-output-display" data-execution_count="16">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="hRjA8q1m" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="O9HzqdvC" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_hRjA8q1m">
+      <div class="form" id="controls_O9HzqdvC">
         <div style="padding-top: 5px">
     <div class="form-check">
-    <label class="form-check-label" for="radio_hRjA8q1m_1">
-      <input class="form-check-input" type="radio" name="radio_hRjA8q1m" id="radio_hRjA8q1m_1" value="1">
+    <label class="form-check-label" for="radio_O9HzqdvC_1">
+      <input class="form-check-input" type="radio" name="radio_O9HzqdvC" id="radio_O9HzqdvC_1" value="1">
       
       <span class="label-body px-1">
         \((-0.6, 0.6)\)
@@ -878,20 +906,20 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_hRjA8q1m_2">
-      <input class="form-check-input" type="radio" name="radio_hRjA8q1m" id="radio_hRjA8q1m_2" value="2">
+    <label class="form-check-label" for="radio_O9HzqdvC_2">
+      <input class="form-check-input" type="radio" name="radio_O9HzqdvC" id="radio_O9HzqdvC_2" value="2">
       
       <span class="label-body px-1">
-        \((-\pi/3, 0)\)
+        \((-\pi/3, \pi/3)\)
       </span>
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_hRjA8q1m_3">
-      <input class="form-check-input" type="radio" name="radio_hRjA8q1m" id="radio_hRjA8q1m_3" value="3">
+    <label class="form-check-label" for="radio_O9HzqdvC_3">
+      <input class="form-check-input" type="radio" name="radio_O9HzqdvC" id="radio_O9HzqdvC_3" value="3">
       
       <span class="label-body px-1">
-        \((-\pi/3, \pi/3)\)
+        \((-\pi/3, 0)\)
       </span>
     </label>
 </div>
@@ -899,25 +927,25 @@ rb.addEventListener("change", function() {
     
         </div>
       </div>
-      <div id="hRjA8q1m_message" style="padding-bottom: 15px"></div>
+      <div id="O9HzqdvC_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_hRjA8q1m"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_O9HzqdvC"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
     var correct = rb.value == 1;
-    var msgBox = document.getElementById('hRjA8q1m_message');
+    var msgBox = document.getElementById('O9HzqdvC_message');
       if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_hRjA8q1m")
+    var explanation = document.getElementById("explanation_O9HzqdvC")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_hRjA8q1m")
+    var explanation = document.getElementById("explanation_O9HzqdvC")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1021,14 +1049,14 @@ rb.addEventListener("change", function() {
 <p>Let <span class="math inline">\(f'(x) = x^4 - 4x^2 + 1\)</span>. Classify all relative extrema of <span class="math inline">\(f(x)\)</span> on the interval <span class="math inline">\((-1, 1)\)</span>.</p>
 <div class="cell" data-execution_count="22">
 <div class="cell-output cell-output-display" data-execution_count="23">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="A55lMWZs" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="kiqZbWAA" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_A55lMWZs">
+      <div class="form" id="controls_kiqZbWAA">
         <div style="padding-top: 5px">
     <div class="form-check">
-    <label class="form-check-label" for="radio_A55lMWZs_1">
-      <input class="form-check-input" type="radio" name="radio_A55lMWZs" id="radio_A55lMWZs_1" value="1">
+    <label class="form-check-label" for="radio_kiqZbWAA_1">
+      <input class="form-check-input" type="radio" name="radio_kiqZbWAA" id="radio_kiqZbWAA_1" value="1">
       
       <span class="label-body px-1">
         at 0 there is a maximum
@@ -1036,8 +1064,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_A55lMWZs_2">
-      <input class="form-check-input" type="radio" name="radio_A55lMWZs" id="radio_A55lMWZs_2" value="2">
+    <label class="form-check-label" for="radio_kiqZbWAA_2">
+      <input class="form-check-input" type="radio" name="radio_kiqZbWAA" id="radio_kiqZbWAA_2" value="2">
       
       <span class="label-body px-1">
         Near -1.93185 and 0.51763 there are relative maxima, near 1.93185 and -0.51763 there are relative minima
@@ -1045,8 +1073,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_A55lMWZs_3">
-      <input class="form-check-input" type="radio" name="radio_A55lMWZs" id="radio_A55lMWZs_3" value="3">
+    <label class="form-check-label" for="radio_kiqZbWAA_3">
+      <input class="form-check-input" type="radio" name="radio_kiqZbWAA" id="radio_kiqZbWAA_3" value="3">
       
       <span class="label-body px-1">
         Near -0.51763 there is a relative minimum, near 0.51763 there is a relative maximum
@@ -1057,25 +1085,25 @@ rb.addEventListener("change", function() {
     
         </div>
       </div>
-      <div id="A55lMWZs_message" style="padding-bottom: 15px"></div>
+      <div id="kiqZbWAA_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_A55lMWZs"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_kiqZbWAA"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
     var correct = rb.value == 3;
-    var msgBox = document.getElementById('A55lMWZs_message');
+    var msgBox = document.getElementById('kiqZbWAA_message');
       if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_A55lMWZs")
+    var explanation = document.getElementById("explanation_kiqZbWAA")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_A55lMWZs")
+    var explanation = document.getElementById("explanation_kiqZbWAA")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1092,14 +1120,23 @@ rb.addEventListener("change", function() {
 <p>Let <code>fp(x) = (2x-1)/cbrt(x^2 - x - 2)^2</code>. Over the interval <span class="math inline">\((-1.5,1.5)\)</span> identify all relative maxima and minima of <span class="math inline">\(f(x)\)</span>.</p>
 <div class="cell" data-execution_count="23">
 <div class="cell-output cell-output-display" data-execution_count="24">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="kvWSOdA2" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="7fwb0P5s" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_kvWSOdA2">
+      <div class="form" id="controls_7fwb0P5s">
         <div style="padding-top: 5px">
     <div class="form-check">
-    <label class="form-check-label" for="radio_kvWSOdA2_1">
-      <input class="form-check-input" type="radio" name="radio_kvWSOdA2" id="radio_kvWSOdA2_1" value="1">
+    <label class="form-check-label" for="radio_7fwb0P5s_1">
+      <input class="form-check-input" type="radio" name="radio_7fwb0P5s" id="radio_7fwb0P5s_1" value="1">
+      
+      <span class="label-body px-1">
+        This function only has an asymptote at -1, no relative extrema
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_7fwb0P5s_2">
+      <input class="form-check-input" type="radio" name="radio_7fwb0P5s" id="radio_7fwb0P5s_2" value="2">
       
       <span class="label-body px-1">
         -1 is a relative min and 0.5 is a maximum
@@ -1107,20 +1144,11 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_kvWSOdA2_2">
-      <input class="form-check-input" type="radio" name="radio_kvWSOdA2" id="radio_kvWSOdA2_2" value="2">
+    <label class="form-check-label" for="radio_7fwb0P5s_3">
+      <input class="form-check-input" type="radio" name="radio_7fwb0P5s" id="radio_7fwb0P5s_3" value="3">
       
       <span class="label-body px-1">
         -1 is a critical point but not an extram, 0.5 is a relative minimum
-      </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label" for="radio_kvWSOdA2_3">
-      <input class="form-check-input" type="radio" name="radio_kvWSOdA2" id="radio_kvWSOdA2_3" value="3">
-      
-      <span class="label-body px-1">
-        This function only has an asymptote at -1, no relative extrema
       </span>
     </label>
 </div>
@@ -1128,25 +1156,25 @@ rb.addEventListener("change", function() {
     
         </div>
       </div>
-      <div id="kvWSOdA2_message" style="padding-bottom: 15px"></div>
+      <div id="7fwb0P5s_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_kvWSOdA2"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_7fwb0P5s"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 2;
-    var msgBox = document.getElementById('kvWSOdA2_message');
+    var correct = rb.value == 3;
+    var msgBox = document.getElementById('7fwb0P5s_message');
       if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_kvWSOdA2")
+    var explanation = document.getElementById("explanation_7fwb0P5s")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_kvWSOdA2")
+    var explanation = document.getElementById("explanation_7fwb0P5s")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1163,14 +1191,14 @@ rb.addEventListener("change", function() {
 <p>Suppose, <span class="math inline">\(f(x)\)</span> has a critical at <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span>. If possible, classify them as relative maximum or minimum assuming <span class="math inline">\(f''(x) = 1 - 2x - \sin(x)\)</span></p>
 <div class="cell" data-execution_count="24">
 <div class="cell-output cell-output-display" data-execution_count="25">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="IBx0CNKj" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="WNreTxAQ" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_IBx0CNKj">
+      <div class="form" id="controls_WNreTxAQ">
         <div style="padding-top: 5px">
     <div class="form-check">
-    <label class="form-check-label" for="radio_IBx0CNKj_1">
-      <input class="form-check-input" type="radio" name="radio_IBx0CNKj" id="radio_IBx0CNKj_1" value="1">
+    <label class="form-check-label" for="radio_WNreTxAQ_1">
+      <input class="form-check-input" type="radio" name="radio_WNreTxAQ" id="radio_WNreTxAQ_1" value="1">
       
       <span class="label-body px-1">
         0 is  relative minimum, 1 is a relative max
@@ -1178,8 +1206,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_IBx0CNKj_2">
-      <input class="form-check-input" type="radio" name="radio_IBx0CNKj" id="radio_IBx0CNKj_2" value="2">
+    <label class="form-check-label" for="radio_WNreTxAQ_2">
+      <input class="form-check-input" type="radio" name="radio_WNreTxAQ" id="radio_WNreTxAQ_2" value="2">
       
       <span class="label-body px-1">
         both are relative maximum
@@ -1187,20 +1215,20 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_IBx0CNKj_3">
-      <input class="form-check-input" type="radio" name="radio_IBx0CNKj" id="radio_IBx0CNKj_3" value="3">
+    <label class="form-check-label" for="radio_WNreTxAQ_3">
+      <input class="form-check-input" type="radio" name="radio_WNreTxAQ" id="radio_WNreTxAQ_3" value="3">
       
       <span class="label-body px-1">
-        One can not say from the given information.
+        0 is a relative maximum, 1 is a relative minimum
       </span>
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_IBx0CNKj_4">
-      <input class="form-check-input" type="radio" name="radio_IBx0CNKj" id="radio_IBx0CNKj_4" value="4">
+    <label class="form-check-label" for="radio_WNreTxAQ_4">
+      <input class="form-check-input" type="radio" name="radio_WNreTxAQ" id="radio_WNreTxAQ_4" value="4">
       
       <span class="label-body px-1">
-        0 is a relative maximum, 1 is a relative minimum
+        One can not say from the given information.
       </span>
     </label>
 </div>
@@ -1208,25 +1236,25 @@ rb.addEventListener("change", function() {
     
         </div>
       </div>
-      <div id="IBx0CNKj_message" style="padding-bottom: 15px"></div>
+      <div id="WNreTxAQ_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_IBx0CNKj"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_WNreTxAQ"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
     var correct = rb.value == 1;
-    var msgBox = document.getElementById('IBx0CNKj_message');
+    var msgBox = document.getElementById('WNreTxAQ_message');
       if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_IBx0CNKj")
+    var explanation = document.getElementById("explanation_WNreTxAQ")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_IBx0CNKj")
+    var explanation = document.getElementById("explanation_WNreTxAQ")
     if (explanation != null) {
        explanation.style.display = "block";
     }
