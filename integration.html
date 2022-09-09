@@ -315,40 +315,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header>
 
-<div class="cell" data-execution_count="1">
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: InitError: PyError (PyImport_ImportModule
-
-The Python package sympy could not be imported by pyimport. Usually this means
-that you did not install sympy in the Python version being used by PyCall.
-
-PyCall is currently configured to use the Python version at:
-
-/opt/hostedtoolcache/Python/3.10.6/x64/bin/python3
-
-and you should use whatever mechanism you usually use (apt-get, pip, conda,
-etcetera) to install the Python package containing the sympy module.
-
-One alternative is to re-configure PyCall to use a different Python
-version on your system: set ENV["PYTHON"] to the path/name of the python
-executable you want to use, run Pkg.build("PyCall"), and re-launch Julia.
-
-Another alternative is to configure PyCall to use a Julia-specific Python
-distribution via the Conda.jl package (which installs a private Anaconda
-Python distribution), which has the advantage that packages can be installed
-and kept up-to-date via Julia.  As explained in the PyCall documentation,
-set ENV["PYTHON"]="", run Pkg.build("PyCall"), and re-launch Julia. Then,
-To install the sympy module, you can use `pyimport_conda("sympy", PKG)`,
-where PKG is the Anaconda package that contains the module sympy,
-or alternatively you can use the Conda package directly (via
-`using Conda` followed by `Conda.add` etcetera).
-
-) &lt;class 'ModuleNotFoundError'&gt;
-ModuleNotFoundError("No module named 'sympy'")
-
-during initialization of module SymPy</code></pre>
-</div>
-</div>
 <p><br> A notebook for this material: <a href="https://raw.githubusercontent.com/mth229/229-projects/master/10-integration.ipynb">ipynb</a> <a href="./229-projects/10-integration.html">(Pluto html)</a> <a href="./229-projects/10-integration-pluto-commentary.html">(With commentary)</a></p>
 <section id="introduction" class="level2" data-number="10.1">
 <h2 data-number="10.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">10.1</span> Introduction</h2>
@@ -362,95 +328,30 @@ during initialization of module SymPy</code></pre>
 \]</span></p>
 <p>This is great as long as some antiderivative is known. There are several different techniques for finding antiderivatives. The <code>integrate</code> function in the <code>SymPy</code> package can do many of them:</p>
 <div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MTH229</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Plots</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>ERROR: LoadError: InitError: </code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>PyError (PyImport_ImportModule
-
-The Python package sympy could not be imported by pyimport. Usually this means
-that you did not install sympy in the Python version being used by PyCall.
-
-PyCall is currently configured to use the Python version at:
-
-/opt/hostedtoolcache/Python/3.10.6/x64/bin/python3
-
-and you should use whatever mechanism you usually use (apt-get, pip, conda,
-etcetera) to install the Python package containing the sympy module.
-
-One alternative is to re-configure PyCall to use a different Python
-version on your system: set ENV["PYTHON"] to the path/name of the python
-executable you want to use, run Pkg.build("PyCall"), and re-launch Julia.
-
-Another alternative is to configure PyCall to use a Julia-specific Python
-distribution via the Conda.jl package (which installs a private Anaconda
-Python distribution), which has the advantage that packages can be installed
-and kept up-to-date via Julia.  As explained in the PyCall documentation,
-set ENV["PYTHON"]="", run Pkg.build("PyCall"), and re-launch Julia. Then,
-To install the sympy module, you can use `pyimport_conda("sympy", PKG)`,
-where PKG is the Anaconda package that contains the module sympy,
-or alternatively you can use the Conda package directly (via
-`using Conda` followed by `Conda.add` etcetera).
-
-) &lt;class 'ModuleNotFoundError'&gt;
-ModuleNotFoundError("No module named 'sympy'")
-
-Stacktrace:
-  [1] pyimport(name::</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>String)
-    @ PyCall ~/.julia/packages/PyCall/ygXW2/src/PyCall.jl:558
-  [2] pyimport_conda(modulename::String, condapkg::String, channel::String)
-    @ PyCall ~/.julia/packages/PyCall/ygXW2/src/PyCall.jl:716
-  [3] pyimport_conda
-    @ ~/.julia/packages/PyCall/ygXW2/src/PyCall.jl:715 [inlined]
-  [4] __init__()
-    @ SymPy ~/.julia/packages/SymPy/7cg6m/src/SymPy.jl:128
-  [5] _include_from_serialized(pkg::Base.PkgId, path::String, depmods::Vector{Any})
-    @ Base ./loading.jl:831
-  [6] _require_search_from_serialized(pkg::Base.PkgId, sourcepath::String, build_id::UInt64)
-    @ Base ./loading.jl:1039
-  [7] _require(pkg::Base.PkgId)
-    @ Base ./loading.jl:1315
-  [8] _require_prelocked(uuidkey::Base.PkgId)
-    @ Base ./loading.jl:1200
-  [9] macro expansion
-    @ ./loading.jl:1180 [inlined]
- [10] macro expansion
-    @ ./lock.jl:223 [inlined]
- [11] require(into::Module, mod::Symbol)
-    @ Base ./loading.jl:1144
- [12] include
-    @ ./Base.jl:419 [inlined]
- [13] include_package_for_output(pkg::Base.PkgId, input::String, depot_path::Vector{String}, dl_load_path::Vector{String}, load_path::Vector{String}, concrete_deps::Vector{Pair{Base.PkgId, UInt64}}, source::Nothing)
-    @ Base ./loading.jl:1554
- [14] top-level scope
-    @ stdin:1
-during initialization of module SymPy
-in expression starting at /home/runner/.julia/packages/MTH229/6VRYU/src/MTH229.jl:1
-in expression starting at stdin:1</code></pre>
-</div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: Failed to precompile MTH229 [ebaf19f5-aa55-568f-9bb2-d6722dad893b] to /home/runner/.julia/compiled/v1.8/MTH229/jl_NwJO4r.</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MTH229</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Plots</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">3</span> <span class="op">-</span> <span class="fu">cos</span>(x) <span class="op">+</span> <span class="fu">x*log</span>(x)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> x</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">integrate</span>(<span class="fu">f</span>(x), x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: LoadError: UndefVarError: @syms not defined
-in expression starting at In[5]:2</code></pre>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">3</span> <span class="op">-</span> <span class="fu">cos</span>(x) <span class="op">+</span> <span class="fu">x*log</span>(x)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> x</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">integrate</span>(<span class="fu">f</span>(x), x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<span class="math-left-align" style="padding-left: 4px; width:0; float:left;"> 
+\[
+\frac{x^{4}}{4} + \frac{x^{2} \log{\left(x \right)}}{2} - \frac{x^{2}}{4} - \sin{\left(x \right)}
+\]
+</span>
 </div>
 </div>
 <p>To find the definite integral, say from <span class="math inline">\(1\)</span> to <span class="math inline">\(10\)</span> we have:</p>
 <div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">integrate</span>(<span class="fu">f</span>(x), (x, <span class="fl">1</span>, <span class="fl">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: x not defined</code></pre>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">integrate</span>(<span class="fu">f</span>(x), (x, <span class="fl">1</span>, <span class="fl">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<span class="math-left-align" style="padding-left: 4px; width:0; float:left;"> 
+\[
+- \sin{\left(10 \right)} + \sin{\left(1 \right)} + 50 \log{\left(10 \right)} + 2475
+\]
+</span>
 </div>
 </div>
 <p>If all functions had antiderivatives that could be found symbolically, there wouldn’t be much more to say. However, it is a fact of life that not all nice functions will have an antiderivative in a convenient form. A test for such functions is provided in <a href="http://en.wikipedia.org/wiki/Risch_algorithm">Risch’s algorithm</a>. In cases where no workable antiderivative is available, the above approach is of no help. Rather, to find the area one can turn to numeric approximations that progressively get better as more approximations are taken.</p>
@@ -474,17 +375,17 @@ in expression starting at In[5]:2</code></pre>
 </ul>
 <p>If we partition <span class="math inline">\([a,b]\)</span> into <span class="math inline">\(n\)</span> same sized intervals, then each has length <span class="math inline">\(\delta = (b-a)/n\)</span> and so the points are separated by this amount. As such, we can choose our <span class="math inline">\(a = x_0 &lt; x_1 &lt; \dots &lt; x_n = b\)</span> with commands like:</p>
 <div class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>a, b, n <span class="op">=</span> <span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span>;</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>delta <span class="op">=</span> (b<span class="op">-</span>a)<span class="op">/</span>n;</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> a <span class="op">.+</span> (<span class="fl">0</span><span class="op">:</span>n) <span class="op">*</span> delta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>a, b, n <span class="op">=</span> <span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">5</span>;</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>delta <span class="op">=</span> (b<span class="op">-</span>a)<span class="op">/</span>n;</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> a <span class="op">.+</span> (<span class="fl">0</span><span class="op">:</span>n) <span class="op">*</span> delta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <pre><code>1.0:0.4:3.0</code></pre>
 </div>
 </div>
 <p>To apply a function to a range of values, we may use a map, a comprehension, a <code>for</code> loop or the “dot” notation. We will use broadcasting here. Recall, the syntax:</p>
 <div class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>fxs <span class="op">=</span> <span class="fu">f</span>.(xs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>fxs <span class="op">=</span> <span class="fu">f</span>.(xs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <pre><code>6-element Vector{Float64}:
  1.0
@@ -497,14 +398,14 @@ in expression starting at In[5]:2</code></pre>
 </div>
 <p>Now to add the numbers up. For this task, the <code>sum</code> function is available</p>
 <div class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(fxs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(fxs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>26.8</code></pre>
 </div>
 </div>
 <p>Okay, just one subtlety, we really only want the points</p>
 <div class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>[ a <span class="op">.+</span> (<span class="fl">0</span><span class="op">:</span>n<span class="op">-</span><span class="fl">1</span>) <span class="op">*</span> delta ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>[ a <span class="op">.+</span> (<span class="fl">0</span><span class="op">:</span>n<span class="op">-</span><span class="fl">1</span>) <span class="op">*</span> delta ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <pre><code>1-element Vector{StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}:
  1.0:0.4:2.6</code></pre>
@@ -512,7 +413,7 @@ in expression starting at In[5]:2</code></pre>
 </div>
 <p>for the left Riemann sum and the points</p>
 <div class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>[ a <span class="op">.+</span> (<span class="fl">1</span><span class="op">:</span>n) <span class="op">*</span> delta ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>[ a <span class="op">.+</span> (<span class="fl">1</span><span class="op">:</span>n) <span class="op">*</span> delta ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <pre><code>1-element Vector{StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}}:
  1.4:0.4:3.0</code></pre>
@@ -521,20 +422,20 @@ in expression starting at In[5]:2</code></pre>
 <p>for the right.</p>
 <p>Putting this together, here are commands to approximate the area under the curve <span class="math inline">\(f(x)=x^2\)</span> using 10 left Riemann sums:</p>
 <div class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>a, b, n <span class="op">=</span> <span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">10</span>;        <span class="co">## note n=10</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>delta <span class="op">=</span> (b <span class="op">-</span> a)<span class="op">/</span>n;         <span class="co">## nothing to change below here</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> a <span class="op">.+</span> (<span class="fl">0</span><span class="op">:</span>n<span class="op">-</span><span class="fl">1</span>) <span class="op">*</span> delta;          <span class="co">## n, right is 1:n * delta</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>fxs <span class="op">=</span> <span class="fu">f</span>.(xs);</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(fxs) <span class="op">*</span> delta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>a, b, n <span class="op">=</span> <span class="fl">1</span>, <span class="fl">3</span>, <span class="fl">10</span>;        <span class="co">## note n=10</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>delta <span class="op">=</span> (b <span class="op">-</span> a)<span class="op">/</span>n;         <span class="co">## nothing to change below here</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> a <span class="op">.+</span> (<span class="fl">0</span><span class="op">:</span>n<span class="op">-</span><span class="fl">1</span>) <span class="op">*</span> delta;          <span class="co">## n, right is 1:n * delta</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>fxs <span class="op">=</span> <span class="fu">f</span>.(xs);</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(fxs) <span class="op">*</span> delta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <pre><code>7.88</code></pre>
 </div>
 </div>
 <p>We compare this value to the known value from the Fundamental Theorem of Calculus, as <span class="math inline">\(F(x) = x^3/3\)</span> is an antiderivative:</p>
 <div class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">F</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">3</span><span class="op">/</span><span class="fl">3</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">F</span>(b) <span class="op">-</span> <span class="fu">F</span>(a)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">F</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">3</span><span class="op">/</span><span class="fl">3</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">F</span>(b) <span class="op">-</span> <span class="fu">F</span>(a)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="13">
 <pre><code>8.666666666666666</code></pre>
 </div>
@@ -548,37 +449,37 @@ in expression starting at In[5]:2</code></pre>
 <p>For the same problem, let <span class="math inline">\(n=100\)</span>. What do you get?</p>
 <div class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display" data-execution_count="14">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="hlRtpOwY" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="lmYaOnor" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_hlRtpOwY">
+      <div class="form" id="controls_lmYaOnor">
         <div style="padding-top: 5px">
     <br>
 <div class="input-group">
-    <input id="hlRtpOwY" type="number" class="form-control" placeholder="Numeric answer">
+    <input id="lmYaOnor" type="number" class="form-control" placeholder="Numeric answer">
 </div>
 
     
         </div>
       </div>
-      <div id="hlRtpOwY_message" style="padding-bottom: 15px"></div>
+      <div id="lmYaOnor_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.getElementById("hlRtpOwY").addEventListener("change", function() {
+document.getElementById("lmYaOnor").addEventListener("change", function() {
   var correct = (Math.abs(this.value - 8.5868) <= 0.0001);
-  var msgBox = document.getElementById('hlRtpOwY_message');
+  var msgBox = document.getElementById('lmYaOnor_message');
     if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_hlRtpOwY")
+    var explanation = document.getElementById("explanation_lmYaOnor")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_hlRtpOwY")
+    var explanation = document.getElementById("explanation_lmYaOnor")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -596,37 +497,37 @@ document.getElementById("hlRtpOwY").addEventListener("change", function() {
 <p>For the same problem, let <span class="math inline">\(n=1000\)</span>. What do you get?</p>
 <div class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display" data-execution_count="15">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="gpMpvH6C" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="0LVa1p8y" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_gpMpvH6C">
+      <div class="form" id="controls_0LVa1p8y">
         <div style="padding-top: 5px">
     <br>
 <div class="input-group">
-    <input id="gpMpvH6C" type="number" class="form-control" placeholder="Numeric answer">
+    <input id="0LVa1p8y" type="number" class="form-control" placeholder="Numeric answer">
 </div>
 
     
         </div>
       </div>
-      <div id="gpMpvH6C_message" style="padding-bottom: 15px"></div>
+      <div id="0LVa1p8y_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.getElementById("gpMpvH6C").addEventListener("change", function() {
+document.getElementById("0LVa1p8y").addEventListener("change", function() {
   var correct = (Math.abs(this.value - 8.658668) <= 0.0001);
-  var msgBox = document.getElementById('gpMpvH6C_message');
+  var msgBox = document.getElementById('0LVa1p8y_message');
     if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_gpMpvH6C")
+    var explanation = document.getElementById("explanation_0LVa1p8y")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_gpMpvH6C")
+    var explanation = document.getElementById("explanation_0LVa1p8y")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -644,14 +545,14 @@ document.getElementById("gpMpvH6C").addEventListener("change", function() {
 <p>For the same problem, let <span class="math inline">\(n=10,000\)</span>. is the difference between the answer and the actual answer within <span class="math inline">\(0.001\)</span>?</p>
 <div class="cell" data-execution_count="15">
 <div class="cell-output cell-output-display" data-execution_count="16">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="fgptYag2" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="6Wzk6GqS" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_fgptYag2">
+      <div class="form" id="controls_6Wzk6GqS">
         <div style="padding-top: 5px">
     <div class="form-check">
-    <label class="form-check-label" for="radio_fgptYag2_1">
-      <input class="form-check-input" type="radio" name="radio_fgptYag2" id="radio_fgptYag2_1" value="1">
+    <label class="form-check-label" for="radio_6Wzk6GqS_1">
+      <input class="form-check-input" type="radio" name="radio_6Wzk6GqS" id="radio_6Wzk6GqS_1" value="1">
       
       <span class="label-body px-1">
         true
@@ -659,8 +560,8 @@ document.getElementById("gpMpvH6C").addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_fgptYag2_2">
-      <input class="form-check-input" type="radio" name="radio_fgptYag2" id="radio_fgptYag2_2" value="2">
+    <label class="form-check-label" for="radio_6Wzk6GqS_2">
+      <input class="form-check-input" type="radio" name="radio_6Wzk6GqS" id="radio_6Wzk6GqS_2" value="2">
       
       <span class="label-body px-1">
         false
@@ -671,25 +572,25 @@ document.getElementById("gpMpvH6C").addEventListener("change", function() {
     
         </div>
       </div>
-      <div id="fgptYag2_message" style="padding-bottom: 15px"></div>
+      <div id="6Wzk6GqS_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_fgptYag2"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_6Wzk6GqS"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
     var correct = rb.value == 1;
-    var msgBox = document.getElementById('fgptYag2_message');
+    var msgBox = document.getElementById('6Wzk6GqS_message');
       if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_fgptYag2")
+    var explanation = document.getElementById("explanation_6Wzk6GqS")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_fgptYag2")
+    var explanation = document.getElementById("explanation_6Wzk6GqS")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -707,32 +608,14 @@ rb.addEventListener("change", function() {
 <p>Let <span class="math inline">\(f(x) = (10 + \cos(2\pi x))^{-1}\)</span>. For the integral over <span class="math inline">\([0,1]\)</span>, the known answer is <span class="math inline">\(1/\sqrt{99}\)</span>. How big must <span class="math inline">\(n\)</span> be so that the error in the Riemann sum is less than <span class="math inline">\(10^{-8}\)</span>?</p>
 <div class="cell" data-execution_count="16">
 <div class="cell-output cell-output-display" data-execution_count="17">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="hXnLaeLt" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="wmGtlM3j" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_hXnLaeLt">
+      <div class="form" id="controls_wmGtlM3j">
         <div style="padding-top: 5px">
     <div class="form-check">
-    <label class="form-check-label" for="radio_hXnLaeLt_1">
-      <input class="form-check-input" type="radio" name="radio_hXnLaeLt" id="radio_hXnLaeLt_1" value="1">
-      
-      <span class="label-body px-1">
-        5
-      </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label" for="radio_hXnLaeLt_2">
-      <input class="form-check-input" type="radio" name="radio_hXnLaeLt" id="radio_hXnLaeLt_2" value="2">
-      
-      <span class="label-body px-1">
-        100
-      </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label" for="radio_hXnLaeLt_3">
-      <input class="form-check-input" type="radio" name="radio_hXnLaeLt" id="radio_hXnLaeLt_3" value="3">
+    <label class="form-check-label" for="radio_wmGtlM3j_1">
+      <input class="form-check-input" type="radio" name="radio_wmGtlM3j" id="radio_wmGtlM3j_1" value="1">
       
       <span class="label-body px-1">
         10000
@@ -740,20 +623,38 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_hXnLaeLt_4">
-      <input class="form-check-input" type="radio" name="radio_hXnLaeLt" id="radio_hXnLaeLt_4" value="4">
+    <label class="form-check-label" for="radio_wmGtlM3j_2">
+      <input class="form-check-input" type="radio" name="radio_wmGtlM3j" id="radio_wmGtlM3j_2" value="2">
       
       <span class="label-body px-1">
-        10
+        100
       </span>
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_hXnLaeLt_5">
-      <input class="form-check-input" type="radio" name="radio_hXnLaeLt" id="radio_hXnLaeLt_5" value="5">
+    <label class="form-check-label" for="radio_wmGtlM3j_3">
+      <input class="form-check-input" type="radio" name="radio_wmGtlM3j" id="radio_wmGtlM3j_3" value="3">
+      
+      <span class="label-body px-1">
+        5
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_wmGtlM3j_4">
+      <input class="form-check-input" type="radio" name="radio_wmGtlM3j" id="radio_wmGtlM3j_4" value="4">
       
       <span class="label-body px-1">
         1000
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_wmGtlM3j_5">
+      <input class="form-check-input" type="radio" name="radio_wmGtlM3j" id="radio_wmGtlM3j_5" value="5">
+      
+      <span class="label-body px-1">
+        10
       </span>
     </label>
 </div>
@@ -761,25 +662,25 @@ rb.addEventListener("change", function() {
     
         </div>
       </div>
-      <div id="hXnLaeLt_message" style="padding-bottom: 15px"></div>
+      <div id="wmGtlM3j_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_hXnLaeLt"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_wmGtlM3j"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 4;
-    var msgBox = document.getElementById('hXnLaeLt_message');
+    var correct = rb.value == 5;
+    var msgBox = document.getElementById('wmGtlM3j_message');
       if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_hXnLaeLt")
+    var explanation = document.getElementById("explanation_wmGtlM3j")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_hXnLaeLt")
+    var explanation = document.getElementById("explanation_wmGtlM3j")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -810,38 +711,42 @@ rb.addEventListener("change", function() {
 </ul>
 <p>This function is defined in <code>MTH229</code>:</p>
 <div class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">riemann</span>(f<span class="op">::</span><span class="dt">Function</span>, a<span class="op">::</span><span class="dt">Real</span>, b<span class="op">::</span><span class="dt">Real</span>, n<span class="op">::</span><span class="dt">Int</span>; method<span class="op">=</span><span class="st">"right"</span>)</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> method <span class="op">==</span> <span class="st">"right"</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>     meth <span class="op">=</span> (f,l,r) <span class="op">-&gt;</span> <span class="fu">f</span>(r) <span class="op">*</span> (r<span class="op">-</span>l)</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">elseif</span> method <span class="op">==</span> <span class="st">"left"</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>     meth<span class="op">=</span> (f,l,r) <span class="op">-&gt;</span> <span class="fu">f</span>(l) <span class="op">*</span> (r<span class="op">-</span>l)</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">elseif</span> method <span class="op">==</span> <span class="st">"trapezoid"</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>     meth <span class="op">=</span> (f,l,r) <span class="op">-&gt;</span> (<span class="fl">1</span><span class="op">/</span><span class="fl">2</span>) <span class="op">*</span> (<span class="fu">f</span>(l) <span class="op">+</span> <span class="fu">f</span>(r)) <span class="op">*</span> (r<span class="op">-</span>l)</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">elseif</span> method <span class="op">==</span> <span class="st">"simpsons"</span></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>     meth <span class="op">=</span> (f,l,r) <span class="op">-&gt;</span> (<span class="fl">1</span><span class="op">/</span><span class="fl">6</span>) <span class="op">*</span> (<span class="fu">f</span>(l) <span class="op">+</span> <span class="fl">4</span><span class="fu">*</span>(<span class="fu">f</span>((l<span class="op">+</span>r)<span class="op">/</span><span class="fl">2</span>)) <span class="op">+</span> <span class="fu">f</span>(r)) <span class="op">*</span> (r<span class="op">-</span>l)</span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  xs <span class="op">=</span> <span class="fu">range</span>(a, b, length<span class="op">=</span>n<span class="op">+</span><span class="fl">1</span>)</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  lrs <span class="op">=</span> <span class="fu">zip</span>(<span class="bu">Iterators</span>.<span class="fu">take</span>(xs, n), <span class="bu">Iterators</span>.<span class="fu">rest</span>(xs, <span class="fl">1</span>))</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(<span class="fu">meth</span>(f, l, r) <span class="cf">for</span> (l,r) <span class="kw">in</span> lrs)</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">riemann</span>(f<span class="op">::</span><span class="dt">Function</span>, a<span class="op">::</span><span class="dt">Real</span>, b<span class="op">::</span><span class="dt">Real</span>, n<span class="op">::</span><span class="dt">Int</span>; method<span class="op">=</span><span class="st">"right"</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> method <span class="op">==</span> <span class="st">"right"</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>     meth <span class="op">=</span> (f,l,r) <span class="op">-&gt;</span> <span class="fu">f</span>(r) <span class="op">*</span> (r<span class="op">-</span>l)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">elseif</span> method <span class="op">==</span> <span class="st">"left"</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>     meth<span class="op">=</span> (f,l,r) <span class="op">-&gt;</span> <span class="fu">f</span>(l) <span class="op">*</span> (r<span class="op">-</span>l)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">elseif</span> method <span class="op">==</span> <span class="st">"trapezoid"</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>     meth <span class="op">=</span> (f,l,r) <span class="op">-&gt;</span> (<span class="fl">1</span><span class="op">/</span><span class="fl">2</span>) <span class="op">*</span> (<span class="fu">f</span>(l) <span class="op">+</span> <span class="fu">f</span>(r)) <span class="op">*</span> (r<span class="op">-</span>l)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">elseif</span> method <span class="op">==</span> <span class="st">"simpsons"</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>     meth <span class="op">=</span> (f,l,r) <span class="op">-&gt;</span> (<span class="fl">1</span><span class="op">/</span><span class="fl">6</span>) <span class="op">*</span> (<span class="fu">f</span>(l) <span class="op">+</span> <span class="fl">4</span><span class="fu">*</span>(<span class="fu">f</span>((l<span class="op">+</span>r)<span class="op">/</span><span class="fl">2</span>)) <span class="op">+</span> <span class="fu">f</span>(r)) <span class="op">*</span> (r<span class="op">-</span>l)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  xs <span class="op">=</span> <span class="fu">range</span>(a, b, length<span class="op">=</span>n<span class="op">+</span><span class="fl">1</span>)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  lrs <span class="op">=</span> <span class="fu">zip</span>(<span class="bu">Iterators</span>.<span class="fu">take</span>(xs, n), <span class="bu">Iterators</span>.<span class="fu">rest</span>(xs, <span class="fl">1</span>))</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(<span class="fu">meth</span>(f, l, r) <span class="cf">for</span> (l,r) <span class="kw">in</span> lrs)</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="the-integrate-function-in-action" class="level3" data-number="10.3.1">
 <h3 data-number="10.3.1" class="anchored" data-anchor-id="the-integrate-function-in-action"><span class="header-section-number">10.3.1</span> The integrate function in action</h3>
 <p>The basic usage of the <code>riemann</code> function is straightforward. Here we approximate the integral of <span class="math inline">\(e^{-x^2}\)</span> from <span class="math inline">\(0\)</span> to <span class="math inline">\(3\)</span> using <span class="math inline">\(10,000\)</span> subintervals:</p>
 <div class="cell" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span>  <span class="fu">exp</span>(<span class="op">-</span>x<span class="op">^</span><span class="fl">2</span>)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">3</span>, <span class="fl">10_000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: riemann not defined</code></pre>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span>  <span class="fu">exp</span>(<span class="op">-</span>x<span class="op">^</span><span class="fl">2</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">3</span>, <span class="fl">10_000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<pre><code>0.8860573667654394</code></pre>
 </div>
 </div>
 <p>How big should the number of intervals be? More intervals will give better answers, but unlike Newton’s method we have no stopping criteria. For this problem, we look at various values based on <code>n</code>:</p>
 <div class="cell" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>[<span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">3</span>, n) for n <span class="kw">in</span> [<span class="fl">100</span>, <span class="fl">1000</span>, <span class="fl">10000</span>, <span class="fl">100000</span>]]   <span class="co">## or use 10.^(2:5)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: riemann not defined</code></pre>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>[<span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">3</span>, n) for n <span class="kw">in</span> [<span class="fl">100</span>, <span class="fl">1000</span>, <span class="fl">10000</span>, <span class="fl">100000</span>]]   <span class="co">## or use 10.^(2:5)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>4-element Vector{Float64}:
+ 0.8712091438971502
+ 0.8847075328188878
+ 0.8860573667654394
+ 0.8861923501105895</code></pre>
 </div>
 </div>
 <p>We see a value around <span class="math inline">\(0.886\)</span> as the answer.</p>
@@ -850,12 +755,17 @@ rb.addEventListener("change", function() {
 <h3 data-number="10.3.2" class="anchored" data-anchor-id="left-versus-right"><span class="header-section-number">10.3.2</span> left versus right</h3>
 <p>Using different methods allows us to compare the right and left Riemann sums. Let’s do so for the monotonic function <span class="math inline">\(e^x\)</span> over the interval <span class="math inline">\([0,2]\)</span>.</p>
 <div class="cell" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">exp</span>(x)</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>ns <span class="op">=</span> [<span class="fl">10</span><span class="op">^</span>i for i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>]</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>ys <span class="op">=</span> [<span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">2</span>, n, method<span class="op">=</span><span class="st">"right"</span>) <span class="op">-</span> <span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">2</span>, n, method<span class="op">=</span><span class="st">"left"</span>) for n <span class="kw">in</span> ns];</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>[ns ys]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: riemann not defined</code></pre>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">exp</span>(x)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>ns <span class="op">=</span> [<span class="fl">10</span><span class="op">^</span>i for i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>]</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>ys <span class="op">=</span> [<span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">2</span>, n, method<span class="op">=</span><span class="st">"right"</span>) <span class="op">-</span> <span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">2</span>, n, method<span class="op">=</span><span class="st">"left"</span>) for n <span class="kw">in</span> ns];</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>[ns ys]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>5×2 Matrix{Float64}:
+     10.0  1.27781
+    100.0  0.127781
+   1000.0  0.0127781
+  10000.0  0.00127781
+ 100000.0  0.000127781</code></pre>
 </div>
 </div>
 <p>Since these are also the minimum and maximum Riemann sums, the above gives a bound on the error in the approximations. We can see it converges quite slowly, in that there are quite a few computations needed to get even a modest bound. (<span class="math inline">\(100,000\)</span> for <span class="math inline">\(0.00013\)</span>).</p>
@@ -866,8 +776,46 @@ rb.addEventListener("change", function() {
 <h4 class="anchored" data-anchor-id="question-4">Question</h4>
 <p>Compute the integral of <span class="math inline">\(e^{-x^2}\)</span> over <span class="math inline">\([0,1]\)</span> using a right Riemann sum with <span class="math inline">\(n=10_000\)</span>. What is your answer?</p>
 <div class="cell" data-execution_count="21">
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: riemann not defined</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="CqJrvrYY" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_CqJrvrYY">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="CqJrvrYY" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="CqJrvrYY_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("CqJrvrYY").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 0.7467925261713516) <= 1.0e-8);
+  var msgBox = document.getElementById('CqJrvrYY_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_CqJrvrYY")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_CqJrvrYY")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
 </div>
 </div>
 </section>
@@ -875,8 +823,46 @@ rb.addEventListener("change", function() {
 <h4 class="anchored" data-anchor-id="question-5">Question</h4>
 <p>Compute the integral of <span class="math inline">\((1 + \cos(x)^2)^{1/2}\)</span> over the interval <span class="math inline">\([0, \pi]\)</span> using a right Riemann sum with <span class="math inline">\(n=10,000\)</span>. What is your answer?</p>
 <div class="cell" data-execution_count="22">
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: riemann not defined</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="CJudXLRH" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_CJudXLRH">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="CJudXLRH" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="CJudXLRH_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("CJudXLRH").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 3.82019778902772) <= 1.0e-8);
+  var msgBox = document.getElementById('CJudXLRH_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_CJudXLRH")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_CJudXLRH")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
 </div>
 </div>
 </section>
@@ -884,24 +870,29 @@ rb.addEventListener("change", function() {
 <h4 class="anchored" data-anchor-id="question-6">Question</h4>
 <p>Repeat the above analysis comparing the right and left Riemann sums for <span class="math inline">\(f(x)=e^x\)</span> over <span class="math inline">\([0,2]\)</span>. However, this time multiply by <span class="math inline">\(n\)</span>, as follows:</p>
 <div class="cell" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>ns <span class="op">=</span> [<span class="fl">10</span><span class="op">^</span>i for i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>]</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">exp</span>(x)</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>[n <span class="op">*</span> (<span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">2</span>, n, method<span class="op">=</span><span class="st">"right"</span>) <span class="op">-</span> <span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">2</span>, n, method<span class="op">=</span><span class="st">"left"</span>)) for n <span class="kw">in</span> ns]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: riemann not defined</code></pre>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>ns <span class="op">=</span> [<span class="fl">10</span><span class="op">^</span>i for i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>]</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">exp</span>(x)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>[n <span class="op">*</span> (<span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">2</span>, n, method<span class="op">=</span><span class="st">"right"</span>) <span class="op">-</span> <span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">2</span>, n, method<span class="op">=</span><span class="st">"left"</span>)) for n <span class="kw">in</span> ns]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<pre><code>5-element Vector{Float64}:
+ 12.778112197861304
+ 12.778112197861446
+ 12.778112197861624
+ 12.77811219781988
+ 12.778112196087932</code></pre>
 </div>
 </div>
 <p>This shows what?</p>
 <div class="cell" data-execution_count="24">
 <div class="cell-output cell-output-display" data-execution_count="24">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="MRNTLn8n" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="awZMHmkF" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_MRNTLn8n">
+      <div class="form" id="controls_awZMHmkF">
         <div style="padding-top: 5px">
     <div class="form-check">
-    <label class="form-check-label" for="radio_MRNTLn8n_1">
-      <input class="form-check-input" type="radio" name="radio_MRNTLn8n" id="radio_MRNTLn8n_1" value="1">
+    <label class="form-check-label" for="radio_awZMHmkF_1">
+      <input class="form-check-input" type="radio" name="radio_awZMHmkF" id="radio_awZMHmkF_1" value="1">
       
       <span class="label-body px-1">
         That it is constant says the difference between right and left Riemann sums is constant.
@@ -909,8 +900,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_MRNTLn8n_2">
-      <input class="form-check-input" type="radio" name="radio_MRNTLn8n" id="radio_MRNTLn8n_2" value="2">
+    <label class="form-check-label" for="radio_awZMHmkF_2">
+      <input class="form-check-input" type="radio" name="radio_awZMHmkF" id="radio_awZMHmkF_2" value="2">
       
       <span class="label-body px-1">
         That it is constant says the difference between right and left Riemann sums never goes to 0
@@ -918,8 +909,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_MRNTLn8n_3">
-      <input class="form-check-input" type="radio" name="radio_MRNTLn8n" id="radio_MRNTLn8n_3" value="3">
+    <label class="form-check-label" for="radio_awZMHmkF_3">
+      <input class="form-check-input" type="radio" name="radio_awZMHmkF" id="radio_awZMHmkF_3" value="3">
       
       <span class="label-body px-1">
         That it is constant says the difference between right and left Riemann sums goes to 0 like 1/n
@@ -930,25 +921,25 @@ rb.addEventListener("change", function() {
     
         </div>
       </div>
-      <div id="MRNTLn8n_message" style="padding-bottom: 15px"></div>
+      <div id="awZMHmkF_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_MRNTLn8n"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_awZMHmkF"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
     var correct = rb.value == 3;
-    var msgBox = document.getElementById('MRNTLn8n_message');
+    var msgBox = document.getElementById('awZMHmkF_message');
       if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_MRNTLn8n")
+    var explanation = document.getElementById("explanation_awZMHmkF")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_MRNTLn8n")
+    var explanation = document.getElementById("explanation_awZMHmkF")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -975,21 +966,26 @@ rb.addEventListener("change", function() {
 <p>The trapezoid rule simply replaces the approximation of the area in a subinterval by a trapezoid, as opposed to a rectangle.</p>
 <p>We can use this as follows. Let’s approximate the area under the curve <span class="math inline">\(y=5x^4\)</span> between <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span> (with known answer <span class="math inline">\(1\)</span>):</p>
 <div class="cell" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fl">5</span>x<span class="op">^</span><span class="fl">4</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">1000</span>, method<span class="op">=</span><span class="st">"trapezoid"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: riemann not defined</code></pre>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fl">5</span>x<span class="op">^</span><span class="fl">4</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">1000</span>, method<span class="op">=</span><span class="st">"trapezoid"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<pre><code>1.0000016666664995</code></pre>
 </div>
 </div>
 <p>Pretty close to 1 with just 1,000 subintervals.</p>
 <p>We now compare the error with the left Riemann sum for the same size <span class="math inline">\(n\)</span>:</p>
 <div class="cell" data-execution_count="26">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>ns <span class="op">=</span> [<span class="fl">10</span><span class="op">^</span>i for i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>]</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>left_r <span class="op">=</span> [<span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">1</span>, n) for n <span class="kw">in</span> ns];</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>trapezoid_r <span class="op">=</span> [<span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">1</span>, n, method<span class="op">=</span><span class="st">"trapezoid"</span>) for n <span class="kw">in</span> ns];</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>[ns (<span class="fl">1</span>)<span class="op">.-</span>left_r (<span class="fl">1</span>)<span class="op">.-</span>trapezoid_r]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: riemann not defined</code></pre>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>ns <span class="op">=</span> [<span class="fl">10</span><span class="op">^</span>i for i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>]</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>left_r <span class="op">=</span> [<span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">1</span>, n) for n <span class="kw">in</span> ns];</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>trapezoid_r <span class="op">=</span> [<span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">1</span>, n, method<span class="op">=</span><span class="st">"trapezoid"</span>) for n <span class="kw">in</span> ns];</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>[ns (<span class="fl">1</span>)<span class="op">.-</span>left_r (<span class="fl">1</span>)<span class="op">.-</span>trapezoid_r]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="26">
+<pre><code>5×3 Matrix{Float64}:
+     10.0  -0.26665      -0.01665
+    100.0  -0.0251667    -0.000166665
+   1000.0  -0.00250167   -1.66667e-6
+  10000.0  -0.000250017  -1.66667e-8
+ 100000.0  -2.50002e-5   -1.66664e-10</code></pre>
 </div>
 </div>
 <p>One can see that the errors are much smaller for the trapezoid method.</p>
@@ -999,10 +995,15 @@ rb.addEventListener("change", function() {
 <p>The trapezoid rule can be viewed as a simple linear approximation to the function <span class="math inline">\(f(x)\)</span> over the subinterval <span class="math inline">\([a, b]\)</span>. That is, replace the function with the secant line between these two values and integrate the replacement. With this viewpoint, it is possible that other easy-to-integrate function approximations will lead to improved approximate integrals. Simpson’s method can be viewed in just this way. It replaces <span class="math inline">\(f\)</span> by the parabola going through <span class="math inline">\((a, f(a))\)</span>, <span class="math inline">\((c, f( c))\)</span> and <span class="math inline">\((b, f(b))\)</span> where <span class="math inline">\(c=(a+b)/2\)</span> is the midpoint between <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>.</p>
 <p>We compare how accurate we get with this rule for the same <code>f</code> as before:</p>
 <div class="cell" data-execution_count="27">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>simpsons_r <span class="op">=</span> [<span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">1</span>, n, method<span class="op">=</span><span class="st">"simpsons"</span>) for n <span class="kw">in</span> ns];</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>[ns (<span class="fl">1</span>)<span class="op">.-</span>left_r (<span class="fl">1</span>)<span class="op">.-</span>trapezoid_r (<span class="fl">1</span>)<span class="op">.-</span>simpsons_r]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: riemann not defined</code></pre>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>simpsons_r <span class="op">=</span> [<span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">1</span>, n, method<span class="op">=</span><span class="st">"simpsons"</span>) for n <span class="kw">in</span> ns];</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>[ns (<span class="fl">1</span>)<span class="op">.-</span>left_r (<span class="fl">1</span>)<span class="op">.-</span>trapezoid_r (<span class="fl">1</span>)<span class="op">.-</span>simpsons_r]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
+<pre><code>5×4 Matrix{Float64}:
+     10.0  -0.26665      -0.01665      -4.16667e-6
+    100.0  -0.0251667    -0.000166665  -4.16667e-10
+   1000.0  -0.00250167   -1.66667e-6   -4.15223e-14
+  10000.0  -0.000250017  -1.66667e-8    1.22125e-15
+ 100000.0  -2.50002e-5   -1.66664e-10   1.22125e-15</code></pre>
 </div>
 </div>
 <p>As can be seen, for this function approximating with a parabola is much quicker to converge. That is, <span class="math inline">\(n\)</span> can be smaller yet the same accuracy is maintained. (Of course, there are more computations involved for each, so the number of operations needed may or may not be fewer, that would require some analysis.)</p>
@@ -1021,23 +1022,23 @@ rb.addEventListener("change", function() {
 <h4 class="anchored" data-anchor-id="question-7">Question</h4>
 <p>The trapezoid rule has no error for linear functions and Simpson’s rule has no error for quadratic functions. Verify the latter by computing the following:</p>
 <div class="cell" data-execution_count="28">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span>; <span class="fu">F</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">3</span><span class="op">/</span><span class="fl">3</span></span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">10</span>, <span class="fl">100</span>, method<span class="op">=</span><span class="st">"simpsons"</span>) <span class="op">-</span> (<span class="fu">F</span>(<span class="fl">10</span>) <span class="op">-</span> <span class="fu">F</span>(<span class="fl">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: riemann not defined</code></pre>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span>; <span class="fu">F</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">3</span><span class="op">/</span><span class="fl">3</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">10</span>, <span class="fl">100</span>, method<span class="op">=</span><span class="st">"simpsons"</span>) <span class="op">-</span> (<span class="fu">F</span>(<span class="fl">10</span>) <span class="op">-</span> <span class="fu">F</span>(<span class="fl">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<pre><code>5.684341886080802e-14</code></pre>
 </div>
 </div>
 <p>How accurate is the approximation? Around</p>
 <div class="cell" data-execution_count="29">
 <div class="cell-output cell-output-display" data-execution_count="29">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="7kcY5Sig" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="K08WvES8" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_7kcY5Sig">
+      <div class="form" id="controls_K08WvES8">
         <div style="padding-top: 5px">
     <div class="form-check">
-    <label class="form-check-label" for="radio_7kcY5Sig_1">
-      <input class="form-check-input" type="radio" name="radio_7kcY5Sig" id="radio_7kcY5Sig_1" value="1">
+    <label class="form-check-label" for="radio_K08WvES8_1">
+      <input class="form-check-input" type="radio" name="radio_K08WvES8" id="radio_K08WvES8_1" value="1">
       
       <span class="label-body px-1">
         <code>1e-8</code>
@@ -1045,8 +1046,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_7kcY5Sig_2">
-      <input class="form-check-input" type="radio" name="radio_7kcY5Sig" id="radio_7kcY5Sig_2" value="2">
+    <label class="form-check-label" for="radio_K08WvES8_2">
+      <input class="form-check-input" type="radio" name="radio_K08WvES8" id="radio_K08WvES8_2" value="2">
       
       <span class="label-body px-1">
         <code>1e-10</code>
@@ -1054,8 +1055,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_7kcY5Sig_3">
-      <input class="form-check-input" type="radio" name="radio_7kcY5Sig" id="radio_7kcY5Sig_3" value="3">
+    <label class="form-check-label" for="radio_K08WvES8_3">
+      <input class="form-check-input" type="radio" name="radio_K08WvES8" id="radio_K08WvES8_3" value="3">
       
       <span class="label-body px-1">
         <code>1e-12</code>
@@ -1063,8 +1064,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_7kcY5Sig_4">
-      <input class="form-check-input" type="radio" name="radio_7kcY5Sig" id="radio_7kcY5Sig_4" value="4">
+    <label class="form-check-label" for="radio_K08WvES8_4">
+      <input class="form-check-input" type="radio" name="radio_K08WvES8" id="radio_K08WvES8_4" value="4">
       
       <span class="label-body px-1">
         <code>1e-14</code>
@@ -1072,8 +1073,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_7kcY5Sig_5">
-      <input class="form-check-input" type="radio" name="radio_7kcY5Sig" id="radio_7kcY5Sig_5" value="5">
+    <label class="form-check-label" for="radio_K08WvES8_5">
+      <input class="form-check-input" type="radio" name="radio_K08WvES8" id="radio_K08WvES8_5" value="5">
       
       <span class="label-body px-1">
         <code>1e-16</code>
@@ -1081,8 +1082,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_7kcY5Sig_6">
-      <input class="form-check-input" type="radio" name="radio_7kcY5Sig" id="radio_7kcY5Sig_6" value="6">
+    <label class="form-check-label" for="radio_K08WvES8_6">
+      <input class="form-check-input" type="radio" name="radio_K08WvES8" id="radio_K08WvES8_6" value="6">
       
       <span class="label-body px-1">
         <code>0</code>
@@ -1093,25 +1094,25 @@ rb.addEventListener("change", function() {
     
         </div>
       </div>
-      <div id="7kcY5Sig_message" style="padding-bottom: 15px"></div>
+      <div id="K08WvES8_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_7kcY5Sig"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_K08WvES8"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
     var correct = rb.value == 4;
-    var msgBox = document.getElementById('7kcY5Sig_message');
+    var msgBox = document.getElementById('K08WvES8_message');
       if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_7kcY5Sig")
+    var explanation = document.getElementById("explanation_K08WvES8")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_7kcY5Sig")
+    var explanation = document.getElementById("explanation_K08WvES8")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1127,23 +1128,23 @@ rb.addEventListener("change", function() {
 <h4 class="anchored" data-anchor-id="question-8">Question</h4>
 <p>Compare the difference between the trapezoid rule and Simpson’s rule when integrating <span class="math inline">\(\cos(x)\)</span> from <span class="math inline">\(0\)</span> to <span class="math inline">\(\pi/6\)</span>. How big is the difference when <span class="math inline">\(n=10,000\)</span>?</p>
 <div class="cell" data-execution_count="30">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>a, b, n <span class="op">=</span> <span class="fl">0</span>, <span class="cn">pi</span><span class="op">/</span><span class="fl">6</span>, <span class="fl">10_000</span></span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">riemann</span>(cos, a, b, n, method<span class="op">=</span><span class="st">"trapezoid"</span>) <span class="op">-</span> <span class="fu">riemann</span>(cos, a, b, n, method<span class="op">=</span><span class="st">"simpsons"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: riemann not defined</code></pre>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>a, b, n <span class="op">=</span> <span class="fl">0</span>, <span class="cn">pi</span><span class="op">/</span><span class="fl">6</span>, <span class="fl">10_000</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">riemann</span>(cos, a, b, n, method<span class="op">=</span><span class="st">"trapezoid"</span>) <span class="op">-</span> <span class="fu">riemann</span>(cos, a, b, n, method<span class="op">=</span><span class="st">"simpsons"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="30">
+<pre><code>-1.1423328949433653e-10</code></pre>
 </div>
 </div>
 <p>How big is the difference?</p>
 <div class="cell" data-execution_count="31">
 <div class="cell-output cell-output-display" data-execution_count="31">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="r4rEhhIb" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="Ofp5In1j" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_r4rEhhIb">
+      <div class="form" id="controls_Ofp5In1j">
         <div style="padding-top: 5px">
     <div class="form-check">
-    <label class="form-check-label" for="radio_r4rEhhIb_1">
-      <input class="form-check-input" type="radio" name="radio_r4rEhhIb" id="radio_r4rEhhIb_1" value="1">
+    <label class="form-check-label" for="radio_Ofp5In1j_1">
+      <input class="form-check-input" type="radio" name="radio_Ofp5In1j" id="radio_Ofp5In1j_1" value="1">
       
       <span class="label-body px-1">
         <code>1e-8</code>
@@ -1151,8 +1152,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_r4rEhhIb_2">
-      <input class="form-check-input" type="radio" name="radio_r4rEhhIb" id="radio_r4rEhhIb_2" value="2">
+    <label class="form-check-label" for="radio_Ofp5In1j_2">
+      <input class="form-check-input" type="radio" name="radio_Ofp5In1j" id="radio_Ofp5In1j_2" value="2">
       
       <span class="label-body px-1">
         <code>1e-10</code>
@@ -1160,8 +1161,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_r4rEhhIb_3">
-      <input class="form-check-input" type="radio" name="radio_r4rEhhIb" id="radio_r4rEhhIb_3" value="3">
+    <label class="form-check-label" for="radio_Ofp5In1j_3">
+      <input class="form-check-input" type="radio" name="radio_Ofp5In1j" id="radio_Ofp5In1j_3" value="3">
       
       <span class="label-body px-1">
         <code>1e-12</code>
@@ -1169,8 +1170,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_r4rEhhIb_4">
-      <input class="form-check-input" type="radio" name="radio_r4rEhhIb" id="radio_r4rEhhIb_4" value="4">
+    <label class="form-check-label" for="radio_Ofp5In1j_4">
+      <input class="form-check-input" type="radio" name="radio_Ofp5In1j" id="radio_Ofp5In1j_4" value="4">
       
       <span class="label-body px-1">
         <code>1e-14</code>
@@ -1178,8 +1179,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_r4rEhhIb_5">
-      <input class="form-check-input" type="radio" name="radio_r4rEhhIb" id="radio_r4rEhhIb_5" value="5">
+    <label class="form-check-label" for="radio_Ofp5In1j_5">
+      <input class="form-check-input" type="radio" name="radio_Ofp5In1j" id="radio_Ofp5In1j_5" value="5">
       
       <span class="label-body px-1">
         <code>1e-16</code>
@@ -1187,8 +1188,8 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_r4rEhhIb_6">
-      <input class="form-check-input" type="radio" name="radio_r4rEhhIb" id="radio_r4rEhhIb_6" value="6">
+    <label class="form-check-label" for="radio_Ofp5In1j_6">
+      <input class="form-check-input" type="radio" name="radio_Ofp5In1j" id="radio_Ofp5In1j_6" value="6">
       
       <span class="label-body px-1">
         <code>0</code>
@@ -1199,25 +1200,25 @@ rb.addEventListener("change", function() {
     
         </div>
       </div>
-      <div id="r4rEhhIb_message" style="padding-bottom: 15px"></div>
+      <div id="Ofp5In1j_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_r4rEhhIb"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_Ofp5In1j"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
     var correct = rb.value == 2;
-    var msgBox = document.getElementById('r4rEhhIb_message');
+    var msgBox = document.getElementById('Ofp5In1j_message');
       if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_r4rEhhIb")
+    var explanation = document.getElementById("explanation_Ofp5In1j")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_r4rEhhIb")
+    var explanation = document.getElementById("explanation_Ofp5In1j")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1233,8 +1234,46 @@ rb.addEventListener("change", function() {
 <h4 class="anchored" data-anchor-id="question-.">Question ….</h4>
 <p>Using Simpson’s rule and <code>n=1000</code> compute the integral of <span class="math inline">\(f(x) = 1/(1+x^2)\)</span> between <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span>.</p>
 <div class="cell" data-execution_count="32">
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: riemann not defined</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="32">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="uNibaV0u" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_uNibaV0u">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="uNibaV0u" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="uNibaV0u_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("uNibaV0u").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 0.7853981633974481) <= 1.0e-5);
+  var msgBox = document.getElementById('uNibaV0u_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_uNibaV0u")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_uNibaV0u")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
 </div>
 </div>
 </section>
@@ -1245,25 +1284,25 @@ rb.addEventListener("change", function() {
 <p><code>Julia</code> provides the <code>quadgk</code> function to do adaptive Gauss-Konrod quadrature, a modern, fast and accurate means to compute 1-dimensional integrals numerically. This is in the <code>QuadGK</code> package which is loaded with <code>MTH229</code>.</p>
 <p>The use is straightforward, and similar to <code>riemann</code> above: you specify a function object, and the limits of integration. You don’t specify <span class="math inline">\(n\)</span> – as this is computed adaptively – but you can optionally specify a tolerance which controls the accuracy, though we don’t do so here. For example, a typical usage might be:</p>
 <div class="cell" data-execution_count="33">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>a, err <span class="op">=</span> <span class="fu">quadgk</span>(sin, <span class="fl">0</span>, <span class="cn">pi</span>)     <span class="co">## 2 is exact</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>a, err <span class="op">=</span> <span class="fu">quadgk</span>(sin, <span class="fl">0</span>, <span class="cn">pi</span>)     <span class="co">## 2 is exact</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="33">
+<pre><code>(2.0, 1.7905676941154525e-12)</code></pre>
 </div>
 </div>
 <p>Two values are returned, the answer and an estimate of the error. In the above, <span class="math inline">\(2\)</span> is the exact answer to this integral, the estimated value a just a bit more <span class="math inline">\(2\)</span>, but is estimated to be off my no more than the second value, <span class="math inline">\(1.78 \cdot 10^{-12}\)</span>.</p>
 <p>If just the answer is of interest, then it can be extracted using <em>index notation</em>:</p>
 <div class="cell" data-execution_count="34">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quadgk</span>(sin, <span class="fl">0</span>, <span class="cn">pi</span>)[<span class="fl">1</span>]       <span class="co"># [1] picks out the first component or two</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quadgk</span>(sin, <span class="fl">0</span>, <span class="cn">pi</span>)[<span class="fl">1</span>]       <span class="co"># [1] picks out the first component or two</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="34">
+<pre><code>2.0</code></pre>
 </div>
 </div>
 <hr>
 <p>For another illustration, since Archimedes the known answer for <span class="math inline">\(\int_0^1 x^2 dx\)</span> is <span class="math inline">\(1/3\)</span>. We see that <code>quadgk</code> gets it right for all the digits:</p>
 <div class="cell" data-execution_count="35">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quadgk</span>(x <span class="op">-&gt;</span> x<span class="op">^</span><span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quadgk</span>(x <span class="op">-&gt;</span> x<span class="op">^</span><span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="35">
+<pre><code>(0.3333333333333333, 5.551115123125783e-17)</code></pre>
 </div>
 </div>
 <p>The <code>riemann</code> function is good for pedagogical purposes, but the <code>quadgk</code> function should be used instead of the <code>riemann</code> function – besides being built-in to <code>julia</code> it is more accurate, more robust, fast, and less work to use.</p>
@@ -1274,8 +1313,46 @@ rb.addEventListener("change", function() {
 <h4 class="anchored" data-anchor-id="question-use-quadgk">Question: Use quadgk</h4>
 <p>Let <span class="math inline">\(f(x) = \exp(-4 \cdot |x-1/2|)\)</span>. Find the integral over <span class="math inline">\([0,1]\)</span> using <code>quadgk</code>:</p>
 <div class="cell" data-execution_count="36">
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="36">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="vTKqlKUf" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_vTKqlKUf">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="vTKqlKUf" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="vTKqlKUf_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("vTKqlKUf").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 0.4323323583816937) <= 1.0e-5);
+  var msgBox = document.getElementById('vTKqlKUf_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_vTKqlKUf")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_vTKqlKUf")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
 </div>
 </div>
 </section>
@@ -1283,8 +1360,46 @@ rb.addEventListener("change", function() {
 <h4 class="anchored" data-anchor-id="question-use-quadgk-1">Question: use quadgk</h4>
 <p>Let <span class="math inline">\(f(x) = \sin(100\pi x)/(\pi x)\)</span>. Find the integral over <span class="math inline">\([0,1]\)</span> using <code>quadgk</code>:</p>
 <div class="cell" data-execution_count="37">
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="37">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="uwLHB7By" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_uwLHB7By">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="uwLHB7By" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="uwLHB7By_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("uwLHB7By").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 0.49898680869304557) <= 0.0001);
+  var msgBox = document.getElementById('uwLHB7By_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_uwLHB7By")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_uwLHB7By")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
 </div>
 </div>
 </section>
@@ -1292,8 +1407,46 @@ rb.addEventListener("change", function() {
 <h4 class="anchored" data-anchor-id="question-9">Question</h4>
 <p>Let <span class="math inline">\(f(x) = \sin(100\pi x)/(\pi x)\)</span>. Using <span class="math inline">\(1,000\)</span> points, find the right-Riemann integral over <span class="math inline">\([0,1]\)</span>.</p>
 <div class="cell" data-execution_count="38">
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: riemann not defined</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="38">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="0IshWgJw" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_0IshWgJw">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="0IshWgJw" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="0IshWgJw_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("0IshWgJw").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 0.4489951557656148) <= 1.0e-5);
+  var msgBox = document.getElementById('0IshWgJw_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_0IshWgJw")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_0IshWgJw")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
 </div>
 </div>
 <p>(The answer via Riemann sums isn’t even correct to 4 decimal points, due to the highly oscillatory nature of the function.)</p>
@@ -1302,31 +1455,19 @@ rb.addEventListener("change", function() {
 <h4 class="anchored" data-anchor-id="question-10">Question</h4>
 <p>How far off is this Riemann estimate, when <span class="math inline">\(n=100,000\)</span>?</p>
 <div class="cell" data-execution_count="39">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fl">1</span><span class="op">/</span>(<span class="fl">1</span> <span class="op">+</span> x<span class="op">^</span><span class="fl">4</span>)</span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">quadgk</span>(f, <span class="fl">0</span>, <span class="fl">1</span>)[<span class="fl">1</span>] <span class="op">-</span> <span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">100_000</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fl">1</span><span class="op">/</span>(<span class="fl">1</span> <span class="op">+</span> x<span class="op">^</span><span class="fl">4</span>)</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">quadgk</span>(f, <span class="fl">0</span>, <span class="fl">1</span>)[<span class="fl">1</span>] <span class="op">-</span> <span class="fu">riemann</span>(f, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">100_000</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="40">
 <div class="cell-output cell-output-display" data-execution_count="40">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="u0aFwVna" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="QVtHMt5z" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_u0aFwVna">
+      <div class="form" id="controls_QVtHMt5z">
         <div style="padding-top: 5px">
     <div class="form-check">
-    <label class="form-check-label" for="radio_u0aFwVna_1">
-      <input class="form-check-input" type="radio" name="radio_u0aFwVna" id="radio_u0aFwVna_1" value="1">
-      
-      <span class="label-body px-1">
-        Roughly <code>1e-12</code>
-      </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label" for="radio_u0aFwVna_2">
-      <input class="form-check-input" type="radio" name="radio_u0aFwVna" id="radio_u0aFwVna_2" value="2">
+    <label class="form-check-label" for="radio_QVtHMt5z_1">
+      <input class="form-check-input" type="radio" name="radio_QVtHMt5z" id="radio_QVtHMt5z_1" value="1">
       
       <span class="label-body px-1">
         Roughly <code>1e-6</code>
@@ -1334,11 +1475,20 @@ rb.addEventListener("change", function() {
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_u0aFwVna_3">
-      <input class="form-check-input" type="radio" name="radio_u0aFwVna" id="radio_u0aFwVna_3" value="3">
+    <label class="form-check-label" for="radio_QVtHMt5z_2">
+      <input class="form-check-input" type="radio" name="radio_QVtHMt5z" id="radio_QVtHMt5z_2" value="2">
       
       <span class="label-body px-1">
         Roughly <code>1e-4</code>
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_QVtHMt5z_3">
+      <input class="form-check-input" type="radio" name="radio_QVtHMt5z" id="radio_QVtHMt5z_3" value="3">
+      
+      <span class="label-body px-1">
+        Roughly <code>1e-12</code>
       </span>
     </label>
 </div>
@@ -1346,25 +1496,25 @@ rb.addEventListener("change", function() {
     
         </div>
       </div>
-      <div id="u0aFwVna_message" style="padding-bottom: 15px"></div>
+      <div id="QVtHMt5z_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_u0aFwVna"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_QVtHMt5z"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 2;
-    var msgBox = document.getElementById('u0aFwVna_message');
+    var correct = rb.value == 1;
+    var msgBox = document.getElementById('QVtHMt5z_message');
       if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_u0aFwVna")
+    var explanation = document.getElementById("explanation_QVtHMt5z")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_u0aFwVna")
+    var explanation = document.getElementById("explanation_QVtHMt5z")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1380,8 +1530,46 @@ rb.addEventListener("change", function() {
 <h4 class="anchored" data-anchor-id="question-11">Question</h4>
 <p>The <code>quadgk</code> function allows you to specify issues where there are troubles. For example, we know that <span class="math inline">\(f(x) = \sin(x)/x\)</span> has an issue at 0. Directly trying this integral <code>quadgk(x-&gt;sin(x)/x, -pi, pi)</code> will fail, but you can specify the issue at <span class="math inline">\(0\)</span> as follows <code>quadgk(x -&gt; sin(x)/x, -pi, 0, pi)</code>. Do so. What is the value of the result:</p>
 <div class="cell" data-execution_count="41">
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="41">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="pSoO7G1Z" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_pSoO7G1Z">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="pSoO7G1Z" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="pSoO7G1Z_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("pSoO7G1Z").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 3.703874103964933) <= 0.0001);
+  var msgBox = document.getElementById('pSoO7G1Z_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_pSoO7G1Z")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_pSoO7G1Z")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
 </div>
 </div>
 </section>
@@ -1389,46 +1577,43 @@ rb.addEventListener("change", function() {
 <h4 class="anchored" data-anchor-id="question-12">Question</h4>
 <p>Let <span class="math inline">\(f(x) = |x - 0.3|^{-1/4}\)</span>. We wish to find <span class="math inline">\(\int_0^1 f(x) dx\)</span>. The problem with this function is the singularity at <span class="math inline">\(x=0.3\)</span>. (That is, the function is not continuous, so has no guarantee that an integral over a closed domain exists.) However, some such integrals do exist, and the <code>quadgk</code> function can integrate around such singularities by spelling them out in the domain of integration. Just specify the trouble spots between the endpoints:</p>
 <div class="cell" data-execution_count="42">
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">abs</span>(x <span class="op">-</span> <span class="fl">0.3</span>)<span class="op">^</span>(<span class="op">-</span><span class="fl">1</span><span class="op">/</span><span class="fl">4</span>)</span>
-<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>val <span class="op">=</span> <span class="fu">quadgk</span>(f, <span class="fl">0</span>, <span class="fl">0.3</span>, <span class="fl">1</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">abs</span>(x <span class="op">-</span> <span class="fl">0.3</span>)<span class="op">^</span>(<span class="op">-</span><span class="fl">1</span><span class="op">/</span><span class="fl">4</span>)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>val <span class="op">=</span> <span class="fu">quadgk</span>(f, <span class="fl">0</span>, <span class="fl">0.3</span>, <span class="fl">1</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Following the above, what answer do you get?</p>
 <div class="cell" data-execution_count="43">
 <div class="cell-output cell-output-display" data-execution_count="43">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="K1kZVBNt" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="yq0947gH" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_K1kZVBNt">
+      <div class="form" id="controls_yq0947gH">
         <div style="padding-top: 5px">
     <br>
 <div class="input-group">
-    <input id="K1kZVBNt" type="number" class="form-control" placeholder="Numeric answer">
+    <input id="yq0947gH" type="number" class="form-control" placeholder="Numeric answer">
 </div>
 
     
         </div>
       </div>
-      <div id="K1kZVBNt_message" style="padding-bottom: 15px"></div>
+      <div id="yq0947gH_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.getElementById("K1kZVBNt").addEventListener("change", function() {
-  var correct = (Math.abs(this.value - 8.66586668) <= 0.0001);
-  var msgBox = document.getElementById('K1kZVBNt_message');
+document.getElementById("yq0947gH").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 1.5608608290003951) <= 0.0001);
+  var msgBox = document.getElementById('yq0947gH_message');
     if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_K1kZVBNt")
+    var explanation = document.getElementById("explanation_yq0947gH")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_K1kZVBNt")
+    var explanation = document.getElementById("explanation_yq0947gH")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1497,14 +1682,14 @@ s(h) = 3 + \log(1 + h), \quad 0 \leq h \leq b
 <p>Which of these functions might describe a fluted glass where the radius changes faster as the height gets bigger, that is the radius is a <em>concave up</em> function?</p>
 <div class="cell" data-execution_count="44">
 <div class="cell-output cell-output-display" data-execution_count="44">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="VoctpnBC" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="TSz7uX3I" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_VoctpnBC">
+      <div class="form" id="controls_TSz7uX3I">
         <div style="padding-top: 5px">
     <div class="form-check">
-    <label class="form-check-label" for="radio_VoctpnBC_1">
-      <input class="form-check-input" type="radio" name="radio_VoctpnBC" id="radio_VoctpnBC_1" value="1">
+    <label class="form-check-label" for="radio_TSz7uX3I_1">
+      <input class="form-check-input" type="radio" name="radio_TSz7uX3I" id="radio_TSz7uX3I_1" value="1">
       
       <span class="label-body px-1">
         <code>r(h) = 2 + (h/10)^2, 0 &lt;= h &lt;= 10</code>
@@ -1512,8 +1697,8 @@ s(h) = 3 + \log(1 + h), \quad 0 \leq h \leq b
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_VoctpnBC_2">
-      <input class="form-check-input" type="radio" name="radio_VoctpnBC" id="radio_VoctpnBC_2" value="2">
+    <label class="form-check-label" for="radio_TSz7uX3I_2">
+      <input class="form-check-input" type="radio" name="radio_TSz7uX3I" id="radio_TSz7uX3I_2" value="2">
       
       <span class="label-body px-1">
         <code>r(h) = 2 + sqrt(h/10), 0 &lt;= h &lt;= 10</code>
@@ -1521,8 +1706,8 @@ s(h) = 3 + \log(1 + h), \quad 0 \leq h \leq b
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_VoctpnBC_3">
-      <input class="form-check-input" type="radio" name="radio_VoctpnBC" id="radio_VoctpnBC_3" value="3">
+    <label class="form-check-label" for="radio_TSz7uX3I_3">
+      <input class="form-check-input" type="radio" name="radio_TSz7uX3I" id="radio_TSz7uX3I_3" value="3">
       
       <span class="label-body px-1">
         <code>r(h) = 2 + h/10, 0 &lt;= h &lt;= 10</code>
@@ -1533,25 +1718,25 @@ s(h) = 3 + \log(1 + h), \quad 0 \leq h \leq b
     
         </div>
       </div>
-      <div id="VoctpnBC_message" style="padding-bottom: 15px"></div>
+      <div id="TSz7uX3I_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_VoctpnBC"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_TSz7uX3I"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
     var correct = rb.value == 1;
-    var msgBox = document.getElementById('VoctpnBC_message');
+    var msgBox = document.getElementById('TSz7uX3I_message');
       if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_VoctpnBC")
+    var explanation = document.getElementById("explanation_TSz7uX3I")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_VoctpnBC")
+    var explanation = document.getElementById("explanation_TSz7uX3I")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1565,19 +1750,19 @@ rb.addEventListener("change", function() {
 <hr>
 <p>For the two types of glasses in the figure, we create functions in <code>julia</code> as follows:</p>
 <div class="cell" data-execution_count="45">
-<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">r</span>(h) <span class="op">=</span> <span class="fl">3</span> <span class="op">+</span> h<span class="op">/</span><span class="fl">5</span></span>
-<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a><span class="fu">s</span>(h) <span class="op">=</span> <span class="fl">3</span> <span class="op">+</span> <span class="fu">log</span>(<span class="fl">1</span> <span class="op">+</span> h)</span>
-<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a><span class="fu">r_vol</span>(b) <span class="op">=</span> <span class="fu">quadgk</span>(x <span class="op">-&gt;</span> <span class="fu">pi*r</span>(x)<span class="op">^</span><span class="fl">2</span>, <span class="fl">0</span>, b)[<span class="fl">1</span>]</span>
-<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a><span class="fu">s_vol</span>(b) <span class="op">=</span> <span class="fu">quadgk</span>(x <span class="op">-&gt;</span> <span class="fu">pi*s</span>(x)<span class="op">^</span><span class="fl">2</span>, <span class="fl">0</span>, b)[<span class="fl">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">r</span>(h) <span class="op">=</span> <span class="fl">3</span> <span class="op">+</span> h<span class="op">/</span><span class="fl">5</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">s</span>(h) <span class="op">=</span> <span class="fl">3</span> <span class="op">+</span> <span class="fu">log</span>(<span class="fl">1</span> <span class="op">+</span> h)</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="fu">r_vol</span>(b) <span class="op">=</span> <span class="fu">quadgk</span>(x <span class="op">-&gt;</span> <span class="fu">pi*r</span>(x)<span class="op">^</span><span class="fl">2</span>, <span class="fl">0</span>, b)[<span class="fl">1</span>]</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="fu">s_vol</span>(b) <span class="op">=</span> <span class="fu">quadgk</span>(x <span class="op">-&gt;</span> <span class="fu">pi*s</span>(x)<span class="op">^</span><span class="fl">2</span>, <span class="fl">0</span>, b)[<span class="fl">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="45">
 <pre><code>s_vol (generic function with 1 method)</code></pre>
 </div>
 </div>
 <p>Then we can easily find the volume as a function of height. For example at 10cm we have:</p>
 <div class="cell" data-execution_count="46">
-<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>(<span class="fu">r_vol</span>(<span class="fl">10</span>), <span class="fu">s_vol</span>(<span class="fl">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>(<span class="fu">r_vol</span>(<span class="fl">10</span>), <span class="fu">s_vol</span>(<span class="fl">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="46">
+<pre><code>(513.1268000863329, 687.2432199897678)</code></pre>
 </div>
 </div>
 <p>However, to find <span class="math inline">\(b\)</span> that makes the glass <span class="math inline">\(450\)</span> cm<span class="math inline">\(^3\)</span> requires us to solve an equation involving an integral for <span class="math inline">\(b\)</span>:</p>
@@ -1586,38 +1771,38 @@ V(b) = \int_0^b \pi r(h)^2 dh = 450.
 \]</span></p>
 <p>Not to worry, we can use <code>find_zero</code> from the <code>Roots</code> package for that (again, this is loaded with the <code>MTH229</code> package). To solve for when <code>V(b) = r_vol(b) - 450 = 0</code> we have</p>
 <div class="cell" data-execution_count="47">
-<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>r_b <span class="op">=</span> <span class="fu">find_zero</span>(x <span class="op">-&gt;</span> <span class="fu">r_vol</span>(x) <span class="op">-</span> <span class="fl">450</span>,  <span class="fl">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: find_zero not defined</code></pre>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>r_b <span class="op">=</span> <span class="fu">find_zero</span>(x <span class="op">-&gt;</span> <span class="fu">r_vol</span>(x) <span class="op">-</span> <span class="fl">450</span>,  <span class="fl">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="47">
+<pre><code>9.168923214523724</code></pre>
 </div>
 </div>
 <p>So <span class="math inline">\(b\)</span> is basically <span class="math inline">\(9.17\)</span>. Given this, how much volume is left at <code>b/2</code>?</p>
 <div class="cell" data-execution_count="48">
-<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">r_vol</span>(r_b<span class="op">/</span><span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: r_b not defined</code></pre>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">r_vol</span>(r_b<span class="op">/</span><span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="48">
+<pre><code>173.27527610482954</code></pre>
 </div>
 </div>
 <p>Which is what percent of the whole?</p>
 <div class="cell" data-execution_count="49">
-<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">r_vol</span>(r_b<span class="op">/</span><span class="fl">2</span>) <span class="op">/</span> <span class="fu">r_vol</span>(r_b) <span class="op">*</span> <span class="fl">100</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: r_b not defined</code></pre>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">r_vol</span>(r_b<span class="op">/</span><span class="fl">2</span>) <span class="op">/</span> <span class="fu">r_vol</span>(r_b) <span class="op">*</span> <span class="fl">100</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="49">
+<pre><code>38.50561691218434</code></pre>
 </div>
 </div>
 <p>As this height is often mistaken for the half-way by volume mark, people tend to drink these pints faster than they think.</p>
 <p>Now compare to the height to get half the volume (225 ml):</p>
 <div class="cell" data-execution_count="50">
-<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>r_half <span class="op">=</span> <span class="fu">find_zero</span>(x <span class="op">-&gt;</span> <span class="fu">r_vol</span>(x) <span class="op">-</span> <span class="fl">225</span>,  <span class="fl">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: find_zero not defined</code></pre>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>r_half <span class="op">=</span> <span class="fu">find_zero</span>(x <span class="op">-&gt;</span> <span class="fu">r_vol</span>(x) <span class="op">-</span> <span class="fl">225</span>,  <span class="fl">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="50">
+<pre><code>5.603662378152273</code></pre>
 </div>
 </div>
 <p>This value is more than half of <span class="math inline">\(b\)</span>:</p>
 <div class="cell" data-execution_count="51">
-<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>r_half <span class="op">/</span> r_b</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: r_half not defined</code></pre>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>r_half <span class="op">/</span> r_b</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="51">
+<pre><code>0.6111581749616989</code></pre>
 </div>
 </div>
 <p>At this height only half the volume is remaining (and not at 50% of the original height.)</p>
@@ -1630,8 +1815,46 @@ V(b) = \int_0^b \pi r(h)^2 dh = 450.
 <p>Compare the above for the curved glass, where <span class="math inline">\(s(h) = 3 + \log(1 + h)\)</span>.</p>
 <p>What is the height of the glass, <code>b</code>, needed to make the volume 450?</p>
 <div class="cell" data-execution_count="52">
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: find_zero not defined</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="52">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="UudJdgv2" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_UudJdgv2">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="UudJdgv2" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="UudJdgv2_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("UudJdgv2").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 7.273543523711023) <= 0.001);
+  var msgBox = document.getElementById('UudJdgv2_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_UudJdgv2")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_UudJdgv2")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
 </div>
 </div>
 </section>
@@ -1639,8 +1862,46 @@ V(b) = \int_0^b \pi r(h)^2 dh = 450.
 <h4 class="anchored" data-anchor-id="question-15">Question</h4>
 <p>Find the volume of the glass represented by <span class="math inline">\(s(h) = 3 + \log(1 + h), 0 \leq h \leq b\)</span> when the glass is filled to half its height. Report the value as a percentage of the total volume.</p>
 <div class="cell" data-execution_count="53">
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="53">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="fQIHGZch" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_fQIHGZch">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="fQIHGZch" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="fQIHGZch_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("fQIHGZch").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 40.17520354006269) <= 1);
+  var msgBox = document.getElementById('fQIHGZch_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_fQIHGZch")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_fQIHGZch")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
 </div>
 </div>
 </section>
@@ -1648,8 +1909,46 @@ V(b) = \int_0^b \pi r(h)^2 dh = 450.
 <h4 class="anchored" data-anchor-id="question-16">Question</h4>
 <p>Now how high do you fill the glass to produce <em>half</em> the volume? Report your answer in terms of a percentage of <span class="math inline">\(b\)</span>, the height of the glass.</p>
 <div class="cell" data-execution_count="54">
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: find_zero not defined</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="54">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="lLMdVmL1" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_lLMdVmL1">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="lLMdVmL1" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="lLMdVmL1_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("lLMdVmL1").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 59.13334210350367) <= 0.1);
+  var msgBox = document.getElementById('lLMdVmL1_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_lLMdVmL1")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_lLMdVmL1")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
 </div>
 </div>
 </section>
@@ -1669,8 +1968,46 @@ V(b) = \int_0^b \pi r(h)^2 dh = 450.
 <li>the radius as a function of height is <span class="math inline">\(r(h) = 5 + (3/15)\cdot h\)</span></li>
 </ul>
 <div class="cell" data-execution_count="55">
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="55">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="1yzHY8wn" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_1yzHY8wn">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="1yzHY8wn" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="1yzHY8wn_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("1yzHY8wn").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 15157.98160668533) <= 10.0);
+  var msgBox = document.getElementById('1yzHY8wn_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_1yzHY8wn")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_1yzHY8wn")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
 </div>
 </div>
 </section>
@@ -1680,9 +2017,9 @@ V(b) = \int_0^b \pi r(h)^2 dh = 450.
 <h2 data-number="10.7" class="anchored" data-anchor-id="example-arc-length"><span class="header-section-number">10.7</span> Example, arc length</h2>
 <p>The basic indefinite integral for a positive function answers the amount of area under the curve over a given interval. However, the integral can be interpreted in many different ways. For example, one can use an integral to answer how long a curve is. Of course one can estimate this answer. For example, consider this curve:</p>
 <div class="cell" data-execution_count="56">
-<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x <span class="op">-&gt;</span> x<span class="op">^</span><span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: plot not defined</code></pre>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x <span class="op">-&gt;</span> x<span class="op">^</span><span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="56">
+<p><img src="integration_files/figure-html/cell-57-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
 <p>This curve has length no more than <span class="math inline">\(2 = 1 + 1\)</span> – the distance along the <span class="math inline">\(x\)</span> axis starting at <span class="math inline">\(0\)</span> to <span class="math inline">\(1\)</span> and then going up. It is also longer than <span class="math inline">\(\sqrt{2} = \sqrt{1^2 + 1^2}\)</span> – the straight line distance between the two endpoints. But how long is it?</p>
@@ -1694,20 +2031,20 @@ l = \int_a^b \sqrt{1 + f'(x)^2} dx
 <p><a href="figures/integration/arclength.gif">Arc length</a></p>
 <p>Rather than focus on a derivation, we do some examples illustrating that to compute the arclength of the graph of a function is relatively straightforward using numeric integration. For example, our answer for <span class="math inline">\(f(x) = x^2\)</span> is given by</p>
 <div class="cell" data-execution_count="57">
-<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span></span>
-<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a><span class="fu">quadgk</span>(x <span class="op">-&gt;</span> <span class="fu">sqrt</span>(<span class="fl">1</span> <span class="op">+</span> f<span class="op">'</span>(x)<span class="op">^</span><span class="fl">2</span>), <span class="fl">0</span>, <span class="fl">1</span>)      <span class="co"># using f' notation defined in MTH229</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="fu">quadgk</span>(x <span class="op">-&gt;</span> <span class="fu">sqrt</span>(<span class="fl">1</span> <span class="op">+</span> f<span class="op">'</span>(x)<span class="op">^</span><span class="fl">2</span>), <span class="fl">0</span>, <span class="fl">1</span>)      <span class="co"># using f' notation defined in MTH229</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="57">
+<pre><code>(1.4789428575446002, 1.0424396901242972e-8)</code></pre>
 </div>
 </div>
 <p>(We use an <em>anonymous function</em> for the integrand which involved the derivative being found through <code>f'</code>. If the graph is described by <code>f</code>, then this expression be the same for all these problems.)</p>
 <hr>
 <p>Whereas, the length of the <span class="math inline">\(f(x) = \sin(x)\)</span> over <span class="math inline">\([0, \pi]\)</span> would be:</p>
 <div class="cell" data-execution_count="58">
-<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">sin</span>(x)</span>
-<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a><span class="fu">quadgk</span>(x <span class="op">-&gt;</span> <span class="fu">sqrt</span>(<span class="fl">1</span> <span class="op">+</span> f<span class="op">'</span>(x)<span class="op">^</span><span class="fl">2</span>), <span class="fl">0</span>, <span class="cn">pi</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">sin</span>(x)</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="fu">quadgk</span>(x <span class="op">-&gt;</span> <span class="fu">sqrt</span>(<span class="fl">1</span> <span class="op">+</span> f<span class="op">'</span>(x)<span class="op">^</span><span class="fl">2</span>), <span class="fl">0</span>, <span class="cn">pi</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="58">
+<pre><code>(3.820197789027713, 9.377002729848982e-9)</code></pre>
 </div>
 </div>
 <p>Next we look at a more practical problem.</p>
@@ -1719,17 +2056,17 @@ y = a \cosh(x/a) = a \cdot \frac{e^{x/a} + e^{-x/a}}{2}.
 \]</span></p>
 <p>Suppose we have the following wire hung between <span class="math inline">\(x=-1\)</span> and <span class="math inline">\(x=1\)</span> with <span class="math inline">\(a = 2\)</span>:</p>
 <div class="cell" data-execution_count="59">
-<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x; a<span class="op">=</span><span class="fl">2</span>) <span class="op">=</span> a <span class="op">*</span> <span class="fu">cosh</span>(x<span class="op">/</span>a)</span>
-<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(f, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: plot not defined</code></pre>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x; a<span class="op">=</span><span class="fl">2</span>) <span class="op">=</span> a <span class="op">*</span> <span class="fu">cosh</span>(x<span class="op">/</span>a)</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(f, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="59">
+<p><img src="integration_files/figure-html/cell-60-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
 <p>How long is the chain? Looking at the graph we can guess an answer is between <span class="math inline">\(2\)</span> and <span class="math inline">\(2.5\)</span>, say, but it isn’t much work to get the answer:</p>
 <div class="cell" data-execution_count="60">
-<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quadgk</span>(x <span class="op">-&gt;</span> <span class="fu">sqrt</span>(<span class="fl">1</span> <span class="op">+</span> f<span class="op">'</span>(x)<span class="op">^</span><span class="fl">2</span>), <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quadgk</span>(x <span class="op">-&gt;</span> <span class="fu">sqrt</span>(<span class="fl">1</span> <span class="op">+</span> f<span class="op">'</span>(x)<span class="op">^</span><span class="fl">2</span>), <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="60">
+<pre><code>(2.0843812219749895, 0.0)</code></pre>
 </div>
 </div>
 </section>
@@ -1740,8 +2077,46 @@ y = a \cosh(x/a) = a \cdot \frac{e^{x/a} + e^{-x/a}}{2}.
 <p>The sag in the chain is adjusted through the parameter <span class="math inline">\(a\)</span> – chains with larger <span class="math inline">\(a\)</span> have less sag.</p>
 <p>Suppose your chain has parameter <code>a=3</code> what is the length? (Use <code>quadgk</code>)</p>
 <div class="cell" data-execution_count="61">
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="61">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="3UV1lXqT" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_3UV1lXqT">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="3UV1lXqT" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="3UV1lXqT_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("3UV1lXqT").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 2.037243343536901) <= 0.001);
+  var msgBox = document.getElementById('3UV1lXqT_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_3UV1lXqT")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_3UV1lXqT")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
 </div>
 </div>
 </section>
@@ -1763,16 +2138,54 @@ f(x; a, b) = a \cosh(x/a) - b
 \]</span></p>
 <p>The second gives <span class="math inline">\(a \cdot \cosh(78/(2a)) - (a + 118) = 0\)</span>. This can be solved numerically for a:</p>
 <div class="cell" data-execution_count="62">
-<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">catenary</span>(x; a<span class="op">=</span><span class="fl">1</span>, b<span class="op">=</span><span class="fl">0</span>) <span class="op">=</span> <span class="fu">a*cosh</span>(x<span class="op">/</span>a) <span class="op">-</span> b</span>
-<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="fu">newton</span>(a <span class="op">-&gt;</span> <span class="fu">catenary</span>(<span class="fl">78</span><span class="op">/</span><span class="fl">2</span>, a<span class="op">=</span>a, b<span class="op">=</span><span class="fl">118</span> <span class="op">+</span> a), <span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: newton not defined</code></pre>
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">catenary</span>(x; a<span class="op">=</span><span class="fl">1</span>, b<span class="op">=</span><span class="fl">0</span>) <span class="op">=</span> <span class="fu">a*cosh</span>(x<span class="op">/</span>a) <span class="op">-</span> b</span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="fu">newton</span>(a <span class="op">-&gt;</span> <span class="fu">catenary</span>(<span class="fl">78</span><span class="op">/</span><span class="fl">2</span>, a<span class="op">=</span>a, b<span class="op">=</span><span class="fl">118</span> <span class="op">+</span> a), <span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="62">
+<pre><code>12.994268574805396</code></pre>
 </div>
 </div>
 <p>Rounding, we take <span class="math inline">\(a=13\)</span>. With these parameters (<span class="math inline">\(a=13\)</span>, <span class="math inline">\(b = 131\)</span>), compute the length of John’s catenary.</p>
 <div class="cell" data-execution_count="63">
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="63">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="1mp6yt1H" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_1mp6yt1H">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="1mp6yt1H" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="1mp6yt1H_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("1mp6yt1H").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 260.46474811265745) <= 1);
+  var msgBox = document.getElementById('1mp6yt1H_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_1mp6yt1H")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_1mp6yt1H")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
 </div>
 </div>
 </section>
@@ -1790,33 +2203,71 @@ y = \frac{-b}{a^2}(x^2 - a^2)
 \]</span></p>
 <p>Find the arc length of the cable in meters.</p>
 <div class="cell" data-execution_count="64">
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="64">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="DqGAmfRG" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_DqGAmfRG">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="DqGAmfRG" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="DqGAmfRG_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("DqGAmfRG").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 1341.1191077638794) <= 0.001);
+  var msgBox = document.getElementById('DqGAmfRG_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_DqGAmfRG")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_DqGAmfRG")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
 </div>
 </div>
 <p>In the picture of the Verrazano-Narrows <a href="http://observer.com/2012/09/staten-island/s-i-8/">bridge</a>, would the shape during construction be a parabola or a catenary?</p>
 <div class="cell" data-execution_count="65">
 <div class="cell-output cell-output-display" data-execution_count="65">
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="JXSfZFbm" data-controltype="">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="9WFyJqyq" data-controltype="">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_JXSfZFbm">
+      <div class="form" id="controls_9WFyJqyq">
         <div style="padding-top: 5px">
     <div class="form-check">
-    <label class="form-check-label" for="radio_JXSfZFbm_1">
-      <input class="form-check-input" type="radio" name="radio_JXSfZFbm" id="radio_JXSfZFbm_1" value="1">
+    <label class="form-check-label" for="radio_9WFyJqyq_1">
+      <input class="form-check-input" type="radio" name="radio_9WFyJqyq" id="radio_9WFyJqyq_1" value="1">
       
       <span class="label-body px-1">
-        A catenary, basically, as in the picture there is basically no load on the cables.
+        A parabola, as just mentioned
       </span>
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_JXSfZFbm_2">
-      <input class="form-check-input" type="radio" name="radio_JXSfZFbm" id="radio_JXSfZFbm_2" value="2">
+    <label class="form-check-label" for="radio_9WFyJqyq_2">
+      <input class="form-check-input" type="radio" name="radio_9WFyJqyq" id="radio_9WFyJqyq_2" value="2">
       
       <span class="label-body px-1">
-        A parabola, as just mentioned
+        A catenary, basically, as in the picture there is basically no load on the cables.
       </span>
     </label>
 </div>
@@ -1824,25 +2275,25 @@ y = \frac{-b}{a^2}(x^2 - a^2)
     
         </div>
       </div>
-      <div id="JXSfZFbm_message" style="padding-bottom: 15px"></div>
+      <div id="9WFyJqyq_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_JXSfZFbm"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_9WFyJqyq"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 1;
-    var msgBox = document.getElementById('JXSfZFbm_message');
+    var correct = rb.value == 2;
+    var msgBox = document.getElementById('9WFyJqyq_message');
       if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_JXSfZFbm")
+    var explanation = document.getElementById("explanation_9WFyJqyq")
     if (explanation != null) {
        explanation.style.display = "none";
     }
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_JXSfZFbm")
+    var explanation = document.getElementById("explanation_9WFyJqyq")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1862,15 +2313,53 @@ y = a \ln\frac{a + \sqrt{a^2 - x^2}}{x} - \sqrt{a^2 - x^2}
 \]</span></p>
 <p>This can be entered into <code>julia</code> as:</p>
 <div class="cell" data-execution_count="66">
-<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">g</span>(x, a) <span class="op">=</span> a <span class="op">*</span> <span class="fu">log</span>((a <span class="op">+</span> <span class="fu">sqrt</span>(a<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> x<span class="op">^</span><span class="fl">2</span>))<span class="op">/</span>x) <span class="op">-</span> <span class="fu">sqrt</span>(a<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> x<span class="op">^</span><span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">g</span>(x, a) <span class="op">=</span> a <span class="op">*</span> <span class="fu">log</span>((a <span class="op">+</span> <span class="fu">sqrt</span>(a<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> x<span class="op">^</span><span class="fl">2</span>))<span class="op">/</span>x) <span class="op">-</span> <span class="fu">sqrt</span>(a<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> x<span class="op">^</span><span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="66">
 <pre><code>g (generic function with 1 method)</code></pre>
 </div>
 </div>
 <p>Let <span class="math inline">\(a=12\)</span>, <span class="math inline">\(f(x) = g(x, a)\)</span>. Compute the length the bow of the boat has traveled between <span class="math inline">\(x=1\)</span> and <span class="math inline">\(x=a\)</span> using <code>quadgk</code>.</p>
 <div class="cell" data-execution_count="67">
-<div class="cell-output cell-output-error">
-<pre><code>LoadError: UndefVarError: quadgk not defined</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="67">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="V2tUAzoN" data-controltype="">
+  <div class="form-group ">
+    <div class="controls">
+      <div class="form" id="controls_V2tUAzoN">
+        <div style="padding-top: 5px">
+    <br>
+<div class="input-group">
+    <input id="V2tUAzoN" type="number" class="form-control" placeholder="Numeric answer">
+</div>
+
+    
+        </div>
+      </div>
+      <div id="V2tUAzoN_message" style="padding-bottom: 15px"></div>
+    </div>
+  </div>
+</form>
+
+<script text="text/javascript">
+document.getElementById("V2tUAzoN").addEventListener("change", function() {
+  var correct = (Math.abs(this.value - 29.818879797456006) <= 0.001);
+  var msgBox = document.getElementById('V2tUAzoN_message');
+    if(correct) {
+    msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
+    var explanation = document.getElementById("explanation_V2tUAzoN")
+    if (explanation != null) {
+       explanation.style.display = "none";
+    }
+  } else {
+    msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
+    var explanation = document.getElementById("explanation_V2tUAzoN")
+    if (explanation != null) {
+       explanation.style.display = "block";
+    }
+  }
+
+});
+
+</script>
 </div>
 </div>
 <p>(The most elementary description of this curve is in terms of the relationship <span class="math inline">\(dy/dx = -\sqrt{a^2-x^2}/x\)</span> which could be used in place of <code>f'</code> in your work.)</p>
@@ -1909,12 +2398,12 @@ More on the tractrix
 \]</span></p>
 <p>where <span class="math inline">\(w_k\)</span> are weights and the <span class="math inline">\(x_k\)</span> some choice of points (nodes) – not necessarily evenly spaced, though that is so in the examples we’ve seen. So, an alternative way to do the trapezoid formula in <code>julia</code> for <span class="math inline">\(n=4\)</span> might be:</p>
 <div class="cell" data-execution_count="68">
-<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>a, b, n <span class="op">=</span> <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">4</span></span>
-<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a>delta <span class="op">=</span> (b<span class="op">-</span>a)<span class="op">/</span>n</span>
-<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span></span>
-<span id="cb97-4"><a href="#cb97-4" aria-hidden="true" tabindex="-1"></a>wts <span class="op">=</span> [<span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">1</span>] <span class="op">*</span> delta <span class="co">## delta * [1, repeat([2],n-1), 1]'</span></span>
-<span id="cb97-5"><a href="#cb97-5" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> a <span class="op">.+</span> (<span class="fl">0</span><span class="op">:</span>n) <span class="op">*</span> delta</span>
-<span id="cb97-6"><a href="#cb97-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(w <span class="op">*</span> <span class="fu">f</span>(x) <span class="cf">for</span> (w,x) <span class="kw">in</span> <span class="fu">zip</span>(wts, xs))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>a, b, n <span class="op">=</span> <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">4</span></span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>delta <span class="op">=</span> (b<span class="op">-</span>a)<span class="op">/</span>n</span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span></span>
+<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>wts <span class="op">=</span> [<span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">1</span>] <span class="op">*</span> delta <span class="co">## delta * [1, repeat([2],n-1), 1]'</span></span>
+<span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> a <span class="op">.+</span> (<span class="fl">0</span><span class="op">:</span>n) <span class="op">*</span> delta</span>
+<span id="cb71-6"><a href="#cb71-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(w <span class="op">*</span> <span class="fu">f</span>(x) <span class="cf">for</span> (w,x) <span class="kw">in</span> <span class="fu">zip</span>(wts, xs))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="68">
 <pre><code>0.6875</code></pre>
 </div>
@@ -1926,21 +2415,21 @@ P_0(x) = 1; P_1(x) = x; \quad  n P_{n}(x)  = (2(n-1)+1) x P_{n-1}(x) -(n-1) P_{n
 \]</span></p>
 <p>Using <code>julia</code>’s <code>Polynomials</code> package this can be implemented almost verbatim:</p>
 <div class="cell" data-execution_count="69">
-<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">Polynomials</span></span>
-<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">Polynomials</span>: Polynomial</span>
-<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">lgp</span>(n<span class="op">::</span><span class="dt">Integer</span>)</span>
-<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n <span class="op">==</span> <span class="fl">0</span> <span class="cf">return</span> <span class="fu">Polynomial</span>([<span class="fl">1</span>]) <span class="cf">end</span></span>
-<span id="cb99-5"><a href="#cb99-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n <span class="op">==</span> <span class="fl">1</span> <span class="cf">return</span> <span class="fu">Polynomial</span>([<span class="fl">0</span>, <span class="fl">1</span>]) <span class="cf">end</span></span>
-<span id="cb99-6"><a href="#cb99-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-7"><a href="#cb99-7" aria-hidden="true" tabindex="-1"></a>    (<span class="fl">2</span><span class="fu">*</span>(n<span class="op">-</span><span class="fl">1</span>) <span class="op">+</span> <span class="fl">1</span>) <span class="op">/</span> n <span class="op">*</span> <span class="fu">lgp</span>(<span class="fl">1</span>) <span class="op">*</span> <span class="fu">lgp</span>(n<span class="op">-</span><span class="fl">1</span>) <span class="op">-</span> (n<span class="op">-</span><span class="fl">1</span>)<span class="op">/</span>n <span class="op">*</span> <span class="fu">lgp</span>(n<span class="op">-</span><span class="fl">2</span>)</span>
-<span id="cb99-8"><a href="#cb99-8" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">Polynomials</span></span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">Polynomials</span>: Polynomial</span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">lgp</span>(n<span class="op">::</span><span class="dt">Integer</span>)</span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n <span class="op">==</span> <span class="fl">0</span> <span class="cf">return</span> <span class="fu">Polynomial</span>([<span class="fl">1</span>]) <span class="cf">end</span></span>
+<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n <span class="op">==</span> <span class="fl">1</span> <span class="cf">return</span> <span class="fu">Polynomial</span>([<span class="fl">0</span>, <span class="fl">1</span>]) <span class="cf">end</span></span>
+<span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a>    (<span class="fl">2</span><span class="fu">*</span>(n<span class="op">-</span><span class="fl">1</span>) <span class="op">+</span> <span class="fl">1</span>) <span class="op">/</span> n <span class="op">*</span> <span class="fu">lgp</span>(<span class="fl">1</span>) <span class="op">*</span> <span class="fu">lgp</span>(n<span class="op">-</span><span class="fl">1</span>) <span class="op">-</span> (n<span class="op">-</span><span class="fl">1</span>)<span class="op">/</span>n <span class="op">*</span> <span class="fu">lgp</span>(n<span class="op">-</span><span class="fl">2</span>)</span>
+<span id="cb73-8"><a href="#cb73-8" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="69">
 <pre><code>lgp (generic function with 1 method)</code></pre>
 </div>
 </div>
 <p>This is used as,</p>
 <div class="cell" data-execution_count="70">
-<div class="sourceCode cell-code" id="cb101"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a>p4 <span class="op">=</span> <span class="fu">lgp</span>(<span class="fl">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>p4 <span class="op">=</span> <span class="fu">lgp</span>(<span class="fl">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="70">
 0.375 - 3.75∙x<sup>2</sup> + 4.375∙x<sup>4</sup>
 </div>
@@ -1948,7 +2437,7 @@ P_0(x) = 1; P_1(x) = x; \quad  n P_{n}(x)  = (2(n-1)+1) x P_{n-1}(x) -(n-1) P_{n
 <p>The term <em>recursion</em> is applied to a function when it makes a reference to itself during a computation. With this function, don’t try it with values much bigger than <span class="math inline">\(20\)</span>, as the recursion can take a long time.</p>
 <p>The nodes are the roots of the right polynomial. Here we have the values for <code>p4</code></p>
 <div class="cell" data-execution_count="71">
-<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> Polynomials.<span class="fu">roots</span>(p4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>xs <span class="op">=</span> Polynomials.<span class="fu">roots</span>(p4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="71">
 <pre><code>4-element Vector{Float64}:
  -0.8611363115940536
@@ -1964,8 +2453,8 @@ w_i = \frac{2}{(1 - x_i^2) \cdot(P^{'}_n(x_i)/P_n(1))^2}
 \]</span></p>
 <p>These can be done simply with:</p>
 <div class="cell" data-execution_count="72">
-<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="fu">weights</span>(x) <span class="op">=</span> <span class="fl">2</span> <span class="op">/</span> ((<span class="fl">1</span> <span class="op">-</span> x<span class="op">^</span><span class="fl">2</span>) <span class="op">*</span> (Polynomials.<span class="fu">derivative</span>(p4)(x)<span class="op">/</span><span class="fu">p4</span>(<span class="fl">1</span>))<span class="op">^</span><span class="fl">2</span> )</span>
-<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>ws <span class="op">=</span> [<span class="fu">weights</span>(xi) for xi <span class="kw">in</span> xs]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="fu">weights</span>(x) <span class="op">=</span> <span class="fl">2</span> <span class="op">/</span> ((<span class="fl">1</span> <span class="op">-</span> x<span class="op">^</span><span class="fl">2</span>) <span class="op">*</span> (Polynomials.<span class="fu">derivative</span>(p4)(x)<span class="op">/</span><span class="fu">p4</span>(<span class="fl">1</span>))<span class="op">^</span><span class="fl">2</span> )</span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>ws <span class="op">=</span> [<span class="fu">weights</span>(xi) for xi <span class="kw">in</span> xs]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="72">
 <pre><code>4-element Vector{Float64}:
  0.3478548451374517
@@ -1983,25 +2472,25 @@ sum(w * f(x) for (w,x) in zip(ws, xs))</code></pre>
 <p>Again, we see <em>recursion</em> when programming this algorithm. To avoid infinite loops during this, we use a limit below to keep track.</p>
 <p>In general, the value of adaptive methods like this, is the function calls concentrate on areas where <span class="math inline">\(f\)</span> is not well approximated and where it is well approximated it just moves on. This approach works well for poorly behaved functions, as it has a more refined grid there.</p>
 <div class="cell" data-execution_count="74">
-<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">adapt</span>(f, a, b, limit)</span>
-<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>    h <span class="op">=</span> b<span class="op">-</span>a</span>
-<span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a>    c <span class="op">=</span> a <span class="op">+</span> (b <span class="op">-</span> a)<span class="op">/</span><span class="fl">2</span></span>
-<span id="cb107-5"><a href="#cb107-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-6"><a href="#cb107-6" aria-hidden="true" tabindex="-1"></a>    a1 <span class="op">=</span> (<span class="fu">f</span>(a) <span class="op">+</span> <span class="fu">f</span>(b)) <span class="op">*</span> h<span class="op">/</span><span class="fl">2</span>          <span class="co">## trapezoid</span></span>
-<span id="cb107-7"><a href="#cb107-7" aria-hidden="true" tabindex="-1"></a>    a2 <span class="op">=</span> (<span class="fu">f</span>(a) <span class="op">+</span> <span class="fl">4</span><span class="fu">f</span>(c) <span class="op">+</span> <span class="fu">f</span>(b)) <span class="op">*</span> h<span class="op">/</span><span class="fl">6</span>  <span class="co">## Simpson's parabola</span></span>
-<span id="cb107-8"><a href="#cb107-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-9"><a href="#cb107-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="fu">isapprox</span>(a1, a2)</span>
-<span id="cb107-10"><a href="#cb107-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span>(a2)</span>
-<span id="cb107-11"><a href="#cb107-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
-<span id="cb107-12"><a href="#cb107-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-13"><a href="#cb107-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> limit <span class="op">==</span> <span class="fl">0</span></span>
-<span id="cb107-14"><a href="#cb107-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">println</span>(<span class="st">"limit reached for this interval [</span><span class="sc">$</span>a<span class="st">, </span><span class="sc">$</span>b<span class="st">]"</span>)</span>
-<span id="cb107-15"><a href="#cb107-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span>(a2)</span>
-<span id="cb107-16"><a href="#cb107-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
-<span id="cb107-17"><a href="#cb107-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-18"><a href="#cb107-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">adapt</span>(f, a, c, limit <span class="op">-</span> <span class="fl">1</span>) <span class="op">+</span> <span class="fu">adapt</span>(f, c, b, limit<span class="op">-</span><span class="fl">1</span>)</span>
-<span id="cb107-19"><a href="#cb107-19" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">adapt</span>(f, a, b, limit)</span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>    h <span class="op">=</span> b<span class="op">-</span>a</span>
+<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>    c <span class="op">=</span> a <span class="op">+</span> (b <span class="op">-</span> a)<span class="op">/</span><span class="fl">2</span></span>
+<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a>    a1 <span class="op">=</span> (<span class="fu">f</span>(a) <span class="op">+</span> <span class="fu">f</span>(b)) <span class="op">*</span> h<span class="op">/</span><span class="fl">2</span>          <span class="co">## trapezoid</span></span>
+<span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a>    a2 <span class="op">=</span> (<span class="fu">f</span>(a) <span class="op">+</span> <span class="fl">4</span><span class="fu">f</span>(c) <span class="op">+</span> <span class="fu">f</span>(b)) <span class="op">*</span> h<span class="op">/</span><span class="fl">6</span>  <span class="co">## Simpson's parabola</span></span>
+<span id="cb81-8"><a href="#cb81-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-9"><a href="#cb81-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="fu">isapprox</span>(a1, a2)</span>
+<span id="cb81-10"><a href="#cb81-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span>(a2)</span>
+<span id="cb81-11"><a href="#cb81-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb81-12"><a href="#cb81-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-13"><a href="#cb81-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> limit <span class="op">==</span> <span class="fl">0</span></span>
+<span id="cb81-14"><a href="#cb81-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">println</span>(<span class="st">"limit reached for this interval [</span><span class="sc">$</span>a<span class="st">, </span><span class="sc">$</span>b<span class="st">]"</span>)</span>
+<span id="cb81-15"><a href="#cb81-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span>(a2)</span>
+<span id="cb81-16"><a href="#cb81-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb81-17"><a href="#cb81-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-18"><a href="#cb81-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">adapt</span>(f, a, c, limit <span class="op">-</span> <span class="fl">1</span>) <span class="op">+</span> <span class="fu">adapt</span>(f, c, b, limit<span class="op">-</span><span class="fl">1</span>)</span>
+<span id="cb81-19"><a href="#cb81-19" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="74">
 <pre><code>adapt (generic function with 1 method)</code></pre>
 </div>
