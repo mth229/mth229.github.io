@@ -568,6 +568,50 @@ The root within $[0, 3]$ is found with:
 find_zero(f, (0, 3))
 ```
 
+### Example: Solving $f(x) = c$
+
+There are two reasonable means to solve $f(x) = c$ for $x$ when $c$ is non-zero. As above, we can define a new function $h(x) = f(x) - c$. Then when $h(x)$ is $0$ we will have $f(x)$ equal to c.
+
+Alternatively, we can pass in $c$ as a parameter by defining a two-argument version of $f$.
+
+Suppose we aim to find when $\tan(x) = c$ for $c > 0$.
+For any $c > 0$, say $c = 1.23$, we can see from the shape of the graph of $\tan(x)$ that there is one intersection point between $0$ and $\pi/2$.
+
+
+We have the `h(x) = f(x) - g(x)` approach:
+
+```{julia}
+f(x) = tan(x)
+g(x) = 1.23
+h(x) = f(x) - g(x)
+find_zero(h, (0, pi/2))
+```
+
+We compare with the arc tangent, as there is a built-in function to do this particular problem:
+
+```{julia}
+atan(1.23)
+```
+
+
+The alternate form is to define our function with a *parameter*:
+
+```{julia}
+f(x, p) = tan(x) - p
+```
+
+We can then pass values for `p` to `find_zero` to solve:[^1]
+[^1]: We used a keyword argument in the example code, the last positional argument can also be used, which is useful for broadcasting, were we interested in find solutions for multiple values of the paramter.
+
+```{julia}
+find_zero(f, (0, pi/2); p=1.23)
+```
+
+
+For this problem, the two approaches are about equal in effort. The first style lends itself to more complicated expressions on both sides of the equals sign, the second is useful when more than one value for $p$ is to be sought.
+
+
+
 ### Problems
 
 
