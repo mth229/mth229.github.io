@@ -1223,8 +1223,9 @@ numericq(val; hint="This value is indistinguishable from 3.5")
 
 #### Question
 
-
-If you need more bits, `Julia` provides the `BigInt` and `BigFloat` classes which give $256$ bits of precision. Using this allows one to compute $2^3^4$ precisely as an integer:
+Recall that with 64-bit integers, we can only store numbers up to $2^{63} - 1$ without overflowing.
+If you need more bits, `Julia` provides the `BigInt` class which allow for what is known as [*arbitrary precision arithmetic*](https://en.wikipedia.org/wiki/Arbitrary-precision_arithmetic), where the number of bits used to store the number grows as needed.
+Using this allows one to compute $2^{3^4}$ precisely as an integer:
 
 
 ```
@@ -1245,3 +1246,12 @@ choices = [
 answer = 1;
 radioq(choices, answer)
 ```
+
+
+:::{.callout-note}
+## Alert
+Like the `BigInt` class, `Julia` also has a `BigFloat` class for storing decimal numbers with arbitrary precision.
+Due to some technical details of how floating point numbers are stored, the number of bits must be fixed in advance of any computation—unlike `BigInt`s whose precision can grow on-the-fly.
+`Julia` provides the `setprecision` command to set this number of bits (e.g. `setprecision(1024)`). The default precision is $256$.
+
+:::
