@@ -1,0 +1,734 @@
+# using SymPy with MTH 232, at CSI
+
+This page briefly describes the use of symbolic math for the Calculus II topics of MTH 232 within `Julia` utilizing the [SymPy](https://sympy.org) library of Python. Either the `SymPy` or `SymPyPythonCall` packages provide access, the difference being the package used for interop between `Julia` and `Python`.
+
+The `SymPy` package is loaded when the `MTH229` package is. We also add the `Plots` package to handle our plotting needs.^[Other plotting packages can be used, of course, but there are a few recipes to easily plot `SymPy` expressions]
+
+```{julia}
+using MTH229
+using Plots
+```
+
+There are a few basic ideas behind the `SymPy` and `SymPyPythonCall` packages
+
+* Symbolic variables and values can be easily created
+* Generic operations, such as math operations, have specialized methods for symbolic values and expressions that utilize the underlying Python library to manipulate or create new symbolic expressions.
+* Functions specific to the Python library are accessed through the `sympy` object, such as `sympy.expand_trig`.
+* Methods of objects in the Python library are called with the same dot call syntax, e.g. `obj.subs(...)` to call the `subs` method of the object
+
+
+## Symbolic variables
+
+There are numerous ways to create symbolic objects in SymPy (`symbols`, `sympify`, ...) but we use the `@syms` macro to create variables with a given name:
+
+```{julia}
+@syms x
+```
+
+
+One or more variables can be created. In this example, the last one creates a range of values:
+
+```{julia}
+@syms x y zs[1:5]
+```
+
+Variables can have basic assumptions placed on them (`positive`, `real`), e.g.
+
+```{julia}
+@syms a::positive, b::real
+```
+
+Symbolic functions can be naturally specified
+
+```{julia}
+@syms u()
+u(x)
+```
+
+## Symbolic numbers
+
+If `x` is symbolic, the expression `2x` will also be symbolic
+
+```{julia}
+2x
+```
+
+Behind the scenes, before multiplying, `2` and `x` are *promoted* to a common type, which will be symbolic. So most regular `Julia` expressions involving one or more symbolic values will simply yield symbolic answers without modification. Integers and rational numbers promote to exact counterparts; floating point numbers convert to floating point values.
+
+Still, exactness can be lost when the floating point values are created before becoming symbolic:
+
+
+```{julia}
+1/10 * x + 2/10 * x - 3/10 * x
+```
+
+The above "should" be $0$, but it isn't, due to the conversion to floating point prior to become symbolic. For example, the expression `1/10 * x` first divides `10` into `1`, producing a floating point approximation for `1/10` and this is promoted to symbolic when multiplied by `x`.
+
+Using rational numbers or re-expressing for earlier promotion to symbolic will keep the exactness:
+
+```{julia}
+1//10 * x + 2//10 * x - 3//10*x, 1x/10 + 2x/10 - 3x/10
+```
+
+Sometimes symbolic values must be created before passing to a function, so dispatch to the symbolic function occurs. Compare these two calls, where the `Sym` constructor is used to create symbolic numbers:
+
+```{julia}
+log(Sym(2)), log(2)
+```
+
+::: {.callout-note}
+# When in doubt, use `Sym`
+
+But most of the time, just being mindful to avoid non-symbolic divisions and function calls with `Julia` numbers is enough.
+:::
+
+## Substitution
+
+
+Substituting one value in for another, is done many ways, for example there is [subs](https://docs.sympy.org/latest/modules/core.html#sympy.core.basic.Basic.subs), `replace`, and `xreplace`. We discuss `subs`.
+
+The `subs` function (or object method) replaces an old value for an new value after *sympifying*^[The `sympify` function takes an expression and makes it symbolic, which can be used to convert numbers to symbolic numbers or strings into variables.] the arguments. The old/new pairs can be specified with a tuple (e.g. `(old, new)`), a dictionary, or the more `Julia`n syntax, a pairs expression `old => new`, with multiple substitutions possibly combined in a tuple.
+
+```{julia}
+@syms a b c x y
+ex = a*x^2 + b* x + c - y
+subs(ex, x => y-1)
+```
+
+```{julia}
+subs(ex, a => 2)
+```
+
+```{julia}
+subs(ex, a=>3, b=>2, c=>1)
+```
+
+The latter is akin to function evaluation. As such, the call notation for symbolic expressions is defined to use `subs`:
+
+```{julia}
+ex(a=>3, b=>2, c=>1)
+```
+
+
+
+
+## Numerical evaluation
+
+An exact symbolic value may be the result of a computation, but it may be of interest to convert that value to a number (e.g. `1.414...` instead of $\sqrt{2}$).
+
+SymPy objects have an `evalf` method that finds a floating-point value.
+
+```{julia}
+u = exp(Sym(2)) - exp(-Sym(2))
+u
+```
+
+The value of `u` is exact. In this next cell, we call the `evalf` method and compare to a computation within `Julia`:
+
+```{julia}
+u.evalf(), exp(2) - exp(-2)
+```
+
+The default for `.evalf()` is 15 decimal points; similar but not the same as for Julia. The method allows a specification of the number of digits in its first argument. (The `verbose=true` argument illustrates some of the algorithm employed.)
+
+```{julia}
+u.evalf(50)
+```
+
+The result of `evalf` looks numeric, but internally the values are symbolic values within `SymPy`.^[The alert reader may notice a different type face in the output below; one used for simpler symbolic expressions.] In `SymPy.jl` the `N` function converts the exact value to a `Julia` number type with an attempt to match the type in Python with a corresponding type in `Julia`. In this example, that is `Rational`.
+
+
+```{julia}
+u = Sym(1) / 1000
+u.evalf(), N(u)
+```
+
+For repeated conversions of expressions to numeric values, the `lambdify` method creates a `Julia` function from an expression, which can then be called as any other function.
+
+```{julia}
+@syms x
+ex = cos(x)
+l =  lambdify(ex)
+ex(PI/3), ex(pi/3), l(pi/3)
+```
+
+
+## Solving an equation
+
+`SymPy` can be used to solve many algebraically solvable equations. The [solve](https://docs.sympy.org/latest/modules/solvers/solvers.html#sympy.solvers.solvers.solve) and [solveset](https://docs.sympy.org/latest/modules/solvers/solveset.html#solveset) functions are used.
+
+By default, an expression is interpreted as an equation set equal to `0`. However, we will always model the use of `rhs ~ lhs` to separate two sides of an equation.^[We can't use `=`, the mathematical indication of an equations, as that is used for assignment within `Julia`, as it is with most programming languages.]
+
+Here the equation $x^2 = 2$ is solved for:
+
+
+```{julia}
+@syms x y::real z::positive
+solve(x^2 ~ 2)
+```
+
+Simple assumptions on the variables are respected:
+
+```{julia}
+solve(y^2 + 1 ~ 0), solve(z + 1 ~ 0)
+```
+
+Equations can have symbolic variables included. In which case, passing in the second argument the variable(s) to solve for is done:
+
+```{julia}
+@syms a b c
+solve(a*x^2 + b*x + c ~ 0, x)
+```
+
+
+The `solve` function has many different types of return values. The `solveset` function always returns a set. For *finite* sets, a `Julia` `Set` object is returned. For *infinite* sets, this is not the case.
+
+```{julia}
+solveset(a*x^2 + b*x + c ~ 0, x)
+```
+
+This may look the same as the last call using `solve`, but a finite set is unordered, so indexing doesn't work unless the set is collected (using `collect`) into a vector.
+
+For infinite sets, the answer is queried. In this command we check for inclusion:^[There is a subtlety, `pi` is promoted to the symbolic value of `PI` before checking, as the floating point value associated to $\pi$, `3.141592653589793`, is not in the set.]
+
+```{julia}
+u = solveset(sin(x) ~ 0, x)
+pi in u
+```
+
+Intersecting with a finite interval will create a finite set:^[To run this example requires a newer version of `SymPy`.]
+
+```#{julia}
+#| eval=false
+S = sympy.Interval(-5, 5)
+intersect(S, u)
+```
+
+
+### Numerically solving an equation
+
+Not all equations can be solved symbolically. For example, finding the solution(s) to $\cos(x) = x$ will result in an error:
+
+```{julia}
+try solve(cos(x) ~ x) catch err "No algorithms are implemented to solve equation -x + cos(x)" end
+```
+
+Within `SymPy`, there is [nsolve](https://docs.sympy.org/latest/modules/solvers/solvers.html#sympy.solvers.solvers.nsolve):
+
+```{julia}
+sympy.nsolve(cos(x) ~ x, pi/4)
+```
+
+
+
+::: {.callout-note}
+# Newer version of `Roots`
+
+The `find_zero` function of the `Roots` package (if new enough) accepts an equation for input:
+
+```
+find_zero(cos(x) ~ x, (0, pi/2))  # using [0,π/2] as a bracketing interval
+```
+
+`Roots` is re-exported by the `MTH229` package.
+
+:::
+
+### Systems of equations
+
+The `solve` function can solve systems of equations. These can be specified by wrapping one or more equations into a container (using parentheses to form a tuple is suggested) and specifying the symbols similarly:
+
+```{julia}
+@syms x::real y::real
+solve((x^2 + y^2 ~ 1, y ~ x^2), (x,y))
+```
+
+
+## Calculus specific functions
+
+SymPy provides function for specific topics of Calculus II.
+
+### Limits
+
+Limits may be taken symbolically using `limit`. The specification $x \rightarrow c$ can be specified with a tuple (`(x,c)`) or pair (`x => c`). Directional limits are specified with `dir="-"`, `dir="+"` (the default), or `dir="+-"`.
+
+```{julia}
+@syms a::positive b::positive x::real
+ex = ((a^x - x*log(a)) / (b^x - x*log(b)))^(1/x^2)
+L = limit(ex, x=>0)
+```
+
+For a given set of values of `a` and `b`, we can see different answers:
+
+```{julia}
+N(L(a=>2, b=>3))
+```
+
+::: {.callout-note}
+## Watch out for early conversion
+
+The above example will fail if instead of making `a` and `b` symbolic and then substituting values of `2` and `3`, the expression were substituted in at the outset:
+
+```{julia}
+@syms x::real
+a, b = 2, 3
+ex = ((a^x - x*log(a)) / (b^x - x*log(b)))^(1/x^2)
+L = limit(ex, x=>0)
+```
+
+This is because both `log(a)` and `log(b)` are then inexact values for $\log(2)$ and $\log(3)$ respectively.
+:::
+
+
+::: {.callout-note}
+## Simplification can be necessary
+
+In this example we wish to take the limit as $x \rightarrow \infty$ of
+
+$$
+f(x) = \frac{\cos{\left(2 x \right)} + 1}{\left(x + \sin{\left(x \right)} \cos{\left(x \right)}\right) e^{\sin{\left(x \right)}} \cos{\left(x \right)}
+ + \left(- \sin^{2}{\left(x \right)} + \cos^{2}{\left(x \right)} + 1\right) e^{\sin{\left(x \right)}}}
+$$
+
+A straightforward approach doesn't work:
+
+```{julia}
+den(x) = 1//2*sin(2x) + x
+num(x) = exp(sin(x))*(cos(x)*sin(x) + x)
+up, vp = diff(den(x),x), diff(num(x),x)
+limit(up/vp, x=> oo)
+```
+
+As seen, `SymPy` returns an unevaluated limit expression, as no answer can be found. However, if the expression is *simplified*, `SymPy` will return the correct answer:
+
+```{julia}
+limit(simplify(up/vp), x => oo)
+```
+
+:::
+
+### Differentiation
+
+Derivatives are taken through `diff(ex, var, ...)` with variants for multiple or mixed derivatives. The basic usage is pretty straightforward. The derivative with respect to $x$ of an expression is found as follows:
+
+```{julia}
+@syms x a b
+ex = sin(a*x - b)
+diff(ex, x)
+```
+
+Second derivatives can be more succinctly expressed by adding more variables:
+
+```{julia}
+diff(ex, x, x) # 2nd derivative
+```
+
+
+### Integration
+
+In Calculus II there are techniques of integration to be learned:
+
+* integration by parts
+* trigonometric integrals
+* partial fractions
+
+The definition of integration can be extended to incorporate infinities:
+
+* improper integrals
+
+Further, there are several formulas where an integral takes on a geometric meaning beyond the area under a curve:
+
+
+* Area between 2 curves: $A = \int_a^b (f(x) - g(x)) dx$.
+* volume of revolution: $V = \int_a^b \pi r(x)^2 dx$.
+* cylindrical shell: $V = \int_a^b 2\pi x f(x) dx$.
+* arc length: $L = \int_a^b \sqrt{1 + f'(x)^2} dx$,
+* surface area: $SA = \int_a^b 2\pi f(x) \sqrt{1+ f'(x)^2} dx$.
+
+
+
+In `SymPy`, the `integrate` function computes integrals symbolically by finding an anti-derivative. Bear in mind, not all integrands have an antiderivative that can be algebraically expressed! `SymPy` uses the tricks of integration above, and in addition implements an algorithm (in part) due to Risch.
+
+The *indefinite integral*, $\int f(x) dx$, is computed with `integrate(f(x), x)` where `f(x)` is some expression depending on `x` and may have symbolic parameters.
+
+Definite integrals, $\int_a^b f(x)dx$, are computed with `integrate(f(x), (x, a, b))`.
+
+For example:
+
+```{julia}
+@syms x c a b
+integrate(x * exp(x^2), x) # integration by parts
+```
+
+```{julia}
+integrate(sin(x)^2, x)  # integration by parts
+```
+
+
+```{julia}
+integrate(x^5/(36x^2 + 1)^(3//2), (x, 0, 1//6)) # trig subs with x = tan(theta)/6
+```
+
+
+```{julia}
+ex = (x^4 + 1) / ( (x^2 + 1)^2 * (x^2 - 4)^2)
+integrate(ex, x) # partial fraction
+```
+
+We can see how this is done by taking the partial fraction decomposition provided by `apart`:
+
+```{julia}
+us = apart(ex)
+```
+
+and then integrate term-by-term:
+
+```{julia}
+[integrate(a, x) for a ∈ Introspection.arguments(us)] # newer SymPy
+```
+
+----
+
+This finds the area bounded by two parabola:
+
+```{julia}
+f(x) = 1 - 2x^2
+g(x) = x^2
+as = solve(f(x) ~ g(x), x)
+a,b = sort(as)
+integrate(f(x) - g(x), (x, a, b))
+```
+
+----
+
+Following an example from [AP](https://apcentral.collegeboard.org/media/pdf/Volumes_of_Solids_of_Revolution_Calculus_CM.pdf), we look at the solid formed by rotating the region bounded by $y = \sqrt{x+2}$ and $y=e^x$ about the line $y = -2$.
+
+We first find the intersection points, solutions to $f(x) = g(x)$. We will solve for these, and will have success, as `SymPy`  uses some special functions
+
+```{julia}
+@syms x
+f(x) = exp(x)
+g(x) = sqrt(x + 2)
+a,b = sort(solve(f(x) ~ g(x), x))
+```
+
+The integral requires two radii from the line $y=-2$. We have on $(a,b)$ that $g(x) > f(x) > 0$, so the distance of $g(x)$ from $y=-2$ is greater than that of $f(x)$, hence the ordering below:
+
+```{julia}
+r1, r2 = (g(x) - (-2)), (f(x) - (-2))
+v = integrate(PI * (r1^2 - r2^2) , (x, a, b))
+```
+
+This isn't a satisfying answer if you want to know the scale. We call `evalf` to give the value:
+
+```{julia}
+v.evalf()
+```
+----
+
+This finds the length of the graph of $x^2$ between $0$ and $1$:
+
+```{julia}
+f(x) = x^2
+dL = sqrt(1 + diff(f(x),x)^2)
+p = integrate(dL, (x, 0, 1))
+```
+
+With numeric value
+
+```{julia}
+p.evalf()
+```
+
+To find the surface area of the volume formed by rotating the graph of $f(x) = \sqrt{9 - x^2}$ between $-1 \leq x \leq 2$ we have:
+
+```{julia}
+f(x) = sqrt(9 - x^2)
+dSA = 2 * PI * f(x) * sqrt(1 + diff(f(x), x)^2)
+```
+
+`SymPy` can't see how to do this, we need to help. By squaring, we can see terms will cancel:
+
+```{julia}
+dSA = sqrt(cancel(dSA^2))
+```
+
+And
+
+```{julia}
+integrate(dSA, (x, -1, 2))
+```
+
+
+### Algebraic manipulation
+
+The integration of rational functions can always be done, as is known since the early days of calculus. The ability to compute a partial fraction decomposition of any rational function (of a single variable in this particular case), allows this integration as each possible term in this decomposition permits an antiderivative.
+
+`SymPy` provides some tools to algebraically manipulate expressions, with some addressing rational expressions. Common algebraic manipulations include `simpliy`/`expand` along with various specialized functions primarily involving polynomial expressions: `factor`, `cancel`, `apart`, and `together`.
+
+
+Symbolic expressions are routinely simplified. However, as simplification can be expensive, only light simplification is done by default. For example, `x^3 * x^2` is reduced to `x^5`; `x/3` is reduced to `(1/3) * x`. Further manipulations are possible. The [simplify](https://docs.sympy.org/latest/tutorials/intro-tutorial/simplification.html) function is an interface that iterates through dozens of specific simplification steps to completion.
+
+In this example, the `gamma` function is $\Gamma(n) = (n-1)!$ for integer $n > 0$. We see by simplifying, the cancellation occurs:
+
+```{julia}
+@syms n::integer
+u = gamma(n) / gamma(n-1)
+u, simplify(u)
+```
+
+
+The [expand](https://docs.sympy.org/latest/tutorials/intro-tutorial/simplification.html#expand) function takes an expression and basically multiplies it out. If new *default* cancellations occur, expand can actually result in shorter expressions:
+
+```{julia}
+expand((x-1)^3)
+```
+
+```{julia}
+ex = (x + 1) * (x - 2) - (x - 1) * x
+ex, expand(ex)
+```
+
+The [factor](https://docs.sympy.org/latest/tutorials/intro-tutorial/simplification.html#factor) function applied to  polynomials is the opposite of expand. This function uses a multivariate factorization algorithm over the *rational* numbers. This point means not everything factorable is factored:
+
+```{julia}
+factor(x^2 - 4), factor(x^2 - 3)
+```
+
+Whereas, the latter factoring could be achieved through
+
+```{julia}
+prod(x - u for u in solve(x^2 - 3))
+```
+
+The `collect` function of sympy collects common powers of a term in an expression. The `collect` function of `Julia` takes an iterable and returns a vector or array of values. As these are different concepts, the `collect` function must be called through `sympy.collect`.
+
+```{julia}
+ex = x*y + x - 3 + 2*x^2 - z*x^2 + x^3
+sympy.collect(ex, x)
+```
+
+For rational expressions, the `cancel` function re-expresses in a canonical form, no common factors and expanded:
+
+```{julia}
+ex = (x - 3)*(x^2 + 2*x + 1)/(x^2 + x)  # common factor of x + 1
+ex, cancel(ex)
+```
+
+The `apart` function finds a partial fraction decomposition for a rational expression. Such decompositions allow the integration of rational polynomials, as the result denominators are of a specific type (powers of linear or quadratic terms).
+
+```{julia}
+apart(ex)
+```
+
+The `together` function re-expresses such a decomposition as a rational expression.
+
+
+
+### Sequences and series
+
+A finite sequence can be generated in a `Julia`n manner using a comprehension. For example,
+
+```{julia}
+[1/Sym(i)^2 for i in 1:10]
+```
+
+The `sympy.sequence` function can also be used to generate sequences, in this case possibly infinite ones. The specification of the values to iterate over follow the `(var, start, end)` pattern of integration. In the following `oo` is used for
+
+```{julia}
+@syms i::(integer, nonnegative)
+sympy.sequence(1/i^2, (i, 1, oo))
+```
+
+There are some methods available for working with [sequences](https://docs.sympy.org/latest/modules/series/sequences.html) which are not pursued here.
+
+----
+
+The `Sum` function of `SymPy` represents symbolic sums, both finite and infinite. It is called through `sympy.Sum` as `sympy.Sum(ex, (i, a, b))` where `ex` is an expression of symbolic function in the variable `i`. The sum is from `i=a` to `i=b` where there is [convention](https://docs.sympy.org/latest/modules/concrete.html#concrete-class-reference) when `a` is not less than `b` and both are finite.
+
+
+```{julia}
+@syms i::(integer, nonnegative) r::real u()
+s = sympy.Sum(u(i), (i, 0, 5))
+```
+
+As seen, `s` is an unevaluated sum. It has a `doit` method to carry out the evaluation:
+
+```{julia}
+s.doit()
+```
+
+The `Sum` function is aware of some common sums:
+
+```{julia}
+@syms n
+s1 = sympy.Sum(1/i, (i, 1, n))
+s2 = sympy.Sum(1/i^2, (i, 1, n))
+s3 = sympy.Sum((-1)^i /i, (i, 1, n))
+s1.doit(), s2.doit(), s3.doit()
+```
+
+Infinite sums are specified with `oo` for $\infty$. (`Inf` as well, but `oo` is more fun to type.)
+
+```{julia}
+s4 = sympy.Sum(1/i^4, (i, 1, oo))
+s5 = sympy.Sum(1/r^i, (i, 0, oo))
+s4.doit(), s5.doit()(r => 3)
+```
+
+The methods `is_convergent` and `is_absolutely_convergent` are useful:
+
+```{julia}
+s3.is_convergent(), s3.is_absolutely_convergent()
+```
+
+----
+
+Suppose $s_n = (n^2 + 4n)\cdot e^{-2n}$ is $\Sigma s_n$ convergent?
+
+```{julia}
+sₙ(n) = (n^2 + 4n) * exp(-2n)
+@syms n::(integer, nonnegative)
+sympy.Sum(sₙ(n), (n, 1, oo)).is_convergent()
+```
+
+This is an example on the integral test where $s_n = \ln(n)/n$.
+
+```{julia}
+sₙ(n) = log(n)/n
+sympy.Sum(sₙ(n), (n, 1, oo)).is_convergent()
+```
+
+However,
+
+```{julia}
+sₙ(n) = log(n)/n^2
+sympy.Sum(sₙ(n), (n, 1, oo)).is_convergent()
+```
+
+## Parametric description of functions
+
+Consider a person on a ferris wheel with position coordinates $x(t)$ and $y(t)$. Both of these are cyclical, one side-by-side (e.g., x(t) = r\sin(\omega t)$, one up-and-down $(y(t) = R - r\cos(\omega t))$. A parametric description of the motion, just combines the two into a time-dependent vector
+
+$$
+r(t) = (r\sin(\omega\cdot t), R - r\cos(\omega \cdot t)).
+$$
+
+The function $r$ is vector-valued, not scalar valued. Within `Julia`, vectors are created using `[]` with commas separating components. The above might be:
+
+```{julia}
+@syms R r t ω
+rho(t) = [r*sin(ω*t), R - r*cos(ω*t)]
+```
+
+We can plot for specific values:
+
+```{julia}
+d = (R => 35, r=>30, ω => 2PI/120)
+rt = subs.(rho(t), d...) # dots to broadcast and "splat"
+plot(rt..., 0, 100)      # dots to splat to two variable
+```
+
+
+### Polar coordinates
+
+Polar coordinates are a special case of a representation. The are an alternate to Cartesian descriptions and use $(r,\theta)$ as an alternate to $(x,y)$. The translation is straightforward: $(x,y) = (r\cdot \cos(\theta), r\cdot\cos(\theta))$.
+
+There isn't much special support for polar coordinates within base `SymPy` or `Julia`. The `plot` function has a `projection=:polar` argument that plots polar plots where $r=r(\theta)$.
+
+For example,
+
+```{julia}
+rho(theta) = 1 + cos(theta) * sin(theta)^2
+@syms θ
+plot(rho(θ), 0, 2pi; projection=:polar, legend=false)
+```
+
+
+
+
+
+### Differential equations
+
+A differential equation is an equation involving a variable, a function, and its derivatives. In the following we define an operator, using `Differential` to simplify the specification of the equation $y'(x) = y(x)$:
+
+```{julia}
+@syms x, u()
+∂ = Differential(x)
+ex = ∂(u(x)) ~ u(x)
+```
+
+(The use of `Differential` just cleans up visually what can be achieved through `diff(u(x), x)` above.)
+
+The `dsolve` function is then used to solve differential equations:
+
+```{julia}
+dsolve(ex)
+```
+
+The constants come from integration. Initial conditions reduce the number of constants. These are specified to the `ics` keyword argument using a dictionary:
+
+```{julia}
+dsolve(ex, ics=Dict(u(0) => 3))
+```
+
+The initial conditions can also involve constraints on derivatives, etc.
+
+We follow with a much more involved example. The following equations model projectile motion using Newton's laws and adding a drag proportional to velocity. This proportion is given by a constant $\gamma$. We use `u` and `v` to model the $x$ and $y$ coordinates of motion over time, $t$. Inverting $x$ to get $t$, allows the solution of $y$ in terms of $t$.
+
+```{julia}
+@syms x0::real y0::real v0::real γ::nonnegative 𝑔::real
+@syms t::positive x u() v()
+Dₜ = Differential(t)
+D2ₜ = Dₜ ∘ Dₜ
+eq₁ = Dₜ(Dₜ(u))(t) ~    - γ * Dₜ(u)(t)
+eq₂ = Dₜ(Dₜ(v))(t) ~ -𝑔 - γ * Dₜ(v)(t)
+```
+
+If we set $\gamma = 0$ and solve, we get the $y$ values as a function of $t$:
+
+```{julia}
+a1, a2 = dsolve.((eq₁(γ=>0), eq₂(γ=>0)), (u(t), v(t)))
+tₓ = only(solve(x - rhs(a1), t)) # invert; only one solution
+yₓ = rhs(a2)(t => tₓ)
+```
+
+We can see the form of a parabola, with two parameters adjusting its shape related to the initial conditions. This is anticipated from physics.
+
+Here, we specify initial values so that we can ultimately plot:
+
+```{julia}
+@syms α::real v₀::real
+icx = Dict(u(0) => Sym(0), diff(u(t),t)(0) => v₀*cos(α))
+icy = Dict(v(0) => Sym(0), diff(v(t),t)(0) => v₀*sin(α) )
+
+a1 = dsolve(eq₁(γ => 0), u(t), ics=icx)
+a2 = dsolve(eq₂(γ => 0), v(t), ics=icy)
+
+tₓ = only(solve(x - rhs(a1), t)) # only one solution
+yₓ = rhs(a2)(t => tₓ)
+```
+
+
+If there is a positive $\gamma$, there will be drag and the formulas will change to reflect that.
+
+```{julia}
+𝑎1 = dsolve(eq₁, u(t), ics=icx)
+𝑎2 = dsolve(eq₂, v(t), ics=icy)
+
+𝑡ₓ = only(solve(x - rhs(𝑎1), t)) # only one solution
+𝑦ₓ = rhs(𝑎2)(t => 𝑡ₓ)
+```
+
+The difference can be visualized through plotting. The proper way to get the values for the constants is to specify numeric values in the initial conditions:
+
+
+```{julia}
+a = yₓ(𝑔 => 32, v₀ => 200, α => PI/4)
+M = maximum(solve(a ~ 0))
+plot(a, 0, N(M))
+
+𝑎 = 𝑦ₓ(𝑔 => 32, v₀ => 200, α => PI/4, γ => 1//2)
+M = nsolve(𝑎 ~ 0, 2*100*sqrt(2)-10) # avoid starting at asymptote
+plot!(𝑎, 0, N(M))
+```
