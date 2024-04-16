@@ -33,6 +33,7 @@ This is great as long as some antiderivative is known. There are several differe
 ```{julia}
 using MTH229
 using Plots
+plotly()
 ```
 
 ```{julia}
@@ -64,8 +65,54 @@ One such approximation is given by the familiar Riemann sums, which we will look
 
 In 1854 Riemann was the first to give a rigorous definition of the integral of a continuous function on a closed interval, the problem we wish to solve here, using the concept of a *Riemann sum*. A Riemann sum is one of the simplest to understand approximations to the area under a curve. The basic idea is that the interval $[a,b]$ is partitioned through points $a = x_0 < x_1 < \cdots x_n = b$ and the area under $f(x)$ between $x_i$ and $x_{i+1}$ is approximated by a rectangle with the base $x_{i+1} - x_i$ and height given by $f(x_i^*)$, where $x_i^*$ is some point in the interval $[x_i, x_{i+1}]$. Typical choices are the left point or the right point of the interval, or the $x$ value which minizes or maximizes $f$ over the interval. The figure shows these four choices for some sample function. For a *Riemann integrable* function, such as a continuous function on $[a,b]$, any of the choices will yield the same value as the partition's mesh shrinks to $0$.
 
+```{julia}
+#| echo: false
+#| fig-alt: "A simple Riemann partition"
+#![Riemann](figures/integration/riemann_choice.png){fig-alt="A simple Riemann partition"}
 
-![Riemann](figures/integration/riemann_choice.png){fig-alt="A simple Riemann partition"}
+g(x) = -x^4 + 2x^2 + 2;
+f(x) = g(x-1/2)
+grey = RGBA(.5, .5, .5, 0.5)
+
+xlims = (-2, 2)
+cps = find_zeros(f', xlims)
+m, M = minimum(f.(xlims)), maximum(f.(cps))
+ylims=(m, M+1)
+p = plot(;xlims = (-2.1, 2.1), ylims=ylims,
+         legend=false,
+         axis=([], false))
+
+plot!(f; linecolor=:black, linewidth=2)
+plot!([xlims...], [m,m]; linecolor=:black, linewidth=2)
+
+# left
+xs = range(0, 1, length=100)
+_xs = [0,1,1,0,0]
+fill = (:grey, 0.1,0)
+
+# right
+plot!(-2 .+ _xs, [m,m,f(-1),f(-1), m]; linecolor=:black, linewidth=1, fill=fill)
+
+# leftt
+plot!(-1 .+ _xs, [m,m,f(-1),f(-1), m]; linecolor=:black, linewidth=1,fill=fill)
+plot!([0,0],[f(-1),f(0)]; linecolor=:black, linewidth=1)
+
+# min
+cp = 0.5
+plot!(0 .+ _xs, [m,m,f(cp),f(cp), m]; linecolor=:black, linewidth=1, fill=fill)
+
+# max
+cp = 1.5
+plot!(1 .+ _xs, [m,m,f(cp),f(cp), m]; linecolor=:black, linewidth=1, fill=fill)
+
+ycenter = -15
+annotate!([(-1.5, ycenter, text("right",:center)),
+           (-0.5, ycenter, text("left",:center)),
+           ( 0.5, ycenter, text("min",:center)),
+           ( 1.5, ycenter, text("max",:center))
+           ])
+```
+
 
 
 As with other limits, we can numerically approximate the limit by computing the Riemann sum for some partition. The steps for this include:
@@ -235,25 +282,33 @@ In addition, we allow for the possibility of using different methods to approxim
   * making the cap a quadratic polynomial that goes through the left and right endpoints and the midpoint (`method="simpsons"`)
 
 
-This function is defined in `MTH229`:
+For pedagocial use, this function is defined in `MTH229`:
 
 
 ```{julia}
 #| eval: false
 function riemann(f::Function, a::Real, b::Real, n::Int; method="right")
-  if method == "right"
-     meth = (f,l,r) -> f(r) * (r-l)
-  elseif method == "left"
-     meth= (f,l,r) -> f(l) * (r-l)
-  elseif method == "trapezoid"
-     meth = (f,l,r) -> (1/2) * (f(l) + f(r)) * (r-l)
-  elseif method == "simpsons"
-     meth = (f,l,r) -> (1/6) * (f(l) + 4*(f((l+r)/2)) + f(r)) * (r-l)
-  end
 
-  xs = range(a, b, length=n+1)
-  lrs = zip(Iterators.take(xs, n), Iterators.rest(xs, 1))
-  sum(meth(f, l, r) for (l,r) in lrs)
+    xs = range(a, b, length=n+1)
+    lrs = zip(xs[1:n], xs[2:n+1])
+
+    if method == "right"
+
+        sum(f(r) * (r-1) for (l,r) in lrs)
+
+    elseif method == "left"
+
+        sum(f(l) * (r-1) for (l,r) in lrs)
+
+    elseif method == "trapezoid"
+
+        (1/2) * sum((f(l) + f(r)) * (r-l) for (l,r) in lrs)
+
+    elseif method == "simpsons"
+
+        (1/6) * sum((f(l) + 4*(f((l+r)/2)) + f(r)) * (r-l) for (l,r) in lrs)
+
+    end
 
 end
 ```
