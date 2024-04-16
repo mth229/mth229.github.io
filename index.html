@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.549">
+<meta name="generator" content="quarto-1.4.553">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="CSI Math department">
-<meta name="dcterms.date" content="2024-02-08">
+<meta name="dcterms.date" content="2024-04-16">
 
 <title>MTH229 with Julia</title>
 <style>
@@ -199,7 +199,7 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./symbolic-math.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">using symbolic math within Julia</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Using symbolic math within Julia</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -262,7 +262,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">February 8, 2024</p>
+      <p class="date">April 16, 2024</p>
     </div>
   </div>
   
@@ -307,12 +307,14 @@ ul.task-list li input[type="checkbox"] {
 <p>For example, the notes use:</p>
 <ul>
 <li><code>plot(f, a, b)</code> to plot <code>f</code> over <code>[a,b]</code>; <code>plot!(g)</code> to add a curve (using <code>Plots</code>)</li>
-<li><code>fzero(f, a, b)</code> or <code>find_zero(f, (a,b))</code> to find <em>a</em> zero inside the bracketing interval <code>[a,b]</code> (from <code>Roots</code>)</li>
-<li><code>fzeros(f, a, b)</code> (or <code>find_zeros(f, (a,b))</code>) to find <em>all</em> the real zeros of a function <code>f</code> in <code>[a,b]</code> (from <code>Roots</code>)</li>
-<li><code>fzero(f, a)</code> (or <code>find_zero(f, a)</code>) to find <em>a</em> zero using initial starting oint <code>a</code> (from <code>Roots</code>)</li>
+<li><code>find_zero(f, (a, b))</code> or <code>fzero(f, a, b)</code> to find <em>a</em> zero <em>between</em> the bracketing interval <code>[a,b]</code> (from <code>Roots</code>)</li>
+<li><code>find_zero(f, a)</code> (or <code>fzero(f, a)</code>) to find <em>a</em> zero <em>near</em> an initial starting point <code>a</code> (from <code>Roots</code>)</li>
+<li><code>lim(f, c)</code> to numerically investigate the limit of <code>f</code> at <code>x=c</code>.</li>
 <li><code>limit(f(x), x=&gt;c)</code> to find the limit of <code>f</code> at <code>c</code> (from <code>SymPy</code>)</li>
 <li><code>f'</code> to return a function that computes the derivative of <code>f</code> (Added in the <code>MTH229</code> package based on the <code>derivative</code> function from the <code>ForwardDiff</code> package)</li>
 <li><code>diff(f(x),x)</code> to find a symbolic derivative of <code>f</code> (from <code>SymPy</code>)</li>
+<li><code>find_zeros(f, (a, b))</code> (or <code>fzeros(f, a,b)</code>) to find <em>all</em> the real zeros of a function <code>f</code> in <code>[a,b]</code> (from <code>Roots</code>)</li>
+<li><code>sign_chart(f, a, b)</code> to find an classify zeros of a function over <code>[a,b]</code></li>
 <li><code>quadgk(f, a, b)</code> to find the numeric integral of <code>f</code> over <code>(a,b)</code> (from the <code>QuadGK</code> package)</li>
 <li><code>integrate(f(x), x)</code> to find the symbolic integral of <code>f</code> (from the <code>SymPy</code> package)</li>
 <li><code>integrate(f(x), (x, a, b))</code> to find the definite integral over <code>[a,b]</code> symbolically (from the <code>SymPy</code> package).</li>
@@ -334,14 +336,14 @@ ul.task-list li input[type="checkbox"] {
 <li><p>Start the application</p></li>
 </ul>
 <p>This opens a terminal, appearing as follows:</p>
-<div id="ddcc9a20" class="cell" data-execution_count="1">
+<div id="e511a1ca" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-stdout">
 <pre><code>               _
    _       _ _(_)_     |  Documentation: https://docs.julialang.org
   (_)     | (_) (_)    |
    _ _   _| |_  __ _   |  Type "?" for help, "]?" for Pkg help.
   | | | | | | |/ _` |  |
-  | | |_| | | | (_| |  |  Version 1.10.0 (2023-12-25)
+  | | |_| | | | (_| |  |  Version 1.10.2 (2024-03-01)
  _/ |\__'_|_|_|\__'_|  |  Official https://julialang.org/ release
 |__/                   |
 </code></pre>
@@ -494,6 +496,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
           // target, if specified
           link.setAttribute("target", "_blank");
           if (link.getAttribute("rel") === null) {
@@ -535,7 +542,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
     });
   }
   const xrefs = window.document.querySelectorAll('a.quarto-xref');
@@ -813,7 +824,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   <div class="nav-page nav-page-previous">
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./calculator.html" class="pagination-link" aria-label="<span class='chapter-number'>1</span>&nbsp; <span class='chapter-title'>Julia as a calculator</span>">
+      <a href="./calculator.html" class="pagination-link" aria-label="Julia as a calculator">
         <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Julia as a calculator</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
