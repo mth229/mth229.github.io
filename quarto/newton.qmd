@@ -1,7 +1,7 @@
 # Newton's method using julia
 
-
 {{< include _common_code.qmd >}}
+
 
 <br/>
 A notebook for this material:
@@ -22,24 +22,24 @@ $$
 Previously we discussed the *bisection method* which applied for some continuous function $f(x)$ which changed signs between $a$ and $b$, points which bracket a zero. Not only did we need to find these bracketing points – which wasn't hard from a graph, more importantly the actual algorithm is pretty slow.
 
 
-If the function $f$ is sufficiently differentiable, then Newton's method may work to find a zero.  Unlike the bisection method which is slow but guaranteed to find a root by the intermediate value theorem, Newton's method is fast (once it is close) but has no such guarantee of converging. In this project, we'll see how to implement the algorithm, try some examples, and then look at what can go wrong.
+If the function $f$ is sufficiently differentiable, then Newton's method may work to find a zero.  Unlike the bisection method which is slow but guaranteed to find a root by the intermediate value theorem, Newton's method is fast (once it is close) but has no such guarantee of converging. In this section, we'll see how to implement the algorithm, try some examples, and then look at what can go wrong.
 
 
 The `MTH229` package provides a function `newton` for easily performing Newton's method, utilizing a function from the `Roots` package. More usefully, we will see that `find_zero`, which we used for bisection, can also be used for root finding with an algorithm that is a bit more robust than Newton's method.
 
 
-To begin, we load `MTH229` and `Plots`. In the background this loads `Roots`:
+To begin, we load `MTH229` and `Plots`, in the background this loads `Roots` and its functions.
 
 
 ```{julia}
 using MTH229
 using Plots
+plotly()
 ```
 
 ```{julia}
 #| echo: false
 using QuizQuestions
-using LaTeXStrings
 ```
 
 ## Basic idea
@@ -47,8 +47,26 @@ using LaTeXStrings
 
 The idea behind Newton's method is simple – *linear approximation*. That is, most functions at any given point are well approximated by the tangent line at that point. If we have a good guess $x_n$, then we can improve this guess iteratively by replacing it with the zero, $x_{n+1}$, of the tangent line at $(x_n, f(x_n))$.
 
+```{julia}
+#| echo: false
+#| fig-cap: Newton, one step
+#| fig-alt: One step of Newton's method
+#![Newton, one step](figures/newton/newton-one-step.png){fig-alt="One step of Newton's method"}
 
-![Newton, one step](figures/newton/newton-one-step.png)
+f(x) = log(x)
+a,b = 1/2, 2
+plot(f, a, b; legend=false, linewidth=2, ticks=false)
+plot!(zero)
+
+x1 = 0.6
+x2 = x1 - f(x1)/f'(x1)
+plot!([x1, x1, x2], [0,f(x1), 0], linestyle=:dash)
+scatter!([x1], [f(x1)])
+annotate!([(x1, 0, text("xᵢ",:bottom)), (x2, 0,  text("xᵢ₊₁",:bottom)),
+           (x1, f(x1), text("(xᵢ, f(xᵢ))",:left)),
+            (1,0, text("xᵅ", :top))])
+```
+
 
 
 A simple picture shows that we have a triangle with base $x_{n+1} - x_{n}$, rise $0 - f(x_n)$ and slope $f'(x_n)$, using the "rise over run" formula:
@@ -92,6 +110,7 @@ A quick graph shows a root near 2:
 
 
 ```{julia}
+#| fig-alt: plot of polynomial
 f(x) = x^3 - 2x - 5
 plot(f, -3, 3)
 ```
@@ -102,7 +121,9 @@ Here we improve the estimate for the root near 2 using Newton's method. We will 
 ```{julia}
 fp(x) = 3x^2 - 2
 x = 2				# starting value, x_0
+
 x = x - f(x)/fp(x)		# new value, x_1
+
 x, f(x)
 ```
 
@@ -110,6 +131,7 @@ We can visualize our progress as follows, noting that `x` holds $x_1$, and zoomi
 
 
 ```{julia}
+#| fig-alt: plot of  function and steps in algorithm
 x0, x1 = 2, x
 plot(f, 1, 3, legend=false)
 plot!([x0, x0, x1], [0, f(x0), 0])  # why these values?
@@ -179,6 +201,7 @@ The above approach – basically repeating steps – can be tedious. There will 
 ```{julia}
 f(x) = x^3 - 2x - 5
 x = 2
+
 x = x - f(x)/f'(x)
 x = x - f(x)/f'(x)
 x = x - f(x)/f'(x)
@@ -519,8 +542,9 @@ The following graph suggests, perhaps, there may be $3$ zeros, one near $9$, one
 
 
 ```{julia}
+#| fig-alt: plot of exp(x) - x^4
 f(x) = exp(x) - x^4
-plot(f, -5,9)
+plot(f, -5, 9)
 ```
 
 We can improve these guesses with
@@ -529,6 +553,9 @@ We can improve these guesses with
 ```{julia}
 find_zero(f, 9), find_zero(f, 2), find_zero(f, -1)
 ```
+
+::: {.callout-note}
+## Avoiding repetition
 
 The above can be written without repeating `find_zero` by using a comprehension:
 
@@ -544,8 +571,7 @@ Or even more compactly, using the broadcast notation:
 find_zero.(f, [-1, 2, 9])
 ```
 
----
-
+:::
 
 As another illustration, let $f(x) = \cos^2(x^2)$ on $[-1,2]$. Find all the zeros of the derivative of $f(x)$.
 
@@ -554,6 +580,7 @@ We graph the derivative to identify starting points:
 
 
 ```{julia}
+#| fig-alt: plot of cos(x^2)^2
 f(x) = cos(x^2)^2
 plot(f', -1, 2)
 ```
@@ -572,15 +599,6 @@ The function values at these points can be found with
 f.(xs)               # or map(f, xs) or [f(x) for x in xs]
 ```
 
-##### find_zeros
-
-
-For such tasks, `find_zeros` also works well. This function looks for all zeros in the interval `[a,b]`:
-
-
-```{julia}
-find_zeros(f, -1, 2)
-```
 
 ### Practice
 
@@ -622,6 +640,7 @@ We graph the function to see, using a smallish interval at first:
 
 
 ```{julia}
+#| fig-alt: plot of x^x - 2
 f(x) = x^x - 2
 plot(f, 0, 2)
 plot!(zero)
@@ -729,8 +748,14 @@ newton(f, fp, 2pi, verbose=true)
 
 Though `julia` makes this happen fast, it will take more than  20 steps before converging and the answer is no where near the guess. This trace might show why
 
-
-![Newton, way off](figures/newton/newton-way-off.png)
+```{julia}
+#| echo: false
+#| fig-cap: Newton, way off
+#| fig-alt: Newton's method can converge slowly for poor initial gueses
+#![Newton, way off](figures/newton/newton-way-off.png){fig-alt="Newton's method can converge slowly for poor initial gueses"}
+f(x) = sin(x) - x/4
+newton_vis(f, 2pi, steps=20)
+```
 
 
 #### Question
@@ -784,8 +809,24 @@ Still an issue. Why?
 
 Despite all our care with the derivative, the method did not converge in $200$ steps. Can you see why from this trace?
 
+```{julia}
+#| echo: false
+#| fig-cap: Newton's method with the cube-root function
+#| fig-alt: Newton's method with the cube-root function
+#![Newton, cubic](figures/newton/newton-cubic.png){fig-alt="Newton's method may not converge"}
 
-![Newton, cubic](figures/newton/newton-cubic.png)
+compose(f, n) = n <= 0 ? identity : f ∘ compose(f, n-1)
+ss = "₁₂₃₄₅₆₇₈₉"
+
+f(x) = cbrt(x)
+nm(x) =  x - f(x)/f'(x)
+x1 = 1
+xs = [compose(nm,i)(x1) for i ∈ 0:5]
+
+newton_vis(cbrt, x1, steps=5)
+scatter!(xs, 0 .* xs)
+annotate!([(xᵢ, 0, text("x$(ss[1 + 3(i-1)])",:top)) for (i,xᵢ) ∈ enumerate(xs)])
+```
 
 ```{julia}
 #| echo: false
@@ -847,10 +888,10 @@ The function `f(x) = atan(x)` is a strictly increasing function with one zero, $
 ```{julia}
 #| echo: false
 choices = [
-    L"For each of $1$, $2$ and $\pi$",
-    L"For $1$ and $2$ but not $\pi$",
-    L"For $1$ but not $2$ or $\pi$",
-    L"For none of  $1$, $2$ and $\pi$" ]
+    raw"For each of ``1``, ``2`` and ``\pi``",
+    raw"For ``1`` and ``2`` but not ``\pi``",
+    raw"For ``1`` but not ``2`` or ``\pi``",
+    raw"For none of  ``1``, ``2`` and ``\pi``" ]
 answer = 3
 radioq(choices, answer, keep_order=true)
 ```
@@ -870,9 +911,9 @@ Newton's method. What are the terms in the series produced?
 ```{julia}
 #| echo: false
 choices = [
-    L"1, -2, -4,  ...",
-    L"-1.0, 1.0, -1.0, ...",
-    L"-1.0, 0.6666666666666667, -0.2850952524822228, ..."
+    raw"``1, -2, -4,  \dots``",
+    raw"``-1.0, 1.0, -1.0, \dots``",
+    raw"``-1.0, 0.6666666666666667, -0.2850952524822228, \dots``"
 ];
 answer = 2;
 radioq(choices, answer)
@@ -903,6 +944,7 @@ To see what happens when using Newton's method, lets start at $x=2$
 
 ```{julia}
 x = 2
+
 x = x - f(x)/fp(x)
 x = x - f(x)/fp(x)
 x = x - f(x)/fp(x)
@@ -915,10 +957,36 @@ Try again with $x=3.0$ What sequence do you get:
 ```{julia}
 #| echo: false
 choices =
-    [L"3, -3.0, 3.0, -3.0, ...",
-     L"2, -2.0, 2.0, -2.0",
-     L"3, 2.0, 1.0, 0.0, -1.0, ..."
+    [raw"``3, -3.0, 3.0, -3.0, \dots``",
+     raw"``2, -2.0, 2.0, -2.0``",
+     raw"``3, 2.0, 1.0, 0.0, -1.0, \dots``"
      ];
 answer = 1;
 radioq(choices, answer)
 ```
+
+
+----
+
+
+::: {.callout-note collapse="true"}
+## Environment of `Julia` when generated
+
+```{julia}
+dollars = get(ENV, "QQ_LaTeX_dollar_delimiters", "false")
+```
+
+`Julia` version:
+
+```{julia}
+VERSION
+```
+
+Packages and versions:
+
+```{julia}
+using Pkg
+Pkg.status()
+```
+
+:::

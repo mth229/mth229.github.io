@@ -19,12 +19,13 @@ We see in this section how to easily create functions in `Julia`. In the followi
 For basic things creating a new function and plotting it is as familiar as this:
 
 
-We begin by loading some packages:
+We begin by loading some packages:^[Packages are a means to extend base `Julia`. There are thousands of add-on packages for `Julia`, but thees notes basically use just the two here, which rely of a handful of other add-on packages.]
 
 
 ```{julia}
 using MTH229
 using Plots
+plotly()
 ```
 
 ```{julia}
@@ -36,6 +37,7 @@ Then we define a function and plot it:
 
 
 ```{julia}
+#| fig-alt: plot of sin(3x^2 - 2x^3) over (0, pi)
 f(x) = sin(3x^2 - 2x^3)
 plot(f, 0, pi)
 ```
@@ -119,14 +121,21 @@ g(2)
 The convention is that when variables are immediately preceded by a numeric literal (and by immediately it is meant no spaces are in between) `Julia` will assume multiplication is intended. (This can bypass the usual order of operations, e.g.  `5/9(x-32)` is not `5/9*(x-32)`.)
 
 
-This can also be used when simple parentheses are involved:
+Implicit multiplication can also be used when simple parentheses are involved:
 
 
 ```{julia}
 k(x) = 2(x - 1)^2 + 3(x+1)
 ```
 
-But won't work with expressions such as `(x+1)(x-1)`, as `Julia` will then think the first parenthetical pair is a function and try to call it with a value of `x-1`.
+But implicit multiplication won't work with expressions such as `(x+1)(x-1)`, as `Julia` will then think the first parenthetical pair is a function and try to call it with a value of `x-1`.
+
+:::{.callout-note}
+## Implicit multiplication is not recommended
+
+Because of certain idiosyncracies with order of precedence we don't recommend the use of implicit multiplication.
+
+:::
 
 
 #### Example: Equations versus functions
@@ -163,6 +172,8 @@ f(72)				## room temperature
 ```
 
 will create a function which is called with a value of `x` at a later time. So the value of `x` defined when the function is created is not important here (as `x` is passed in as an argument).
+
+These notes almost always use functions not expressions, so becoming familiar with functions is necessary.
 
 
 ### Rational functions
@@ -211,7 +222,7 @@ For the fractional power, this shows the required parentheses around `(1/4)` to 
 ## Common functions
 
 
-Of course `Julia` has readily available all the usual built-in functions found on a scientific calculator, and many more. See the section on [mathematical operations and functions](https://docs.julialang.org/en/latest/manual/mathematical-operations/) of the official `Julia` documentation. In the following, we show how to translate some basic math functions into `Julia` functions:
+Of course `Julia` has readily available all the usual built-in functions found on a scientific calculator, and many more. See the section on [mathematical operations and functions](https://docs.julialang.org/en/v1/manual/mathematical-operations/#Arithmetic-Operators) of the official `Julia` documentation. In the following, we show how to translate some basic math functions into `Julia` functions:
 
 
 ### Trigonometric functions
@@ -234,8 +245,8 @@ The conversion from the commonly written form ($\sin^2(x)$) to the far less ambi
 
 :::
 
----
-
+:::{.callout-note}
+## Degrees, not radians
 
 If you want to work in degrees you can do so with the degree-based trigonometric functions, which follow the same naming pattern save a trailing "d":
 
@@ -243,6 +254,10 @@ If you want to work in degrees you can do so with the degree-based trigonometric
 ```{julia}
 fd(x) = cosd(x) - sind(x)^2
 ```
+
+This is not used in the following, rather, when needed converting from degrees to radians through multiplication by `pi/180` is. (There is also `deg2rad`.)
+:::
+
 
 ### Inverse trigonometric functions
 
@@ -329,7 +344,7 @@ can be done through:
 f(x) = log(10, 1 + x)
 ```
 
-where the *first* argument expresses the base.  For convenience, `Julia` also gives the functions `log10` and `log2` for base 10 and 2 respectively.
+where the *first* argument expresses the base.  For convenience, `Julia` also gives the functions `log10` and `log2` for base $10$ and $2$ respectively.
 
 
 ## Algebra of functions
@@ -602,10 +617,11 @@ A quick plot will show why the above function is called a "hockey stick" functio
 
 
 ```{julia}
+#| fig-alt: plot of cell phone
 plot(cell_phone, 0, 1000)
 ```
 
-When functions that have different rules based on the specific value of $x$ that is input, the  use "cases" notation is common. For example,
+When functions that have different rules based on the specific value of $x$ that is input, the  use of "cases" notation is common. For example,
 
 
 $$
@@ -776,7 +792,7 @@ There are many, and likely more to be added as the language matures.
 `Julia`'s multiple dispatch allows multiple functions with the same name. The function that gets selected depends on the arguments given to the function. We can exploit this to simplify our tasks. For example, consider this optimization problem:
 
 
-> For all rectangles of perimeter 20, what is the one with largest area?
+> For all rectangles of perimeter $20$, what is the one with largest area?
 
 
 
@@ -790,11 +806,11 @@ Representing the area of a rectangle in terms of two variables is easy:
 Area(w, h) = w * h
 ```
 
-But the other fact about this problem – that the perimeter is 20 – means that height depends on width. For this question, we can see that $P=2w + 2h$ so that
+But the other fact about this problem – that the perimeter is $20$ – means that height depends on width. For this question, we can see that $P=2w + 2h$ so that
 
 
 ```{julia}
-h(w) = (20  - 2*w)/2
+h(w) = (20  - 2 * w)/2
 ```
 
 By hand we would substitute this last expression into that for the area (to get $A=w\cdot (20-2 \cdot w)/2 = -w^2 + 10$) and simplify. However, within `Julia` we can let composition do the substitution and leave algebraic simplification for `Julia` to do:
@@ -811,31 +827,42 @@ For example, the `plot` function expects functions of a single numeric variable.
 
 
 ```{julia}
+#| fig-alt: plot of area
 plot(Area, 0, 10)
 ```
 
 From this, we can see that that the width yielding the maximum area is $w=5$, and so $h=5$ as well.
 
+### Functions with parameters
 
-## Functions with parameters
+A common use of multiple arguments in the `Julia` ecosystem is to use functions with the signature `f(x,p)` where the second argument is for a parameter (or parameters, when a container of values is passed).
+
+The following use sets a *default* value for the parameter so it may or may note be specified:
+
+```{julia}
+f(x, p=1) = cos(x) - p * x
+```
+
+It isn't shown now, but this pattern can be used to solve for when $f(x,p) = 0$ for various choices of $p$ quite directly.
+
+## Keyword arguments
+
+Keyword arguments are widely used when plotting with `Julia` as they conveniently help customize specific attributes of a plot on a case-by-case basis. In the following, we see how keyword argument may also be used to specify parameters, though the pattern `f(x, p)`, as just described, is more commonly used.
 
 
-Parameters and function arguments are easily confused. We will use *keywords* for our parameters. Keywords also allow us to specify a default value. Using a keyword is as simple as specifying the desired argument with `key=value`.
 
-
-A simple case is a function which computes the $y$ value on a line $y=mx+b$ from a given $x$ value. Here $m$ and $b$ are parameters. We will give them a default of $1$ and $0$:
+We consider a simple case -- a function which computes the $y$ value on a line $y=mx+b$ from a given $x$ value. Here $m$ and $b$ are parameters. We will give them a default of $1$ and $0$:
 
 
 ```{julia}
 mxplusb(x; m=1, b=0) = m*x + b
 ```
 
-The syntax is to use a semicolon  to separate regular arguments from those with keywords. This is not needed when calling the function:
-
+The syntax is to use a semicolon  to separate regular arguments from those with keywords. This semicolon is not needed when calling the function; a comma may be used:
 
 ```{julia}
 mxplusb(2)				## 1*2 + 0, using defaults
-mxplusb(2, m=2, b=3)		        ## 2*2 + 3, using passed in values
+mxplusb(2, m=2, b=3)	## 2*2 + 3, using passed in values
 ```
 
 For a more complicated example, we revisit this function
@@ -873,7 +900,7 @@ g(50, theta=pi/8)		## smaller in this case.
 Passing in parameters has the big advantage of explicitly showing how `Julia` will find variables used within a function, as otherwise you need to have an understanding of the *scoping rules* in place. (Scoping rules determine where variables that are not passed in as arguments are found when referred to within a function.)
 
 
-A common pattern in the `Julia` ecosystem is to use two positional arguments to pass in the function value(s) *and* the parameter(s) (through `f(x, p)`). A container is typically used for each, but in this example we pass in `x` as a number, and use a *named* tuple container to pass the parameters. The unpacking of parameters can be done in different ways, here we just access the named fields using `Julia`'s access notation (e.g. `p.b` gets the value named `b` from the tuple):
+As mentioned, a more common pattern in the `Julia` ecosystem is to use two positional arguments to pass in the function value(s) *and* the parameter(s) (through `f(x, p)`). A container is typically used for each, but in this example we pass in `x` as a number, and use a *named* tuple container to pass the parameters. The unpacking of parameters can be done in different ways, here we just access the named fields using `Julia`'s access notation (e.g. `p.b` gets the value named `b` from the tuple):
 
 
 ```{julia}
@@ -976,7 +1003,7 @@ numericq(x[ind])
 ## Anonymous functions
 
 
-A common mathematical notation for a function that emphasizes the fact that $f$ maps $x$ to some value $y$ involving the rule of $f$ is to use an arrow as:
+A alternate mathematical notation for a function that emphasizes the fact that $f$ maps $x$ to some value $y$ involving the rule of $f$ is to use an arrow as:
 
 
 $$
@@ -990,7 +1017,7 @@ You can do the exact thing in `Julia` to create a function:
 x -> -16x^2 + 32x
 ```
 
-This expression creates a function object, but since we didn't bind it to a variable (that is, we didn't give the function a name) it will be immediately forgotten. Such functions without a name are known as *anonymous functions*.
+This expression creates a function object, but since we didn't bind it to a variable (that is, we didn't give the function a name) it was immediately forgotten. Such functions without a name are known as *anonymous functions*.
 
 
 Anonymous functions are very useful when working with functions defined by parameters as they can fix values of a parameter.
@@ -1000,6 +1027,14 @@ Anonymous functions are very useful when working with functions defined by param
 f(x, p) = cos(x) - x/p
 fn = x -> f(x, 2)  # fn fixes p=2 (a "closure")
 ```
+
+:::{.callout-note}
+## `Base.Fix1` and `Base.Fix2`
+
+The pattern of fixing a value of a function is common enough that there are also function `Base.Fix1` and `Base.Fix2`. This is a more performant means to *partially apply* the two-argument function `f` and appears often behind the scenes.
+
+:::
+
 
 ### Operators
 
@@ -1169,7 +1204,7 @@ We get a tuple back. `Julia` makes working with tuple return values very easy. W
 a, msg = f(-1)			# alternatively: (a, b) = f(-1)
 ```
 
-A less artificial example will be discussed later: the `quadgk` function which estimates the value of an integral. For this computation both the value and an estimated maximum error are of interest, so both are returned as a tuple.
+A less artificial example will be discussed later: the `quadgk` function which estimates the value of an integral. For this computation both the value and an estimated maximum error are of interest, so both are returned using a tuple.
 
 
 ### Specializing functions by argument type
@@ -1189,17 +1224,17 @@ can be specialized to just integer values with:
 binom(n::Integer, k::Integer) = factorial(n)/(factorial(n-k) * factorial(k))
 ```
 
-The extra bit `::Integer` specializes `n` and `k` so that this function only is called with both `n` and `k` are of this type.
+The extra bit `::Integer` is called a *type annotation* and specializes `n` and `k` so that this function only is called with both `n` and `k` are of this type.
 
 
-Then we can call our `binom` function as:
+As defined, we can call our `binom` function as:
 
 
 ```{julia}
-binom(10,4)
+binom(10, 4)
 ```
 
-But not as follows, as $\pi$ is not an integer:
+But not as follows ($\pi$ is not an integer):
 
 
 ```{julia}
@@ -1250,3 +1285,35 @@ Or vice versa. Basically, `Julia` has assigned a certain function type to that n
 
 
 We use the generic function approach in these notes to define our named functions, as the basic notation so closely mirrors the standard math notation.
+
+:::{.callout-note}
+## Dynamic language
+
+Julia is called a *dynamic programming language*  as variables can have their type changed. The *one* area where this is not possible is when a name is given to a generic function:
+* the name of a generic function can be re-used as a variable name (`invalid redefinition of constant ...`)
+* a variable name can be not reused as a name for a generic function (`cannot define function ...; it already has a value`)
+
+Unfortunately this can happen easily with some names being used mathematically for both. For example, $h$ may be a common function name after $f$ and $g$ but is also a name for a value, as in the expression $f(c + h)$.
+
+:::
+
+----
+
+
+::: {.callout-note collapse="true"}
+## Environment of `Julia` when generated
+
+`Julia` version:
+
+```{julia}
+VERSION
+```
+
+Packages and versions:
+
+```{julia}
+using Pkg
+Pkg.status()
+```
+
+:::

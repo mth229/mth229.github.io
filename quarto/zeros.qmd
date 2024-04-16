@@ -43,18 +43,18 @@ Conceptually this is identical to the above, as we just set $h(x) = f(x) - g(x)$
 Here we discuss a few different elementary means to do find zeros with `Julia`, leaving some others for a later time.
 
 
-We will use the add-on package `Roots`  which provides implementations of a few zero- and root-finding algorithms.
+We will use the add-on package `Roots`  which provides implementations of a few zero- and root-finding algorithms. This package is loaded when the `MTH229` package is loaded.
 
 
 ```{julia}
 using MTH229
 using Plots
+plotly()
 ```
 
 ```{julia}
 #| echo: false
 using QuizQuestions
-using LaTeXStrings
 ```
 
 ## Zeros of a polynomial
@@ -159,6 +159,7 @@ For the model without wind resistance, we can graph the function easily enough. 
 
 
 ```{julia}
+#| fig-alt: plot of j over (0,500)
 plot(j, 0, 500)
 ```
 
@@ -166,6 +167,7 @@ Well, we haven't even seen the peak yet. Plotting over a wider interval will sho
 
 
 ```{julia}
+#| fig-alt: plot of j over (0, 1250)
 plot(j, 0, 1250)
 ```
 
@@ -173,6 +175,7 @@ As for the model with wind resistance,  a quick plot over the same interval, $[0
 
 
 ```{julia}
+#| fig-alt: plot of y over (0, 1250)
 plot(y, 0, 1250)
 ```
 
@@ -192,6 +195,7 @@ We try on the reduced interval avoiding the obvious *asymptote* at `b`  by subtr
 
 
 ```{julia}
+#| fig-alt: plot of y over (0, b-1) to avoid asymptote
 plot(y, 0, b - 1)
 ```
 
@@ -199,10 +203,12 @@ Now we can see the zero is around 140. We re-plot:
 
 
 ```{julia}
+#| fig-alt: plot of y over (135, 141)
 plot(y, 135, 141)
 ```
 
 ```{julia}
+#| fig-alt: plot of y over (140, 141)
 plot(y, 140, 141)
 plot!(zero)
 ```
@@ -214,6 +220,7 @@ Finally, we plot both graphs at once to see that it was a very windy day indeed.
 
 
 ```{julia}
+#| fig-alt: plot of j and y
 b = 140.7
 plot(j , 0, 1250)
 plot!(y, 0, b)
@@ -247,6 +254,7 @@ Assuming this is a realistic problem and an average American household might pro
 
 
 ```{julia}
+#| fig-alt: plot of cell phone plans
 plot(plan1, 10, 20)
 plot!(plan2)
 ```
@@ -335,7 +343,7 @@ Let $y(x)$ be defined as above to model the flight of an arrow. Suppose a hill i
 
 
 ```{julia}
-hill(x) = x > 100 ? 2.0*(x-100) : 0.0
+hill(x) = x > 100 ? 2.0 * (x-100) : 0.0
 ```
 
 By solving `y(x) = hill(x)` solve for how far the arrow will fly before hitting the hill.
@@ -363,13 +371,23 @@ The last example had us graphically "zoom" in on a zero, and led us to an estima
 
 In particular if $f(x)$ is continuous with $f(a)$ and $f(b)$ having *different* signs then there must be a point $c$ in $[a,b]$ where $f(c) = 0$. (When $f(a)$ and $f(b)$ have different signs, we say $a$ and $b$ *bracket* a root.)  This observation is due to Bolzano.
 
+The bisection algorithm finds a zero *between* two bracketing value, as illustrated in this graphic:
+
+```{julia}
+#| fig-alt: A zero of sin is between 3 and 4
+plot(sin, 1, 5)
+plot!(zero)
+vline!([3,4])
+```
+
+The zero of the sine function at $\pi$ is clearly *between* $3$ and $4$. The bisection algorithm is a method to refine the bracketing interval so that it is as small as possible.
 
 The bisection algorithm utilizes Bolzano's observation. It is a simple *iterative* procedure for finding such a value $c$ when we have a continuous function and a bracketing interval.
 
 
 :::{.callout-note}
 ## Alert
-The bisection method does not work when the function does not **cross** the $x$ axis at the root. For example, the zero at $0$ of $f(x) = x^2 e^x$ would not be found with this method.
+The bisection method does not work when the function does not **cross** the $x$ axis at the root. For example, the zero at $0$ of $f(x) = x^2 e^x$ would not be found with this method. This is why a *bracketing* interval is needed to start the algorithm.
 
 :::
 
@@ -383,33 +401,48 @@ Graphically, we could do this. For example, Let's consider $f(x) = x^2 - 2$ with
 
 
 ```{julia}
+#| fig-alt: plot of quadratic
 f(x) = x^2 - 2
 a,b = 1, 2
-plot(f, a, b)
+plot(f, 0, 3; legend=false)
+plot!(zero)
+vline!([a, (a+b)/2, b])  # add vertical lines at a, b and midway
 ```
 
 We can see that $c = (a + b)/2 = 3/2$ will have $f(c) > 0$, so the new bracket is $[a,c]$:
 
 
 ```{julia}
+#| fig-alt: plot of quadratic after narrowing
 a, b = a, (a + b)/2
-plot(f, a, b)
+
+plot(f, a, b; legend=false)
+plot!(zero)
+vline!([(a+b)/2])
 ```
 
-Now the midpoint is negative, so we modify `a`:
+Now the function value at the midpoint is negative, so we modify `a`:
 
 
 ```{julia}
+#| fig-alt: plot of quadratic after narrowing
 a, b = (a + b)/2, b
-plot(f, a, b)
+
+plot(f, a, b; legend=false)
+plot!(zero)
+vline!([(a+b)/2])
 ```
 
-And again, this has a midpoint in the negative territory so again we modify `a`:
+And again, this has a function value at the midpoint in the negative territory so again we modify `a`:
 
 
 ```{julia}
+#| fig-alt: plot of quadratic after narrowing
 a, b = (a + b)/2, b
-plot(f, a, b)
+
+plot(f, a, b; legend=false)
+plot!(zero)
+vline!([(a+b)/2])
 ```
 
 And now, as the midpoint is in positive territory we would modify $b$ ...
@@ -429,7 +462,7 @@ if f(a) * f(c) < 0
 else
   a, b = c, b
 end
-a,b
+a, b
 ```
 
 Though some check if `f(c) == 0` is also needed.
@@ -441,7 +474,7 @@ Here $c=1.5$ and the new interval is $[1.0, 1.5]$, as we had graphically. We jus
 It seems as though we could be here all day. Indeed, if doing this by hand it might take up quite a bit of time. We should automate this. Before automating this, we need to think: *when would we stop?*
 
 
-Mathematically we can keep taking halves using the concept of a limit. See for example [Zeno's paradox](http://en.wikipedia.org/wiki/Zenos_paradoxes). On a computer we don't have such a luxury. In fact, for floating point numbers we couldn't keep taking halves – even if we wanted – as ultimately we should expect tp get `a` and `b` being floating point values that are next to each other – and hence there is no midpoint. (Well, there are some cases that suggest a more careful numeric approach to the above.)
+Mathematically we can keep taking halves using the concept of a limit. See for example [Zeno's paradox](http://en.wikipedia.org/wiki/Zenos_paradoxes). On a computer we don't have such a luxury. In fact, for floating point numbers we couldn't keep taking halves – even if we wanted – as ultimately we should expect to get `a` and `b` being floating point values that are next to each other – and hence there is no midpoint. (Well, there are some cases that suggest a more careful numeric approach to the above.)
 
 
 So even though this doesn't make mathematical sense we can try stopping when the following condition is no longer true:
@@ -457,7 +490,7 @@ A `while` loop is used to repeat the central step until the above (or some varia
 The `MTH229` package has a `bisection` method implemented for this which also outputs a graphical indication of the first few steps taken.
 
 
-Okay, let's look at the function $f(x) = -16x^2 + 32x$. We know that 0 and $2$ are roots. Let's see if our algorithm finds them:
+Okay, let's look at the function $f(x) = -16x^2 + 32x$. We know that $0$ and $2$ are roots. Let's see if our algorithm finds them:
 
 
 ```{julia}
@@ -498,17 +531,53 @@ floating point value just a bit bigger. We can't realistically expect
 to get any closer than that, as there are no machine numbers in between these two.
 
 
-### The Roots package and find_zero
+#### Question
 
+Plot `airyai` over `[-3,3]`. Which of the following is a *bracketing* interval?
 
-The bisection method, while easy to describe and understand, can be made a bit more efficient. The `find_zero` function from the `Roots` package does so. This package is loaded when `MTH229` is. This function uses a tuple to specify the bracketing interval. but does not need to typed in.
+```{julia}
+#| echo: false
+choices = ["[$i, $(i+1)]" for in -3:2]
+answer = 1
+radioq(choices, answer)
+```
 
+#### Question
 
-For example, to find a root of $f(x) = 2x \cdot \exp(-20) - 2 \cdot \exp(-20x) + 1$ in the interval $[0,1]$ we have:
+Let $f(x) = e^x - x^4$ which of these intervals is a *bracketing interval* for a zero of $f$?
+
+```{julia}
+#| echo: false
+choices = ["[$i, $(i+1)]" for i in 0:4]
+answer = 2
+radioq(choices, answer)
+```
+
+#### Question
+
+Let $f(x) = 1/2 + \sin(3x) + \sin(7x)$. Which of these is a *bracketing interval$?
 
 
 ```{julia}
-using Roots
+#| echo: false
+choices = ["[$i, $(i+1)]" for i in -2:0]
+answer = 2
+radioq(choices, answer)
+```
+
+
+
+
+## The Roots package and find_zero
+
+
+The bisection method, while easy to describe and understand, can be made a bit more efficient. The `find_zero` function from the `Roots` package does so. This package is loaded when `MTH229` is. This function uses a tuple to specify the bracketing interval.
+
+
+For example, to find a zero of $f(x) = 2x \cdot \exp(-20) - 2 \cdot \exp(-20x) + 1$ in the *bracketing* interval $[0,1]$ we have:
+
+
+```{julia}
 f(x) = 2x * exp(-20) - 2 * exp(-20x) + 1
 find_zero(f, (0, 1))
 ```
@@ -523,13 +592,13 @@ A slightly different interface is given by the `fzero` function, where that abov
 fzero(f, 0, 1)
 ```
 
-##### Example: Graphical and numerical answers
+### Example: Graphical and numerical answers
 
 
 One needs to know where to look in order to use the bisection method. The basic "one-two punch" is:
 
 
-  * graph the function to identify quickly values $[a,b]$ which bound a zero, then
+  * graph the function to identify bracketing values for which the zero is *between$ $a$ and $b$. These need not be very precise, indeed can even be infinite.
   * use the bisection method to find the zero to many decimal points.
 
 
@@ -543,6 +612,7 @@ A quick plot shows that the function has such a wide range that looking over the
 
 
 ```{julia}
+#| fig-alt: plot of exp(x) = x^4
 f(x) = exp(x) - x^4
 plot(f, 0, 10)
 ```
@@ -551,6 +621,7 @@ Instead, we look between $[0,3]$ and $[8,9]$. A quick confirmation shows these a
 
 
 ```{julia}
+#| fig-alt: plot of exp(x) - x^4 over (8,9)
 plot(f, 8, 9)
 ```
 
@@ -572,13 +643,20 @@ find_zero(f, (0, 3))
 
 There are two reasonable means to solve $f(x) = c$ for $x$ when $c$ is non-zero. As above, we can define a new function $h(x) = f(x) - c$. Then when $h(x)$ is $0$ we will have $f(x)$ equal to c.
 
-Alternatively, we can pass in $c$ as a parameter by defining a two-argument version of $f$.
+Alternatively, we can pass in $c$ as a parameter by defining a two-argument version of $f.$
 
 Suppose we aim to find when $\tan(x) = c$ for $c > 0$.
 For any $c > 0$, say $c = 1.23$, we can see from the shape of the graph of $\tan(x)$ that there is one intersection point between $0$ and $\pi/2$.
 
 
-We have the `h(x) = f(x) - g(x)` approach:
+The easiest way is to create a simple function:
+
+```{julia}
+h(x) = tan(x) - 1.23
+find_zero(h, (0, pi/2))
+```
+
+We can be more formal (as it is a more general pattern) and use two functions to define the problem:
 
 ```{julia}
 f(x) = tan(x)
@@ -593,15 +671,16 @@ We compare with the arc tangent, as there is a built-in function to do this part
 atan(1.23)
 ```
 
+----
 
-The alternate form is to define our function with a *parameter*:
+An alternate approach is to define our function with a *parameter*:
 
 ```{julia}
 f(x, p) = tan(x) - p
 ```
 
-We can then pass values for `p` to `find_zero` to solve:[^1]
-[^1]: We used a keyword argument in the example code, the last positional argument can also be used, which is useful for broadcasting, were we interested in find solutions for multiple values of the paramter.
+We can then pass values for `p` to `find_zero` to `solve`:^[
+We use a keyword argument in the example code, the last positional argument can also be used, which is useful for broadcasting, were we interested in finding solutions for multiple values of the parameter.]
 
 ```{julia}
 find_zero(f, (0, pi/2); p=1.23)
@@ -610,7 +689,51 @@ find_zero(f, (0, pi/2); p=1.23)
 
 For this problem, the two approaches are about equal in effort. The first style lends itself to more complicated expressions on both sides of the equals sign, the second is useful when more than one value for $p$ is to be sought.
 
+### Example: Solving $f(x) = g(x)$
 
+The `find_zero` function finds a value solving $f(x) = 0$. When the question involves two function, e.g. $f(x) = g(x)$ it can't be immediately used. However, forming an auxiliary function $h(x) = f(x) - g(x)$ works as solutions to $h(x) = 0$ satisfy $f(x) = g(x)$.
+
+For example, identifying when $\cos(x) = 2x$ may be of interest. By simple geometry, the line through zero with positive slope will intersect the cosine somewhere in $[0, \pi/2]$:
+
+We can do this with the following approach:
+
+```{julia}
+f(x) = cos(x)
+g(x) = 2x
+h(x) = f(x) - g(x)
+
+find_zero(h, (0, pi/2))
+```
+
+More generally, we might be interested in solving $\cos(x) - px$ for different $p > 0$. The parameter approach can be readily used:
+
+```{julia}
+h(x, p) = cos(x) - p * x
+find_zero(h, (0, pi/2); p = 2)
+```
+
+#### Example
+
+The `secant(f, a, b)` function returns a *function* representing the secant line between $(a, f(a))$ and $(b, f(b))$. In the following we see where the secant line between $1$ and $2$ intersects that between $-2$ and $-1$ for $f(x) = e^x$.
+
+Graphically, we have
+
+```{julia}
+f(x) = exp(x)
+plot(f, -2.1, 2.1; legend=false, ylims=(0, 10))
+plot!(secant(f, 1, 2))
+plot!(secant(f, -2, -1))
+```
+
+The intersection point near $0.5$ is clear. In the following we show how an infinite bracketing interval is possible. As two non-parallel lines intersect in one point, any open interval containing the intersection point will be a bracketing interval. The bisection algorithm of `find_zero` handles without fuss any signed value, even infinite ones (though does stop if it encounters a `NaN` value).
+
+```{julia}
+f(x) = exp(x)
+h(x) = secant(f, 1, 2)(x) - secant(f, -2, -1)(x)
+find_zero(h, (-Inf, Inf))
+```
+
+The above follows the pattern of using `h(x)= f(x) - g(x)` to solve $f(x) = g(x)$. But the two functions have a somewhat awkward syntax. The `secant(f, 1,2)` call returns a function, so `secant(f, 1, 2)(x)` is used to call that function at `x`.
 
 ### Problems
 
@@ -673,7 +796,7 @@ numericq(val, 1e-8)
 #### Question: what goes up must come down...
 
 
-![Up and down](http://ej.iop.org/images/0143-0807/33/1/149/Full/ejp405251f1_online.jpg)
+![Up and down](https://www.researchgate.net/figure/A-1684-example-typical-of-those-prior-to-1700-showing-the-trajectories-of-cannon-fire-in_fig1_230963032)
 
 
 In 1638, according to [Amir D. Aczel](http://books.google.com/books?id=kvGt2OlUnQ4C&pg=PA28&lpg=PA28&dq=mersenne+cannon+ball+tests&source=bl&ots=wEUd7e0jFk&sig=LpFuPoUvODzJdaoug4CJsIGZZHw&hl=en&sa=X&ei=KUGcU6OAKJCfyASnioCoBA&ved=0CCEQ6AEwAA#v=onepage&q=mersenne%20cannon%20ball%20tests&f=false), an experiment was performed in the French Countryside. A monk, Marin Mersenne, launched a cannonball straight up into the air in an attempt to help Descartes prove facts about the rotation of the earth. Though the experiment was not successful, Mersenne later observed that the time for the cannonball to go up was greater than the time to come down. [According to "Vertical Projection in a Resisting Medium: Reflections on Observations of Mersenne ".](http://www.maa.org/publications/periodicals/american-mathematical-monthly/american-mathematical-monthly-contents-junejuly-2014)
@@ -687,9 +810,9 @@ Let $v_0= 390$. The three times in question can be found from the zeros of `f` a
 
 ```{julia}
 #| echo: false
-choices = [L"(0.0, 12.1875, 24.375)",
-	L"(-4.9731, 0.0, 4.9731)",
-	L"(0.0, 625.0, 1250.0)"]
+choices = ["``(0.0, 12.1875, 24.375)``",
+	       "``(-4.9731, 0.0, 4.9731)``",
+	       "``(0.0, 625.0, 1250.0)``"]
 answer = 1
 radioq(choices, answer)
 ```
@@ -722,39 +845,12 @@ Now find the three times: $t_0$, the starting time; $t_a$, the time at the apex 
 t0 = 0.0
 tf = find_zero(h, (10, 20))
 ta = find_zero(D(h), (t0, tf))
-choices = [L"(0, 13.187, 30.0)",
-	L"(0, 32.0, 390.0)",
-	L"(0, 2.579, 13.187)"]
+choices = ["``(0, 13.187, 30.0)``",
+	       "``(0, 32.0, 390.0)``",
+	       "``(0, 2.579, 13.187)``"]
 answer = 3
 radioq(choices, answer)
 ```
-
-## The `find_zeros` function
-
-
-So, `find_zero` finds one value within a bracket. But this suggests a means to find all (most?) of the zeros within an interval – split the interval up into many pieces; identify those that bracket a zero; use `find_zero` on those intervals; accumulate the results.
-
-
-This is basically implemented in the `find_zeros(f, a, b)` function. So, to find the zeros of $e^x - x^4$ over $[-10, 10]$ we have:
-
-
-```{julia}
-f(x) = exp(x) - x^4
-find_zeros(f, -10, 10)
-```
-
-The above description will only work for zeros which cross the $x$ axis, but `find_zeros` tries a bit more. So, it will find the zero of $f(x) = x^2 \cdot e^x$:
-
-
-```{julia}
-f(x) = x^2 * exp(x)
-find_zeros(f, -1, 1)
-```
-
-That being said, `find_zeros` can miss zeros, so a graph is always suggested to verify the zeros are exhausted.
-
-
-The `fzeros` function is an alternate name for `find_zeros`.
 
 
 ## Polynomials of higher degrees
@@ -919,6 +1015,27 @@ If $f(x) = x^5 - x +1$ we have $g(x) = -x^5 +x + 1$ (just change the signs of th
 
 ```{julia}
 #| echo: false
-val = fzeros(x -> x^5 - x +1, -5, 5)[1]
+val = find_zeros(x -> x^5 - x +1, (-5, 5))[1]
 numericq(val, 1e-2)
 ```
+
+----
+
+
+::: {.callout-note collapse="true"}
+## Environment of `Julia` when generated
+
+`Julia` version:
+
+```{julia}
+VERSION
+```
+
+Packages and versions:
+
+```{julia}
+using Pkg
+Pkg.status()
+```
+
+:::

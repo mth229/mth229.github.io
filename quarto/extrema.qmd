@@ -65,8 +65,34 @@ The simplest way to investigate the maximum or minimum value of a function over 
 
 We begin with the question of which rectangles of perimeter 20 have the largest area? The figure shows a few different rectangles with this perimeter and their respective areas.
 
+```{julia}
+#| echo: false
+#| fig-alt: "Rectangles with fixed perimeter, which has maximal area?"
 
-![Rectangles](figures/extrema/extrema-rectangles.png)
+# ![Rectangles](figures/extrema/extrema-rectangles.png){fig-alt="Rectangles with fixed perimeter, which has maximal area?"}
+
+xlims = (-2, 2)
+cps = find_zeros(g', (-2,2))
+
+xlims = (0,10)
+ylims = (0, 10)
+p = plot(;xlims = xlims, ylims=ylims,
+         legend=false,
+         aspect_ratio=:equal, axis=([], false))
+
+plot_square = (a,α,col) -> begin
+    b = (20-2a)/2
+    plot!([0,a,a,0,0], [0,0, b, b, 0];
+          line = (2,α, col))
+    annotate!([(a+1/4,b+1/2, "A = $(a*b)")])
+end
+
+plot_square(8,0.5,:red)
+plot_square(6,0.4,:blue)
+    plot_square(4.5,0.3,:green)
+plot_square(2.5,0.2,:brown)
+```
+
 
 
 The basic mathematical approach is to find a function of a single variable to maximize or minimize. In this case we have two variables describing a rectangle: a base $b$ and height $h$. Our formulas are:
@@ -88,15 +114,16 @@ This is exactly the form needed to apply our theorem about the existence of extr
 ```{julia}
 using MTH229
 using Plots
+plotly()
 ```
 
 ```{julia}
 #| echo: false
 using QuizQuestions
-using LaTeXStrings
 ```
 
 ```{julia}
+#| fig-alt: plot of b*(10-b)
 A(b) = b * (10 - b)
 plot(A, 0, 10)
 ```
@@ -155,10 +182,31 @@ Let a "Norman" window consist of a rectangular window of top length $x$ and side
 # \\ text(0, -4, "x", pos=1)
 # \\ ```
 # </script>
+
+##![Norman window](figures/extrema/extrema-norman.png){fig-alt="A Norman window has a half circle above a rectangle"}
+
 nothing
 ```
 
-![Norman window](figures/extrema/extrema-norman.png)
+```{julia}
+#| echo: false
+#| fig-alt: "A Norman window has a half circle above a rectangle"
+p = plot(; xlims=(-1.1, 1.1), ylims=(-0.2, 3.5), legend=false,
+         aspect_ratio=:equal, axis=([], false))
+
+plot!([-1,-1,1,1], [2,0,0,2]; linecolor=:black)
+ts = range(0, pi, length=100)
+plot!(cos.(ts), 2 .+ sin.(ts); linecolor=:black)
+
+plot!([-1,1], [2,2]; linecolor=:black, linestyle=:dash)
+plot!([0,cos(pi/4)],[2, 2 + sin(pi/4)]; linecolor=:black)
+
+annotate!([
+    (0, -0.1, text("x", :bottom)),
+    (1.1, 1, "y"),
+    (0.6, 2 + 0.4*sin(pi/4), text("x/2", :bottom))
+])
+```
 
 
 Then we have two equations.
@@ -209,6 +257,7 @@ We begin by simply graphing and estimating the values of the maximum and where i
 
 
 ```{julia}
+#| fig-alt: plot of A(x) over possible x values
 plot(A, 0, 20/(1+pi/2))
 ```
 
@@ -219,6 +268,7 @@ As reading the maximum from the graph is more difficult than reading a $0$ of a 
 
 
 ```{julia}
+#| fig-alt: plot of derivative
 plot(A', 5.5, 5.7)     # uses A' notation defined in MTH229
 ```
 
@@ -299,8 +349,35 @@ A ladder is to be moved through a two-dimensional hallway which has a bend and g
 nothing
 ```
 
-![Ladder](figures/extrema/extrema-ladder.png)
 
+```{julia}
+#| echo: false
+#| fig-alt: "Ladder problems are common, here we see how to navigate a corner"
+
+θ = pi/5
+a, b = 5, 8
+Δ = 0.3
+grey = RGBA(.5, .5, .5, 0.5)
+xlims = (0, a + b/tan(θ))
+ylims = (0, b + a*tan(θ))
+p = plot(;xlims = xlims, ylims=ylims,
+         legend=false,
+         aspect_ratio=:equal, axis=([], false))
+
+vline!([0], linecolor=grey)
+hline!([0], linecolor=grey)
+plot!([a,a], [0,b]; linecolor=grey)
+plot!([a,a], [b, last(ylims)]; linecolor=grey, linestyle=:dash)
+plot!([0,a], [b,b]; linecolor=grey)
+plot!([a, last(xlims)], [b,b];linecolor=grey, linestyle=:dash)
+plot!([last(xlims), 0], [0, last(ylims)]; linewidth=3)
+annotate!([(a+Δ, b/2, text("8")),
+           (a + b*tan(θ) - 3Δ, b/2, text("l₁")),
+           (a/2, b-Δ, text("5")),
+           (a/2, b + a/2*tan(θ) - 2Δ, "l₂"),
+           (last(xlims)-4Δ, 0 + 3Δ/2, text("θ"))
+           ])
+```
 
 We approach this problem in reverse. It is easy to see when a ladder is too long. It gets stuck at some angle $\theta$. So for each $\theta$ we find that ladder length that is just too long. Then we find the minimum length of all these ladders that are too long. If a ladder is this length or more it will get stuck for some angle. However, if it is less than this length it will not get stuck. So to maximize a ladder length, we minimize a different function. Neat.
 
@@ -329,6 +406,7 @@ This is not a continuous function on a closed interval – it is undefined at th
 
 
 ```{julia}
+#| fig-alt: plot of maximum possible ladder length per angle
 delta = 0.2
 plot(l, delta, pi/2 - delta)
 ```
@@ -400,8 +478,33 @@ numericq(val, 1e-3)
 A movie screen projects on a wall 20 feet high beginning 10 feet above the floor. What value of $x$ gives the largest angle $\theta?$ (Thanks https://www.math.ucdavis.edu/~kouba.)
 
 
-![Movie screen](figures/extrema/extrema-movie-screen.gif)
+```{julia}
+#| echo: false
+#| fig-alt: "Where to sit at a movie?"
 
+#![Movie screen](figures/extrema/extrema-movie-screen.gif){fig-alt="Where to sit a movie?"}
+
+grey = RGBA(.5, .5, .5, 0.5)
+Δ = 0.5
+
+x = 40
+θ₁ = atan(10/x)
+
+xlims = (0, x)
+ylims = (0, 10 + 20)
+p = plot(;xlims = xlims, ylims=ylims,
+         legend=false,
+         aspect_ratio=:equal, axis=([], false))
+
+plot!([0, x,x,0], [0,0,10, 0]; linecolor=:black)
+plot!([0,x,x,0],[0, 10, 10+20, 0]; linecolor=:black, fill=(:grey, 0.25, 0))
+annotate!([(x/2, 0 + 3Δ, "x"),
+           (x + 3Δ, 10/2, "10"),
+           (x + 3Δ, 10 + 20/2, "20"),
+           (x/4, x/4 * 10/x + 5Δ, "θ")
+           ])
+
+```
 
 What is the value of theta in degrees?
 
@@ -456,6 +559,7 @@ T(x) = x/30 + sqrt(5^2 + (10-x)^2)/10
 ```
 
 ```{julia}
+#| fig-alt: plot of T over (0, 10)
 plot(T, 0, 10)
 ```
 
@@ -463,6 +567,7 @@ The minimum happens way out near 8. We zoom in a bit:
 
 
 ```{julia}
+#| fig-alt: plot of T over (7, 9)
 plot(T, 7, 9)
 ```
 
@@ -532,6 +637,7 @@ f(x) = x * exp(-x^2)
 ```
 
 ```{julia}
+#| fig-alt: plot of x*exp(-x^2) over (0, 100)
 plot(f, 0, 100)
 ```
 
@@ -539,6 +645,7 @@ Clearly the action is nearer to 1 than 100. We try graphing the derivative near 
 
 
 ```{julia}
+#| fig-alt: plot of x*exp(-x^2) over (0, 5)
 plot(f', 0, 5)
 ```
 
@@ -604,6 +711,7 @@ We start by making a graph, making an educated guess that the answer is somewher
 
 
 ```{julia}
+#| fig-alt: plot of surface area
 plot(SA, 2, 10)
 ```
 
@@ -693,11 +801,40 @@ Well, suppose you hold the rope in two places, which we can take to be $(0,0)$ a
 
 # \\ ```
 #</script>
+![String](figures/extrema/extrema-ring-string.png){fig-alt="A ring on a string"}
 nothing
 ```
 
-![String](figures/extrema/extrema-ring-string.png)
 
+```{julia}
+#| echo: false
+#| fig-alt: "A ring on a string"
+let
+Δ = 0.02
+xlims = (0-5Δ, 1+5Δ)
+ylims = (-5, 2)
+p = plot(;xlims = xlims, ylims=ylims,
+         legend=false,
+         #aspect_ratio=:equal,
+         axis=([], false))
+
+x = range(.1, .9, length=9)
+y = [-4.46262,-4.46866, -4.47268, -4.47469, -4.47468, -4.47267, -4.46864, -4.4626 , -4.45454]
+plot!([0,x[3],1], [0,y[3],1])
+scatter!([0,1],[0,1], markersize=5)
+plot!([0,x[3],x[3]], [0, 0, y[3]], linewidth=2, linecolor=:grey)
+plot!([1,x[3],x[3]], [1, 1, y[3]], linewidth=2, linecolor=:grey)
+annotate!([
+    (0,0,text("(0,0)",:bottom)),
+    (1,1,text("(a,b)",:bottom)),
+    (x[3]/2, 0, text("x",:top)),
+    (x[3]-Δ, y[3]/2, text("|y|",:right)),
+    (x[3] + Δ, (1 + y[3])/2, text("b-y",:left)),
+    ((x[3]+1)/2, 1, text("a-x",:top))
+])
+    scatter!([x[3]], [y[3]]; markersize=8, markershape=:circle, markercolor=:gold)
+    end
+```
 
 Since the length of the rope does not change, we must have for any admissible $(x,y)$ that:
 
@@ -773,6 +910,7 @@ Now, through this inversion trick, we have a function $y=g(x)$. We graph to see 
 
 
 ```{julia}
+#| fig-alt: plot of g
 plot(g, 0.2, 0.8)
 ```
 
@@ -805,3 +943,24 @@ atan(abs(t)/x) - atan((b-t)/(a-x))
 ```
 
 Now, were we lucky and just happened to take $b = 1$ in such a way to make this work? Well, no. But convince yourself by doing the above for different values of $b$.
+
+----
+
+
+::: {.callout-note collapse="true"}
+## Environment of `Julia` when generated
+
+`Julia` version:
+
+```{julia}
+VERSION
+```
+
+Packages and versions:
+
+```{julia}
+using Pkg
+Pkg.status()
+```
+
+:::

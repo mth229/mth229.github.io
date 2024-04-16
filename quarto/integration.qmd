@@ -33,12 +33,12 @@ This is great as long as some antiderivative is known. There are several differe
 ```{julia}
 using MTH229
 using Plots
+plotly()
 ```
 
 ```{julia}
 #| echo: false
 using QuizQuestions
-using LaTeXStrings
 ```
 
 ```{julia}
@@ -65,8 +65,54 @@ One such approximation is given by the familiar Riemann sums, which we will look
 
 In 1854 Riemann was the first to give a rigorous definition of the integral of a continuous function on a closed interval, the problem we wish to solve here, using the concept of a *Riemann sum*. A Riemann sum is one of the simplest to understand approximations to the area under a curve. The basic idea is that the interval $[a,b]$ is partitioned through points $a = x_0 < x_1 < \cdots x_n = b$ and the area under $f(x)$ between $x_i$ and $x_{i+1}$ is approximated by a rectangle with the base $x_{i+1} - x_i$ and height given by $f(x_i^*)$, where $x_i^*$ is some point in the interval $[x_i, x_{i+1}]$. Typical choices are the left point or the right point of the interval, or the $x$ value which minizes or maximizes $f$ over the interval. The figure shows these four choices for some sample function. For a *Riemann integrable* function, such as a continuous function on $[a,b]$, any of the choices will yield the same value as the partition's mesh shrinks to $0$.
 
+```{julia}
+#| echo: false
+#| fig-alt: "A simple Riemann partition"
+#![Riemann](figures/integration/riemann_choice.png){fig-alt="A simple Riemann partition"}
 
-![Riemann](figures/integration/riemann_choice.png)
+g(x) = -x^4 + 2x^2 + 2;
+f(x) = g(x-1/2)
+grey = RGBA(.5, .5, .5, 0.5)
+
+xlims = (-2, 2)
+cps = find_zeros(f', xlims)
+m, M = minimum(f.(xlims)), maximum(f.(cps))
+ylims=(m, M+1)
+p = plot(;xlims = (-2.1, 2.1), ylims=ylims,
+         legend=false,
+         axis=([], false))
+
+plot!(f; linecolor=:black, linewidth=2)
+plot!([xlims...], [m,m]; linecolor=:black, linewidth=2)
+
+# left
+xs = range(0, 1, length=100)
+_xs = [0,1,1,0,0]
+fill = (:grey, 0.1,0)
+
+# right
+plot!(-2 .+ _xs, [m,m,f(-1),f(-1), m]; linecolor=:black, linewidth=1, fill=fill)
+
+# leftt
+plot!(-1 .+ _xs, [m,m,f(-1),f(-1), m]; linecolor=:black, linewidth=1,fill=fill)
+plot!([0,0],[f(-1),f(0)]; linecolor=:black, linewidth=1)
+
+# min
+cp = 0.5
+plot!(0 .+ _xs, [m,m,f(cp),f(cp), m]; linecolor=:black, linewidth=1, fill=fill)
+
+# max
+cp = 1.5
+plot!(1 .+ _xs, [m,m,f(cp),f(cp), m]; linecolor=:black, linewidth=1, fill=fill)
+
+ycenter = -15
+annotate!([(-1.5, ycenter, text("right",:center)),
+           (-0.5, ycenter, text("left",:center)),
+           ( 0.5, ycenter, text("min",:center)),
+           ( 1.5, ycenter, text("max",:center))
+           ])
+```
+
 
 
 As with other limits, we can numerically approximate the limit by computing the Riemann sum for some partition. The steps for this include:
@@ -236,25 +282,33 @@ In addition, we allow for the possibility of using different methods to approxim
   * making the cap a quadratic polynomial that goes through the left and right endpoints and the midpoint (`method="simpsons"`)
 
 
-This function is defined in `MTH229`:
+For pedagocial use, this function is defined in `MTH229`:
 
 
 ```{julia}
 #| eval: false
 function riemann(f::Function, a::Real, b::Real, n::Int; method="right")
-  if method == "right"
-     meth = (f,l,r) -> f(r) * (r-l)
-  elseif method == "left"
-     meth= (f,l,r) -> f(l) * (r-l)
-  elseif method == "trapezoid"
-     meth = (f,l,r) -> (1/2) * (f(l) + f(r)) * (r-l)
-  elseif method == "simpsons"
-     meth = (f,l,r) -> (1/6) * (f(l) + 4*(f((l+r)/2)) + f(r)) * (r-l)
-  end
 
-  xs = range(a, b, length=n+1)
-  lrs = zip(Iterators.take(xs, n), Iterators.rest(xs, 1))
-  sum(meth(f, l, r) for (l,r) in lrs)
+    xs = range(a, b, length=n+1)
+    lrs = zip(xs[1:n], xs[2:n+1])
+
+    if method == "right"
+
+        sum(f(r) * (r-1) for (l,r) in lrs)
+
+    elseif method == "left"
+
+        sum(f(l) * (r-1) for (l,r) in lrs)
+
+    elseif method == "trapezoid"
+
+        (1/2) * sum((f(l) + f(r)) * (r-l) for (l,r) in lrs)
+
+    elseif method == "simpsons"
+
+        (1/6) * sum((f(l) + 4*(f((l+r)/2)) + f(r)) * (r-l) for (l,r) in lrs)
+
+    end
 
 end
 ```
@@ -642,7 +696,7 @@ The volume of a solid of revolution about the $y$-axis is illustrated [here](htt
 This figure shows a volume of revolution (a glass) with an emphasis on the radius of the solid. The volume can be determined if the radius is known.
 
 
-![Glass](figures/integration/integration-glass.jpg)
+![Glass](figures/integration/integration-glass.jpg){fig-alt="A glass as a solid of revolution"}
 
 
 The basic formula requires the description of the radius as a function of $x$ (if oriented as the figure) or the height, $h$, (if oriented as in real life). Suppose we specify the radius with $r(h)$, then the following formula holds with $b$ the total height.
@@ -668,7 +722,7 @@ The answer, of course, depends on the shape of the glass.  That is the shape of 
 For a standard measuring cup, the answer for different `b`'s is printed on the side:
 
 
-![Measuring cup](figures/integration/measuring_cup.png)
+![Measuring cup](figures/integration/measuring_cup.png){fig-alt="A measuring cup is calibrated according to actual volume, which is shape dependent"}
 
 
 With the formula for the volume of a solid of revolution we can compute this marks numerically if we know the radius as a function of height.
@@ -843,7 +897,7 @@ numericq(val, .1)
 Consider this big Solo cup:
 
 
-![Solo cup](figures/integration/big-solo-cup.jpg)
+![Solo cup](figures/integration/big-solo-cup.jpg){fig-alt="A big red solo cup"}
 
 
 It has approximate dimensions: smaller radius 5 feet, upper radius 8 feet and height 15 feet. How many gallons is it? At $8$ pounds a gallon this would be pretty heavy!
@@ -872,6 +926,7 @@ The basic indefinite integral for a positive function answers the amount of area
 
 
 ```{julia}
+#| fig-alt: plot of x^2 over (0,1)
 plot(x -> x^2, 0, 1)
 ```
 
@@ -930,6 +985,7 @@ Suppose we have the following wire hung between $x=-1$ and $x=1$ with $a = 2$:
 
 
 ```{julia}
+#| fig-alt: plot of a *cosh(x/a) over (-1,1) with a=2
 f(x; a=2) = a * cosh(x/a)
 plot(f, -1, 1)
 ```
@@ -1258,3 +1314,24 @@ out - beta(2 + 1, 10 + 1)
 ```
 
 (The use of `isapprox` above determines how accurate the values will be. This function uses two tolerances to test if the valus `x` and `y` are approximately the same. These could be changed easily enough so that more precise answers can be found.)
+
+----
+
+
+::: {.callout-note collapse="true"}
+## Environment of `Julia` when generated
+
+`Julia` version:
+
+```{julia}
+VERSION
+```
+
+Packages and versions:
+
+```{julia}
+using Pkg
+Pkg.status()
+```
+
+:::

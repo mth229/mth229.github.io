@@ -14,6 +14,20 @@ A notebook for this material:
 
 ## Introduction
 
+We load the `MTH229` package and plotting package for this section:
+
+
+```{julia}
+using MTH229
+using Plots
+plotly()
+```
+
+```{julia}
+#| echo: false
+using QuizQuestions
+```
+
 
 This project explores the relationship between a function, $f(x)$ and its first and second derivatives.
 
@@ -51,38 +65,210 @@ Pay attention to the difference between positive and non-negative. For example, 
 
 :::
 
-## Graphically Identifying positive, increasing, concave up, critical points, ...
+
+## Identifying when a function is *positive*
+
+A common task in this subject is identifying where a function is positive, negative, zero, or undefined.
+
+A theoretical tool is the *intermediate value theorem* which can be used to say that a continuous function has only one sign (positive or negative) between adjacent zeros. That is, if $a$ and $b$ are zeros of $f(x)$, a continuous function with say $a < b$ and there is *no* $c$ with $a < c < b$ such that $f(c) = 0$, then $f(x)$ for $x$ in $(a,b)$ is either always positive or always negative.
+
+This gives a technique to identify where a function is *positive*:
+
+* find all the zeros of $f(x)$ and sort them in increasing order
+* check the sign  between adjacent zeros at *one* point, a test point (often chosen conveniently to make evaluation easier).
+* Also check the sign to the left of the smallest zero and the right of the largest zero by using two test points.
+
+Wherever one of the test points is positive, the interval between the two adjacent zeros will correspond to an interval where the function is positive.
+
+If the function is not continuous, say at a finite set of points, then include the points of discontinuity in the consideration. In fact, only discontinuities where the function jumps over the $y$ axis need consideration.
+
+### Graphically identifying zeros of a function over $[a,b]$
 
 
-We load `MTH229` to provide access to graphing, the `'` notation, and the `plotif` function:
+We can graphically identify when a function is positive with the strategy above. Consider the following function over the interval $[-2, 1]$:
+
+$$
+f(x) = e^{-x} \cdot (\sin(3x) + \sin(5x)).
+$$
+
+A plot shows *roughly* that this function is positive between $-2$ and $-0.8$, save near $-1.57$ where $f$ is $0$ and between $0.0$ and $0.8$.
+
+```{julia}
+f(x) = exp(-x) * (sin(3x) + sin(5x))
+plot(f, -2, 1)
+plot!(zero)
+```
+
+The `MTH229` package provides a *convenience* function to color the graph of `f` when a second function, `g` is *nonnegative*, called `plotif`. In this case, we want `g` to be  `f`:
+
+```{julia}
+plotif(f, f, -2, 1)
+```
+
+The `plotif` function show when `g` is non-negative, not just positive, so wouldn't show a different color for the graph near $-1.57$ where `f` is zero but doesn't cross the $x$ axis.
+
+### Numerically find zeros of a function over $[a,b]$; the `find_zeros` function
+
+We have discussed two means to find zeros of a function $f$:
+
+* when the zero is *between* two values which form a bracketing interval. The zero in the graph above between $-1$ and $-0.5$ is an example. Such zeros are readily identified through *bisection*
+
+* when a zero is *near* a value, such as these four which are near $-1.5$, $-0.75$, $0.0$ and $0.8$. Such zeros may typically be found with *Newton's* method (or `find_zero`)
+
+The `Roots` package, exported with `MTH229`, provides a convenience function, `find_zeros`, which uses bisection or `fzero` to identify *heuristically* all zeros in an interval $[a,b]$. It is easy to use: the interval is specified by pairing off the interval:
+
+```{julia}
+find_zeros(f, (-2, 1))  # note the s in find_zeros
+```
+
+The algorithm isn't guaranteed to always work the way bisection is, but works fairly well to identify all the zeros execept for cases where there are *many* zeros in the interval or the interval chosen is *too wide*. (A bracketing interval specified to bisection may be infinite, but such wide intervals can be problematic with `find_zeros`, though can work in some cases.)
+
+Here is another example, find the zeros of $f(x) = e^x - x^4$ over $[-10, 10]$:
 
 
 ```{julia}
-using MTH229
-using Plots
+f(x) = exp(x) - x^4
+find_zeros(f, -10, 10)
 ```
+
+The above also shows the interval can also be specified using two values, as is done with `plot`.
+
+A related problem might be find all zeros of $f(x) = e^x - x^6$. Where should one look to ensure all of the zeros are identified? Too big an interval and the values of $e^x$ will be infinite (numerically) and that may cause problems. Too small an interval and zeros may be excluded. In this case a bit of analysis can help: any zero must be bigger than $-1$, as to the left of $-1$ the exponential is smaller than $1$ and the polynomial bigger than $1$ in absolute value. Further, as exponentials *eventually* dominate polynomials, the interval need not be too large. We could quickly check that $e^{20}$ is bigger than $20^6$ but instead we just try a somewhat larger right limit:
+
+```{julia}
+f(x) = exp(x) - x^6
+find_zeros(f, (-1, 50))
+```
+
+
+#### Discontinuous function
+
+The algorithm used by `find_zeros` relies on both bisection and a method like Newton's method. The bisection implementation will pick up on places where the function changes sign, even if not continuous. In the example below, the two vertical asymptotes at $3$ and $4$ are found:
+
+
+```{julia}
+f(x) = (x-1)*(x-2) / ((x-3)*(x-4))
+zs = find_zeros(f, -10, 10)
+```
+
+
+The values at the `zs` can easily be checked using broadcasting:
+
+```{julia}
+f.(zs)  # using the broadcasting syntax -- the dot.
+```
+
+Programatically, the `filter` function might be used to screen these out, or in this example a comprehension:
+
+```{julia}
+[z for z in zs if abs(f(z)) <= 10]
+```
+
+However, for our usage below it is quite helpful that these points are identified.
+
+
+
+### The `sign_chart` function
+
+The technique above to find where a function is positive can be automated if `find_zeros` is used to find the zeros. This is done in `sign_chart`.
+
+For example,
+
+```{julia}
+f(x) = exp(x) - x^6
+sign_chart(f, -1, 20)
+```
+
+The output shows how the sign changes at the identified zeros (or other points). In this case we can infer that the function is positive on $(-0.8656\dots, 1.22688869\dots)$ and again on $(16.998887\dots, \infty)$.
+
+
+Another example,
+
+
+```{julia}
+f(x) = (x-1)*(x-2) / ((x-3)*(x-4))
+sign_chart(f, -10, 10)
+```
+
+This shows the function is positive on $(-\infty, 1)$, $(2, 3)$, and $(4, \infty)$.
+
+
+#### Question
+
+How many zeros are found between $-2$ and $1$ for
+
+$$
+f(x) = e^{-x/2} \cdot (\sin(11x) + \sin(13x))
+$$
 
 ```{julia}
 #| echo: false
-using QuizQuestions
-using LaTeXStrings
+val = length(find_zeros(x -> exp(-x/2)*(sin(11x) + sin(13x)), -2, 1))
+numericq(val)
 ```
 
-The `plotif` function from the `MTH229` package makes it easy for us to highlight when a function is positive. This function (`plotif(f, g, a, b)`) plots the function $f(x)$ twice over `[a,b]`, the second time doing so only *if* $g(x) \geq 0$.
+#### Question
+
+What is the largest value identified in $[-2,1]$ by `find_zeros` for the function
+
+$$
+f(x) = e^{-x/2} \cdot (\sin(11x) + \sin(13x))
+$$
+
+```{julia}
+#| echo: false
+val = maximum(find_zeros(x -> exp(-x/2)*(sin(11x) + sin(13x)), -2, 1))
+numericq(val)
+```
 
 
-We can plot when a function is positive by using `f` for `g`. For example, when $f(x) = x^3 - 2x - 1/2$ we make the plot
+#### Question
 
+For $f(x) = e^{-x/2} \cdot (\sin(11x) + \sin(13x))$
+Consider the output of `sign_chart(f, -2, 1)`. What is the sign of $f$ at $-1$?
+
+```{julia}
+#| echo: false
+choices = ["positive", "zero", "negative", "undefined"]
+answer = 1
+radioq(choices, answer)
+```
+
+#### Question
+
+Consider $f(x) = e^{-x} \cdot (\sin(3x) + \sin(5x))$ over $[-2, 1]$. What does `sign_chart` identify at the *smallest* zero?
+
+
+```{julia}
+#| echo: false
+choices = [
+    "There is a sign change from `+` to `-`",
+    "There is a sign change from `-` to `+`",
+    "There is no sign change; the function is zero at this point, but doesn't cross the x-axis"]
+answer = 3
+radioq(choices, answer)
+```
+
+
+
+## Graphically Identifying increasing, concave up, critical points, ...
+
+As seen, the `plotif` function from the `MTH229` package makes it easy for us to highlight when a function is non negative, as it shows in a separate color when the second function is non-negative.
+
+For example, consider $f(x) =  x^3 - 2x - 1/2$.
+
+This graph shows where $f(x)$ is positive over $(-2,2)$:
 
 ```{julia}
 f(x) = x^3 - 2x - 1/2
 plotif(f, f, -2, 2)
+plot!(zero)
 ```
 
 In this graph, we estimate graphically that the intervals $(-1.2, 0.2)$ and $(1.5, 2)$ are where $f$ is positive within this viewing window.
 
 
-We can do the same with the derivative, then our graph will show when the function is increasing:
+If we change the screening function to the derivative of $f(x)$, then our graph will show when the function is increasing (or flat):
 
 
 ```{julia}
@@ -92,7 +278,7 @@ plotif(f, f', -2, 2)
 Again, we eyeball from the graph to estimate that this occurs on $(-2, -0.8)$ and $(0.8, 2)$.
 
 
-And of course, using when the second derivative is positive shows where `f` is concave up:
+Using when the second derivative is non-negative indicates where `f` is concave up:
 
 
 ```{julia}
@@ -144,6 +330,52 @@ choices = ["(0, 0.6) and (3.5, 10)",
 	"(0,10)"];
 answer = 1;
 radioq(choices, answer)
+```
+
+#### Question
+
+Consider the function below:
+
+```
+f(x) = x < -1 ? -x-1 : x > 1 ? x - 1 : 0
+```
+
+What does the output of `plotif(f, f', -5, 5)` show?
+
+```{julia}
+#| echo: false
+choices = ["It shows where `f` is *increasing* only",
+	"It shows where `f` is *increasing* or *flat*",
+	"It shows where `f` is *flat* only"
+]
+answer = 2;
+radioq(choices, answer)
+```
+
+### Numerically finding zeros, critical points, and inflection point candidates
+
+The `find_zeros` function can readily identify when some function is zero (or undefined). It can be used, as seen, to find zeros. However, if passed `f'` it will identify critical points. When passed `f''` it will find when $f''(x) = 0$ (or undefined). Such points are *candidates* for inflection points, though a check on whether the concavity changes is necessary to say such is an inflection point.
+
+In the following we use `scatter!` to show these values on the graph.
+
+```{julia}
+f(x) = exp(-x/2) * (sin(3x) + sin(5x))
+zs = find_zeros(f, -2, 1)
+cps = find_zeros(f', -2, 1)
+ips = find_zeros(f'', -2, 1)
+
+plot(f, -2, 1)
+scatter!(zs, f.(zs), markercolor="blue", markersize=7)
+scatter!(cps, f.(cps), markercolor="red", markersize=3)
+scatter!(ips, f.(ips), markercolor="green", markershape=:diamond)
+```
+
+An attempt to distinguish the points using color, marker size and shape is made, showing that the value at $-1.5707963267\dots$ is both a zero and a critical point.
+
+The graph also shows that the candidates for inflection points are indeed inflection points. This could also be verified with `sign_chart` where the second derivative changes sign at each:
+
+```{julia}
+sign_chart(f'', -2, 1)
 ```
 
 ## Relationships
@@ -223,8 +455,8 @@ You know that $f'(x) = |x|$. Over $[-1,1]$ where if $f(x)$ increasing and where 
 #| echo: false
 choices=[
     "You don't know -- the derivative of |x| does not exist",
-	L"f is increasing on $(0,1)$ and concave up on $(-1,1)$",
-    L"f is increasing on $(-1,1)$ and concave up on $(0,1)$"
+	"``f`` is increasing on ``(0,1)`` and concave up on ``(-1,1)``",
+    "``f`` is increasing on ``(-1,1)`` and concave up on ``(0,1)``"
 ];
 answer = 2;
 radioq(choices, answer)
@@ -290,25 +522,23 @@ As $f(x)$ is everywhere differentiable, these critical points would be where the
 
 
 ```{julia}
+#| fig-alt: plot of 2sin(x) + cos(2x) over (0, 2pi)
 f(x) = 2sin(x) + cos(2x)
 plot(f', 0, 2pi)
 ```
 
-We see four: one near 0.8, one near 1.5, one near 2.5 and one near
+We see four: one near $0.8$, one near $1.5$, one near $2.5$ and one near $5$.
 
-
-5. We use `find_zeros` to identify:
+As explained, we could use `find_zeros` to identify these more precisely:
 
 
 ```{julia}
 cps = find_zeros(f', 0, 6)
 ```
 
-Use the first derivative test to classify these values as relative maximum or minimum. From the graph of `f'` we see at the first one the derivative is changing sign from positive to negative at the first one (hence a local maximum), and this alternates as we go along.
+From the graph of `f'` we can see at the first critical point the derivative is changing sign from positive to negative at the first one (hence a local maximum), and this alternates as we go along.
 
-
-The `MTH229` package has a `sign_chart` function to do check numerically for sign changes of a function:
-
+However, we can do this numerically, using the `sign_chart` function.
 
 ```{julia}
 sign_chart(f', 0, 4)
@@ -318,25 +548,19 @@ So by the first derivative test we have a max, min, max, min which we see when w
 
 
 ```{julia}
+#| fig-alt: plot of f over (0, 2pi)
 plot(f, 0, 2pi)
 ```
 
-To get the same from the second derivative test, we evaluate $f''(x)$ at these four points:
+To get the same classification from the second derivative test, we evaluate $f''(x)$ at these four critical points:
 
 
 ```{julia}
 f''.(cps)
 ```
 
-(Using the dot broadcasts `f''` over all the values in `cps`.)
+Where using the dot broadcasts `f''` over all the values in `cps`.
 
-
-If you wanted something fancy, you could convert using `sign`:
-
-
-```{julia}
-["max", "can't tell", "min"][2 .+ Int.(sign.(f''.(cps)))]
-```
 
 #### Question
 
@@ -386,3 +610,24 @@ choices = [
 answer = 1;
 radioq(choices, answer)
 ```
+
+----
+
+
+::: {.callout-note collapse="true"}
+## Environment of `Julia` when generated
+
+`Julia` version:
+
+```{julia}
+VERSION
+```
+
+Packages and versions:
+
+```{julia}
+using Pkg
+Pkg.status()
+```
+
+:::

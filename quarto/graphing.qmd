@@ -16,29 +16,18 @@ A notebook for this material:
 The `Julia` language is a new language and as such, certain design decisions are still being made. One key decision is the interface for creating graphics. At this point there are many different ones (`Makie`, `PyPlot`, plotly, plotlyjs, `GR`, `Winston`, `Gadfly`, `Gaston`,...), and perhaps more will be generated before a dominant one is arrived at. As such, we don't try to teach the details of any one of them.
 
 
-Currently, the  the `Plots` package  provides a unified interface to many backend plotting packages.  We will use the `Plots` package in these examples.
+Currently, the  `Plots` package  provides a unified interface to many backend plotting packages.  We will use the popular `Plots` package in these examples, but recognize that it is likely the `Makie` will eventually become the preferred plotting package.
 
 
-For the impatient, this is all that is needed to know to get up and running.
+For the impatient, this is all that is needed to know to get up and running to make a plot.
+
+First load the necessary package:
 
 
 ```{julia}
 using MTH229
 using Plots
-```
-
-```{julia}
-#| echo: false
-using QuizQuestions
-using LaTeXStrings
-```
-
-Then, graphing a function is as easy as specifying the function and the domain to graph over, e.g.:
-
-
-```{julia}
-f(x) = exp(-x^2/2)
-plot(f, -3, 3) 			# plot f over [-3,3]
+plotly()
 ```
 
 :::{.callout-note}
@@ -52,11 +41,27 @@ hovers over them. (The default can be re-loaded by the command:
 
 :::
 
+```{julia}
+#| echo: false
+using QuizQuestions
+```
+
+Once done, graphing a function is as easy as specifying the function and the domain to graph over, e.g.:
+
+
+```{julia}
+#| fig-alt: plot of exp(-x^2/2) over (-3,3)
+f(x) = exp(-x^2 / 2)
+plot(f, -3, 3) 			# plot f over [-3,3]
+```
+
+
 
 Graphs can be layered by using the `plot!` function (with an exclamation point indicating a current graph is begin modified):
 
 
 ```{julia}
+#| fig-alt: plot of cos(x), 1 - x^2/2 over (-pi/2, pi/2)
 f(x) = cos(x)
 g(x) = 1 - x^2/2
 plot(f, -pi/2, pi/2)
@@ -81,6 +86,7 @@ as in
 
 
 ```{julia}
+#| fig-alt: plot of sin over (0, 2pi)
 plot(sin, 0, 2pi)
 ```
 
@@ -97,6 +103,7 @@ Again, we plot a function, this time a basic polynomial:
 
 
 ```{julia}
+#| fig-alt: plot of polynomial over (-3,3)
 f(x) = x^2 - 2x + 2
 plot(f, -3, 3)
 ```
@@ -108,23 +115,26 @@ A graph can have layers added to it using `plot!` or other such functions. For e
 
 
 ```{julia}
+#| fig-alt: plot of polynomial with zero line
 f(x) = x^2 - 2x + 2
 plot(f, -3, 3)
 plot!(zero)     # x axis
 ```
 
-The automatic legend can be supressed by passing the argument `legend=false` to the initial `plot` command.
+The automatic legend can be supressed by passing the keyword argument `legend=false` to the initial `plot` command.
 
 
 Adding points can be done with the `scatter!` command. We put the `x` and `y` values into containers defined by `[]`. For example, the polynomial $x^2 - 3x +2$ has roots at $2$ and $1$, we emphasize this through:
 
 
 ```{julia}
+#| fig-alt: plot of plot of polynomial with roots
 f(x) = x^2 - 3x + 2
 rts = [1, 2]
 plot(f, 0, 3)
 scatter!(rts, [0, 0])
 ```
+
 
 ### Inf, NaN values
 
@@ -152,6 +162,7 @@ Using `rangeclamp` is fairly simple. The output is a function, so can be passed 
 
 
 ```{julia}
+#| fig-alt: plot of rangeclamped 1/x
 f(x) = 1/x
 plot(rangeclamp(f), -3, 3)
 ```
@@ -160,10 +171,23 @@ Or
 
 
 ```{julia}
+#| fig-alt: plot of rangeclamped 1/x
 plot(rangeclamp(f, 100), -3, 3)
 ```
 
 This trimming also works when `Inf` and `-Inf` values are encountered, as both can be ordered by `>`.
+
+:::{.callout-note}
+## ylims, xlims
+
+The range of `x` values comes from the choice of `a` and `b` in `plot(f, a, b)` and the range of `y` values comes from the range of `f` over the interval `[a,b]`. These can be adjusted manually through the keyword arguments `xlims=(l,r)` and `ylims=(m, M)`. An alternate to clamping `f` is to change the `y` limits, though as no `NaN` values are used, there can be artificacts in the resulting graphs:
+
+```{julia}
+#| fig-alt: plot of 1/x with range narrowed using `ylims`
+f(x) = 1/x
+plot(f, -3, 3, ylims = (-10, 10))
+```
+
 
 
 ### Plotting with anonymous functions
@@ -173,17 +197,18 @@ Consider a function with a parameter, `theta`, defined by:
 
 
 ```{julia}
-function g(x; theta=pi/4)
+function g(x, theta=pi/4)
 	 a = 200*cos(theta)
 	 tan(theta)*x + (32/a)*x - 32*log(a/(a-x))
 end
 ```
 
-Plotting `g` will use the default value of $\pi/4$. To plot with a different value, say $\pi/3$ we can create a new function:
+Plotting `g` will use the default value of $\pi/4$. To plot with a different value, say $\pi/3$ we can create a new function, fixing `theta`:
 
 
 ```{julia}
-f(x) = g(x, theta=pi/3)
+#| fig-alt: plot of arrow model
+f(x) = g(x, pi/3)
 plot(f, 0, 100)
 ```
 
@@ -191,7 +216,8 @@ Which works, but is a bit verbose. It would be more convenient to use an anonymo
 
 
 ```{julia}
-plot(x -> g(x, theta=pi/3), 0, 100)
+#| fig-alt: plot of same using anonymous function
+plot(x -> g(x, pi/3), 0, 100; ylims = (0, 150), legend=false)
 ```
 
 There are many instances where plotting with anonymous functions are convenient. It can be hard to get used to seeing that arrow, but it can simplify many expressions if used properly.
@@ -303,6 +329,7 @@ One can try a simple plot:
 
 
 ```{julia}
+#| fig-alt: plot of 1/x
 plot(x -> 1/x, -3, 3)
 ```
 
@@ -313,6 +340,7 @@ Doing better without much work is done by simply restricting the part that is pl
 
 
 ```{julia}
+#| fig-alt: plot of 1/x
 plot(x -> 1/x, 0, 3)
 ```
 
@@ -320,6 +348,7 @@ It is best to avoid the asymptote at $0$ completely by backing away by enough to
 
 
 ```{julia}
+#| fig-alt: plot of 1/x
 plot(x -> 1/x, 1/10,  3)
 ```
 
@@ -334,6 +363,7 @@ This will have a vertical asymptote at $1$, zeros at $2$ and $3$ and a slant asy
 
 
 ```{julia}
+#| fig-alt: plot of rational function
 f(x) = (x-2)*(x-3)/(x-1)
 plot(f, -10, 10)
 ```
@@ -345,6 +375,7 @@ For example, to graph to the right of the asymptote can be done with:
 
 
 ```{julia}
+#| fig-alt: plot of rational function adjusting domain
 plot(f, 1 + 0.5, 4)
 ```
 
@@ -352,6 +383,7 @@ This shows the two zeros and gives an idea of the relative minimum. Similarly, a
 
 
 ```{julia}
+#| fig-alt: plot of rational function adjustion domain
 plot(f, -3, 1 - 0.1)
 ```
 
@@ -365,6 +397,7 @@ One solution to avoiding this issue is to use the `rangeclamp` function that was
 
 
 ```{julia}
+#| fig-alt: plot of rangeclamed f
 plot(rangeclamp(f), -10, 10)
 ```
 
@@ -385,6 +418,7 @@ The domain comes from the fact that $\sin(0) = 0$ and $\cos(\pi/2) = 0$, so we w
 
 
 ```{julia}
+#| fig-alt: plot of function with vertical asymptotes
 f(x) = 5/cos(x) + 10/sin(x)
 plot(f, 0, pi/2)
 ```
@@ -393,6 +427,7 @@ As typical with vertical asymptotes, we can't see finer features of the graph wh
 
 
 ```{julia}
+#| fig-alt: plot of function with vertical asymptotes
 delta = 0.3;
 plot(f, 0 + delta, pi/2 - delta)
 ```
@@ -469,7 +504,7 @@ x |  y
 4 | 16
 ```
 
-As these are the steps done to create the ordered pairs for a plot, we would like to be able to mimic the following procedures used above in `julia`:
+As these are the steps done to create the ordered pairs for a plot, we would like to be able to mimic the following procedures used above in `Julia`:
 
 
   * choose a collection of $x$ values
@@ -480,13 +515,13 @@ As these are the steps done to create the ordered pairs for a plot, we would lik
 We have seen how variables can be used to refer to a single value, but we want to refer to more than one value now. A container for holding such is an `Array`. Arrays are implemented in most all computer languages, though the term can mean different things.  We are looking for vectors, or one-dimensional arrays.  In general, an array is a multidimensional grid of values – all of the same type (integer, floating point, *functions*, ..., or ANY).
 
 
-For our purposes, we want vectors (one dimensional, $n$ by 1 arrays in `julia`). These can be easily constructed in different ways.
+For our purposes, we want vectors (one dimensional, $n$ by 1 arrays in `Julia`). These can be easily constructed in different ways.
 
 
 ### Creating 1-dimensional arrays with `[]`
 
 
-In many different contexts, `julia` uses `[]` to create collections from individual components.
+In many different contexts, `Julia` uses `[]` to create collections from individual components.
 
 
 For example, to directly create a 1-dimensional array with the `[]` syntax one simply types in the values separated by commas:
@@ -553,8 +588,7 @@ Here are 5 evenly spaced numbers from $0$ to $\pi/2$ given by `range`
 range(0, pi/2, length=5)
 ```
 
-The values are not displayed, but will be if `collect`ed:
-
+The `range` function returns an object which is a sub-type of `AbstractVector`, so can be used where vectors are used, in most cases. The `show` method for ranges is such that the values are not displayed (nor are they computed until needed). To see the values, the abstract vector can be `collect`ed into a vector:
 
 ```{julia}
 collect(range(0, pi/2, length=5))
@@ -840,14 +874,14 @@ We use `u` for the dummy variable in the anonymous function, so as not to get it
 ### Broadcasting
 
 
-`Julia` allows a function to be broadcast over a collection of values with a simple notational trick or inserting a "." *before* the parenthesis. To see, we have:
+`Julia` allows a function to be broadcast over a collection of values with the simple notational trick of inserting a "." *before* the parenthesis used to call the function^[For *infix* functions, like `+`, the dot appears before the operator, as with `.+`.]. To see, we have:
 
 
 ```{julia}
 sin.([1,2,3])
 ```
 
-In this use, the output is the same as though `map(sin, [1,2,3])` were called. In general, this "." notation is a bit different, as there can be multiple arguments passed and the size of the values is matched if possible by replication. For example, this command find the logarithm of 5 for different bases. The value 5 is replicated once for each of the bases:
+In this use, the output is the same as though `map(sin, [1,2,3])` were called. In general, this "." notation is a bit different, as there can be multiple arguments passed and the size of the values is matched if possible by replication. For example, this command find the logarithm of $5$ for different bases. The value $5$ is replicated once for each of the bases:
 
 
 ```{julia}
@@ -1049,88 +1083,22 @@ For example, to plot $y=x^2$ over $[-1,1]$ we might do:
 
 
 ```{julia}
+#| fig-alt: plot of x^2 showing how points can be chosen
 f(x) = x^2
 xs = range(-1, 1, length=101)
 ys = f.(xs)
 plot(xs, ys)
 ```
 
-One can place both to get both points and lines. The `scatter` function will plot the points, but not connect the lines. In the following, the `scatter!` function is used. (Not the `!` at the end.) This form adds the plot of the lines to the last graph, rather than make a new one.
+One can place both to get both points and lines. The `scatter` function will plot the points, but not connect the lines. In the following, the `scatter!` function is used. (Note the `!` at the end.) This form adds the plot of the lines to the last graph, rather than make a new one.
 
 
 ```{julia}
+#| fig-alt: plot of f with chosen points shown
 xs = range(-2, 2, length=5)
 ys = f.(xs)
 plot(xs, ys)
 scatter!(xs, ys, markersize=5)
-```
-
-## Two functions at once
-
-
-We use layering to plot two or more functions at once, though there are alternatives (plotting a vector of functions will do the same).
-
-
-For example, to graph both the sine and cosine function we have:
-
-
-```{julia}
-plot(sin, 0, 2pi)
-plot!(cos)
-```
-
-Or to compare the effects of a simple transformation:
-
-
-```{julia}
-f(x) = x^2
-g(x) = 15 + f(x-3)
-plot(f, -10, 10)
-plot!(g)
-```
-
-To print a heavier $x$-axis, we can graph the function $y=0$, specified through the anonymous function `x -> 0`:
-
-
-```{julia}
-f(x) = x^2 - 2
-plot(f, -2, 2)
-plot!(x -> 0)
-```
-
-The above, may also be done with `zero`:
-
-
-```{julia}
-plot(f, -2, 2)
-plot!(zero, -2, 2)   # zero is a function returning 0, useful for programming in general.
-```
-
-##### Example: Operators, aka. derived functions"
-
-
-Often we wish to plot a function derived from another function. For example, this is used to add a secant line to a graph. The following function (which is in the `MTH229` package) will create a function which represents the secant line of $f(x)$ between two points, $a$ and $b$:
-
-
-```{julia}
-#| eval: false
-function secant(f, a, b)
-	 m =  (f(b) - f(a)) / (b-a)	# slope of secant line
-	 x -> f(a) + m * (x - a)
-end
-```
-
-Pause for a moment to see what this function does. The first line simply finds the slope between the two points $(a,f(a))$ and $(b,f(b))$. The second does something with the point-slope form of a line using the point $(a, f(a))$. The tricky part is that last line defines an anonymous function to be returned (the `x ->` part). So `secant` is an *operator* – a function which accepts a function for an argument and returns a function.
-
-
-Using this function makes it simple to add a secant line to a graph.
-
-
-```{julia}
-f(x) = sin(x)
-a, b = 0, pi/2
-plot(f, a, b)
-plot!(secant(f, a, b))
 ```
 
 ### Practice
@@ -1177,6 +1145,7 @@ We saw that this  will produce two graphs:
 
 
 ```{julia}
+#| fig-alt: plot of sin and colored by sign of cos
 plot(sin, 0, 2pi)
 plot!(x -> cos(x) > 0 ? 0.0 : NaN)
 ```
@@ -1211,3 +1180,109 @@ choices = [
 answer = 3;
 radioq(choices, answer)
 ```
+
+
+## Two functions at once
+
+As previously noted, We can use layering to plot two or more functions at once. For example, to graph both the sine and cosine function we have:
+
+
+```{julia}
+#| fig-alt: plot of sin and cosine
+plot(sin, 0, 2pi)
+plot!(cos)
+```
+
+Or to compare the effects of a simple transformation:
+
+
+```{julia}
+#| fig-alt: plot of f and g
+f(x) = x^2
+g(x) = 15 + f(x-3)
+plot(f, -10, 10)
+plot!(g)
+```
+
+To print a heavier $x$-axis, we can graph the function $y=0$, specified through the anonymous function `x -> 0`:
+
+
+```{julia}
+#| fig-alt: plot of f and zero
+f(x) = x^2 - 2
+plot(f, -2, 2)
+plot!(x -> 0)
+```
+
+The above, may also be done with `zero`:
+
+
+```{julia}
+#| fig-alt: plot of f and zero
+plot(f, -2, 2)
+plot!(zero)   # zero is a function returning 0, useful for programming in general.
+```
+
+:::{.callout-note}
+## plot([f,g],a,b)
+
+There are various ways with `Plots` to make multiple graphs at once. Two commonly seen ones are to pass in a vector of function, as with `plot([sin,cos], 0, 2pi)`. For plotting with vectors, a matrix can be specified in which case *each* column specifies a different trace. For this, something like the following
+
+```{julia}
+#| fig-alt: plot of two series using a matrix to hold two columns
+x = range(0, 2pi, length=101)
+ys = [sin.(x) cos.(x)]        # two columns
+plot(x, ys)
+```
+
+These styles are not utilized within these notes, though they can be convenient when many function are to be plotted at once.
+:::
+
+##### Example: Operators, aka. "derived functions"
+
+
+Often we wish to plot a function derived from another function. For example, this is used to add a secant line to a graph. The following function (which is in the `MTH229` package) will create a function which represents the secant line of $f(x)$ between two points, $a$ and $b$:
+
+
+```{julia}
+#| eval: false
+function secant(f, a, b)
+	 m =  (f(b) - f(a)) / (b-a)	# slope of secant line
+	 x -> f(a) + m * (x - a)
+end
+```
+
+Pause for a moment to see what this function does. The first line simply finds the slope between the two points $(a,f(a))$ and $(b,f(b))$. The second does something with the point-slope form of a line using the point $(a, f(a))$. The tricky part is that last line defines an anonymous function to be returned (the `x ->` part). So `secant` is an *operator* – a function which accepts a function for an argument and returns a function.
+
+
+Using this function makes it simple to add a secant line to a graph.
+
+
+```{julia}
+#| fig-alt: plot of f and secant
+f(x) = sin(x)
+a, b = 0, pi/2
+plot(f, a, b; legend=false)
+plot!(secant(f, a, b))
+```
+
+----
+
+
+::: {.callout-note collapse="true"}
+## Environment of `Julia` when generated
+
+`Julia` version:
+
+```{julia}
+VERSION
+```
+
+Packages and versions:
+
+```{julia}
+using Pkg
+Pkg.status()
+```
+
+:::
