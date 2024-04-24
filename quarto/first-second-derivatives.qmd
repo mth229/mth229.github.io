@@ -7,10 +7,7 @@
 
 <br/>
 A notebook for this material:
-[ipynb](
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/08-first_second_derivatives.ipynb)
-[(Pluto html)](./229-projects/08-first_second_derivatives.html)
-[(With commentary)](./229-projects/08-first_second_derivatives-pluto-commentary.html)
 
 ## Introduction
 
@@ -99,7 +96,7 @@ plot(f, -2, 1)
 plot!(zero)
 ```
 
-The `MTH229` package provides a *convenience* function to color the graph of `f` when a second function, `g` is *nonnegative*, called `plotif`. In this case, we want `g` to be  `f`:
+The `MTH229` package loads a *convenience* function to color the graph of `f` when a second function, `g` is *nonnegative*, called `plotif`. In this case, we want `g` to be  `f`:
 
 ```{julia}
 plotif(f, f, -2, 1)
@@ -141,7 +138,7 @@ find_zeros(f, (-1, 50))
 ```
 
 
-#### Discontinuous function
+#### Discontinuous functions
 
 The algorithm used by `find_zeros` relies on both bisection and a method like Newton's method. The bisection implementation will pick up on places where the function changes sign, even if not continuous. In the example below, the two vertical asymptotes at $3$ and $4$ are found:
 
@@ -181,17 +178,21 @@ sign_chart(f, -1, 20)
 
 The output shows how the sign changes at the identified zeros (or other points). In this case we can infer that the function is positive on $(-0.8656\dots, 1.22688869\dots)$ and again on $(16.998887\dots, \infty)$.
 
+----
 
-Another example,
-
+Returning to the example function
 
 ```{julia}
-f(x) = (x-1)*(x-2) / ((x-3)*(x-4))
-sign_chart(f, -10, 10)
+f(x) = exp(-x) * (sin(3x) + sin(5x))
 ```
 
-This shows the function is positive on $(-\infty, 1)$, $(2, 3)$, and $(4, \infty)$.
+we apply `sign_chart` over $(-2,1)$:
 
+```{julia}
+sign_chart(f, -2, 1)
+```
+
+The output matches the graph produced above with `plotif`. The zero at $-1.57\dots$ does not have a sign change, the others do in agreement with the graph.
 
 #### Question
 
@@ -236,7 +237,7 @@ radioq(choices, answer)
 
 #### Question
 
-Consider $f(x) = e^{-x} \cdot (\sin(3x) + \sin(5x))$ over $[-2, 1]$. What does `sign_chart` identify at the *smallest* zero?
+Consider $f(x) = \sin(3x) + \sin(5x)$ over $[-2, 1]$. What does `sign_chart` identify at the *smallest* zero?
 
 
 ```{julia}
@@ -253,7 +254,7 @@ radioq(choices, answer)
 
 ## Graphically Identifying increasing, concave up, critical points, ...
 
-As seen, the `plotif` function from the `MTH229` package makes it easy for us to highlight when a function is non negative, as it shows in a separate color when the second function is non-negative.
+As seen, the `plotif` function loaded with the `MTH229` package makes it easy for us to highlight when a function is non negative, as it shows in a separate color when the second function is non-negative.
 
 For example, consider $f(x) =  x^3 - 2x - 1/2$.
 
@@ -285,7 +286,7 @@ Using when the second derivative is non-negative indicates where `f` is concave 
 plotif(f,  f'', -2, 2)
 ```
 
-We can see the function is concave up on $(0, 2)$.
+We can see the function is concave up on $(0, 2)$ and changes concavity at the inflection point $x=0$.
 
 
 #### Question
@@ -337,7 +338,7 @@ radioq(choices, answer)
 Consider the function below:
 
 ```
-f(x) = x < -1 ? -x-1 : x > 1 ? x - 1 : 0
+f(x) = x < -1 ? -x - 1 : x > 1 ? x - 1 : 0
 ```
 
 What does the output of `plotif(f, f', -5, 5)` show?
@@ -560,6 +561,18 @@ f''.(cps)
 ```
 
 Where using the dot broadcasts `f''` over all the values in `cps`.
+
+The following graphic is to illustrate why the second derivative test works as it does:
+
+```{julia}
+plot(f, 0, 2pi; legend=false, linewidth=4)
+cps = find_zeros(f', 0, 2pi)
+plot_parabola!(c, fc, fppc) = plot!(x -> fc + fppc * (x - c)^2/2, c-3/4, c+3/4; linewidth=2)
+plot_parabola!.(cps, f.(cps), f''.(cps))
+current()
+```
+
+Each critical point is matched with a parabola with quadratic term one-half the second derivative. We can see at a relative minimum, then the parabola opens upward just like the graph of `f`; at a relative maximum, the approximating parabola opens downward.
 
 
 #### Question
