@@ -20,44 +20,10 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -102,9 +68,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-
-<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -340,62 +303,9 @@ window.Quarto = {
 
 <p>This page briefly describes the use of symbolic math for the Calculus II topics of MTH 232 within <code>Julia</code> utilizing the <a href="https://sympy.org">SymPy</a> library of Python. Either the <code>SymPy</code> or <code>SymPyPythonCall</code> packages provide access, the difference being the package used for interop between <code>Julia</code> and <code>Python</code>.</p>
 <p>The <code>SymPy</code> package is loaded when the <code>MTH229</code> package is. We also add the <code>Plots</code> package to handle our plotting needs.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
-<div id="3cbf6ea4" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MTH229</span> <span class="co"># loads SymPy (v2.0 or greater)</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Plots</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plotly</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>┌ Warning: Failed to load integration with PlotlyBase &amp; PlotlyKaleido.
-│   exception =
-│    ArgumentError: Package PlotlyBase not found in current path.
-│    - Run `import Pkg; Pkg.add("PlotlyBase")` to install the PlotlyBase package.
-│    Stacktrace:
-│      [1] macro expansion
-│        @ ./loading.jl:1772 [inlined]
-│      [2] macro expansion
-│        @ ./lock.jl:267 [inlined]
-│      [3] __require(into::Module, mod::Symbol)
-│        @ Base ./loading.jl:1753
-│      [4] #invoke_in_world#3
-│        @ ./essentials.jl:926 [inlined]
-│      [5] invoke_in_world
-│        @ ./essentials.jl:923 [inlined]
-│      [6] require(into::Module, mod::Symbol)
-│        @ Base ./loading.jl:1746
-│      [7] top-level scope
-│        @ ~/.julia/packages/Plots/ju9dp/src/backends.jl:565
-│      [8] eval
-│        @ ./boot.jl:385 [inlined]
-│      [9] _initialize_backend(pkg::Plots.PlotlyBackend)
-│        @ Plots ~/.julia/packages/Plots/ju9dp/src/backends.jl:564
-│     [10] backend
-│        @ ~/.julia/packages/Plots/ju9dp/src/backends.jl:244 [inlined]
-│     [11] plotly()
-│        @ Plots ~/.julia/packages/Plots/ju9dp/src/backends.jl:87
-│     [12] top-level scope
-│        @ In[2]:3
-│     [13] eval
-│        @ ./boot.jl:385 [inlined]
-│     [14] include_string(mapexpr::typeof(REPL.softscope), mod::Module, code::String, filename::String)
-│        @ Base ./loading.jl:2076
-│     [15] softscope_include_string(m::Module, code::String, filename::String)
-│        @ SoftGlobalScope ~/.julia/packages/SoftGlobalScope/u4UzH/src/SoftGlobalScope.jl:65
-│     [16] execute_request(socket::ZMQ.Socket, msg::IJulia.Msg)
-│        @ IJulia ~/.julia/packages/IJulia/Vo51o/src/execute_request.jl:67
-│     [17] #invokelatest#2
-│        @ ./essentials.jl:892 [inlined]
-│     [18] invokelatest
-│        @ ./essentials.jl:889 [inlined]
-│     [19] eventloop(socket::ZMQ.Socket)
-│        @ IJulia ~/.julia/packages/IJulia/Vo51o/src/eventloop.jl:8
-│     [20] (::IJulia.var"#15#18")()
-│        @ IJulia ~/.julia/packages/IJulia/Vo51o/src/eventloop.jl:38
-└ @ Plots ~/.julia/packages/Plots/ju9dp/src/backends.jl:574</code></pre>
-</div>
-<div class="cell-output cell-output-display" data-execution_count="2">
-<pre><code>Plots.PlotlyBackend()</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>using MTH229 # loads SymPy (v2.0 or greater)
+using Plots
+plotly()</code></pre>
 <p>There are a few basic ideas behind the <code>SymPy</code> and <code>SymPyPythonCall</code> packages</p>
 <ul>
 <li>Symbolic variables and values can be easily created</li>
@@ -406,67 +316,27 @@ window.Quarto = {
 <section id="symbolic-variables" class="level2" data-number="11.1">
 <h2 data-number="11.1" class="anchored" data-anchor-id="symbolic-variables"><span class="header-section-number">11.1</span> Symbolic variables</h2>
 <p>There are numerous ways to create symbolic objects in SymPy (<code>symbols</code>, <code>sympify</code>, …) but we use the <code>@syms</code> macro to create variables with a given name:</p>
-<div id="df25de37" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
-<pre><code>(x,)</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>@syms x</code></pre>
 <p>One or more variables can be created. In this example, the last one creates a range of values:</p>
-<div id="3def49a9" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> x y zs[<span class="fl">1</span><span class="op">:</span><span class="fl">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
-<pre><code>(x, y, Sym{PyCall.PyObject}[zs₁, zs₂, zs₃, zs₄, zs₅])</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>@syms x y zs[1:5]</code></pre>
 <p>Variables can have basic assumptions placed on them (<code>positive</code>, <code>real</code>), e.g.</p>
-<div id="0b6b9603" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> a<span class="op">::</span><span class="dt">positive</span>, b<span class="op">::</span><span class="dt">real</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="5">
-<pre><code>(a, b)</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>@syms a::positive, b::real</code></pre>
 <p>Symbolic functions can be naturally specified</p>
-<div id="0fb200b8" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> <span class="fu">u</span>()</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">u</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="6">
-<p><span class="math inline">\(u{\left(x \right)}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>@syms u()
+u(x)</code></pre>
 </section>
 <section id="symbolic-numbers" class="level2" data-number="11.2">
 <h2 data-number="11.2" class="anchored" data-anchor-id="symbolic-numbers"><span class="header-section-number">11.2</span> Symbolic numbers</h2>
 <p>If <code>x</code> is symbolic, the expression <code>2x</code> will also be symbolic</p>
-<div id="e24fff94" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fl">2</span>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="7">
-<p><span class="math inline">\(2 x\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>2x</code></pre>
 <p>Behind the scenes, before multiplying, <code>2</code> and <code>x</code> are <em>promoted</em> to a common type, which will be symbolic. So most regular <code>Julia</code> expressions involving one or more symbolic values will simply yield symbolic answers without modification. Integers and rational numbers promote to exact counterparts; floating point numbers convert to floating point values.</p>
 <p>Still, exactness can be lost when the floating point values are created before becoming symbolic:</p>
-<div id="196ee2de" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fl">1</span><span class="op">/</span><span class="fl">10</span> <span class="op">*</span> x <span class="op">+</span> <span class="fl">2</span><span class="op">/</span><span class="fl">10</span> <span class="op">*</span> x <span class="op">-</span> <span class="fl">3</span><span class="op">/</span><span class="fl">10</span> <span class="op">*</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="8">
-<p><span class="math inline">\(5.55111512312578 \cdot 10^{-17} x\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>1/10 * x + 2/10 * x - 3/10 * x</code></pre>
 <p>The above “should” be <span class="math inline">\(0\)</span>, but it isn’t, due to the conversion to floating point prior to become symbolic. For example, the expression <code>1/10 * x</code> first divides <code>10</code> into <code>1</code>, producing a floating point approximation for <code>1/10</code> and this is promoted to symbolic when multiplied by <code>x</code>.</p>
 <p>Using rational numbers or re-expressing for earlier promotion to symbolic will keep the exactness:</p>
-<div id="c5529a8d" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fl">1</span><span class="op">//</span><span class="fl">10</span> <span class="op">*</span> x <span class="op">+</span> <span class="fl">2</span><span class="op">//</span><span class="fl">10</span> <span class="op">*</span> x <span class="op">-</span> <span class="fl">3</span><span class="op">//</span><span class="fl">10</span><span class="op">*</span>x, <span class="fl">1</span>x<span class="op">/</span><span class="fl">10</span> <span class="op">+</span> <span class="fl">2</span>x<span class="op">/</span><span class="fl">10</span> <span class="op">-</span> <span class="fl">3</span>x<span class="op">/</span><span class="fl">10</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="9">
-<pre><code>(0, 0)</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>1//10 * x + 2//10 * x - 3//10*x, 1x/10 + 2x/10 - 3x/10</code></pre>
 <p>Sometimes symbolic values must be created before passing to a function, so dispatch to the symbolic function occurs. Compare these two calls, where the <code>Sym</code> constructor is used to create symbolic numbers:</p>
-<div id="6f676eff" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span>(<span class="fu">Sym</span>(<span class="fl">2</span>)), <span class="fu">log</span>(<span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="10">
-<pre><code>(log(2), 0.6931471805599453)</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>log(Sym(2)), log(2)</code></pre>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -485,154 +355,60 @@ When in doubt, use <code>Sym</code>
 <h2 data-number="11.3" class="anchored" data-anchor-id="substitution"><span class="header-section-number">11.3</span> Substitution</h2>
 <p>Substituting one value in for another, is done many ways, for example there is <a href="https://docs.sympy.org/latest/modules/core.html#sympy.core.basic.Basic.subs">subs</a>, <code>replace</code>, and <code>xreplace</code>. We discuss <code>subs</code>.</p>
 <p>The <code>subs</code> function (or object method) replaces an old value for an new value after <em>sympifying</em><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> the arguments. The old/new pairs can be specified with a tuple (e.g.&nbsp;<code>(old, new)</code>), a dictionary, or the more <code>Julia</code>n syntax, a pairs expression <code>old =&gt; new</code>, with multiple substitutions possibly combined in a tuple.</p>
-<div id="6585461c" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> a b c x y</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>ex <span class="op">=</span> a<span class="op">*</span>x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> b<span class="op">*</span> x <span class="op">+</span> c <span class="op">-</span> y</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">subs</span>(ex, x <span class="op">=&gt;</span> y<span class="op">-</span><span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="11">
-<p><span class="math inline">\(a \left(y - 1\right)^{2} + b \left(y - 1\right) + c - y\)</span></p>
-</div>
-</div>
-<div id="d3c5b67b" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">subs</span>(ex, a <span class="op">=&gt;</span> <span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="12">
-<p><span class="math inline">\(b x + c + 2 x^{2} - y\)</span></p>
-</div>
-</div>
-<div id="55d75208" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">subs</span>(ex, a<span class="op">=&gt;</span><span class="fl">3</span>, b<span class="op">=&gt;</span><span class="fl">2</span>, c<span class="op">=&gt;</span><span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="13">
-<p><span class="math inline">\(3 x^{2} + 2 x - y + 1\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>@syms a b c x y
+ex = a*x^2 + b* x + c - y
+subs(ex, x =&gt; y-1)</code></pre>
+<pre class="{julia}"><code>subs(ex, a =&gt; 2)</code></pre>
+<pre class="{julia}"><code>subs(ex, a=&gt;3, b=&gt;2, c=&gt;1)</code></pre>
 <p>The latter is akin to function evaluation. As such, the call notation for symbolic expressions is defined to use <code>subs</code>:</p>
-<div id="128f444a" class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ex</span>(a<span class="op">=&gt;</span><span class="fl">3</span>, b<span class="op">=&gt;</span><span class="fl">2</span>, c<span class="op">=&gt;</span><span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="14">
-<p><span class="math inline">\(3 x^{2} + 2 x - y + 1\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>ex(a=&gt;3, b=&gt;2, c=&gt;1)</code></pre>
 </section>
 <section id="numerical-evaluation" class="level2" data-number="11.4">
 <h2 data-number="11.4" class="anchored" data-anchor-id="numerical-evaluation"><span class="header-section-number">11.4</span> Numerical evaluation</h2>
 <p>An exact symbolic value may be the result of a computation, but it may be of interest to convert that value to a number (e.g.&nbsp;<code>1.414...</code> instead of <span class="math inline">\(\sqrt{2}\)</span>).</p>
 <p>SymPy objects have an <code>evalf</code> method that finds a floating-point value.</p>
-<div id="280bf367" class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> <span class="fu">exp</span>(<span class="fu">Sym</span>(<span class="fl">2</span>)) <span class="op">-</span> <span class="fu">exp</span>(<span class="fu">-Sym</span>(<span class="fl">2</span>))</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="15">
-<p><span class="math inline">\(- \frac{1}{e^{2}} + e^{2}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>u = exp(Sym(2)) - exp(-Sym(2))
+u</code></pre>
 <p>The value of <code>u</code> is exact. In this next cell, we call the <code>evalf</code> method and compare to a computation within <code>Julia</code>:</p>
-<div id="057be1b3" class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>u.<span class="fu">evalf</span>(), <span class="fu">exp</span>(<span class="fl">2</span>) <span class="op">-</span> <span class="fu">exp</span>(<span class="op">-</span><span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="16">
-<pre><code>(7.25372081569404, 7.253720815694038)</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>u.evalf(), exp(2) - exp(-2)</code></pre>
 <p>The default for <code>.evalf()</code> is 15 decimal points; similar but not the same as for Julia. The method allows a specification of the number of digits in its first argument. (The <code>verbose=true</code> argument illustrates some of the algorithm employed.)</p>
-<div id="b806890d" class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>u.<span class="fu">evalf</span>(<span class="fl">50</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="17">
-<p><span class="math inline">\(7.2537208156940375353364279656025234097726840246423\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>u.evalf(50)</code></pre>
 <p>The result of <code>evalf</code> looks numeric, but internally the values are symbolic values within <code>SymPy</code>.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> In <code>SymPy.jl</code> the <code>N</code> function converts the exact value to a <code>Julia</code> number type with an attempt to match the type in Python with a corresponding type in <code>Julia</code>. In this example, that is <code>Rational</code>.</p>
-<div id="82bdd91b" class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> <span class="fu">Sym</span>(<span class="fl">1</span>) <span class="op">/</span> <span class="fl">1000</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>u.<span class="fu">evalf</span>(), <span class="fu">N</span>(u)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="18">
-<pre><code>(0.00100000000000000, 1//1000)</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>u = Sym(1) / 1000
+u.evalf(), N(u)</code></pre>
 <p>For repeated conversions of expressions to numeric values, the <code>lambdify</code> method creates a <code>Julia</code> function from an expression, which can then be called as any other function.</p>
-<div id="35e8edb0" class="cell" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> x</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>ex <span class="op">=</span> <span class="fu">cos</span>(x)</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>l <span class="op">=</span>  <span class="fu">lambdify</span>(ex)</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ex</span>(PI<span class="op">/</span><span class="fl">3</span>), <span class="fu">ex</span>(<span class="cn">pi</span><span class="op">/</span><span class="fl">3</span>), <span class="fu">l</span>(<span class="cn">pi</span><span class="op">/</span><span class="fl">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="19">
-<pre><code>(1/2, 0.500000000000000, 0.5000000000000001)</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>@syms x
+ex = cos(x)
+l =  lambdify(ex)
+ex(PI/3), ex(pi/3), l(pi/3)</code></pre>
 </section>
 <section id="solving-an-equation" class="level2" data-number="11.5">
 <h2 data-number="11.5" class="anchored" data-anchor-id="solving-an-equation"><span class="header-section-number">11.5</span> Solving an equation</h2>
 <p><code>SymPy</code> can be used to solve many algebraically solvable equations. The <a href="https://docs.sympy.org/latest/modules/solvers/solvers.html#sympy.solvers.solvers.solve">solve</a> and <a href="https://docs.sympy.org/latest/modules/solvers/solveset.html#solveset">solveset</a> functions are used.</p>
 <p>By default, an expression is interpreted as an equation set equal to <code>0</code>. However, we will always model the use of <code>rhs ~ lhs</code> to separate two sides of an equation.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
 <p>Here the equation <span class="math inline">\(x^2 = 2\)</span> is solved for:</p>
-<div id="31e5b863" class="cell" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> x y<span class="op">::</span><span class="dt">real </span>z<span class="op">::</span><span class="dt">positive</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">solve</span>(x<span class="op">^</span><span class="fl">2</span> <span class="op">~</span> <span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="20">
-<pre><code>2-element Vector{Sym{PyCall.PyObject}}:
- -√2
-  √2</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>@syms x y::real z::positive
+solve(x^2 ~ 2)</code></pre>
 <p>Simple assumptions on the variables are respected:</p>
-<div id="a31df3b9" class="cell" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">solve</span>(y<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">1</span> <span class="op">~</span> <span class="fl">0</span>), <span class="fu">solve</span>(z <span class="op">+</span> <span class="fl">1</span> <span class="op">~</span> <span class="fl">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="21">
-<pre><code>(Any[], Any[])</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>solve(y^2 + 1 ~ 0), solve(z + 1 ~ 0)</code></pre>
 <p>Equations can have symbolic variables included. In which case, passing in the second argument the variable(s) to solve for is done:</p>
-<div id="39e7b435" class="cell" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> a b c</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">solve</span>(a<span class="op">*</span>x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> b<span class="op">*</span>x <span class="op">+</span> c <span class="op">~</span> <span class="fl">0</span>, x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="22">
-<pre><code>2-element Vector{Sym{PyCall.PyObject}}:
- (-b - sqrt(-4*a*c + b^2))/(2*a)
- (-b + sqrt(-4*a*c + b^2))/(2*a)</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>@syms a b c
+solve(a*x^2 + b*x + c ~ 0, x)</code></pre>
 <p>The <code>solve</code> function has many different types of return values. The <code>solveset</code> function always returns a set. For <em>finite</em> sets, a <code>Julia</code> <code>Set</code> object is returned. For <em>infinite</em> sets, this is not the case.</p>
-<div id="7980d162" class="cell" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">solveset</span>(a<span class="op">*</span>x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> b<span class="op">*</span>x <span class="op">+</span> c <span class="op">~</span> <span class="fl">0</span>, x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="23">
-<pre><code>Set{Sym} with 2 elements:
-  -b/(2*a) + sqrt(-4*a*c + b^2)/(2*a)
-  -b/(2*a) - sqrt(-4*a*c + b^2)/(2*a)</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>solveset(a*x^2 + b*x + c ~ 0, x)</code></pre>
 <p>This may look the same as the last call using <code>solve</code>, but a finite set is unordered, so indexing doesn’t work unless the set is collected (using <code>collect</code>) into a vector.</p>
 <p>For infinite sets, the answer is queried. In this command we check for inclusion:<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a></p>
-<div id="3e6d5cde" class="cell" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> <span class="fu">solveset</span>(<span class="fu">sin</span>(x) <span class="op">~</span> <span class="fl">0</span>, x)</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="cn">pi</span> <span class="kw">in</span> u</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="24">
-<pre><code>true</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>u = solveset(sin(x) ~ 0, x)
+pi in u</code></pre>
 <p>Intersecting with a finite interval will create a finite set:<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a></p>
-<div id="f806cf2c" class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>S <span class="op">=</span> sympy.<span class="fu">Interval</span>(<span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span>)</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">intersect</span>(S, u)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="25">
-<pre><code>Set{Sym} with 3 elements:
-  0
-  pi
-  -pi</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>S = sympy.Interval(-5, 5)
+intersect(S, u)</code></pre>
 <section id="numerically-solving-an-equation" class="level3" data-number="11.5.1">
 <h3 data-number="11.5.1" class="anchored" data-anchor-id="numerically-solving-an-equation"><span class="header-section-number">11.5.1</span> Numerically solving an equation</h3>
 <p>Not all equations can be solved symbolically. For example, finding the solution(s) to <span class="math inline">\(\cos(x) = x\)</span> will result in an error:</p>
-<div id="2d83d2c9" class="cell" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>try <span class="fu">solve</span>(<span class="fu">cos</span>(x) <span class="op">~</span> x) catch err <span class="st">"No algorithms are implemented to solve equation -x + cos(x)"</span> <span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="26">
-<pre><code>"No algorithms are implemented to solve equation -x + cos(x)"</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>try solve(cos(x) ~ x) catch err "No algorithms are implemented to solve equation -x + cos(x)" end</code></pre>
 <p>Within <code>SymPy</code>, there is <a href="https://docs.sympy.org/latest/modules/solvers/solvers.html#sympy.solvers.solvers.nsolve">nsolve</a>:</p>
-<div id="a000ef04" class="cell" data-execution_count="26">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>sympy.<span class="fu">nsolve</span>(<span class="fu">cos</span>(x) <span class="op">~</span> x, <span class="cn">pi</span><span class="op">/</span><span class="fl">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="27">
-<p><span class="math inline">\(0.739085133215161\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>sympy.nsolve(cos(x) ~ x, pi/4)</code></pre>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -652,15 +428,8 @@ Newer version of <code>Roots</code>
 <section id="systems-of-equations" class="level3" data-number="11.5.2">
 <h3 data-number="11.5.2" class="anchored" data-anchor-id="systems-of-equations"><span class="header-section-number">11.5.2</span> Systems of equations</h3>
 <p>The <code>solve</code> function can solve systems of equations. These can be specified by wrapping one or more equations into a container (using parentheses to form a tuple is suggested) and specifying the symbols similarly:</p>
-<div id="a63ecb7e" class="cell" data-execution_count="27">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> x<span class="op">::</span><span class="dt">real </span>y<span class="op">::</span><span class="dt">real</span></span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">solve</span>((x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> y<span class="op">^</span><span class="fl">2</span> <span class="op">~</span> <span class="fl">1</span>, y <span class="op">~</span> x<span class="op">^</span><span class="fl">2</span>), (x,y))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="28">
-<pre><code>2-element Vector{Tuple{Sym{PyCall.PyObject}, Sym{PyCall.PyObject}}}:
- (-sqrt(-1/2 + sqrt(5)/2), -1/2 + sqrt(5)/2)
- (sqrt(-1/2 + sqrt(5)/2), -1/2 + sqrt(5)/2)</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>@syms x::real y::real
+solve((x^2 + y^2 ~ 1, y ~ x^2), (x,y))</code></pre>
 </section>
 </section>
 <section id="calculus-specific-functions" class="level2" data-number="11.6">
@@ -669,21 +438,11 @@ Newer version of <code>Roots</code>
 <section id="limits" class="level3" data-number="11.6.1">
 <h3 data-number="11.6.1" class="anchored" data-anchor-id="limits"><span class="header-section-number">11.6.1</span> Limits</h3>
 <p>Limits may be taken symbolically using <code>limit</code>. The specification <span class="math inline">\(x \rightarrow c\)</span> can be specified with a tuple (<code>(x,c)</code>) or pair (<code>x =&gt; c</code>). Directional limits are specified with <code>dir="-"</code>, <code>dir="+"</code> (the default), or <code>dir="+-"</code>.</p>
-<div id="409b7275" class="cell" data-execution_count="28">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> a<span class="op">::</span><span class="dt">positive </span>b<span class="op">::</span><span class="dt">positive </span>x<span class="op">::</span><span class="dt">real</span></span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>ex <span class="op">=</span> ((a<span class="op">^</span>x <span class="op">-</span> <span class="fu">x*log</span>(a)) <span class="op">/</span> (b<span class="op">^</span>x <span class="op">-</span> <span class="fu">x*log</span>(b)))<span class="op">^</span>(<span class="fl">1</span><span class="op">/</span>x<span class="op">^</span><span class="fl">2</span>)</span>
-<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="fu">limit</span>(ex, x<span class="op">=&gt;</span><span class="fl">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="29">
-<p><span class="math inline">\(e^{\frac{\log{\left(a \right)}^{2}}{2} - \frac{\log{\left(b \right)}^{2}}{2}}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>@syms a::positive b::positive x::real
+ex = ((a^x - x*log(a)) / (b^x - x*log(b)))^(1/x^2)
+L = limit(ex, x=&gt;0)</code></pre>
 <p>For a given set of values of <code>a</code> and <code>b</code>, we can see different answers:</p>
-<div id="2d3fc3cf" class="cell" data-execution_count="29">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">N</span>(<span class="fu">L</span>(a<span class="op">=&gt;</span><span class="fl">2</span>, b<span class="op">=&gt;</span><span class="fl">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="30">
-<pre><code>0.6954139679176876</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>N(L(a=&gt;2, b=&gt;3))</code></pre>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -695,15 +454,10 @@ Watch out for early conversion
 </div>
 <div class="callout-body-container callout-body">
 <p>The above example will fail if instead of making <code>a</code> and <code>b</code> symbolic and then substituting values of <code>2</code> and <code>3</code>, the expression were substituted in at the outset:</p>
-<div id="29c028a7" class="cell" data-execution_count="30">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> x<span class="op">::</span><span class="dt">real</span></span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>a, b <span class="op">=</span> <span class="fl">2</span>, <span class="fl">3</span></span>
-<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>ex <span class="op">=</span> ((a<span class="op">^</span>x <span class="op">-</span> <span class="fu">x*log</span>(a)) <span class="op">/</span> (b<span class="op">^</span>x <span class="op">-</span> <span class="fu">x*log</span>(b)))<span class="op">^</span>(<span class="fl">1</span><span class="op">/</span>x<span class="op">^</span><span class="fl">2</span>)</span>
-<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="fu">limit</span>(ex, x<span class="op">=&gt;</span><span class="fl">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="31">
-<p><span class="math inline">\(\infty\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>@syms x::real
+a, b = 2, 3
+ex = ((a^x - x*log(a)) / (b^x - x*log(b)))^(1/x^2)
+L = limit(ex, x=&gt;0)</code></pre>
 <p>This is because both <code>log(a)</code> and <code>log(b)</code> are then inexact values for <span class="math inline">\(\log(2)\)</span> and <span class="math inline">\(\log(3)\)</span> respectively.</p>
 </div>
 </div>
@@ -723,43 +477,23 @@ f(x) = \frac{\cos{\left(2 x \right)} + 1}{\left(x + \sin{\left(x \right)} \cos{\
 + \left(- \sin^{2}{\left(x \right)} + \cos^{2}{\left(x \right)} + 1\right) e^{\sin{\left(x \right)}}}
 \]</span></p>
 <p>A straightforward approach doesn’t work:</p>
-<div id="5f101dc5" class="cell" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">den</span>(x) <span class="op">=</span> <span class="fl">1</span><span class="op">//</span><span class="fl">2</span><span class="fu">*sin</span>(<span class="fl">2</span>x) <span class="op">+</span> x</span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="fu">num</span>(x) <span class="op">=</span> <span class="fu">exp</span>(<span class="fu">sin</span>(x))<span class="fu">*</span>(<span class="fu">cos</span>(x)<span class="fu">*sin</span>(x) <span class="op">+</span> x)</span>
-<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>up, vp <span class="op">=</span> <span class="fu">diff</span>(<span class="fu">den</span>(x),x), <span class="fu">diff</span>(<span class="fu">num</span>(x),x)</span>
-<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a><span class="fu">limit</span>(up<span class="op">/</span>vp, x<span class="op">=&gt;</span> oo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="32">
-<p><span class="math inline">\(\lim_{x \to \infty}\left(\frac{\cos{\left(2 x \right)} + 1}{\left(x + \sin{\left(x \right)} \cos{\left(x \right)}\right) e^{\sin{\left(x \right)}} \cos{\left(x \right)} + \left(- \sin^{2}{\left(x \right)} + \cos^{2}{\left(x \right)} + 1\right) e^{\sin{\left(x \right)}}}\right)\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>den(x) = 1//2*sin(2x) + x
+num(x) = exp(sin(x))*(cos(x)*sin(x) + x)
+up, vp = diff(den(x),x), diff(num(x),x)
+limit(up/vp, x=&gt; oo)</code></pre>
 <p>As seen, <code>SymPy</code> returns an unevaluated limit expression, as no answer can be found. However, if the expression is <em>simplified</em>, <code>SymPy</code> will return the correct answer:</p>
-<div id="abf95b31" class="cell" data-execution_count="32">
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">limit</span>(<span class="fu">simplify</span>(up<span class="op">/</span>vp), x <span class="op">=&gt;</span> oo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="33">
-<p><span class="math inline">\(0\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>limit(simplify(up/vp), x =&gt; oo)</code></pre>
 </div>
 </div>
 </section>
 <section id="differentiation" class="level3" data-number="11.6.2">
 <h3 data-number="11.6.2" class="anchored" data-anchor-id="differentiation"><span class="header-section-number">11.6.2</span> Differentiation</h3>
 <p>Derivatives are taken through <code>diff(ex, var, ...)</code> with variants for multiple or mixed derivatives. The basic usage is pretty straightforward. The derivative with respect to <span class="math inline">\(x\)</span> of an expression is found as follows:</p>
-<div id="9e817de5" class="cell" data-execution_count="33">
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> x a b</span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>ex <span class="op">=</span> <span class="fu">sin</span>(a<span class="op">*</span>x <span class="op">-</span> b)</span>
-<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a><span class="fu">diff</span>(ex, x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="34">
-<p><span class="math inline">\(a \cos{\left(a x - b \right)}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>@syms x a b
+ex = sin(a*x - b)
+diff(ex, x)</code></pre>
 <p>Second derivatives can be more succinctly expressed by adding more variables:</p>
-<div id="6e6c7a12" class="cell" data-execution_count="34">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">diff</span>(ex, x, x) <span class="co"># 2nd derivative</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="35">
-<p><span class="math inline">\(- a^{2} \sin{\left(a x - b \right)}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>diff(ex, x, x) # 2nd derivative</code></pre>
 </section>
 <section id="integration" class="level3" data-number="11.6.3">
 <h3 data-number="11.6.3" class="anchored" data-anchor-id="integration"><span class="header-section-number">11.6.3</span> Integration</h3>
@@ -785,132 +519,49 @@ f(x) = \frac{\cos{\left(2 x \right)} + 1}{\left(x + \sin{\left(x \right)} \cos{\
 <p>The <em>indefinite integral</em>, <span class="math inline">\(\int f(x) dx\)</span>, is computed with <code>integrate(f(x), x)</code> where <code>f(x)</code> is some expression depending on <code>x</code> and may have symbolic parameters.</p>
 <p>Definite integrals, <span class="math inline">\(\int_a^b f(x)dx\)</span>, are computed with <code>integrate(f(x), (x, a, b))</code>.</p>
 <p>For example:</p>
-<div id="16735e11" class="cell" data-execution_count="35">
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> x c a b</span>
-<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">integrate</span>(x <span class="op">*</span> <span class="fu">exp</span>(x<span class="op">^</span><span class="fl">2</span>), x) <span class="co"># integration by parts</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="36">
-<p><span class="math inline">\(\frac{e^{x^{2}}}{2}\)</span></p>
-</div>
-</div>
-<div id="94f9ff8a" class="cell" data-execution_count="36">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">integrate</span>(<span class="fu">sin</span>(x)<span class="op">^</span><span class="fl">2</span>, x)  <span class="co"># integration by parts</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="37">
-<p><span class="math inline">\(\frac{x}{2} - \frac{\sin{\left(x \right)} \cos{\left(x \right)}}{2}\)</span></p>
-</div>
-</div>
-<div id="76076771" class="cell" data-execution_count="37">
-<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">integrate</span>(x<span class="op">^</span><span class="fl">5</span><span class="op">/</span>(<span class="fl">36</span>x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">1</span>)<span class="op">^</span>(<span class="fl">3</span><span class="op">//</span><span class="fl">2</span>), (x, <span class="fl">0</span>, <span class="fl">1</span><span class="op">//</span><span class="fl">6</span>)) <span class="co"># trig subs with x = tan(theta)/6</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="38">
-<p><span class="math inline">\(\frac{1}{17496} - \frac{11 \sqrt{2}}{279936}\)</span></p>
-</div>
-</div>
-<div id="ae1c4aea" class="cell" data-execution_count="38">
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>ex <span class="op">=</span> (x<span class="op">^</span><span class="fl">4</span> <span class="op">+</span> <span class="fl">1</span>) <span class="op">/</span> ( (x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">1</span>)<span class="op">^</span><span class="fl">2</span> <span class="op">*</span> (x<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">4</span>)<span class="op">^</span><span class="fl">2</span>)</span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">integrate</span>(ex, x) <span class="co"># partial fraction</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="39">
-<p><span class="math inline">\(\frac{- 9 x^{3} - 49 x}{200 x^{4} - 600 x^{2} - 800} - \frac{37 \log{\left(x - 2 \right)}}{4000} + \frac{37 \log{\left(x + 2 \right)}}{4000} - \frac{\operatorname{atan}{\left(x \right)}}{125}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>@syms x c a b
+integrate(x * exp(x^2), x) # integration by parts</code></pre>
+<pre class="{julia}"><code>integrate(sin(x)^2, x)  # integration by parts</code></pre>
+<pre class="{julia}"><code>integrate(x^5/(36x^2 + 1)^(3//2), (x, 0, 1//6)) # trig subs with x = tan(theta)/6</code></pre>
+<pre class="{julia}"><code>ex = (x^4 + 1) / ( (x^2 + 1)^2 * (x^2 - 4)^2)
+integrate(ex, x) # partial fraction</code></pre>
 <p>We can see how this is done by taking the partial fraction decomposition provided by <code>apart</code>:</p>
-<div id="51de686c" class="cell" data-execution_count="39">
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>us <span class="op">=</span> <span class="fu">apart</span>(ex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="40">
-<p><span class="math inline">\(- \frac{6}{125 \left(x^{2} + 1\right)} + \frac{2}{25 \left(x^{2} + 1\right)^{2}} + \frac{37}{4000 \left(x + 2\right)} + \frac{17}{400 \left(x + 2\right)^{2}} - \frac{37}{4000 \left(x - 2\right)} + \frac{17}{400 \left(x - 2\right)^{2}}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>us = apart(ex)</code></pre>
 <p>and then integrate term-by-term:</p>
-<div id="26589922" class="cell" data-execution_count="40">
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>[<span class="fu">integrate</span>(a, x) for a <span class="op">∈</span> Introspection.<span class="fu">arguments</span>(us)] <span class="co"># newer SymPy</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="41">
-<pre><code>6-element Vector{Sym{PyCall.PyObject}}:
-    -37*log(4000*x - 8000)/4000
-                 -6*atan(x)/125
- 2*x/(50*x^2 + 50) + atan(x)/25
-              -17/(400*x - 800)
-              -17/(400*x + 800)
-     37*log(4000*x + 8000)/4000</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>[integrate(a, x) for a ∈ Introspection.arguments(us)] # newer SymPy</code></pre>
 <hr>
 <p>This finds the area bounded by two parabola:</p>
-<div id="42218a1c" class="cell" data-execution_count="41">
-<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fl">1</span> <span class="op">-</span> <span class="fl">2</span>x<span class="op">^</span><span class="fl">2</span></span>
-<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="fu">g</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span></span>
-<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>as <span class="op">=</span> <span class="fu">solve</span>(<span class="fu">f</span>(x) <span class="op">~</span> <span class="fu">g</span>(x), x)</span>
-<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>a,b <span class="op">=</span> <span class="fu">sort</span>(as)</span>
-<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a><span class="fu">integrate</span>(<span class="fu">f</span>(x) <span class="op">-</span> <span class="fu">g</span>(x), (x, a, b))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="42">
-<p><span class="math inline">\(\frac{4 \sqrt{3}}{9}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>f(x) = 1 - 2x^2
+g(x) = x^2
+as = solve(f(x) ~ g(x), x)
+a,b = sort(as)
+integrate(f(x) - g(x), (x, a, b))</code></pre>
 <hr>
 <p>Following an example from <a href="https://apcentral.collegeboard.org/media/pdf/Volumes_of_Solids_of_Revolution_Calculus_CM.pdf">AP</a>, we look at the solid formed by rotating the region bounded by <span class="math inline">\(y = \sqrt{x+2}\)</span> and <span class="math inline">\(y=e^x\)</span> about the line <span class="math inline">\(y = -2\)</span>.</p>
 <p>We first find the intersection points, solutions to <span class="math inline">\(f(x) = g(x)\)</span>. We will solve for these, and will have success, as <code>SymPy</code> uses some special functions</p>
-<div id="71550e4e" class="cell" data-execution_count="42">
-<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> x</span>
-<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">exp</span>(x)</span>
-<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a><span class="fu">g</span>(x) <span class="op">=</span> <span class="fu">sqrt</span>(x <span class="op">+</span> <span class="fl">2</span>)</span>
-<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>a,b <span class="op">=</span> <span class="fu">sort</span>(<span class="fu">solve</span>(<span class="fu">f</span>(x) <span class="op">~</span> <span class="fu">g</span>(x), x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="43">
-<pre><code>2-element Vector{Sym{PyCall.PyObject}}:
-     -2 - LambertW(-2*exp(-4))/2
- -2 - LambertW(-2*exp(-4), -1)/2</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>@syms x
+f(x) = exp(x)
+g(x) = sqrt(x + 2)
+a,b = sort(solve(f(x) ~ g(x), x))</code></pre>
 <p>The integral requires two radii from the line <span class="math inline">\(y=-2\)</span>. We have on <span class="math inline">\((a,b)\)</span> that <span class="math inline">\(g(x) &gt; f(x) &gt; 0\)</span>, so the distance of <span class="math inline">\(g(x)\)</span> from <span class="math inline">\(y=-2\)</span> is greater than that of <span class="math inline">\(f(x)\)</span>, hence the ordering below:</p>
-<div id="0aa8d8b6" class="cell" data-execution_count="43">
-<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>r1, r2 <span class="op">=</span> (<span class="fu">g</span>(x) <span class="op">-</span> (<span class="op">-</span><span class="fl">2</span>)), (<span class="fu">f</span>(x) <span class="op">-</span> (<span class="op">-</span><span class="fl">2</span>))</span>
-<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>v <span class="op">=</span> <span class="fu">integrate</span>(PI <span class="op">*</span> (r1<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> r2<span class="op">^</span><span class="fl">2</span>) , (x, a, b))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="44">
-<p><span class="math inline">\(- \pi \left(-4 + \frac{4 \sqrt{2} \sqrt{- W\left(- \frac{2}{e^{4}}\right)} \left(-2 - \frac{W\left(- \frac{2}{e^{4}}\right)}{2}\right)}{3} - \frac{4}{e^{\frac{W\left(- \frac{2}{e^{4}}\right)}{2} + 2}} - \frac{1}{2 e^{W\left(- \frac{2}{e^{4}}\right) + 4}} - W\left(- \frac{2}{e^{4}}\right) + \frac{8 \sqrt{2} \sqrt{- W\left(- \frac{2}{e^{4}}\right)}}{3} + \frac{\left(-2 - \frac{W\left(- \frac{2}{e^{4}}\right)}{2}\right)^{2}}{2}\right) + \pi \left(- 4 e^{-2 - \frac{W_{-1}\left(- \frac{2}{e^{4}}\right)}{2}} - 4 - \frac{e^{-4 - W_{-1}\left(- \frac{2}{e^{4}}\right)}}{2} + \frac{\left(-2 - \frac{W_{-1}\left(- \frac{2}{e^{4}}\right)}{2}\right)^{2}}{2} + \frac{4 \sqrt{2} \sqrt{- W_{-1}\left(- \frac{2}{e^{4}}\right)} \left(-2 - \frac{W_{-1}\left(- \frac{2}{e^{4}}\right)}{2}\right)}{3} - W_{-1}\left(- \frac{2}{e^{4}}\right) + \frac{8 \sqrt{2} \sqrt{- W_{-1}\left(- \frac{2}{e^{4}}\right)}}{3}\right)\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>r1, r2 = (g(x) - (-2)), (f(x) - (-2))
+v = integrate(PI * (r1^2 - r2^2) , (x, a, b))</code></pre>
 <p>This isn’t a satisfying answer if you want to know the scale. We call <code>evalf</code> to give the value:</p>
-<div id="d6de8121" class="cell" data-execution_count="44">
-<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>v.<span class="fu">evalf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="45">
-<p><span class="math inline">\(19.7247527844568\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>v.evalf()</code></pre>
 <hr>
 <p>This finds the length of the graph of <span class="math inline">\(x^2\)</span> between <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span>:</p>
-<div id="fa1ee6f7" class="cell" data-execution_count="45">
-<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span></span>
-<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>dL <span class="op">=</span> <span class="fu">sqrt</span>(<span class="fl">1</span> <span class="op">+</span> <span class="fu">diff</span>(<span class="fu">f</span>(x),x)<span class="op">^</span><span class="fl">2</span>)</span>
-<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> <span class="fu">integrate</span>(dL, (x, <span class="fl">0</span>, <span class="fl">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="46">
-<p><span class="math inline">\(\frac{\operatorname{asinh}{\left(2 \right)}}{4} + \frac{\sqrt{5}}{2}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>f(x) = x^2
+dL = sqrt(1 + diff(f(x),x)^2)
+p = integrate(dL, (x, 0, 1))</code></pre>
 <p>With numeric value</p>
-<div id="bfe25dad" class="cell" data-execution_count="46">
-<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>p.<span class="fu">evalf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="47">
-<p><span class="math inline">\(1.4789428575446\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>p.evalf()</code></pre>
 <p>To find the surface area of the volume formed by rotating the graph of <span class="math inline">\(f(x) = \sqrt{9 - x^2}\)</span> between <span class="math inline">\(-1 \leq x \leq 2\)</span> we have:</p>
-<div id="e9f3396a" class="cell" data-execution_count="47">
-<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">sqrt</span>(<span class="fl">9</span> <span class="op">-</span> x<span class="op">^</span><span class="fl">2</span>)</span>
-<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>dSA <span class="op">=</span> <span class="fl">2</span> <span class="op">*</span> PI <span class="op">*</span> <span class="fu">f</span>(x) <span class="op">*</span> <span class="fu">sqrt</span>(<span class="fl">1</span> <span class="op">+</span> <span class="fu">diff</span>(<span class="fu">f</span>(x), x)<span class="op">^</span><span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="48">
-<p><span class="math inline">\(2 \pi \sqrt{9 - x^{2}} \sqrt{\frac{x^{2}}{9 - x^{2}} + 1}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>f(x) = sqrt(9 - x^2)
+dSA = 2 * PI * f(x) * sqrt(1 + diff(f(x), x)^2)</code></pre>
 <p><code>SymPy</code> can’t see how to do this, we need to help. By squaring, we can see terms will cancel:</p>
-<div id="bdfd850a" class="cell" data-execution_count="48">
-<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>dSA <span class="op">=</span> <span class="fu">sqrt</span>(<span class="fu">cancel</span>(dSA<span class="op">^</span><span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="49">
-<p><span class="math inline">\(6 \pi\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>dSA = sqrt(cancel(dSA^2))</code></pre>
 <p>And</p>
-<div id="9f48e681" class="cell" data-execution_count="49">
-<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">integrate</span>(dSA, (x, <span class="op">-</span><span class="fl">1</span>, <span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="50">
-<p><span class="math inline">\(18 \pi\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>integrate(dSA, (x, -1, 2))</code></pre>
 </section>
 <section id="algebraic-manipulation" class="level3" data-number="11.6.4">
 <h3 data-number="11.6.4" class="anchored" data-anchor-id="algebraic-manipulation"><span class="header-section-number">11.6.4</span> Algebraic manipulation</h3>
@@ -918,164 +569,64 @@ f(x) = \frac{\cos{\left(2 x \right)} + 1}{\left(x + \sin{\left(x \right)} \cos{\
 <p><code>SymPy</code> provides some tools to algebraically manipulate expressions, with some addressing rational expressions. Common algebraic manipulations include <code>simpliy</code>/<code>expand</code> along with various specialized functions primarily involving polynomial expressions: <code>factor</code>, <code>cancel</code>, <code>apart</code>, and <code>together</code>.</p>
 <p>Symbolic expressions are routinely simplified. However, as simplification can be expensive, only light simplification is done by default. For example, <code>x^3 * x^2</code> is reduced to <code>x^5</code>; <code>x/3</code> is reduced to <code>(1/3) * x</code>. Further manipulations are possible. The <a href="https://docs.sympy.org/latest/tutorials/intro-tutorial/simplification.html">simplify</a> function is an interface that iterates through dozens of specific simplification steps to completion.</p>
 <p>In this example, the <code>gamma</code> function is <span class="math inline">\(\Gamma(n) = (n-1)!\)</span> for integer <span class="math inline">\(n &gt; 0\)</span>. We see by simplifying, the cancellation occurs:</p>
-<div id="170ec704" class="cell" data-execution_count="50">
-<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> n<span class="op">::</span><span class="dt">integer</span></span>
-<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>u <span class="op">=</span> <span class="fu">gamma</span>(n) <span class="op">/</span> <span class="fu">gamma</span>(n<span class="op">-</span><span class="fl">1</span>)</span>
-<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>u, <span class="fu">simplify</span>(u)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="51">
-<pre><code>(gamma(n)/gamma(n - 1), n - 1)</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>@syms n::integer
+u = gamma(n) / gamma(n-1)
+u, simplify(u)</code></pre>
 <p>The <a href="https://docs.sympy.org/latest/tutorials/intro-tutorial/simplification.html#expand">expand</a> function takes an expression and basically multiplies it out. If new <em>default</em> cancellations occur, expand can actually result in shorter expressions:</p>
-<div id="608b7768" class="cell" data-execution_count="51">
-<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">expand</span>((x<span class="op">-</span><span class="fl">1</span>)<span class="op">^</span><span class="fl">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="52">
-<p><span class="math inline">\(x^{3} - 3 x^{2} + 3 x - 1\)</span></p>
-</div>
-</div>
-<div id="8ea619a5" class="cell" data-execution_count="52">
-<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>ex <span class="op">=</span> (x <span class="op">+</span> <span class="fl">1</span>) <span class="op">*</span> (x <span class="op">-</span> <span class="fl">2</span>) <span class="op">-</span> (x <span class="op">-</span> <span class="fl">1</span>) <span class="op">*</span> x</span>
-<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>ex, <span class="fu">expand</span>(ex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="53">
-<pre><code>(-x*(x - 1) + (x - 2)*(x + 1), -2)</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>expand((x-1)^3)</code></pre>
+<pre class="{julia}"><code>ex = (x + 1) * (x - 2) - (x - 1) * x
+ex, expand(ex)</code></pre>
 <p>The <a href="https://docs.sympy.org/latest/tutorials/intro-tutorial/simplification.html#factor">factor</a> function applied to polynomials is the opposite of expand. This function uses a multivariate factorization algorithm over the <em>rational</em> numbers. This point means not everything factorable is factored:</p>
-<div id="78d1ce8d" class="cell" data-execution_count="53">
-<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="fu">factor</span>(x<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">4</span>), <span class="fu">factor</span>(x<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="54">
-<pre><code>((x - 2)*(x + 2), x^2 - 3)</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>factor(x^2 - 4), factor(x^2 - 3)</code></pre>
 <p>Whereas, the latter factoring could be achieved through</p>
-<div id="57b35acc" class="cell" data-execution_count="54">
-<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prod</span>(x <span class="op">-</span> u <span class="cf">for</span> u <span class="kw">in</span> <span class="fu">solve</span>(x<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="55">
-<p><span class="math inline">\(\left(x - \sqrt{3}\right) \left(x + \sqrt{3}\right)\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>prod(x - u for u in solve(x^2 - 3))</code></pre>
 <p>The <code>collect</code> function of sympy collects common powers of a term in an expression. The <code>collect</code> function of <code>Julia</code> takes an iterable and returns a vector or array of values. As these are different concepts, the <code>collect</code> function must be called through <code>sympy.collect</code>.</p>
-<div id="69b68b3b" class="cell" data-execution_count="55">
-<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>ex <span class="op">=</span> x<span class="op">*</span>y <span class="op">+</span> x <span class="op">-</span> <span class="fl">3</span> <span class="op">+</span> <span class="fl">2</span><span class="op">*</span>x<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> z<span class="op">*</span>x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> x<span class="op">^</span><span class="fl">3</span></span>
-<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>sympy.<span class="fu">collect</span>(ex, x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="56">
-<p><span class="math inline">\(x^{3} + x^{2} \cdot \left(2 - z\right) + x \left(y + 1\right) - 3\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>ex = x*y + x - 3 + 2*x^2 - z*x^2 + x^3
+sympy.collect(ex, x)</code></pre>
 <p>For rational expressions, the <code>cancel</code> function re-expresses in a canonical form, no common factors and expanded:</p>
-<div id="bd56607c" class="cell" data-execution_count="56">
-<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>ex <span class="op">=</span> (x <span class="op">-</span> <span class="fl">3</span>)<span class="fu">*</span>(x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">2</span><span class="op">*</span>x <span class="op">+</span> <span class="fl">1</span>)<span class="op">/</span>(x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> x)  <span class="co"># common factor of x + 1</span></span>
-<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>ex, <span class="fu">cancel</span>(ex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="57">
-<pre><code>((x - 3)*(x^2 + 2*x + 1)/(x^2 + x), (x^2 - 2*x - 3)/x)</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>ex = (x - 3)*(x^2 + 2*x + 1)/(x^2 + x)  # common factor of x + 1
+ex, cancel(ex)</code></pre>
 <p>The <code>apart</code> function finds a partial fraction decomposition for a rational expression. Such decompositions allow the integration of rational polynomials, as the result denominators are of a specific type (powers of linear or quadratic terms).</p>
-<div id="0dfb23ee" class="cell" data-execution_count="57">
-<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apart</span>(ex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="58">
-<p><span class="math inline">\(x - 2 - \frac{3}{x}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>apart(ex)</code></pre>
 <p>The <code>together</code> function re-expresses such a decomposition as a rational expression.</p>
 </section>
 <section id="sequences-and-series" class="level3" data-number="11.6.5">
 <h3 data-number="11.6.5" class="anchored" data-anchor-id="sequences-and-series"><span class="header-section-number">11.6.5</span> Sequences and series</h3>
 <p>A finite sequence can be generated in a <code>Julia</code>n manner using a comprehension. For example,</p>
-<div id="ef43e98d" class="cell" data-execution_count="58">
-<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>[<span class="fl">1</span><span class="op">/</span><span class="fu">Sym</span>(i)<span class="op">^</span><span class="fl">2</span> for i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="59">
-<pre><code>10-element Vector{Sym{PyCall.PyObject}}:
-     1
-   1/4
-   1/9
-  1/16
-  1/25
-  1/36
-  1/49
-  1/64
-  1/81
- 1/100</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>[1/Sym(i)^2 for i in 1:10]</code></pre>
 <p>The <code>sympy.sequence</code> function can also be used to generate sequences, in this case possibly infinite ones. The specification of the values to iterate over follow the <code>(var, start, end)</code> pattern of integration. In the following <code>oo</code> is used for</p>
-<div id="19cf2187" class="cell" data-execution_count="59">
-<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> i<span class="op">::</span><span class="dt">(integer</span>, nonnegative)</span>
-<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>sympy.<span class="fu">sequence</span>(<span class="fl">1</span><span class="op">/</span>i<span class="op">^</span><span class="fl">2</span>, (i, <span class="fl">1</span>, oo))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="60">
-<p><span class="math inline">\(\left[1, \frac{1}{4}, \frac{1}{9}, \frac{1}{16}, \ldots\right]\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>@syms i::(integer, nonnegative)
+sympy.sequence(1/i^2, (i, 1, oo))</code></pre>
 <p>There are some methods available for working with <a href="https://docs.sympy.org/latest/modules/series/sequences.html">sequences</a> which are not pursued here.</p>
 <hr>
 <p>The <code>Sum</code> function of <code>SymPy</code> represents symbolic sums, both finite and infinite. It is called through <code>sympy.Sum</code> as <code>sympy.Sum(ex, (i, a, b))</code> where <code>ex</code> is an expression of symbolic function in the variable <code>i</code>. The sum is from <code>i=a</code> to <code>i=b</code> where there is <a href="https://docs.sympy.org/latest/modules/concrete.html#concrete-class-reference">convention</a> when <code>a</code> is not less than <code>b</code> and both are finite.</p>
-<div id="d6268715" class="cell" data-execution_count="60">
-<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> i<span class="op">::</span><span class="dt">(integer</span>, nonnegative) r<span class="op">::</span><span class="dt">real </span><span class="fu">u</span>()</span>
-<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> sympy.<span class="fu">Sum</span>(<span class="fu">u</span>(i), (i, <span class="fl">0</span>, <span class="fl">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="61">
-<p><span class="math inline">\(\sum_{i=0}^{5} u{\left(i \right)}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>@syms i::(integer, nonnegative) r::real u()
+s = sympy.Sum(u(i), (i, 0, 5))</code></pre>
 <p>As seen, <code>s</code> is an unevaluated sum. It has a <code>doit</code> method to carry out the evaluation:</p>
-<div id="78c80343" class="cell" data-execution_count="61">
-<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>s.<span class="fu">doit</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="62">
-<p><span class="math inline">\(u{\left(0 \right)} + u{\left(1 \right)} + u{\left(2 \right)} + u{\left(3 \right)} + u{\left(4 \right)} + u{\left(5 \right)}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>s.doit()</code></pre>
 <p>The <code>Sum</code> function is aware of some common sums:</p>
-<div id="4a396fcc" class="cell" data-execution_count="62">
-<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> n</span>
-<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>s1 <span class="op">=</span> sympy.<span class="fu">Sum</span>(<span class="fl">1</span><span class="op">/</span>i, (i, <span class="fl">1</span>, n))</span>
-<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a>s2 <span class="op">=</span> sympy.<span class="fu">Sum</span>(<span class="fl">1</span><span class="op">/</span>i<span class="op">^</span><span class="fl">2</span>, (i, <span class="fl">1</span>, n))</span>
-<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a>s3 <span class="op">=</span> sympy.<span class="fu">Sum</span>((<span class="op">-</span><span class="fl">1</span>)<span class="op">^</span>i <span class="op">/</span>i, (i, <span class="fl">1</span>, n))</span>
-<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a>s1.<span class="fu">doit</span>(), s2.<span class="fu">doit</span>(), s3.<span class="fu">doit</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="63">
-<pre><code>(harmonic(n), harmonic(n, 2), -(-1)^(n + 1)*lerchphi(exp_polar(I*pi), 1, n + 1) - log(2))</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>@syms n
+s1 = sympy.Sum(1/i, (i, 1, n))
+s2 = sympy.Sum(1/i^2, (i, 1, n))
+s3 = sympy.Sum((-1)^i /i, (i, 1, n))
+s1.doit(), s2.doit(), s3.doit()</code></pre>
 <p>Infinite sums are specified with <code>oo</code> for <span class="math inline">\(\infty\)</span>. (<code>Inf</code> as well, but <code>oo</code> is more fun to type.)</p>
-<div id="00fec9da" class="cell" data-execution_count="63">
-<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>s4 <span class="op">=</span> sympy.<span class="fu">Sum</span>(<span class="fl">1</span><span class="op">/</span>i<span class="op">^</span><span class="fl">4</span>, (i, <span class="fl">1</span>, oo))</span>
-<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>s5 <span class="op">=</span> sympy.<span class="fu">Sum</span>(<span class="fl">1</span><span class="op">/</span>r<span class="op">^</span>i, (i, <span class="fl">0</span>, oo))</span>
-<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>s4.<span class="fu">doit</span>(), s5.<span class="fu">doit</span>()(r <span class="op">=&gt;</span> <span class="fl">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="64">
-<pre><code>(pi^4/90, 3/2)</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>s4 = sympy.Sum(1/i^4, (i, 1, oo))
+s5 = sympy.Sum(1/r^i, (i, 0, oo))
+s4.doit(), s5.doit()(r =&gt; 3)</code></pre>
 <p>The methods <code>is_convergent</code> and <code>is_absolutely_convergent</code> are useful:</p>
-<div id="31e27501" class="cell" data-execution_count="64">
-<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>s3.<span class="fu">is_convergent</span>(), s3.<span class="fu">is_absolutely_convergent</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="65">
-<pre><code>(True, False)</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>s3.is_convergent(), s3.is_absolutely_convergent()</code></pre>
 <hr>
 <p>Suppose <span class="math inline">\(s_n = (n^2 + 4n)\cdot e^{-2n}\)</span> is <span class="math inline">\(\Sigma s_n\)</span> convergent?</p>
-<div id="c5670cf1" class="cell" data-execution_count="65">
-<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sₙ</span>(n) <span class="op">=</span> (n<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">4</span>n) <span class="op">*</span> <span class="fu">exp</span>(<span class="op">-</span><span class="fl">2</span>n)</span>
-<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> n<span class="op">::</span><span class="dt">(integer</span>, nonnegative)</span>
-<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>sympy.<span class="fu">Sum</span>(<span class="fu">sₙ</span>(n), (n, <span class="fl">1</span>, oo)).<span class="fu">is_convergent</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="66">
-<p><span class="math inline">\(\text{True}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>sₙ(n) = (n^2 + 4n) * exp(-2n)
+@syms n::(integer, nonnegative)
+sympy.Sum(sₙ(n), (n, 1, oo)).is_convergent()</code></pre>
 <p>This is an example on the integral test where <span class="math inline">\(s_n = \ln(n)/n\)</span>.</p>
-<div id="cd3bc1cc" class="cell" data-execution_count="66">
-<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sₙ</span>(n) <span class="op">=</span> <span class="fu">log</span>(n)<span class="op">/</span>n</span>
-<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>sympy.<span class="fu">Sum</span>(<span class="fu">sₙ</span>(n), (n, <span class="fl">1</span>, oo)).<span class="fu">is_convergent</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="67">
-<p><span class="math inline">\(\text{False}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>sₙ(n) = log(n)/n
+sympy.Sum(sₙ(n), (n, 1, oo)).is_convergent()</code></pre>
 <p>However,</p>
-<div id="47b83505" class="cell" data-execution_count="67">
-<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sₙ</span>(n) <span class="op">=</span> <span class="fu">log</span>(n)<span class="op">/</span>n<span class="op">^</span><span class="fl">2</span></span>
-<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a>sympy.<span class="fu">Sum</span>(<span class="fu">sₙ</span>(n), (n, <span class="fl">1</span>, oo)).<span class="fu">is_convergent</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="68">
-<p><span class="math inline">\(\text{True}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>sₙ(n) = log(n)/n^2
+sympy.Sum(sₙ(n), (n, 1, oo)).is_convergent()</code></pre>
 </section>
 </section>
 <section id="parametric-description-of-functions" class="level2" data-number="11.7">
@@ -1085,1749 +636,69 @@ f(x) = \frac{\cos{\left(2 x \right)} + 1}{\left(x + \sin{\left(x \right)} \cos{\
 r(t) = (r\sin(\omega\cdot t), R - r\cos(\omega \cdot t)).
 \]</span></p>
 <p>The function <span class="math inline">\(r\)</span> is vector-valued, not scalar valued. Within <code>Julia</code>, vectors are created using <code>[]</code> with commas separating components. The above might be:</p>
-<div id="86facdb2" class="cell" data-execution_count="68">
-<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> R r t ω</span>
-<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rho</span>(t) <span class="op">=</span> [<span class="fu">r*sin</span>(ω<span class="op">*</span>t), R <span class="op">-</span> <span class="fu">r*cos</span>(ω<span class="op">*</span>t)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="69">
-<pre><code>rho (generic function with 1 method)</code></pre>
-</div>
-</div>
+<pre class="{julia}"><code>@syms R r t ω
+rho(t) = [r*sin(ω*t), R - r*cos(ω*t)]</code></pre>
 <p>We can plot for specific values:</p>
-<div id="dbfae1b4" class="cell" data-execution_count="69">
-<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> (R <span class="op">=&gt;</span> <span class="fl">35</span>, r<span class="op">=&gt;</span><span class="fl">30</span>, ω <span class="op">=&gt;</span> <span class="fl">2</span>PI<span class="op">/</span><span class="fl">120</span>)</span>
-<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a>rt <span class="op">=</span> <span class="fu">subs</span>.(<span class="fu">rho</span>(t), d<span class="op">...</span>) <span class="co"># dots to broadcast and "splat"</span></span>
-<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(rt<span class="op">...</span>, <span class="fl">0</span>, <span class="fl">100</span>)      <span class="co"># dots to splat to two variable</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="70">
-    <div id="50db7bf2-6836-46ad-afdf-5be26d086f40" style="width:672px;height:480px;"></div>
-    <script>
-        requirejs.config({
-        paths: {
-            plotly: 'https://cdn.plot.ly/plotly-2.6.3.min'
-        }
-    });
-    require(['plotly'], function (Plotly) {
-
-    Plotly.newPlot('50db7bf2-6836-46ad-afdf-5be26d086f40', [
-    {
-        "showlegend": true,
-        "mode": "lines",
-        "xaxis": "x",
-        "colorbar": {
-            "y": 0.5115740740740741,
-            "title": "",
-            "len": 0.9604476523767862,
-            "x": 0.9941413573303337
-        },
-        "name": "y1",
-        "yaxis": "y",
-        "legendgroup": "y1",
-        "line": {
-            "color": "rgba(0, 154, 250, 1.000)",
-            "shape": "linear",
-            "dash": "solid",
-            "width": 1
-        },
-        "y": [
-            5.0,
-            5.010383823456213,
-            5.041528105572219,
-            5.093411286566205,
-            5.16599745005205,
-            5.259236347902625,
-            5.373063435034286,
-            5.507399914088559,
-            5.662152789979949,
-            5.837214934272293,
-            6.032465159338901,
-            6.247768302255324,
-            6.482975318366513,
-            6.737923384463748,
-            7.012436011499759,
-            7.306323166764177,
-            7.619381405434581,
-            7.951394011412177,
-            8.30213114734459,
-            8.671350013731878,
-            9.05879501700569,
-            9.464197946465159,
-            9.887278159947083,
-            10.327742778101811,
-            10.78528688714044,
-            11.259593749912856,
-            11.750335025170585,
-            12.257170994862634,
-            12.779750799306964,
-            13.31771268007483,
-            13.870684230419833,
-            14.4382826530783,
-            15.020115025262562,
-            15.615778570663707,
-            16.224860938275405,
-            16.846940487845963,
-            17.48158658176081,
-            18.128359883153525,
-            18.786812660038905,
-            19.456489095257677,
-            20.136925602018085,
-            20.827651144816166,
-            21.528187565512397,
-            22.23804991433895,
-            22.956746785608615,
-            23.68378065789272,
-            24.41864823843284,
-            25.160840811547644,
-            25.909844590793817,
-            26.665141074637233,
-            27.42620740538822,
-            28.19251673115229,
-            28.963538570546028,
-            29.73873917992534,
-            30.51758192287217,
-            31.299527641683657,
-            32.0840350306067,
-            32.87056101055952,
-            33.65856110508082,
-            34.44748981724626,
-            35.23680100729139,
-            36.0259482706796,
-            36.81438531635328,
-            37.601566344906516,
-            38.38694642641741,
-            39.16998187767848,
-            39.95013063856398,
-            40.72685264727373,
-            41.49961021419355,
-            42.2678683941135,
-            43.03109535654626,
-            43.78876275388953,
-            44.540346087177134,
-            45.28532506916606,
-            46.02318398450778,
-            46.75341204675478,
-            47.47550375195502,
-            48.188959228589425,
-            48.89328458361043,
-            49.58799224434188,
-            50.272601296003636,
-            50.94663781462704,
-            51.60963519513129,
-            52.261134474333,
-            52.900684648665674,
-            53.52784298638921,
-            54.14217533407306,
-            54.743256417141126,
-            55.3306701342701,
-            55.904009845437685,
-            56.462878653421136,
-            57.006889678551296,
-            57.535666326531974,
-            58.048842549139124,
-            58.546063097619566,
-            59.026983768613725,
-            59.49127164243197,
-            59.93860531352,
-            60.36867511295338,
-            60.78118332280735,
-            61.17584438225359,
-            61.55238508524096,
-            61.9105447696239,
-            62.25007549760696,
-            62.57074222738096,
-            62.87232297583192,
-            63.154608972209815,
-            63.41740480265131,
-            63.66052854545585,
-            63.88381189702185,
-            64.08710028835577,
-            64.27025299207321,
-            64.43314321981808,
-            64.57565821003254,
-            64.69769930601672,
-            64.79918202422427,
-            64.88003611274654,
-            64.9402055999448,
-            64.9796488331969,
-            64.99833850773145,
-            64.99626168552972,
-            64.97341980428206,
-            64.92982867639265,
-            64.86551847803318,
-            64.78053372825345,
-            64.67493325816264,
-            64.54879017020332,
-            64.40219178754586,
-            64.23523959363855,
-            64.04804916195522,
-            63.84075007598887,
-            63.61348583954694,
-            63.36641377741002,
-            63.09970492642306,
-            62.81354391709425,
-            62.508128845783666,
-            62.18367113757005,
-            61.84039539989081,
-            61.478539267056405,
-            61.09835323574684,
-            60.700100491604076,
-            60.28405672704052,
-            59.85050995038961,
-            59.399760286530565,
-            58.93211976912559,
-            58.4479121246129,
-            57.94747254810561,
-            57.43114747135128,
-            56.89929432291275,
-            56.35228128073657,
-            55.79048701727997,
-            55.21430043737293,
-            54.62412040899708,
-            54.02035548716718,
-            53.40342363110706,
-            52.77375191491525,
-            52.13177623192085,
-            51.4779409929342,
-            50.812698818601405,
-            50.136510226075345,
-            49.44984331022054,
-            48.75317341957223,
-            48.046982827273794,
-            47.331760397221075,
-            46.60800124564372,
-            45.876206398358725,
-            45.136882443932855,
-            44.39054118299401,
-            43.637699273935,
-            42.87887787525412,
-            42.11460228478054,
-            41.34540157603459,
-            40.571808231973655,
-            39.79435777637855,
-            39.01358840313438,
-            38.23004060366328,
-            37.44425679276651,
-            36.65678093313526,
-            35.86815815878963,
-            35.07893439770714,
-            34.289655993901285,
-            33.500869329212264,
-            32.71312044507149,
-            31.92695466450162,
-            31.1429162146142,
-            30.361547849865666,
-            29.583390476332937,
-            28.808982777268568,
-            28.038860840194523,
-            27.273557785793116,
-            26.513603398851508,
-            25.75952376151561,
-            25.01184088910717,
-            24.27107236875609,
-            23.537731001098145,
-            22.812324445286343,
-            22.09535486756133,
-            21.38731859362434,
-            20.688705765053335,
-            20.00000000000002
-        ],
-        "type": "scatter",
-        "x": [
-            0.0,
-            0.789253814424291,
-            1.577961264030507,
-            2.365576362224294,
-            3.1515538785969115,
-            3.9353497163636577,
-            4.716421289017523,
-            5.494227895937369,
-            6.268231096690575,
-            7.03789508377106,
-            7.802687053514666,
-            8.562077574935083,
-            9.315540956225064,
-            10.062555608669141,
-            10.802604407715966,
-            11.535175050960325,
-            12.259760412786967,
-            12.975858895430818,
-            13.682974776210477,
-            14.380618550694667,
-            15.068307271564091,
-            15.74556488293405,
-            16.411922549906492,
-            17.066918983123244,
-            17.71010075809585,
-            18.34102262909087,
-            18.959247837353423,
-            19.5643484134556,
-            20.15590547356036,
-            20.733509509395947,
-            21.29676067173998,
-            21.845269047217048,
-            22.378654928218122,
-            22.896549075755054,
-            23.398592975068038,
-            23.88443908380923,
-            24.35375107263062,
-            24.806204058009694,
-            25.241484827151616,
-            25.659292054812354,
-            26.059336511892518,
-            26.441341265657638,
-            26.80504187144622,
-            27.150186555732834,
-            27.476536390419582,
-            27.783865458235233,
-            28.071961009127588,
-            28.340623607540707,
-            28.589667270475175,
-            28.818919596235748,
-            29.02822188377724,
-            29.21742924256613,
-            29.386410692881743,
-            29.535049256487575,
-            29.66324203761008,
-            29.770900294168744,
-            29.857949499208264,
-            29.92432939249016,
-            29.969994022208244,
-            29.99491177679897,
-            29.99906540682469,
-            29.982452036914687,
-            29.94508316775563,
-            29.886984668130204,
-            29.808196757009277,
-            29.70877397571016,
-            29.588785150140083,
-            29.448313343151145,
-            29.28745579703964,
-            29.106323866229587,
-            28.905042940187116,
-            28.683752356618967,
-            28.442605305015288,
-            28.18176872060347,
-            27.901423168786412,
-            27.60176272014524,
-            27.282994816092977,
-            26.945340125272235,
-            26.589032390796262,
-            26.214318268439122,
-            25.821457155887003,
-            25.410721013168967,
-            24.98239417439121,
-            24.536773150905415,
-            24.07416642604734,
-            23.594894241587696,
-            23.09928837604321,
-            22.58769191500131,
-            22.0604590136175,
-            21.51795465144967,
-            20.9605543797992,
-            20.388644061733785,
-            19.802619604971788,
-            19.202886687813216,
-            18.589860478306928,
-            17.963965346848468,
-            17.325634572407658,
-            16.67531004258908,
-            16.013441947733156,
-            15.340488469269811,
-            14.656915462539976,
-            13.963196134305118,
-            13.259810715167385,
-            12.547246127127702,
-            11.82599564651163,
-            11.096558562496405,
-            10.359439831475559,
-            9.615149727500357,
-            8.8642034890401,
-            8.107120962305862,
-            7.344426241384225,
-            6.576647305430752,
-            5.804315653173709,
-            5.027965934981552,
-            4.248135582748561,
-            3.465364437854935,
-            2.680194377459034,
-            1.8931689393802211,
-            1.1048329458321078,
-            0.31573212626679886,
-            -0.4735872604090973,
-            -1.26257880398478,
-            -2.0506963212004403,
-            -2.8373942338453504,
-            -3.622127946436905,
-            -4.404354223219698,
-            -5.183531564222975,
-            -5.959120580116759,
-            -6.7305843656066475,
-            -7.497388871109241,
-            -8.259003272450489,
-            -9.014900338331362,
-            -9.764556795306342,
-            -10.507453690021958,
-            -11.243076748464768,
-            -11.970916731970219,
-            -12.690469789745405,
-            -13.401237807662396,
-            -14.102728753080093,
-            -14.794457015456233,
-            -15.475943742513795,
-            -16.14671717172866,
-            -16.806312956909586,
-            -17.454274489644245,
-            -18.09015321538842,
-            -18.71350894398032,
-            -19.323910154364192,
-            -19.920934293312918,
-            -20.504168067942707,
-            -21.07320773181688,
-            -21.627659364441477,
-            -22.167139143958668,
-            -22.691273612849155,
-            -23.199699936460156,
-            -23.69206615417934,
-            -24.168031423081324,
-            -24.627266253877874,
-            -25.06945273900846,
-            -25.49428477271331,
-            -25.901468262936692,
-            -26.290721334913478,
-            -26.661774526298355,
-            -27.014370973702547,
-            -27.348266590508622,
-            -27.66323023584075,
-            -27.959043874573048,
-            -28.235502728265455,
-            -28.492415416922682,
-            -28.729604091477885,
-            -28.946904556909555,
-            -29.144166385906384,
-            -29.321253023001212,
-            -29.478041879102328,
-            -29.61442441635627,
-            -29.730306223283762,
-            -29.825607080136468,
-            -29.900261014429535,
-            -29.954216346611364,
-            -29.98743572583903,
-            -29.999896155834584,
-            -29.99158901080434,
-            -29.962520041410126,
-            -29.912709370788363,
-            -29.84219148061971,
-            -29.75101518725897,
-            -29.639243607941722,
-            -29.506954117091098,
-            -29.354238292754978,
-            -29.181201853210617,
-            -28.98796458378066,
-            -28.77466025391117,
-            -28.541436524569068,
-            -28.28845484602311,
-            -28.015890346079154,
-            -27.723931708847022,
-            -27.412781044123108,
-            -27.08265374747879,
-            -26.73377835115183,
-            -26.366396365843823,
-            -25.98076211353317
-        ]
-    }
-]
-, {
-    "showlegend": true,
-    "xaxis": {
-        "showticklabels": true,
-        "gridwidth": 0.5,
-        "tickvals": [
-            -30.0,
-            -20.0,
-            -10.0,
-            0.0,
-            10.0,
-            20.0,
-            30.0
-        ],
-        "range": [
-            -31.799865002714363,
-            31.79903425370447
-        ],
-        "domain": [
-            0.032313669124692745,
-            0.9941413573303337
-        ],
-        "mirror": false,
-        "tickangle": 0,
-        "showline": true,
-        "ticktext": [
-            "−30",
-            "−20",
-            "−10",
-            "0",
-            "10",
-            "20",
-            "30"
-        ],
-        "zeroline": false,
-        "tickfont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 11
-        },
-        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
-        "anchor": "y",
-        "visible": true,
-        "ticks": "inside",
-        "tickmode": "array",
-        "linecolor": "rgba(0, 0, 0, 1.000)",
-        "showgrid": true,
-        "title": "",
-        "gridcolor": "rgba(0, 0, 0, 0.100)",
-        "titlefont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 15
-        },
-        "tickcolor": "rgb(0, 0, 0)",
-        "type": "-"
-    },
-    "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
-    "annotations": [],
-    "height": 480,
-    "margin": {
-        "l": 0,
-        "b": 20,
-        "r": 0,
-        "t": 20
-    },
-    "plot_bgcolor": "rgba(255, 255, 255, 1.000)",
-    "yaxis": {
-        "showticklabels": true,
-        "gridwidth": 0.5,
-        "tickvals": [
-            10.0,
-            20.0,
-            30.0,
-            40.0,
-            50.0,
-            60.0
-        ],
-        "range": [
-            3.2000498447680563,
-            66.79828866296339
-        ],
-        "domain": [
-            0.031350247885680964,
-            0.9917979002624672
-        ],
-        "mirror": false,
-        "tickangle": 0,
-        "showline": true,
-        "ticktext": [
-            "10",
-            "20",
-            "30",
-            "40",
-            "50",
-            "60"
-        ],
-        "zeroline": false,
-        "tickfont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 11
-        },
-        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
-        "anchor": "x",
-        "visible": true,
-        "ticks": "inside",
-        "tickmode": "array",
-        "linecolor": "rgba(0, 0, 0, 1.000)",
-        "showgrid": true,
-        "title": "",
-        "gridcolor": "rgba(0, 0, 0, 0.100)",
-        "titlefont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 15
-        },
-        "tickcolor": "rgb(0, 0, 0)",
-        "type": "-"
-    },
-    "legend": {
-        "yanchor": "auto",
-        "xanchor": "auto",
-        "bordercolor": "rgba(0, 0, 0, 1.000)",
-        "bgcolor": "rgba(255, 255, 255, 1.000)",
-        "borderwidth": 1,
-        "tracegroupgap": 0,
-        "y": 1.0,
-        "font": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 11
-        },
-        "title": {
-            "font": {
-                "color": "rgba(0, 0, 0, 1.000)",
-                "family": "sans-serif",
-                "size": 15
-            },
-            "text": ""
-        },
-        "traceorder": "normal",
-        "x": 1.0
-    },
-    "width": 672
-}
-);
-    });
-    </script>
-</div>
-</div>
+<pre class="{julia}"><code>d = (R =&gt; 35, r=&gt;30, ω =&gt; 2PI/120)
+rt = subs.(rho(t), d...) # dots to broadcast and "splat"
+plot(rt..., 0, 100)      # dots to splat to two variable</code></pre>
 <section id="polar-coordinates" class="level3" data-number="11.7.1">
 <h3 data-number="11.7.1" class="anchored" data-anchor-id="polar-coordinates"><span class="header-section-number">11.7.1</span> Polar coordinates</h3>
 <p>Polar coordinates are a special case of a representation. The are an alternate to Cartesian descriptions and use <span class="math inline">\((r,\theta)\)</span> as an alternate to <span class="math inline">\((x,y)\)</span>. The translation is straightforward: <span class="math inline">\((x,y) = (r\cdot \cos(\theta), r\cdot\cos(\theta))\)</span>.</p>
 <p>There isn’t much special support for polar coordinates within base <code>SymPy</code> or <code>Julia</code>. The <code>plot</code> function has a <code>projection=:polar</code> argument that plots polar plots where <span class="math inline">\(r=r(\theta)\)</span>.</p>
 <p>For example,</p>
-<div id="a9a088c3" class="cell" data-execution_count="70">
-<div class="sourceCode cell-code" id="cb101"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rho</span>(theta) <span class="op">=</span> <span class="fl">1</span> <span class="op">+</span> <span class="fu">cos</span>(theta) <span class="op">*</span> <span class="fu">sin</span>(theta)<span class="op">^</span><span class="fl">2</span></span>
-<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> θ</span>
-<span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">rho</span>(θ), <span class="fl">0</span>, <span class="fl">2</span>pi; projection<span class="op">=:</span>polar, legend<span class="op">=</span><span class="cn">false</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="71">
-    <div id="f2935796-751b-41fd-9532-1dd45ba53673" style="width:672px;height:480px;"></div>
-    <script>
-        requirejs.config({
-        paths: {
-            plotly: 'https://cdn.plot.ly/plotly-2.6.3.min'
-        }
-    });
-    require(['plotly'], function (Plotly) {
-
-    Plotly.newPlot('f2935796-751b-41fd-9532-1dd45ba53673', [
-    {
-        "showlegend": true,
-        "mode": "lines",
-        "xaxis": "x",
-        "colorbar": {
-            "y": 0.5115740740740741,
-            "title": "",
-            "len": 0.9604476523767862,
-            "x": 0.9941413573303337
-        },
-        "name": "y1",
-        "yaxis": "y",
-        "legendgroup": "y1",
-        "r": [
-            1.0,
-            1.0001045771321393,
-            1.000418199163076,
-            1.0009405381004446,
-            1.0016710476371342,
-            1.0041518959737978,
-            1.0077267457921073,
-            1.0123756090922313,
-            1.0180724762105955,
-            1.024785448060775,
-            1.0324768983310302,
-            1.0411036648219982,
-            1.0506172689613476,
-            1.0609641623903567,
-            1.072085999381069,
-            1.083919933712622,
-            1.0963989385121884,
-            1.1230052155729204,
-            1.151298444257177,
-            1.1866171407281132,
-            1.2222504397045941,
-            1.2569883263801724,
-            1.2896288342888558,
-            1.302512960258393,
-            1.3147304255222423,
-            1.3262003183800208,
-            1.3368450968398802,
-            1.3465910015873863,
-            1.355368449604569,
-            1.3631124063893734,
-            1.3697627348366868,
-            1.375683738879915,
-            1.3801865544828549,
-            1.3832162696444292,
-            1.3847264136261888,
-            1.3846792606348197,
-            1.3830460803177587,
-            1.379807333524189,
-            1.3749528121187493,
-            1.3690450875599978,
-            1.3617697930916124,
-            1.3531402149759848,
-            1.3431763847380918,
-            1.331904989275136,
-            1.3193592464810213,
-            1.3055787470248368,
-            1.2906092630986699,
-            1.2732986791201895,
-            1.2547520213830428,
-            1.2350474378862695,
-            1.2142697623645993,
-            1.1925100286104235,
-            1.1698649478389356,
-            1.1464363522094225,
-            1.1223306078181439,
-            1.0644862537621882,
-            1.005035529272156,
-            0.9454592182132373,
-            0.8872420030824097,
-            0.8621896420397946,
-            0.8378133813857368,
-            0.8142308760701698,
-            0.791554911178203,
-            0.7698927123727448,
-            0.7493452914718182,
-            0.7300068312941216,
-            0.7119641136573736,
-            0.6972710276045517,
-            0.6836829661196415,
-            0.6712426135307703,
-            0.659987268950958,
-            0.6499486769818709,
-            0.6411528853952793,
-            0.6336201304797935,
-            0.6273647506055309,
-            0.6220099274584431,
-            0.6181861111263056,
-            0.6158876065784754,
-            0.6151003172211962,
-            0.6158018443273101,
-            0.61796163431446,
-            0.6215411730064759,
-            0.6264942257403665,
-            0.6328082308060783,
-            0.6403959174181474,
-            0.6491884961915717,
-            0.6591106976122696,
-            0.6700812291870036,
-            0.6820132675429571,
-            0.6948149825793382,
-            0.7083900905855456,
-            0.7406499355074956,
-            0.775063256983313,
-            0.8104519812883221,
-            0.8456275326100624,
-            0.8619478742790965,
-            0.8778341053257274,
-            0.8931685420968719,
-            0.9078380552825716,
-            0.9217348143486274,
-            0.9347569968514015,
-            0.9468094580220074,
-            0.9578043562656353,
-            0.9680291850921108,
-            0.9769440412470091,
-            0.9844790816599276,
-            0.9905753532806784,
-            0.9951852116767523,
-            0.9982726592973429,
-            0.999813601026234,
-            0.9997960152272654,
-            0.9985727943944429,
-            0.9962518436685683,
-            0.9928459990469227,
-            0.9883741047444542,
-            0.9828609183840861,
-            0.9763369864277865,
-            0.9688384904689624,
-            0.9604070651519047,
-            0.9489170934140932,
-            0.9362020814369161,
-            0.9223678054722396,
-            0.9075296535022476,
-            0.891811759098536,
-            0.8753460693608887,
-            0.8582713538563885,
-            0.84073216191788,
-            0.8078901848681634,
-            0.7749371649669194,
-            0.7428341227537292,
-            0.712534077404773,
-            0.6994072736191755,
-            0.686949247813804,
-            0.6752441286753629,
-            0.6643725843933774,
-            0.6544113834956241,
-            0.6454329760750286,
-            0.6375050976377403,
-            0.6306903976821832,
-            0.6249808151431913,
-            0.6205256315653993,
-            0.6173719513812046,
-            0.6155602531577498,
-            0.615124155000131,
-            0.6160902170518481,
-            0.6184777821769893,
-            0.6222988557008335,
-            0.6282901332063344,
-            0.6360828011686794,
-            0.6456604247234785,
-            0.6569948942907569,
-            0.6700465894179888,
-            0.6847646209806424,
-            0.7010871501053291,
-            0.7189417816560789,
-            0.7363753326722886,
-            0.7549311495501492,
-            0.7745349790676885,
-            0.7951068858187474,
-            0.8165616824140982,
-            0.8388093890703882,
-            0.861755720016901,
-            0.8853025939995507,
-            0.9409332151708029,
-            0.9979131451630212,
-            1.0549407948113638,
-            1.110713216710825,
-            1.1357537057331535,
-            1.1601313413964076,
-            1.183728961068162,
-            1.206434164295937,
-            1.2281399967227142,
-            1.248745599753194,
-            1.2681568218873918,
-            1.2862867878800712,
-            1.3028294848089947,
-            1.3179820642185647,
-            1.3316848327128321,
-            1.3438866510631597,
-            1.3545452255323818,
-            1.3636273451710323,
-            1.3711090636447343,
-            1.3769758244920203,
-            1.3811218779098526,
-            1.3837445671602868,
-            1.3848561397321295,
-            1.384477128526197,
-            1.382636215745315,
-            1.379370049948684,
-            1.374723017339815,
-            1.3687469686217695,
-            1.3613030255649476,
-            1.3525954308839936,
-            1.3427021983137233,
-            1.3317079016256579,
-            1.3197031440157414,
-            1.3067839912892758,
-            1.2930513722994426,
-            1.278610450294524,
-            1.245025918702508,
-            1.2097529584431757,
-            1.1740090141699417,
-            1.139006958149238,
-            1.114719549034837,
-            1.0918695149718285,
-            1.0708551649689673,
-            1.0520410034833285,
-            1.04356224785365,
-            1.0357520517205203,
-            1.0286440428440233,
-            1.0222687860574164,
-            1.016653664218802,
-            1.0118227715683312,
-            1.0077968199020524,
-            1.004593057924108,
-            1.0025879453205835,
-            1.0011515803981241,
-            1.0002881026162957,
-            1.0
-        ],
-        "line": {
-            "color": "rgba(0, 154, 250, 1.000)",
-            "shape": "linear",
-            "dash": "solid",
-            "width": 1
-        },
-        "type": "scatterpolar",
-        "theta": [
-            0.0,
-            0.5859491411872878,
-            1.1718982823745756,
-            1.7578474235618633,
-            2.343796564749151,
-            3.6982830369779216,
-            5.0527695092066915,
-            6.407255981435462,
-            7.761742453664232,
-            9.116228925893001,
-            10.470715398121772,
-            11.825201870350543,
-            13.179688342579315,
-            14.534174814808086,
-            15.888661287036856,
-            17.24314775926563,
-            18.597634231494396,
-            21.30660717595194,
-            24.015580120409478,
-            27.27153976864454,
-            30.5274994168796,
-            33.78345906511467,
-            37.039418713349725,
-            38.41585493565398,
-            39.79229115795824,
-            41.1687273802625,
-            42.54516360256675,
-            43.92159982487101,
-            45.29803604717526,
-            46.674472269479516,
-            48.05090849178377,
-            49.54610403130234,
-            51.04129957082092,
-            52.53649511033949,
-            54.03169064985806,
-            55.526886189376626,
-            57.022081728895195,
-            58.51727726841377,
-            60.01247280793233,
-            61.39091084297964,
-            62.76934887802693,
-            64.14778691307424,
-            65.52622494812154,
-            66.90466298316885,
-            68.28310101821616,
-            69.66153905326345,
-            71.03997708831075,
-            72.5178083444666,
-            73.99563960062245,
-            75.4734708567783,
-            76.95130211293416,
-            78.42913336909001,
-            79.90696462524586,
-            81.38479588140171,
-            82.86262713755757,
-            86.2870520134801,
-            89.71147688940265,
-            93.1359017653252,
-            96.56032664124774,
-            98.08193899442242,
-            99.60355134759709,
-            101.12516370077176,
-            102.64677605394644,
-            104.16838840712113,
-            105.6900007602958,
-            107.21161311347048,
-            108.73322546664515,
-            110.06754237952111,
-            111.40185929239706,
-            112.73617620527301,
-            114.07049311814897,
-            115.40481003102492,
-            116.73912694390087,
-            118.07344385677683,
-            119.40776076965278,
-            120.86252437310574,
-            122.31728797655875,
-            123.77205158001173,
-            125.22681518346472,
-            126.68157878691771,
-            128.13634239037071,
-            129.5911059938237,
-            131.0458695972767,
-            132.50927926020145,
-            133.97268892312624,
-            135.436098586051,
-            136.89950824897576,
-            138.36291791190055,
-            139.8263275748253,
-            141.2897372377501,
-            142.7531469006749,
-            145.9891199329704,
-            149.22509296526593,
-            152.4610659975615,
-            155.69703902985702,
-            157.2365123734702,
-            158.7759857170834,
-            160.31545906069658,
-            161.85493240430975,
-            163.39440574792292,
-            164.93387909153608,
-            166.47335243514925,
-            168.01282577876245,
-            169.61352086175765,
-            171.21421594475285,
-            172.81491102774808,
-            174.41560611074328,
-            176.01630119373849,
-            177.6169962767337,
-            179.21769135972892,
-            180.81838644272412,
-            182.16583074738898,
-            183.5132750520538,
-            184.86071935671865,
-            186.20816366138348,
-            187.5556079660483,
-            188.90305227071315,
-            190.25049657537798,
-            191.5979408800428,
-            193.24301764962837,
-            194.88809441921396,
-            196.53317118879954,
-            198.1782479583851,
-            199.8233247279707,
-            201.46840149755624,
-            203.1134782671418,
-            204.7585550367274,
-            207.77254382429973,
-            210.78653261187205,
-            213.80052139944436,
-            216.81451018701668,
-            218.20633580580594,
-            219.5981614245952,
-            220.98998704338442,
-            222.38181266217367,
-            223.7736382809629,
-            225.16546389975213,
-            226.5572895185414,
-            227.94911513733064,
-            229.35899135811462,
-            230.76886757889864,
-            232.17874379968265,
-            233.58862002046666,
-            234.99849624125062,
-            236.40837246203463,
-            237.81824868281865,
-            239.22812490360266,
-            240.8082008959572,
-            242.38827688831182,
-            243.96835288066643,
-            245.54842887302098,
-            247.1285048653756,
-            248.7085808577302,
-            250.28865685008475,
-            251.86873284243936,
-            253.30053678377794,
-            254.73234072511656,
-            256.1641446664552,
-            257.59594860779373,
-            259.02775254913234,
-            260.4595564904709,
-            261.89136043180946,
-            263.3231643731481,
-            266.6017978955124,
-            269.88043141787676,
-            273.15906494024114,
-            276.4376984626055,
-            277.95556000134434,
-            279.47342154008317,
-            280.991283078822,
-            282.50914461756076,
-            284.0270061562996,
-            285.5448676950384,
-            287.0627292337772,
-            288.5805907725161,
-            290.0770243878749,
-            291.5734580032337,
-            293.06989161859246,
-            294.56632523395126,
-            296.06275884931006,
-            297.55919246466885,
-            299.0556260800276,
-            300.5520596953864,
-            302.00497288600195,
-            303.4578860766175,
-            304.9107992672331,
-            306.36371245784864,
-            307.81662564846414,
-            309.2695388390797,
-            310.7224520296952,
-            312.1753652203108,
-            313.6647870239394,
-            315.15420882756797,
-            316.6436306311965,
-            318.13305243482506,
-            319.6224742384536,
-            321.11189604208215,
-            322.6013178457107,
-            324.09073964933924,
-            327.3544086484741,
-            330.6180776476088,
-            333.8817466467436,
-            337.1454156458784,
-            339.5159228830895,
-            341.88643012030064,
-            344.2569373575118,
-            346.6274445947229,
-            347.8126982133284,
-            348.997951831934,
-            350.1832054505396,
-            351.36845906914516,
-            352.55371268775076,
-            353.7389663063563,
-            354.9242199249618,
-            356.1094735435674,
-            357.0821051576755,
-            358.0547367717837,
-            359.02736838589186,
-            360.0
-        ]
-    }
-]
-, {
-    "angularaxis": {
-        "showline": true,
-        "visible": true,
-        "range": [
-            0.0,
-            360.0
-        ]
-    },
-    "showlegend": false,
-    "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
-    "annotations": [],
-    "height": 480,
-    "margin": {
-        "l": 0,
-        "b": 20,
-        "r": 0,
-        "t": 20
-    },
-    "plot_bgcolor": "rgba(255, 255, 255, 1.000)",
-    "direction": "counterclockwise",
-    "radialaxis": {
-        "showline": true,
-        "visible": true,
-        "range": [
-            0,
-            1.4618317219832229
-        ],
-        "orientation": -90
-    },
-    "width": 672
-}
-);
-    });
-    </script>
-</div>
-</div>
+<pre class="{julia}"><code>rho(theta) = 1 + cos(theta) * sin(theta)^2
+@syms θ
+plot(rho(θ), 0, 2pi; projection=:polar, legend=false)</code></pre>
 </section>
 <section id="differential-equations" class="level3" data-number="11.7.2">
 <h3 data-number="11.7.2" class="anchored" data-anchor-id="differential-equations"><span class="header-section-number">11.7.2</span> Differential equations</h3>
 <p>A differential equation is an equation involving a variable, a function, and its derivatives. In the following we define an operator, using <code>Differential</code> to simplify the specification of the equation <span class="math inline">\(y'(x) = y(x)\)</span>:</p>
-<div id="b49d218c" class="cell" data-execution_count="71">
-<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> x, <span class="fu">u</span>()</span>
-<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>∂ <span class="op">=</span> <span class="fu">Differential</span>(x)</span>
-<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>ex <span class="op">=</span> <span class="fu">∂</span>(<span class="fu">u</span>(x)) <span class="op">~</span> <span class="fu">u</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="72">
-<p><span class="math inline">\(\frac{d}{d x} u{\left(x \right)} = u{\left(x \right)}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>@syms x, u()
+∂ = Differential(x)
+ex = ∂(u(x)) ~ u(x)</code></pre>
 <p>(The use of <code>Differential</code> just cleans up visually what can be achieved through <code>diff(u(x), x)</code> above.)</p>
 <p>The <code>dsolve</code> function is then used to solve differential equations:</p>
-<div id="60bd1ba2" class="cell" data-execution_count="72">
-<div class="sourceCode cell-code" id="cb103"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dsolve</span>(ex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="73">
-<p><span class="math inline">\(u{\left(x \right)} = C_{1} e^{x}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>dsolve(ex)</code></pre>
 <p>The constants come from integration. Initial conditions reduce the number of constants. These are specified to the <code>ics</code> keyword argument using a dictionary:</p>
-<div id="54d90f19" class="cell" data-execution_count="73">
-<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dsolve</span>(ex, ics<span class="op">=</span><span class="fu">Dict</span>(<span class="fu">u</span>(<span class="fl">0</span>) <span class="op">=&gt;</span> <span class="fl">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="74">
-<p><span class="math inline">\(u{\left(x \right)} = 3 e^{x}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>dsolve(ex, ics=Dict(u(0) =&gt; 3))</code></pre>
 <p>The initial conditions can also involve constraints on derivatives, etc.</p>
 <p>We follow with a much more involved example. The following equations model projectile motion using Newton’s laws and adding a drag proportional to velocity. This proportion is given by a constant <span class="math inline">\(\gamma\)</span>. We use <code>u</code> and <code>v</code> to model the <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> coordinates of motion over time, <span class="math inline">\(t\)</span>. Inverting <span class="math inline">\(x\)</span> to get <span class="math inline">\(t\)</span>, allows the solution of <span class="math inline">\(y\)</span> in terms of <span class="math inline">\(t\)</span>.</p>
-<div id="748b9772" class="cell" data-execution_count="74">
-<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> x0<span class="op">::</span><span class="dt">real </span>y0<span class="op">::</span><span class="dt">real </span>v0<span class="op">::</span><span class="dt">real </span>γ<span class="op">::</span><span class="dt">nonnegative </span>𝑔<span class="op">::</span><span class="dt">real</span></span>
-<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> t<span class="op">::</span><span class="dt">positive </span>x <span class="fu">u</span>() <span class="fu">v</span>()</span>
-<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>Dₜ <span class="op">=</span> <span class="fu">Differential</span>(t)</span>
-<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a>D2ₜ <span class="op">=</span> Dₜ <span class="op">∘</span> Dₜ</span>
-<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a>eq₁ <span class="op">=</span> <span class="fu">Dₜ</span>(<span class="fu">Dₜ</span>(u))(t) <span class="op">~</span>    <span class="op">-</span> γ <span class="op">*</span> <span class="fu">Dₜ</span>(u)(t)</span>
-<span id="cb105-6"><a href="#cb105-6" aria-hidden="true" tabindex="-1"></a>eq₂ <span class="op">=</span> <span class="fu">Dₜ</span>(<span class="fu">Dₜ</span>(v))(t) <span class="op">~</span> <span class="op">-</span>𝑔 <span class="op">-</span> γ <span class="op">*</span> <span class="fu">Dₜ</span>(v)(t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="75">
-<p><span class="math inline">\(\frac{d^{2}}{d t^{2}} v{\left(t \right)} = - γ \frac{d}{d t} v{\left(t \right)} - 𝑔\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>@syms x0::real y0::real v0::real γ::nonnegative 𝑔::real
+@syms t::positive x u() v()
+Dₜ = Differential(t)
+D2ₜ = Dₜ ∘ Dₜ
+eq₁ = Dₜ(Dₜ(u))(t) ~    - γ * Dₜ(u)(t)
+eq₂ = Dₜ(Dₜ(v))(t) ~ -𝑔 - γ * Dₜ(v)(t)</code></pre>
 <p>If we set <span class="math inline">\(\gamma = 0\)</span> and solve, we get the <span class="math inline">\(y\)</span> values as a function of <span class="math inline">\(t\)</span>:</p>
-<div id="b3b270d4" class="cell" data-execution_count="75">
-<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>a1, a2 <span class="op">=</span> <span class="fu">dsolve</span>.((<span class="fu">eq₁</span>(γ<span class="op">=&gt;</span><span class="fl">0</span>), <span class="fu">eq₂</span>(γ<span class="op">=&gt;</span><span class="fl">0</span>)), (<span class="fu">u</span>(t), <span class="fu">v</span>(t)))</span>
-<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a>tₓ <span class="op">=</span> <span class="fu">only</span>(<span class="fu">solve</span>(x <span class="op">-</span> <span class="fu">rhs</span>(a1), t)) <span class="co"># invert; only one solution</span></span>
-<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a>yₓ <span class="op">=</span> <span class="fu">rhs</span>(a2)(t <span class="op">=&gt;</span> tₓ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="76">
-<p><span class="math inline">\(x - \frac{𝑔 \left(- C_{1} + x\right)^{2}}{2 C_{2}^{2}}\)</span></p>
-</div>
-</div>
+<pre class="{julia}"><code>a1, a2 = dsolve.((eq₁(γ=&gt;0), eq₂(γ=&gt;0)), (u(t), v(t)))
+tₓ = only(solve(x - rhs(a1), t)) # invert; only one solution
+yₓ = rhs(a2)(t =&gt; tₓ)</code></pre>
 <p>We can see the form of a parabola, with two parameters adjusting its shape related to the initial conditions. This is anticipated from physics.</p>
 <p>Here, we specify initial values so that we can ultimately plot:</p>
-<div id="25139aaf" class="cell" data-execution_count="76">
-<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> α<span class="op">::</span><span class="dt">real </span>v₀<span class="op">::</span><span class="dt">real</span></span>
-<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>icx <span class="op">=</span> <span class="fu">Dict</span>(<span class="fu">u</span>(<span class="fl">0</span>) <span class="op">=&gt;</span> <span class="fu">Sym</span>(<span class="fl">0</span>), <span class="fu">diff</span>(<span class="fu">u</span>(t),t)(<span class="fl">0</span>) <span class="op">=&gt;</span> <span class="fu">v₀*cos</span>(α))</span>
-<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>icy <span class="op">=</span> <span class="fu">Dict</span>(<span class="fu">v</span>(<span class="fl">0</span>) <span class="op">=&gt;</span> <span class="fu">Sym</span>(<span class="fl">0</span>), <span class="fu">diff</span>(<span class="fu">v</span>(t),t)(<span class="fl">0</span>) <span class="op">=&gt;</span> <span class="fu">v₀*sin</span>(α) )</span>
-<span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-5"><a href="#cb107-5" aria-hidden="true" tabindex="-1"></a>a1 <span class="op">=</span> <span class="fu">dsolve</span>(<span class="fu">eq₁</span>(γ <span class="op">=&gt;</span> <span class="fl">0</span>), <span class="fu">u</span>(t), ics<span class="op">=</span>icx)</span>
-<span id="cb107-6"><a href="#cb107-6" aria-hidden="true" tabindex="-1"></a>a2 <span class="op">=</span> <span class="fu">dsolve</span>(<span class="fu">eq₂</span>(γ <span class="op">=&gt;</span> <span class="fl">0</span>), <span class="fu">v</span>(t), ics<span class="op">=</span>icy)</span>
-<span id="cb107-7"><a href="#cb107-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-8"><a href="#cb107-8" aria-hidden="true" tabindex="-1"></a>tₓ <span class="op">=</span> <span class="fu">only</span>(<span class="fu">solve</span>(x <span class="op">-</span> <span class="fu">rhs</span>(a1), t)) <span class="co"># only one solution</span></span>
-<span id="cb107-9"><a href="#cb107-9" aria-hidden="true" tabindex="-1"></a>yₓ <span class="op">=</span> <span class="fu">rhs</span>(a2)(t <span class="op">=&gt;</span> tₓ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="77">
-<p><span class="math inline">\(\frac{x \sin{\left(α \right)}}{\cos{\left(α \right)}} - \frac{x^{2} 𝑔}{2 v₀^{2} \cos^{2}{\left(α \right)}}\)</span></p>
-</div>
-</div>
-<p>If there is a positive <span class="math inline">\(\gamma\)</span>, there will be drag and the formulas will change to reflect that.</p>
-<div id="7a38dd7a" class="cell" data-execution_count="77">
-<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a>𝑎<span class="fl">1</span> <span class="op">=</span> <span class="fu">dsolve</span>(eq₁, <span class="fu">u</span>(t), ics<span class="op">=</span>icx)</span>
-<span id="cb108-2"><a href="#cb108-2" aria-hidden="true" tabindex="-1"></a>𝑎<span class="fl">2</span> <span class="op">=</span> <span class="fu">dsolve</span>(eq₂, <span class="fu">v</span>(t), ics<span class="op">=</span>icy)</span>
-<span id="cb108-3"><a href="#cb108-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb108-4"><a href="#cb108-4" aria-hidden="true" tabindex="-1"></a>𝑡ₓ <span class="op">=</span> <span class="fu">only</span>(<span class="fu">solve</span>(x <span class="op">-</span> <span class="fu">rhs</span>(𝑎<span class="fl">1</span>), t)) <span class="co"># only one solution</span></span>
-<span id="cb108-5"><a href="#cb108-5" aria-hidden="true" tabindex="-1"></a>𝑦ₓ <span class="op">=</span> <span class="fu">rhs</span>(𝑎<span class="fl">2</span>)(t <span class="op">=&gt;</span> 𝑡ₓ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="78">
-<p><span class="math inline">\(- \frac{𝑔 \log{\left(\frac{v₀ \cos{\left(α \right)}}{v₀ \cos{\left(α \right)} - x γ} \right)}}{γ^{2}} + \frac{v₀ γ \sin{\left(α \right)} + 𝑔}{γ^{2}} + \frac{\left(v₀ \cos{\left(α \right)} - x γ\right) \left(- v₀ γ \sin{\left(α \right)} - 𝑔\right)}{v₀ γ^{2} \cos{\left(α \right)}}\)</span></p>
-</div>
-</div>
-<p>The difference can be visualized through plotting. The proper way to get the values for the constants is to specify numeric values in the initial conditions:</p>
-<div id="c68b1f33" class="cell" data-execution_count="78">
-<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="fu">yₓ</span>(𝑔 <span class="op">=&gt;</span> <span class="fl">32</span>, v₀ <span class="op">=&gt;</span> <span class="fl">200</span>, α <span class="op">=&gt;</span> PI<span class="op">/</span><span class="fl">4</span>)</span>
-<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> <span class="fu">maximum</span>(<span class="fu">solve</span>(a <span class="op">~</span> <span class="fl">0</span>))</span>
-<span id="cb109-3"><a href="#cb109-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(a, <span class="fl">0</span>, <span class="fu">N</span>(M))</span>
-<span id="cb109-4"><a href="#cb109-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb109-5"><a href="#cb109-5" aria-hidden="true" tabindex="-1"></a>𝑎 <span class="op">=</span> <span class="fu">𝑦ₓ</span>(𝑔 <span class="op">=&gt;</span> <span class="fl">32</span>, v₀ <span class="op">=&gt;</span> <span class="fl">200</span>, α <span class="op">=&gt;</span> PI<span class="op">/</span><span class="fl">4</span>, γ <span class="op">=&gt;</span> <span class="fl">1</span><span class="op">//</span><span class="fl">2</span>)</span>
-<span id="cb109-6"><a href="#cb109-6" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> <span class="fu">nsolve</span>(𝑎 <span class="op">~</span> <span class="fl">0</span>, <span class="fl">2</span><span class="fu">*100*sqrt</span>(<span class="fl">2</span>)<span class="op">-</span><span class="fl">10</span>) <span class="co"># avoid starting at asymptote</span></span>
-<span id="cb109-7"><a href="#cb109-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot!</span>(𝑎, <span class="fl">0</span>, <span class="fu">N</span>(M))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="79">
-    <div id="75c6018c-3ebc-45db-b2ab-48974384a986" style="width:672px;height:480px;"></div>
-    <script>
-        requirejs.config({
-        paths: {
-            plotly: 'https://cdn.plot.ly/plotly-2.6.3.min'
-        }
-    });
-    require(['plotly'], function (Plotly) {
+<pre class="{julia}"><code>@syms α::real v₀::real
+icx = Dict(u(0) =&gt; Sym(0), diff(u(t),t)(0) =&gt; v₀*cos(α))
+icy = Dict(v(0) =&gt; Sym(0), diff(v(t),t)(0) =&gt; v₀*sin(α) )
 
-    Plotly.newPlot('75c6018c-3ebc-45db-b2ab-48974384a986', [
-    {
-        "showlegend": true,
-        "mode": "lines",
-        "xaxis": "x",
-        "colorbar": {
-            "y": 0.5115740740740741,
-            "title": "",
-            "len": 0.9604476523767862,
-            "x": 0.9941413573303336
-        },
-        "name": "y1",
-        "yaxis": "y",
-        "legendgroup": "y1",
-        "line": {
-            "color": "rgba(0, 154, 250, 1.000)",
-            "shape": "linear",
-            "dash": "solid",
-            "width": 1
-        },
-        "y": [
-            0.0,
-            2.0312341283889417,
-            4.055845255310713,
-            6.073833380765314,
-            8.085198504752745,
-            26.369431302103685,
-            44.087419160117975,
-            61.23916207879562,
-            77.82466005813662,
-            97.00975664958597,
-            115.37685376333971,
-            130.26782360103067,
-            144.57404755166263,
-            159.45201619856232,
-            173.63998185120394,
-            186.10874638668915,
-            197.99106295412957,
-            210.078760260226,
-            221.49238805346096,
-            227.79594309100906,
-            233.87328891307033,
-            239.72442551964474,
-            245.34935291073236,
-            254.78856814382414,
-            263.5131833295907,
-            270.57581136493013,
-            277.0889327261996,
-            283.56383318917506,
-            289.38554317624573,
-            294.5828280364573,
-            299.119135167798,
-            303.3652111979502,
-            306.8032994606839,
-            309.32442633051534,
-            311.11407845476174,
-            312.1992143604324,
-            312.4935401584719,
-            312.12826682053895,
-            311.2026212127993,
-            310.3621204143959,
-            309.3128019016538,
-            308.0546656745729,
-            306.58771173315336,
-            303.35830835009773,
-            299.4279691328129,
-            295.1753660828358,
-            290.32486841769884,
-            284.8018885445799,
-            278.6654052893832,
-            271.0590612681184,
-            262.6821493019105,
-            254.42581751212037,
-            245.53675037466576,
-            240.16327740417466,
-            234.58244645193236,
-            228.79425751793917,
-            222.798710602195,
-            211.1484883273148,
-            198.78718467873648,
-            185.9042932329138,
-            172.33025562499984,
-            158.4897007510624,
-            143.9976160192656,
-            128.46508318902283,
-            112.24786600411198,
-            103.07367141067243,
-            93.69400738559852,
-            84.10887392889072,
-            74.31827104054878,
-            59.72978147091999,
-            44.707703586347634,
-            29.252037386831717,
-            13.362782872372009,
-            10.049460194115682,
-            6.717888822635132,
-            3.3680687579296773,
-            0.0
-        ],
-        "type": "scatter",
-        "x": [
-            0.0,
-            2.034545629122527,
-            4.069091258245054,
-            6.103636887367581,
-            8.138182516490108,
-            26.950494630778586,
-            45.76280674506706,
-            64.57511885935554,
-            83.38743097364402,
-            105.9982618641653,
-            128.60909275468657,
-            147.72626250891233,
-            166.8434322631381,
-            187.6100369786738,
-            208.37664169420952,
-            227.52161440319983,
-            246.66658711219014,
-            267.19202122546585,
-            287.71745533874156,
-            299.60781949125044,
-            311.49818364375926,
-            323.3885477962681,
-            335.2789119487769,
-            356.41241685398074,
-            377.5459217591845,
-            396.0781011046839,
-            414.6102804501834,
-            434.81533049814146,
-            455.02038054609955,
-            475.34551475338816,
-            495.6706489606768,
-            518.1426839071735,
-            540.6147188536702,
-            561.9962930705199,
-            583.3778672873696,
-            605.6097434400808,
-            627.8416195927921,
-            646.5561238242482,
-            665.2706280557043,
-            676.6947722889374,
-            688.1189165221706,
-            699.5430607554038,
-            710.9672049886368,
-            731.8976826801113,
-            752.8281603715858,
-            772.1590717436586,
-            791.4899831157313,
-            811.0715972932869,
-            830.6532114708425,
-            852.5987113646562,
-            874.5442112584699,
-            894.4303771103947,
-            914.3165429623195,
-            925.7006871371958,
-            937.0848313120721,
-            948.4689754869484,
-            959.8531196618246,
-            980.9345299220861,
-            1002.0159401823474,
-            1022.799740395664,
-            1043.5835406089807,
-            1063.762890478641,
-            1083.9422403483013,
-            1104.6286542875869,
-            1125.3150682268724,
-            1136.647252251646,
-            1147.9794362764196,
-            1159.3116203011932,
-            1170.6438043259668,
-            1187.105660139933,
-            1203.5675159538991,
-            1220.029371767865,
-            1236.4912275818313,
-            1239.8684206863736,
-            1243.2456137909157,
-            1246.6228068954579,
-            1250.0
-        ]
-    },
-    {
-        "showlegend": true,
-        "mode": "lines",
-        "xaxis": "x",
-        "colorbar": {
-            "y": 0.5115740740740741,
-            "title": "",
-            "len": 0.9604476523767862,
-            "x": 0.9941413573303336
-        },
-        "name": "y2",
-        "yaxis": "y",
-        "legendgroup": "y2",
-        "line": {
-            "color": "rgba(227, 111, 71, 1.000)",
-            "shape": "linear",
-            "dash": "solid",
-            "width": 1
-        },
-        "y": [
-            -5.684341886080802e-14,
-            1.7525642381842204,
-            17.712680227886665,
-            27.076342720475168,
-            34.84774673085087,
-            43.12744738315456,
-            50.60007615580548,
-            58.42725761426067,
-            67.23715907309548,
-            74.81206253969174,
-            81.23946028300662,
-            87.99713718133324,
-            94.50714920649858,
-            97.9714967264429,
-            101.33311983155517,
-            104.4307052110899,
-            107.42409305637611,
-            110.41934594597555,
-            113.28758868394402,
-            115.59743739644941,
-            117.80587165797664,
-            120.35591035976518,
-            122.73390943856492,
-            124.74996280735368,
-            126.59901776737146,
-            128.14740301329522,
-            129.53128213895764,
-            130.75262000305122,
-            131.77786390996624,
-            132.67360687793402,
-            133.27635525985863,
-            133.5443220104251,
-            133.5210298351688,
-            133.36524063428024,
-            133.0979813557574,
-            132.71236822373766,
-            132.2008594344345,
-            131.6078052002349,
-            130.89250252377883,
-            130.0470281146329,
-            129.06266251070872,
-            127.94685413810194,
-            126.67648509312444,
-            125.24022291078414,
-            123.62544118671765,
-            121.87344221953319,
-            119.92534967564053,
-            117.7648555580777,
-            115.37352890739376,
-            112.66057139911692,
-            109.65719526854453,
-            108.03746614432904,
-            106.33360418107686,
-            104.54112290282255,
-            102.6551671105039,
-            100.47532519487993,
-            98.16938982958402,
-            95.72905468810876,
-            93.14516464661784,
-            90.40759604551018,
-            87.50511506256703,
-            84.42520921338507,
-            81.1538856182247,
-            78.64893108293896,
-            76.02806846342278,
-            73.28399214703717,
-            70.40868328051505,
-            67.39331379377123,
-            64.22813371641618,
-            60.90233817065275,
-            57.403909476732274,
-            53.719428564851945,
-            49.83384824292479,
-            45.730218670386876,
-            41.389352414231254,
-            36.789412393560866,
-            31.90540037678524,
-            26.708515762985233,
-            21.165343053749172,
-            18.781899854019528,
-            16.330644777618588,
-            13.808344542988475,
-            11.211528964157004,
-            8.536467225919441,
-            5.77914111268413,
-            2.9352147091906,
-            2.4868995751603507e-13
-        ],
-        "type": "scatter",
-        "x": [
-            0.0,
-            1.7550386075444364,
-            17.982904714431257,
-            27.735175834208967,
-            35.98059695069611,
-            44.93743539700274,
-            53.194848198099244,
-            62.04766741969239,
-            72.30452666468042,
-            81.41961272872679,
-            89.41272179635594,
-            98.1273562567361,
-            106.89378418214424,
-            111.7399877222191,
-            116.58619126229394,
-            121.1972316468775,
-            125.80827203146107,
-            130.60268416059364,
-            135.3970962897262,
-            139.43297007121328,
-            143.4688438527004,
-            148.39618829277754,
-            153.3235327328547,
-            157.8372919596173,
-            162.35105118637986,
-            166.51985616319914,
-            170.6886611400184,
-            174.9115313951416,
-            179.13440165026478,
-            183.8670553475078,
-            188.5997090447508,
-            192.88825734843425,
-            197.17680565211768,
-            199.63185166518952,
-            202.08689767826135,
-            204.5419436913332,
-            206.99698970440502,
-            209.27014398874758,
-            211.5432982730901,
-            213.81645255743265,
-            216.0896068417752,
-            218.33067059968124,
-            220.57173435758727,
-            222.8127981154933,
-            225.0538618733993,
-            227.22974930432383,
-            229.40563673524832,
-            231.5815241661728,
-            233.75741159709733,
-            235.98797444337947,
-            238.2185372896616,
-            239.33381871280267,
-            240.44910013594375,
-            241.56438155908484,
-            242.6796629822259,
-            243.90158325932566,
-            245.1235035364254,
-            246.34542381352514,
-            247.56734409062489,
-            248.78926436772463,
-            250.0111846448244,
-            251.23310492192417,
-            252.4550251990239,
-            253.34254499987622,
-            254.23006480072854,
-            255.11758460158086,
-            256.0051044024332,
-            256.8926242032855,
-            257.7801440041378,
-            258.6676638049901,
-            259.55518360584244,
-            260.44270340669476,
-            261.3302232075471,
-            262.2177430083994,
-            263.1052628092517,
-            263.99278261010403,
-            264.88030241095635,
-            265.7678222118086,
-            266.6553420126609,
-            267.01949606496896,
-            267.38365011727694,
-            267.747804169585,
-            268.111958221893,
-            268.47611227420106,
-            268.8402663265091,
-            269.20442037881713,
-            269.56857443112517
-        ]
-    }
-]
-, {
-    "showlegend": true,
-    "xaxis": {
-        "showticklabels": true,
-        "gridwidth": 0.5,
-        "tickvals": [
-            0.0,
-            200.0,
-            400.0,
-            600.0,
-            800.0,
-            1000.0,
-            1200.0
-        ],
-        "range": [
-            -37.5,
-            1287.5
-        ],
-        "domain": [
-            0.04554118235220598,
-            0.9941413573303336
-        ],
-        "mirror": false,
-        "tickangle": 0,
-        "showline": true,
-        "ticktext": [
-            "0",
-            "200",
-            "400",
-            "600",
-            "800",
-            "1000",
-            "1200"
-        ],
-        "zeroline": false,
-        "tickfont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 11
-        },
-        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
-        "anchor": "y",
-        "visible": true,
-        "ticks": "inside",
-        "tickmode": "array",
-        "linecolor": "rgba(0, 0, 0, 1.000)",
-        "showgrid": true,
-        "title": "",
-        "gridcolor": "rgba(0, 0, 0, 0.100)",
-        "titlefont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 15
-        },
-        "tickcolor": "rgb(0, 0, 0)",
-        "type": "-"
-    },
-    "paper_bgcolor": "rgba(255, 255, 255, 1.000)",
-    "annotations": [],
-    "height": 480,
-    "margin": {
-        "l": 0,
-        "b": 20,
-        "r": 0,
-        "t": 20
-    },
-    "plot_bgcolor": "rgba(255, 255, 255, 1.000)",
-    "yaxis": {
-        "showticklabels": true,
-        "gridwidth": 0.5,
-        "tickvals": [
-            0.0,
-            100.0,
-            200.0,
-            300.0
-        ],
-        "range": [
-            -9.374806204754236,
-            321.86834636322607
-        ],
-        "domain": [
-            0.031350247885680964,
-            0.9917979002624672
-        ],
-        "mirror": false,
-        "tickangle": 0,
-        "showline": true,
-        "ticktext": [
-            "0",
-            "100",
-            "200",
-            "300"
-        ],
-        "zeroline": false,
-        "tickfont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 11
-        },
-        "zerolinecolor": "rgba(0, 0, 0, 1.000)",
-        "anchor": "x",
-        "visible": true,
-        "ticks": "inside",
-        "tickmode": "array",
-        "linecolor": "rgba(0, 0, 0, 1.000)",
-        "showgrid": true,
-        "title": "",
-        "gridcolor": "rgba(0, 0, 0, 0.100)",
-        "titlefont": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 15
-        },
-        "tickcolor": "rgb(0, 0, 0)",
-        "type": "-"
-    },
-    "legend": {
-        "yanchor": "auto",
-        "xanchor": "auto",
-        "bordercolor": "rgba(0, 0, 0, 1.000)",
-        "bgcolor": "rgba(255, 255, 255, 1.000)",
-        "borderwidth": 1,
-        "tracegroupgap": 0,
-        "y": 1.0,
-        "font": {
-            "color": "rgba(0, 0, 0, 1.000)",
-            "family": "sans-serif",
-            "size": 11
-        },
-        "title": {
-            "font": {
-                "color": "rgba(0, 0, 0, 1.000)",
-                "family": "sans-serif",
-                "size": 15
-            },
-            "text": ""
-        },
-        "traceorder": "normal",
-        "x": 1.0
-    },
-    "width": 672
-}
-);
-    });
-    </script>
-</div>
-</div>
+a1 = dsolve(eq₁(γ =&gt; 0), u(t), ics=icx)
+a2 = dsolve(eq₂(γ =&gt; 0), v(t), ics=icy)
+
+tₓ = only(solve(x - rhs(a1), t)) # only one solution
+yₓ = rhs(a2)(t =&gt; tₓ)</code></pre>
+<p>If there is a positive <span class="math inline">\(\gamma\)</span>, there will be drag and the formulas will change to reflect that.</p>
+<pre class="{julia}"><code>𝑎1 = dsolve(eq₁, u(t), ics=icx)
+𝑎2 = dsolve(eq₂, v(t), ics=icy)
+
+𝑡ₓ = only(solve(x - rhs(𝑎1), t)) # only one solution
+𝑦ₓ = rhs(𝑎2)(t =&gt; 𝑡ₓ)</code></pre>
+<p>The difference can be visualized through plotting. The proper way to get the values for the constants is to specify numeric values in the initial conditions:</p>
+<pre class="{julia}"><code>a = yₓ(𝑔 =&gt; 32, v₀ =&gt; 200, α =&gt; PI/4)
+M = maximum(solve(a ~ 0))
+plot(a, 0, N(M))
+
+𝑎 = 𝑦ₓ(𝑔 =&gt; 32, v₀ =&gt; 200, α =&gt; PI/4, γ =&gt; 1//2)
+M = nsolve(𝑎 ~ 0, 2*100*sqrt(2)-10) # avoid starting at asymptote
+plot!(𝑎, 0, N(M))</code></pre>
 
 
 </section>
