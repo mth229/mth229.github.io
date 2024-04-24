@@ -6,8 +6,6 @@
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/06-derivatives.ipynb)
-[(Pluto html)](./229-projects/06-derivatives.html)
-[(With commentary)](./229-projects/06-derivatives-pluto-commentary.html)
 
 
 
@@ -50,12 +48,12 @@ This graph shows $f(x) = 2 - x^2$ and various secant lines when $c=-0.75$.
 #| fig-alt: plot of 2 - x^2  with secant lines
 f(x) = 2 - x^2
 c = -0.75
-sec_line(h) = secant(f, c, c+h)                # secant in MTH229 package
+slh(h) = secant(f, c, c+h)                # secant from the MTH229 package
 plot(f, -1, 1, legend=false)
-plot!(sec_line(1))
-plot!(sec_line(0.75))
-plot!(sec_line(0.5))
-plot!(sec_line(0.25))
+plot!(slh(1))
+plot!(slh(0.75))
+plot!(slh(0.5))
+plot!(slh(0.25))
 ```
 
 As the value of $h$ goes towards 0 along the path $1$, $0.75$, $0.5$, $0.25$, ... the slope of the secant line heads towards the slope of the tangent line, in this case $2\cdot 0.75 = 1.5$.
@@ -74,7 +72,8 @@ The most naive approximation is simply to assume $h$ is some small number and us
 
 
 ```{julia}
-f(x) = x^2 - 2x; fp(x) = 2x - 2
+f(x) = x^2 - 2x
+df(x) = 2x - 2
 h = .001
 c = 3
 ( f(c + h) - f(c) ) / h
@@ -84,7 +83,7 @@ This is known as the *forward difference quotient* approximation to the derivati
 
 
 ```{julia}
-( f(c + h) - f(c) ) / h - fp(c)
+( f(c + h) - f(c) ) / h - df(c)
 ```
 
 That is not too close, just to 3 digits of accuracy.
@@ -107,9 +106,10 @@ Let's try the derivative of some well known function.  We know the derivative of
 
 
 ```{julia}
-f(x) = sin(x); fp(x) = cos(x)
+f(x) = sin(x)
+df(x) = cos(x)
 c = pi/4; h = 0.0001
-( f(c + h) - f(c) )/h - fp(c)
+( f(c + h) - f(c) )/h - df(c)
 ```
 
 Not as good as we can get – the error is like `1e-5`, but not too bad already.
@@ -121,7 +121,7 @@ Not as good as we can get – the error is like `1e-5`, but not too bad already.
 Suppose the tractor company John Deere models its profit per units sold through the function $P(x) = 50 e^{x/250}/(1 - e^{x/250})$. Find the marginal profit for $x=200$.
 
 
-The marginal profit is the change in profit per unit sold – or the derivative – at $x=200$.  We can find this quite simply by either differentiating directly, or as we do here, approximating the answer with `julia`. We first note that the function above, is a composition, so it may be written using two functions:
+The marginal profit is the change in profit per unit sold – or the derivative – at $x=200$.  We can find this quite simply by either differentiating directly, or as we do here, approximating the answer with `Julia`. We first note that the function above, is a composition, so it may be written using two functions:
 
 
 ```{julia}
@@ -269,7 +269,7 @@ radioq(choices, answer, keep_order=true)
 We might be interested not in the derivative at a point, but in the derivative as a function. This is how we think of the derivative when we say if $f(x) = \sin(x)$, the $f'(x) = \cos(x)$.  Mathematically, from this viewpoint, the derivative is referred to as an *operator*, as it takes a function and returns a function.
 
 
-We can reproduce this behavior easily enough with `julia`, as functions are *first class objects*: they can be passed as arguments and returned as values.
+We can reproduce this behavior easily enough with `Julia`, as functions are *first class objects*: they can be passed as arguments and returned as values.
 
 
 First, let's define a function to find the derivative at a point using the "forward difference quotient":
@@ -298,23 +298,17 @@ To see this work, we can find and plot the derivative of $\sin(x)$:
 ```{julia}
 #| fig-alt: plot of sin and its derivative
 f(x) = sin(x)
-fp(x) = Df(f)(x)
+fp = Df(f)
 plot(f, 0, 2pi)
 plot!(fp)
 ```
 
-Well, we already knew that should just be $\cos(x)$.  The point is we can easily make the an approximate derivative function from `f` with the definition `fp(x) = Df(f)(x)`.
+Well, we already knew that should just be $\cos(x)$.  The point is we can easily make the an approximate derivative function from `f` with the definition `fp = Df(f)`.
 
-
-:::{.callout-note}
-## Parsing Df(f)(x)
-Seeing the pair of parenthesis can lead to confusion, as it isn't common math notation. Here parentheses are not used for grouping, but rather function application. There are two function applications and the associativity rules for function application are left to right, as with most – but not all – operations. So `Df(f)` is done first. This returns a function (the approximate derivative) which is then evaluated at `x`.
-
-:::
 
 :::{.callout-note}
 ## Defining `fp` or `fp(x)`
-We could also have just plotted `f` and `Df(f)` without naming `fp`. As well, could have written `fp = Df(f)`, but that creates `fp` as an *anonymous* function and we then couldn't redefine it through `fp(x) = ...`, which would attempt to make it a *generic* function.
+We could also have just plotted `f` and `Df(f)` without naming `fp`. As well, could have written `fp(x) = Df(f)(x)`, but that will use the global variable `f` everytime it is called. A reminder though, using `fp = Df(f)` and `fp(x) = ...` in the same session will error. To avoid this, we use `fp` for the former and `df` when the latter is desired.
 
 :::
 
@@ -340,7 +334,7 @@ A function's *critical points* are where its derivative is $0$ or undefined. We 
 ```{julia}
 #| fig-alt: plot  of f(x) = x^3 -5x + 4 and its derivative
 f(x) = x^3 -5x + 4
-fp(x) = Df(f)(x)
+fp = Df(f)
 plot(fp, -5, 5)
 ```
 
@@ -366,7 +360,7 @@ find_zero(fp, (-2, -1)), find_zero(f', (1, 2))
 Let $f(x) = \cos(x)$ over the interval $[0, 360]$ (in degrees). When is the function increasing?
 
 
-From the relationship of the derivative and the function, we know the answer is when $f'(x) > 0$. For this example, we can solve this directly as $f'(x) = -\sin(x)$ and we know when that is positive (well you are supposed to anyways: when the angle is in the third and fourth quadrants). Let's see how we would do this task with `julia` and compare.
+From the relationship of the derivative and the function, we know the answer is when $f'(x) > 0$. For this example, we can solve this directly as $f'(x) = -\sin(x)$ and we know when that is positive (well you are supposed to anyways: when the angle is in the third and fourth quadrants). Let's see how we would do this task with `Julia` and compare.
 
 
 First, we only need the derivative, so we just ask:
@@ -374,7 +368,7 @@ First, we only need the derivative, so we just ask:
 
 ```{julia}
 f(x) = cosd(x)			# using degrees
-fp(x) = Df(f)(x)        # use default h
+fp = Df(f)              # use default h
 ```
 
 Then we wish to indicate on the graph where `fp(x) > 0`. We can do this by defining a function that is $0$ when that is the case and `NaN` otherwise (so that those points are not plotted). We do so below using the `plotif` function from the `MTH229` package
@@ -395,11 +389,13 @@ Let $f(x) = e^x$. Using a forward difference quotient and $h=0.001$ graph both t
 
 ```{julia}
 #| echo: false
-choices = ["It is about 0.1", "It is about 0.01", "It is about 0"]
-fp(x, h=0.001) = (exp(x+h)-exp(x))/h
-m = maximum(abs(exp(x) - fp(x)) for x ∈ range(0, 3, length=100))
-_, answer = findmin(abs.(m .- (0.1, 0.01, 0)))
-radioq(choices, answer)
+let
+    choices = ["It is about 0.1", "It is about 0.01", "It is about 0"]
+    df(x, h=0.001) = (exp(x+h)-exp(x))/h
+    m = maximum(abs(exp(x) - df(x)) for x ∈ range(0, 3, length=100))
+    _, answer = findmin(abs.(m .- (0.1, 0.01, 0)))
+    radioq(choices, answer)
+end
 ```
 
 #### Question
@@ -441,8 +437,8 @@ The error in the approximation of the derivative depends on the size of $h$. Mat
 
 ```{julia}
 f(x) = sin(x)
-fp(x) = cos(x)
-[ Df(f,h=h)(.5) - fp(.5) for h=[.1, .01, .001, .0001, .00001] ]
+df(x) = cos(x)
+[ Df(f,h=h)(.5) - df(.5) for h=[.1, .01, .001, .0001, .00001] ]
 ```
 
 It gets better as $h$ gets smaller. In fact, it looks like when $h$ gets smaller by a factor of $1/10$ so does the error. Let's look a little deeper though. Rather than type in the values of $h$ as above, let's use an expression to compute them. Here we find the powers $10^{-1}, \dots, 10^{-16}$ at once and then compute the differences:
@@ -483,9 +479,9 @@ Now to see whether a forward difference quotient or central difference quotient 
 
 ```{julia}
 f(x) = sin(x)
-fp(x) = cos(x)
-using_D =  [ Df(f,h=h)(.5) - fp(.5) for h in hs ];
-using_Dc = [ Dc(f,h=h)(.5) - fp(.5) for h in hs ];
+df(x) = cos(x)
+using_D =  [ Df(f,h=h)(.5) - df(.5) for h in hs ];
+using_Dc = [ Dc(f,h=h)(.5) - df(.5) for h in hs ];
 [hs using_D using_Dc]
 ```
 
@@ -517,7 +513,7 @@ Doing so is easy:
 
 ```{julia}
 f(x) = 10/(1+x^2) - 10*exp(-(1/2)*x^2)
-fp(x) = Dc(f)(x)
+fp = Dc(f)
 intersection_point(c) = c - f(c)/fp(c)
 ```
 
@@ -536,7 +532,7 @@ You can tell from the graph of $f(x)$ that this value should be more than 1, as 
 #| fig-alt: plot of function and tangent line
 plot(f, .5, 2.1, legend=false)
 plot!(zero)
-plot!(x -> f(c) + fp(c)*(x-c))
+plot!(tangent(f, c))
 ```
 
 ---
@@ -705,23 +701,18 @@ plot!(f')
 plot!(f'')
 ```
 
-Here is an example where we plot the tangent line and the function. The `MTH229` package provides this function to compute a tangent line function:
-
+Here is an example where we plot the tangent line and the function. The `MTH229` package provides a function `tangent` which takes values for `f` and `c` and returns a *function* that represents the tangent line. The use is illustrated below. First we define a function `f` and use `tangent` to define a function `tl`:
 
 ```{julia}
-#| eval: false
-tangent(f, c) = x -> f(c) + f'(c)*(x-c)
+f(x) = x^x
+c = 1
+tl = tangent(f, c)
 ```
-
-This is employed as follows:
-
 
 ```{julia}
 #| fig-alt: plot of x^x and its tangent line
-f(x) = x^x
-c = 1
 plot(f, 1/2, 2)
-plot!(tangent(f, c))
+plot!(tl)     # or, more directly, plot!(tangent(f, c))
 ```
 
 ---
@@ -776,7 +767,8 @@ The mean value theorem tells us that there is at least one time where the instan
 
 
 ```{julia}
-find_zero(t -> A'(t) - m, (0, 30))
+u(t) = A'(t) - m
+find_zero(u, (0, 30))
 ```
 
 So at 12.4 days, the instantaneous rate is equal to the average rate of decomposition over the first 30 days.
@@ -788,7 +780,8 @@ But this doesn't really answer the question asked, which is about the average am
 ```{julia}
 a, err = quadgk(A, 0, 30)	# area under A from 0,30
 avg = a/(30-0)
-find_zero(t -> A(t) - avg, (0, 30))
+u(t) = A(t) - avg
+find_zero(u, (0, 30))
 ```
 
 We get the same answer – think about whether that is a coincidence.
@@ -812,7 +805,8 @@ So, we can use $[30, 100]$ as a bracket for $L(t) - 0.5 = 0$:
 
 
 ```{julia}
-find_zero(t -> L(t) - 0.5, (30, 100))
+u(t) = L(t) - 0.5
+find_zero(u, (30, 100))
 ```
 
 So a bit over 35 days to decompose to half a pound.
@@ -875,8 +869,8 @@ We can compare the error at many different points with the following construct
 ```{julia}
 #| eval: false
 f(x) = exp(-x)*sin(x)
-fp(x) = exp(-x)*(cos(x) - sin(x))
-[abs(f'(x) - fp(x) ) for x in range(0, pi, 25)]
+dfpx) = exp(-x)*(cos(x) - sin(x))
+[abs(f'(x) - df(x) ) for x in range(0, pi, 25)]
 ```
 
 What is the order (exponent) of the largest difference above?
@@ -961,8 +955,8 @@ Numerically, we can check how this basically works for some test function:
 
 ```{julia}
 f(x) = exp(x) - x^3
-fp(x) = exp(x) - 3x^2
-[hs [Df(f,h=h)(.5) - fp(.5) for h in hs] ]
+df(x) = exp(x) - 3x^2
+[hs [Df(f,h=h)(.5) - df(.5) for h in hs] ]
 ```
 
 We see the best case is around $h=10^{-8}$, as expected by the theory.
@@ -1007,8 +1001,8 @@ A subtle point above is that we are minimizing an upper bound in $h$ with an ass
 ```{julia}
 hs = [(1/10)^i for i in 1:16]
 f(x) = x^2 - 2x
-fp(x) = 2x - 2
-[hs [Dc(f,h=h)(.5) - fp(.5) for h in hs] ]
+df(x) = 2x - 2
+[hs [Dc(f,h=h)(.5) - df(.5) for h in hs] ]
 ```
 
 What is the best value of $h$?
@@ -1038,8 +1032,8 @@ Consider these commands:
 ```{julia}
 #| eval: false
 f(x) = sin(x)
-fp(x) = cos(x)
-[hs [ Dc(f,h=h)(.5) - fp(.5) for h in hs] ]
+df(x) = cos(x)
+[hs [ Dc(f,h=h)(.5) - df(.5) for h in hs] ]
 ```
 
 Do they show the smallest error around $10^{-6}$ as expected?

@@ -6,8 +6,6 @@
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/03-graphics.ipynb)
-[(Pluto html)](./229-projects/03-graphics.html)
-[(With commentary)](./229-projects/03-graphics-pluto-commentary.html)
 
 
 ## Introduction
@@ -155,7 +153,7 @@ trim(f; val=10) = x -> abs(f(x)) > val ? NaN : f(x)
 This action is very similar to  [clamping](http://en.wikipedia.org/wiki/Clamping_(graphics)).
 
 
-The `MTH229` package implements this in the function `rangeclamp(f, hi=20, lo=-hi)`. (Base `julia` has a `clamp` function.)
+The `MTH229` package implements this in the function `rangeclamp(f, hi=20, lo=-hi)`. (Base `Julia` has a `clamp` function.)
 
 
 Using `rangeclamp` is fairly simple. The output is a function, so can be passed directly to the `plot` call:
@@ -319,7 +317,7 @@ Some features of interest for a graph that are identifiable by calculus concepts
 For example, if you want to find zeroes of a function, you really want to look at areas of the graph where the $y$ values are close to $0$. However, if you have a vertical asymptote on the same graph, the $y$ values might also be asked to show very large or small values. With only a finite number of pixels available, it is impossible to easily do both.
 
 
-What to do? If you were on a smartphone, you might be tempted to pan around to avoid the asymptotes, then pinch and zoom narrow the graph to the feature of interest.  With `julia` you basically do the same thing, though panning and zooming is done by changing the domain of the $x$ values used in plotting.
+What to do? If you were on a smartphone, you might be tempted to pan around to avoid the asymptotes, then pinch and zoom narrow the graph to the feature of interest.  With `Julia` you basically do the same thing, though panning and zooming is done by changing the domain of the $x$ values used in plotting.
 
 
 Let's look at the function $f(x) = 1/x$, which has an obvious vertical asymptote at $0$.
@@ -554,7 +552,7 @@ Row and column vectors are different! We will primarily use column vectors going
 **Containers are for like values...**
 
 
-In general, `julia` uses `[` and `]` to create containers for like values. These containers can be more complicated than a single row or column. One subtle thing is that each object must be of the same value, though sometimes this happens by a silent conversion. So, mixing integer and floating point numbers will produce a container of just floating point values:
+In general, `Julia` uses `[` and `]` to create containers for like values. These containers can be more complicated than a single row or column. One subtle thing is that each object must be of the same value, though sometimes this happens by a silent conversion. So, mixing integer and floating point numbers will produce a container of just floating point values:
 
 
 ```{julia}
@@ -578,7 +576,7 @@ It should be possible to specify arithmetic sequences either by
   * the start and end points and step size.
 
 
-In `julia` the `range` function will do the former and the range operator the latter.
+In `Julia` the `range` function will do the former and the range operator the latter.
 
 
 Here are 5 evenly spaced numbers from $0$ to $\pi/2$ given by `range`
@@ -604,7 +602,7 @@ The "range" operator, `:`, is used to specify a step size, like $h$ in the defin
 1:4
 ```
 
-That isn't so impressive. The description `julia` uses to show this value is exactly how we defined it, but this range is specifying the values 1, 2, 3, 4. To see that, we `collect` the values to make an array:
+That isn't so impressive. The description `Julia` uses to show this value is exactly how we defined it, but this range is specifying the values 1, 2, 3, 4. To see that, we `collect` the values to make an array:
 
 
 ```{julia}
@@ -705,7 +703,7 @@ radioq(choices, answer)
 ## Indexing
 
 
-A column vector has a natural sense of first, second, ..., the $n$-th element. This allows `julia` to refer to the values by index ($1$-based, unlike some other computer languages). So, if `x` is an array, `x[1]` is the first value in that array. One can extract and *assign* values using indices. A simple example is:
+A column vector has a natural sense of first, second, ..., the $n$-th element. This allows `Julia` to refer to the values by index ($1$-based, unlike some other computer languages). So, if `x` is an array, `x[1]` is the first value in that array. One can extract and *assign* values using indices. A simple example is:
 
 
 ```{julia}
@@ -828,7 +826,7 @@ radioq(choices, answer)
 ## Mapping a function to multiple values
 
 
-To specify the $y$ values we wish to "map" the function `f` to each $x$ value.  In `julia` there are many different ways to do this, we list four for completeness, but will restrict our attention to just the first three styles.
+To specify the $y$ values we wish to "map" the function `f` to each $x$ value.  In `Julia` there are many different ways to do this, we list four for completeness, but will restrict our attention to just the first three styles.
 
 
 ### The map function
@@ -837,7 +835,7 @@ To specify the $y$ values we wish to "map" the function `f` to each $x$ value.  
 The `map` function. In many areas of mathematics, one refers to a function as a "map" from the domain to the range. The implication is that the function takes all the $x$ values to the corresponding $y$ values at once (conceptually) and not one at a time. The `map` function will apply the function `f` to each value in the array `x`, basically taking `[x1, x2, ..., xn]` and returning `[f(x1), f(x2), ..., f(xn)]`.
 
 
-For example, let's look at the simple polynomial $f(x) = -16x^2 + 32x$. We define our `julia` function with:
+For example, let's look at the simple polynomial $f(x) = -16x^2 + 32x$. We define our `Julia` function with:
 
 
 ```{julia}
@@ -924,7 +922,7 @@ The two approaches, broadcasting/maps and comprehensions, are equally useful. Pe
 Finally, for completeness, we mention another means to generate vectors of numbers that is more familiar to users of other computer languages.
 
 
-The `for` loop is a very common pattern in computer programming. For speed reasons, some languages (e.g., `MATLAB` and `R`) try to avoid for loops for a "vectorized" approach (see below), but `julia` works well with `for` loops, and they are sometimes easier to understand than a vectorized approach.
+The `for` loop is a very common pattern in computer programming. For speed reasons, some languages (e.g., `MATLAB` and `R`) try to avoid for loops for a "vectorized" approach (see below), but `Julia` works well with `for` loops, and they are sometimes easier to understand than a vectorized approach.
 
 
 A `for` loop simply loops over each value in the iterable data vector `x` giving it a temporary name as it goes. To use a `for` loop to create the $y$ values requires several steps. The first creates a container to hold the new values, using the `similar` function to make a vector of the same size as `x` below (but fills it with nonsense):
@@ -943,7 +941,7 @@ The `for` loop ends with the keyword `end`. Here we loop over each index of `x` 
 Conceptually this is the opposite of `map` where we think of the function acting on the entire column vector `x`. Instead, we iterate one-by-one over the values of `x` saving the function values as we go. The use of for loops is called *imperative programming*, as you describe each step. The use of functions like `map` is called *declarative programming* as you simply declare what you want and the computer language does the rest.
 
 
-In some languages for loops are avoided if possible, as they can be slower. As well, they can require extra bookkeeping, such as needing to allocate a container for the answers. That being said, in `julia` they are widely used for speed and storage reasons. As well, they are used when we need to refer to more than one index. An example of that is the following way to create a Fibonacci pattern from the formula $x_i = x_{i-1} + x_{i-2}$:
+In some languages for loops are avoided if possible, as they can be slower. As well, they can require extra bookkeeping, such as needing to allocate a container for the answers. That being said, in `Julia` they are widely used for speed and storage reasons. As well, they are used when we need to refer to more than one index. An example of that is the following way to create a Fibonacci pattern from the formula $x_i = x_{i-1} + x_{i-2}$:
 
 
 ```{julia}
@@ -1241,21 +1239,10 @@ These styles are not utilized within these notes, though they can be convenient 
 ##### Example: Operators, aka. "derived functions"
 
 
-Often we wish to plot a function derived from another function. For example, this is used to add a secant line to a graph. The following function (which is in the `MTH229` package) will create a function which represents the secant line of $f(x)$ between two points, $a$ and $b$:
+Often we wish to plot a function derived from another function. For example, to add a secant or tangent line to a graph.
 
+To illustrate, we can add a secant line, as follows for a specific `f`, `a` and `b`.
 
-```{julia}
-#| eval: false
-function secant(f, a, b)
-	 m =  (f(b) - f(a)) / (b-a)	# slope of secant line
-	 x -> f(a) + m * (x - a)
-end
-```
-
-Pause for a moment to see what this function does. The first line simply finds the slope between the two points $(a,f(a))$ and $(b,f(b))$. The second does something with the point-slope form of a line using the point $(a, f(a))$. The tricky part is that last line defines an anonymous function to be returned (the `x ->` part). So `secant` is an *operator* – a function which accepts a function for an argument and returns a function.
-
-
-Using this function makes it simple to add a secant line to a graph.
 
 
 ```{julia}
@@ -1263,8 +1250,25 @@ Using this function makes it simple to add a secant line to a graph.
 f(x) = sin(x)
 a, b = 0, pi/2
 plot(f, a, b; legend=false)
+secant_line(x) = f(a) + (f(b) - f(a)) / (b - a) * (x - a)
+plot!(secant_line)
+```
+
+For creating secant lines, the `MTH229` package provides a function `secant` called with `f`, `a`, and `b` that returns a *function*. To repeat the above, we might have:
+
+```{julia}
+plot(f, a, b; legend=false)
 plot!(secant(f, a, b))
 ```
+
+To name the secant line, it is suggested to so something like:
+
+```{julia}
+sl = secant(f, a, b)
+```
+
+(This is in contrast to other other definitions of a function where `f(x)` appear on the *left-hand* side of the defintion; here just a variable name is used, as the functon `secant` returns a function object, we aren't defining a function, just naming it.)
+
 
 ----
 

@@ -6,8 +6,6 @@
 <br/>
 A notebook for this material:
 [ipynb](https://raw.githubusercontent.com/mth229/229-projects/master/02-functions.ipynb)
-[(Pluto html)](./229-projects/02-functions.html)
-[(With commentary)](./229-projects/02-functions-pluto-commentary.html)
 
 
 ## Introduction
@@ -33,7 +31,7 @@ plotly()
 using QuizQuestions
 ```
 
-Then we define a function and plot it:
+Then we define a function and plot it over $[0, \pi]$:
 
 
 ```{julia}
@@ -758,43 +756,188 @@ radioq(["`f(x) = x > 30   ? 13*x + 1500.0        : 30.0`",
 	     ], 3)
 ```
 
-## Functions of multiple arguments
+## Anonymous functions
 
+
+A alternate mathematical notation for a function that emphasizes the fact that $f$ maps $x$ to some value $y$ involving the rule of $f$ is to use an arrow as:
+
+
+$$
+x \rightarrow -16x^2 + 32x
+$$
+
+You can do the exact thing in `Julia` to create a function:
+
+
+```{julia}
+x -> -16x^2 + 32x
+```
+
+This expression creates a function object, but since we didn't bind it to a variable (that is, we didn't give the function a name) it was immediately forgotten. Such functions without a name are known as *anonymous functions*.
+
+
+Anonymous functions can be named. For example, we might have:
+
+```{julia}
+motion_of_particle = x -> -16x^2 + 32x
+```
+
+This names a function object; it does not create a method for a generic function (to be described later). One source of possible confusion is the name given to an anonymous function *can not* be used as a name for a function defined through the style `f(x) = ...`, as that creates a method for a *generic function*. Vice versa.
+
+
+## Functions of multiple variables
 
 The concept of a function is of much more general use than its restriction to mathematical functions of single real variable. A natural application comes from describing basic properties of geometric objects. The following function definitions likely will cause no great concern when skimmed over:
 
 
 ```{julia}
 Area(w, h) = w * h		                   # of a rectangle
-Volume(r, h) = pi * r^2 * h	                   # of a cylinder
+Volume(r, h) = pi * r^2 * h	               # of a cylinder
 SurfaceArea(r, h) = pi * r * (r + sqrt(h^2 + r^2)) # of a right circular cone
 ```
 
-The right-hand sides may or may not be familiar, but it should be reasonable to believe that if push came to shove, they could be looked up. However, the left-hand sides are subtly different – they have two arguments, not one. In `Julia` it is trivial to define functions with multiple arguments – we just did.
+The right-hand sides may or may not be familiar, but it should be reasonable to believe that if push came to shove, they could be looked up. However, the left-hand sides are subtly different – they have two arguments, not one. In `Julia` it is trivial to define functions with multiple arguments – we just did. However, `Julia` has two means to specify additional arguments, as described briefly in the following.
 
+
+### Positional arguments
+
+Functions like `Area` above use *position* to match the values used when calling the function with the variables in the function definition. This is quite natural. We would expect `Area(5,6)` to use `w=5` and `h=6` when the evaluation is performed.
+
+##### Question
+
+The function call `log(x)` finds $\log_e(x) = \ln(x)$; the function call `log2(x)` finds $\log_2(x)$; the function call `log10(x)` finds $\log_{10}(x)$. More generally we have `log(a, b)` to find the log for a specified base.
+
+Does `log(a, b)` find $\log_a(b)$ *or* $\log_b(a)$?
+
+```{julia}
+#| echo: false
+choices = [raw"``\log_a(b)``", raw"``\log_b(a)``"]
+answer = 1
+radioq(choices, answer)
+```
+
+In a function definition, there can be $0, 1$, or more positional arguments, even an unspecified variable number of arguments. The values may be restricted to having different types. Default values may be given. Here we stick to the simplest cases, as illustrated above, where the variables are all named and separated by commas in the function definition.
+
+### Keyword arguments
+
+Positional arguments work well for many cases, but are not always the most covenient approach:
+
+* if there are numerous arguments, the user must know what position matches to what variable which can mean consulting the documentation or some other means. For example, in `Volume` above is the radius the first or second argument? It is hard to guess without peeking.
+
+* if there are numerous arguments but the user only wants to change a few from the *default* values the user would need to still use all the arguments. (Well, not technically, but practically.)
+
+The latter issue is well solved with *keyword arguments*.
+
+Keyword arguments are widely used when plotting with `Julia` as they conveniently help customize specific attributes of a plot on a case-by-case basis. The `Plots` package we will illustrate utilizes *positional arguments* for the data to be plotted and *keyword arguments* to adjust attributes of how the data is shown.
+
+For an example using keyword arguments, we revisit this function
+
+
+$$
+ g(x) = \tan(\theta) x + \frac{32}{200 \cos\theta} x -
+     32 \log\left(\frac{200 \cos\theta}{200\cos\theta - x}\right).
+$$
+
+The value $\theta$ may have a default value of $\pi/4$ for most uses, but rather than hard code that value, we set it as a default and allow it to be adjusted by the user by passing the argument `theta=...`.
+
+Keyword arguments are separated from any positional arguments by a *semicolon* and are given a *default value*:
+
+For example:
+
+```{julia}
+function g(x; theta=pi/4)
+	 a = 200*cos(theta)
+	 tan(theta)*x + (32/a)*x - 32*log(a/(a-x))
+end
+```
+
+If keyword arguments are not specified when called, the defaults are used:
+
+```{julia}
+g(50)
+```
+
+Is the same as `g(50, theta=pi/4)`.
+
+To modify a keyword argument it is specified as `key=value` **after** any positional arguments are specified in the function call.
+
+For example, if the angle were less than the default of $\pi/4$ would the value of $f$ be smaller or larger?
+
+
+```{julia}
+g(50, theta=pi/8)		## smaller in this case.
+```
+
+The pattern `g(theta=pi/8, 50)` would error.
+
+We used a comma to separate the positional argument from the keyword argument. Commas are used to separate different positional arguments; commas are used to separate different keyword arguments, so this is natural. However, a semicolon can also be used, to mirror their mandated use when *defining* a function with keyword arguments.
+
+
+
+### Generic functions
 
 Earlier we saw the `log` function can use a second argument to express the base. This function is defined by `log(b, x) = log(x) / log(b)`. The `log(x)` value is the natural log, and this definition just uses the change-of-base formula for logarithms.
 
 
-But not so fast, on the left side is a function with two arguments and on the right side the functions have one argument – yet they share the same name. How does `Julia` know which to use? `Julia` uses the number, order, and *type* of the arguments passed to a function to determine which function definition to use. This is technically known as **multiple dispatch** or **polymorphism**. As a feature of the language, it can be used to greatly simplify the number of functions the user must learn. The basic idea is that many functions are "generic" in that they will work for many different scenarios. For example addition. It is defined for real numbers, integers, complex numbers, ... . Each definition may be different, but to the end user only the operator `+` need be used. The rest happens behind the scenes. As an example, to see how many different definitions ("methods") are defined in the base `Julia` language for the `log` operator, we can execute:
+But not so fast, on the left side is a function with two arguments and on the right side the functions have one argument – yet they share the same name. How does `Julia` know which to use? `Julia` uses the number, order, and *type* of the *positional* arguments passed to a function to determine which *method* for the generic function to use.
 
+This is technically known as **multiple dispatch** or **polymorphism**. As a feature of the language, it can be used to greatly simplify the number of functions the user must learn. The basic idea is that many functions are "generic" in that they will work for many different scenarios.
+
+A good example is addition. In experience, different algorithms are used for adding integers (using carrying); adding decimal numbers (align the decimal points); adding complex numbers (add real and imaginary parts separately); adding polynomials (add coefficients of like terms); etc. Each definition may be different, but the concept the same. For the end user, only the operator `+` need be used. A similar thing occurs with `Julia`.
+
+Some upcoming example usage of generic functions will include:
+
+* `find_zero(f, c)` and `find_zero(f, a, b)` will both find a zero of `f`, but the first form will look for one *near* `c`; the second for a zero between `a` and `b` -- while using a *totally* different algorithm.
+
+* `plot(f, a, b)` will plot the function `f` over the interval `[a,b]`. However, `plot(xs, ys)` will plot the points $(x_1, y_1), (x_2, y_2), \dots (x_n, y_n)$ specified with two contains.
+
+For each example, the same general idea is being asked (finding a zero or rendering a plot) but different implementations, or methods, are eventually used.
+
+
+::: {.callout-note}
+## Anonymous and generic functions
+
+`Julia` has two types of functions: anonymous functions and generic functions. (There are also "callable" structs which act like functions.) Anonymous functions, despite their name, can be named in the way a name can be given to a value, just like naming any other value.
+
+Generic functions are more complicated. In order to have one name and many methods, a method table is used behind the scenes.
+
+Generic function names in the method table (e.g., `plot`, `log`, etc.) can not be repurposed as variable names or vice versa. `Julia` is a dynamic language otherwise, where the type of values attached to a variable name can be changed, but not in this usage.
+
+Hence the following will error, as `h1` is used a variable and then a function:
 
 ```{julia}
-methods(log)
+h1 = 4
 ```
 
-There are many, and likely more to be added as the language matures.
+```{julia}
+#| error: true
+h1(x) = 4
+```
+
+Similarly, this will error when the attempt to redefine `h2` is made:
+
+```{julia}
+h2(x) = 4
+```
+
+```{julia}
+#| error: true
+h2 = 4
+```
+
+The suggestion is to use familiar names for variables (e.g., `x`, `y`, `a`, ...) and either descriptive function names or the usual common names (e.g. `f`, `g`, ...) for *generic* functions (those defined by `f(x) = ...`.)
 
 
-### An application of composition and multiple dispatch
+
+:::
+
+#### Example: composition and multiple dispatch
 
 
 `Julia`'s multiple dispatch allows multiple functions with the same name. The function that gets selected depends on the arguments given to the function. We can exploit this to simplify our tasks. For example, consider this optimization problem:
 
 
 > For all rectangles of perimeter $20$, what is the one with largest area?
-
-
 
 The start of this problem is to represent the area in terms of one variable. We see next that composition can simplify this task, which when done by hand requires a certain amount of algebra.
 
@@ -806,14 +949,14 @@ Representing the area of a rectangle in terms of two variables is easy:
 Area(w, h) = w * h
 ```
 
-But the other fact about this problem – that the perimeter is $20$ – means that height depends on width. For this question, we can see that $P=2w + 2h$ so that
+But the other fact about this problem – the constraint that the perimeter is $20$ – means that height depends on width. For this question, we can see that $P=2w + 2h$ so that
 
 
 ```{julia}
 h(w) = (20  - 2 * w)/2
 ```
 
-By hand we would substitute this last expression into that for the area (to get $A=w\cdot (20-2 \cdot w)/2 = -w^2 + 10$) and simplify. However, within `Julia` we can let composition do the substitution and leave algebraic simplification for `Julia` to do:
+By hand we would substitute this last expression into that for the area  and simplify (to get $A=w\cdot (20-2 \cdot w)/2 = -w^2 + 10$). However, within `Julia` we can let composition do the substitution and leave algebraic simplification for `Julia` to do:
 
 
 ```{julia}
@@ -823,7 +966,7 @@ Area(w) = Area(w, h(w))
 This might seem odd, as now we have two *different* but related functions named `Area`. Julia will decide which to use based on the number of arguments when the function is called. This allows both to be used on the same line, as above. This usage is not common with computer languages, but is a feature of `Julia` which is built around the concept of *generic* functions with multiple dispatch rules to decide which rule to call.
 
 
-For example, the `plot` function expects functions of a single numeric variable. Behind the scenes, then the function `A(w)` will be used in this graph:
+For example, the `plot` function, when called as below, expects functions of a single numeric variable. Behind the scenes, then the function `A(w)` will be used in this graph:
 
 
 ```{julia}
@@ -833,86 +976,273 @@ plot(Area, 0, 10)
 
 From this, we can see that that the width yielding the maximum area is $w=5$, and so $h=5$ as well.
 
-### Functions with parameters
 
-A common use of multiple arguments in the `Julia` ecosystem is to use functions with the signature `f(x,p)` where the second argument is for a parameter (or parameters, when a container of values is passed).
+## Functions with parameters
 
-The following use sets a *default* value for the parameter so it may or may note be specified:
+Many descriptions involve both a variable (or variables) and different parameters. In calculus many functions are part of wider family of functions (exponential, logaorithmic, etc.) that use parameters to fit the family to a problem at hand. Function transformations are an example.
+
+A even more familiar example is the equation for a line $y = m\cdot x + b,$ where $x$ is a variable and $m$ and $b$ are **parameters** for a given application.
+
+The equation written as a function might be implemented through:
 
 ```{julia}
-f(x, p=1) = cos(x) - p * x
+f(x) = m * x + b
 ```
 
-It isn't shown now, but this pattern can be used to solve for when $f(x,p) = 0$ for various choices of $p$ quite directly.
+The value of `x` is *passed* into the function when `f` is called, but where would the values for `m` and `b` be found? In math, these parameters would come from the *context* of the problem being discussed. On the computer, there are *scoping rules* used to resolve the task of identifying a value assigned to a variable in a given scope.
 
-## Keyword arguments
+Were `f` defined as above, the values of `m` and `b` would likely come from the *global scope*. This uses the *current* values assigned to the symbols `m` and `b` and **not** the values when `f` is defined. This means if those values are changed, the values `f` computes will be changed.
 
-Keyword arguments are widely used when plotting with `Julia` as they conveniently help customize specific attributes of a plot on a case-by-case basis. In the following, we see how keyword argument may also be used to specify parameters, though the pattern `f(x, p)`, as just described, is more commonly used.
+For the most part this is just fine, but it is fragile and can lead to subtle mistakes.
+
+In general, using global variables is frowned upon for the reason above and for performance reasons. Rather is it suggested that parameters are passed in the functions that use them. We illustrate three possible means to specify parameters when calling a function in the following example.
+
+### Example: lines
+
+The line is an essential object in calculus and other subjects. Their ubiquity leads to different mathematical descriptions:
+
+* The general *equation* of a line: $Ax + By = C$
+* the slope-intercept *equation* of a line $y = m\cdot x + b$, as above
+* the point-slope *equation* of a line $y = y_1 + m \cdot (x - x_1)$
+
+The general equation is useful, as it can describe vertical lines, where the slope is undefined. However, the use of the slope-intercept or point-slope forms is more commonly employed in calculus, especially the point-slope form as the data describing a line is usually presented in terms of these two quantities.
 
 
+Both of these latter forms can be written in function form, e.g. $f(x) = m\cdot x + b$.
 
-We consider a simple case -- a function which computes the $y$ value on a line $y=mx+b$ from a given $x$ value. Here $m$ and $b$ are parameters. We will give them a default of $1$ and $0$:
+Consider the task mentioned above of making a function for the slope-intercept form of a line, $f(x) = m\cdot x + b$, where $x$ is the variable;  $m$ and $b$ the parameters.
 
+Some different forms that can be used:
+
+* Using different positional arguments for the variable and the parameters:
 
 ```{julia}
-mxplusb(x; m=1, b=0) = m*x + b
+three_arguments(x, m, b) = m * x + b
 ```
 
-The syntax is to use a semicolon  to separate regular arguments from those with keywords. This semicolon is not needed when calling the function; a comma may be used:
-
+* Using the `f(x, p)` form, with two positional arguments, and where the parameters are passed through in a container:
 ```{julia}
-mxplusb(2)				## 1*2 + 0, using defaults
-mxplusb(2, m=2, b=3)	## 2*2 + 3, using passed in values
+fxp(x, p) = p[1] * x + p[2] # p = (m, b) is passed
 ```
 
-For a more complicated example, we revisit this function
-
-
-$$
- g(x) = \tan(\theta) x + \frac{32}{200 \cos\theta} x -
-     32 \log\left(\frac{200 \cos\theta}{200\cos\theta - x}\right).
-$$
-
-Rather than define the value of and $\theta$ outside the function, we can pass in the value for this *parameter* in this definition
-
+* Using keyword arguments for the parameters:
 
 ```{julia}
-function g(x; theta=pi/4)
-	 a = 200*cos(theta)
-	 tan(theta)*x + (32/a)*x - 32*log(a/(a-x))
+keyword_arguments(x; m=0, b=1) = m * x + b
+```
+
+
+For the point-slope form of a line, these three styles might become:
+
+```{julia}
+four_arguments(x, m, x1, y1) = y1 + m * (x - x1)
+fxp(x, p) = p[3] + p[1] * (x - p[2])  # p = (m, x1, y1) is passed
+keyword_arguments(x; m=0, x1 = 0, y1 = 0) = y1 + m * (x - x1)
+```
+
+
+All three forms have their merits:
+
+* The multiple arguments form is the easiest to understand. The style is used in most calculus books to describe multi-variable functions.
+
+* The `f(x, p)` style is an extremely common design pattern in the `Julia` ecosystem. It provides a consistent interface for scalar values and multivariate values just by passing in containers of values for `x` and `p`. (We would pass in a container of `(m,b)` or `(m, x1, y1)` to use the above; more sophisticated containers and unpacking schemes are used in practice. Named tuples in particular are convenient.)
+
+* The keyword arguments form is utilized in many statistics book, as most probability distributions are parameterized. This style is very explicit for the user; the default values and calling style allows for the easiest customization from the defaults. Keyword arguments do not participate in method dispatch.
+
+
+### Operators
+
+In computer science terminology, `Julia` is a language which treats functions as *first class objects*. In the  `plot` function, illustrated above, the basic syntax for the call is `plot(f, a, b)`, with the function object, `f`, being passed as an argument to `plot`.
+
+This particular usage fits into a more general template: `verb(function_object, arguments....)` that will be seen in other contexts later in these notes.
+
+In calculus an *operator* is some operation that takes a function and produces a different, but related function. Calculus has two main operators: the derivative and, in some scenarios, the integral, as will be discussed elsewhere.
+
+In `Julia` it is natural to use functions which mirror mathematical
+operators: functions which accept other functions as inputs and
+output function objects. We call such functions operators here, though
+that term isn't so standard. In the example below, we give an
+illustration. However, the main example -- the derivative -- will wait
+until later.
+
+One difference we highlight is that since operators return functions we simply *assign* them names such as `f = ...`, when that is desirable, rather than use the function definition notation of `f(x) = ...`. Though we are mindful that the same name can't be used for both styles, as the former style assigns a variable to a function object, the latter creates a method for a function name.
+
+----
+
+Returning to our discussion of a line, suppose we have the function using multiple arguments to represent parameters:
+
+```{julia}
+point_slope(x, m, x1, y1) = y1 + m * (x - x1)
+```
+
+In calculus, a *secant line* is related to a function, $f(x)$, and *two* points $(a,f(a))$ and $(b, f(b)).$ As two points determine a line, this is well defined. Suppose `f`, `a`, and `b` are specified, say by:
+
+```{julia}
+f(x) = x^2
+a, b = 0, 1
+```
+
+then we can create the secant line for this data as:
+
+```{julia}
+m = (f(b) - f(a)) / (b-a)
+x1, y1 = a, f(a)  # or b, f(b) it doesn't matter
+secant_line(x) = point_slope(x, m, x1, y1)
+```
+
+This takes the values of `f`, `a`, and `b` (or the derived *parameters* `m`, `x1`, and `y1`) and creates a function of just `x`. This function can be called like any other function:
+
+```{julia}
+secant_line(3)
+```
+
+While the above construction is easy to understand, it is also a bit of a fragile construction, as the values of the parameters, `m`, `x1`, and `y1` are *global* variables derived from the basic inputs `f`, `a`, and `b`. As mentioned earlier, when `secant_line` is called the current values assigned to the global variables are used --  not necessarily the same values as when `secant_line` is defined.
+
+To be explicit about the values of the parameters being *fixed*, a different approach is typically used.
+
+Below, we write a function to return an  *anonymous function* with the values for the parameters fixed. In computer science language, we are creating a *closure*:
+
+```{julia}
+function Secant(f, a, b)
+    m = (f(b) - f(a)) / (b -a)
+    x1, y1 = a, f(a)
+    x -> point_slope(x, m, x1, y1)
 end
 ```
 
-The default means `g(50, theta=pi/4)` would be the same as
-
+The same "`secant_line`" function would be generated through:
 
 ```{julia}
-g(50)
+sl = Secant(f, a, b)
 ```
 
-The parameter make it easy to look at other types of problems. For example, if the angle were less, would the value of $f$ be smaller or larger?
-
+To see they are the same, let's just call them at an arbitrary value of `x` and compare:
 
 ```{julia}
-g(50, theta=pi/8)		## smaller in this case.
+sl(3), secant_line(3)
 ```
 
-Passing in parameters has the big advantage of explicitly showing how `Julia` will find variables used within a function, as otherwise you need to have an understanding of the *scoping rules* in place. (Scoping rules determine where variables that are not passed in as arguments are found when referred to within a function.)
+::: {.callout_note}
+#### Note: "`sl`" -- not "`sl(x)`"
 
-
-As mentioned, a more common pattern in the `Julia` ecosystem is to use two positional arguments to pass in the function value(s) *and* the parameter(s) (through `f(x, p)`). A container is typically used for each, but in this example we pass in `x` as a number, and use a *named* tuple container to pass the parameters. The unpacking of parameters can be done in different ways, here we just access the named fields using `Julia`'s access notation (e.g. `p.b` gets the value named `b` from the tuple):
-
+The `Secant` function above constructs and returns a *function*, so `sl` is a function object. We don't need to write `sl(x)` on the *left-hand side*, as we do when we define a generic function or method through an expression of its arguments. This *can* be done, were the following usage employed:
 
 ```{julia}
-function mxplusb(x, p)
-   m, b = p.m, p.b
-   m * x + b
+sec_line(x) = Secant(f, a, b)(x)
+```
+
+but this is not recommended: it is a bit awkward to type, is inefficient, and---*most importantly*---uses *global* values for `a` and `b` each time it is called.
+:::
+
+The `secant(f, a, b)` function in the `MTH229` package returns a function like `Secant` that has a reminder of what it does when used:
+
+```{julia}
+f(x) = x^2
+a, b = 0, 1
+sl = secant(f, a, b)
+```
+
+----
+
+The `sl` object is a black-box function, but it can be used to identify the slope and the intercept of the secant line being represented.
+
+For example, the intercept of a line (the $b$ in $y = m\cdot x + b$) is the value of the function when $x=0$ or:
+
+```{julia}
+b = sl(0)
+```
+
+The slope can be found by taking *any* two points, forming $(x_0, y_0)$ and $(x_1, y_1)$ and using the slope formula:
+
+```{julia}
+a, b = 2, 3
+x0, y0 = a, sl(a)
+x1, y1 = b, sl(b)
+m = (y1 - y0) / (x1 - x0)
+```
+
+Or more directly, the two intermediate lines can be skipped:
+
+```{julia}
+m = (sl(b) - sl(a)) / (b - a)
+```
+
+----
+
+##### Question
+
+The package defines a related function `tangent(f, c)` to return a *function* which computes the tangent line to `f` at `c`:
+
+```{julia}
+f(x) = x^2
+c = 1
+tl = tangent(f, c)
+```
+
+For the line described by `tl`, compute:
+
+* the $y$-intercept:
+
+```{julia}
+#| echo: false
+let
+    tl = tangent(x -> x^2, 1)
+    val = tl(0)
+    numericq(val)
 end
-p = (m=2, b=1)
-mxplusb(10, p)  # computes 2*10 + 1
 ```
 
-### Practice
+
+* the slope:
+
+```{julia}
+#| echo: false
+let
+    tl = tangent(x -> x^2, 1)
+    val = (tl(1) - tl(0)) / 1
+    numericq(val)
+end
+```
+
+
+* the $x$-intercept:
+
+```{julia}
+#| echo: false
+let
+    tl = tangent(x -> x^2, 1)
+    # y = m*x + b --> x = (y-b)/m = -b/m when y = 0
+    b = tl(0)
+    m = tl(1) - tl(0)
+    val = -b / m
+    numericq(val)
+end
+```
+
+::: {.callout-note}
+## Partial function application
+A [partial function  application](https://en.wikipedia.org/wiki/Partial_application) is related to the closure above. Consider our first example for a function representing the slope-intercept form using three arguments:
+
+```{julia}
+slope_intercept(x, m, b) = m * x + b
+```
+
+For a fixed `m` and `b`, we can use the following style to create a function of `x` as follows:
+
+```{julia}
+SlopeIntercept(m, b) = x -> slope_intercept(x, m, b)
+```
+
+When the function *returned* by `SlopeIntercept` is called, it uses the fixed values for `m` and `b`.
+
+The pattern of fixing a value of a function is common enough that there are also functions `Base.Fix1` and `Base.Fix2`. Both are for functions of *two* variables, `f(x,y)`. The first is used to create a function of `y` for a *fixed* `x`; the second to create a function of `x` for a fixed `y`. While the style of `SlopeIntercept` above, where an anonymous function is returned, is natural, the implementation of these two "fix" functions is more performant and their use appears often behind the scenes.
+
+:::
+
+
+
+
+## Practice
 
 
 #### Question: transformations
@@ -1000,91 +1330,11 @@ answer, ind = findmax(out)
 numericq(x[ind])
 ```
 
-## Anonymous functions
-
-
-A alternate mathematical notation for a function that emphasizes the fact that $f$ maps $x$ to some value $y$ involving the rule of $f$ is to use an arrow as:
-
-
-$$
-x \rightarrow -16x^2 + 32x
-$$
-
-You can do the exact thing in `Julia` to create a function:
-
-
-```{julia}
-x -> -16x^2 + 32x
-```
-
-This expression creates a function object, but since we didn't bind it to a variable (that is, we didn't give the function a name) it was immediately forgotten. Such functions without a name are known as *anonymous functions*.
-
-
-Anonymous functions are very useful when working with functions defined by parameters as they can fix values of a parameter.
-
-
-```{julia}
-f(x, p) = cos(x) - x/p
-fn = x -> f(x, 2)  # fn fixes p=2 (a "closure")
-```
-
-:::{.callout-note}
-## `Base.Fix1` and `Base.Fix2`
-
-The pattern of fixing a value of a function is common enough that there are also function `Base.Fix1` and `Base.Fix2`. This is a more performant means to *partially apply* the two-argument function `f` and appears often behind the scenes.
-
-:::
-
-
-### Operators
-
-
-In calculus an *operator* is some operation that takes a function and produces a different, but related function. Calculus has two main operators: the derivative and the integral, as will be discussed elsewhere.
-
-
-In `Julia` it is natural to use functions which mirror mathematical operators: functions which accept other functions as inputs and can output a function.  In computer science terminology, `Julia` treats functions like *first class objects*.
-
-
-The `plot` function has been previously used to illustrate some examples. The basic syntax for this call is `plot(f, a, b)`. This fits into a more general template: `verb(function_object, arguments....)`. Other upcoming examples are a "verb" for finding derivatives and a "verb" for finding integrals.
-
-
-Let's look at a concrete example, where it is natural to both pass in a function *and* return a function.
-
-
-In a precalculus course, we learn about *transformations of functions* where we relate the function $g(x) = d + af(c(x-b))$ to the function $f(x)$ in terms of the parameters $a$, $b$, $c$, and $d$. Here we focus on $d$ and $b$ which shift up and right.
-
-
-Let's make a function that takes $f$, some specifications, and returns $g$:
-
-
-```{julia}
-function tform(f; shift_up=0, shift_right=0)
-  x -> shift_up + f(x - shift_right)
-end
-```
-
-This basically is $g(x) = d + f(x-b)$, but with longer names. This function takes as its main argument a function (`f`) and returns a function. (The "arrow" in the last line is defining an anonymous function for returning.)
-
-
-Here we look at $1/(x-2)$ evaluated at $3$:
-
-
-```{julia}
-f(x) = 1/x
-tf(x) = tform(f, shift_right=2)(x) ## returns a function
-tf(3)
-```
-
-We can use the output of `tform` directly in a function call, or make a specific version of the function, as above, by defining it for certain values of its parameters.
-
-
-### Practice
-
 
 #### Question
 
 
-What anonymous function will create $\sin(x^2)$?
+What anonymous function will compute $\sin(x^2)$?
 
 
 ```{julia}
@@ -1115,29 +1365,6 @@ answer = 1;
 radioq(choices, answer)
 ```
 
-#### Question
-
-
-What does this operator do?
-
-
-```{julia}
-function secant(f, a, b)
-  m = (f(b) - f(a)) / (b-a)
-  x -> f(a) - m * (x - a)
-end
-```
-
-```{julia}
-#| echo: false
-choices = [
-"It computes the slope of the secant line.",
-"It returns a function to compute the secant line between a and b.",
-"It produces an error."
-];
-answer = 2;
-radioq(choices, answer)
-```
 
 #### Question
 
@@ -1158,6 +1385,29 @@ choices=[
  "It returns a function whose graph is that of `f` reflected through the \$x\$ axis",
  "It returns a function whose graph is that of `f` reflected through the \$y\$ axis"]
 answer=2
+radioq(choices, answer)
+```
+
+#### Question
+
+
+What does this operator do?
+
+
+```{julia}
+function trim(f, c)
+  x -> abs(f(x)) <= c ? f(x) : NaN
+end
+```
+
+```{julia}
+#| echo: false
+choices = [
+"It computes the slope of the secant line.",
+"It returns a function which has NaN values where `f` would be greater in value than `c`",
+"It produces an error."
+];
+answer = 2;
 radioq(choices, answer)
 ```
 
@@ -1250,55 +1500,7 @@ Types in `Julia` are a more complicated matter than we want to get into here, bu
 Clearly the latter ones should nest, in that an object of type `Integer` should also be of type `Real`. This means when we specialize a mathematical function, it is enough to specify values of `Real`.
 
 
-### Generic and anonymous functions
-
-
-In `Julia` there are really two types of functions: *generic functions* and *anonymous functions*. A generic function is created when we use this form to create a function:
-
-
-```{julia}
-g1(x) = sin(3x^2 - 2x^3)
-```
-
-An anonymous function is made when we do something like
-
-
-```{julia}
-g2 = x -> sin(3x^2 - 2x^3)
-```
-
-For the most part the end user can't tell the difference:
-
-
-```{julia}
-(g1(1), g2(1))
-```
-
-But, there are times when there can be a conflict, in particular when you try to redefine a generic function as an anonymous function:
-
-
-```{julia}
-g1 = x -> sin(2x^2)
-```
-
-Or vice versa. Basically, `Julia` has assigned a certain function type to that name and you can't change that type though you can change the function's definition. (This is one exception to the "dynamic" aspect of `Julia`.)
-
-
-We use the generic function approach in these notes to define our named functions, as the basic notation so closely mirrors the standard math notation.
-
-:::{.callout-note}
-## Dynamic language
-
-Julia is called a *dynamic programming language*  as variables can have their type changed. The *one* area where this is not possible is when a name is given to a generic function:
-* the name of a generic function can be re-used as a variable name (`invalid redefinition of constant ...`)
-* a variable name can be not reused as a name for a generic function (`cannot define function ...; it already has a value`)
-
-Unfortunately this can happen easily with some names being used mathematically for both. For example, $h$ may be a common function name after $f$ and $g$ but is also a name for a value, as in the expression $f(c + h)$.
-
-:::
-
 ----
-
 
 ::: {.callout-note collapse="true"}
 ## Environment of `Julia` when generated
