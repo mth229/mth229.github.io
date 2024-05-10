@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.553">
+<meta name="generator" content="quarto-1.4.554">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -349,10 +349,10 @@ f(x) = 0.
 <p><span class="math display">\[
 f(x) = g(x)
 \]</span></p>
-<p>Conceptually this is identical to the above, as we just set <span class="math inline">\(h(x) = f(x) - g(x)\)</span> and solve for when <span class="math inline">\(h(x)\)</span> is <span class="math inline">\(0\)</span>.</p>
+<p>Conceptually this is identical to the above, as we just set <span class="math inline">\(eqn(x) = f(x) - g(x)\)</span> and solve for when <span class="math inline">\(eqn(x)\)</span> is <span class="math inline">\(0\)</span>.</p>
 <p>Here we discuss a few different elementary means to do find zeros with <code>Julia</code>, leaving some others for a later time.</p>
 <p>We will use the add-on package <code>Roots</code> which provides implementations of a few zero- and root-finding algorithms. This package is loaded when the <code>MTH229</code> package is loaded.</p>
-<div id="fd7a3b61" class="cell" data-execution_count="2">
+<div id="d54d0a36" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MTH229</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Plots</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plotly</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -381,7 +381,7 @@ Alert
 </div>
 </div>
 <p>For example, if we have the quadratic polynomial <span class="math inline">\(2x^2 + 3x - 2\)</span> we can solve for the roots with:</p>
-<div id="770a6c82" class="cell" data-execution_count="4">
+<div id="a163b38d" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="fl">2</span>; b <span class="op">=</span> <span class="fl">3</span>; c <span class="op">=</span> <span class="op">-</span><span class="fl">2</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>discr <span class="op">=</span> b<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">4</span><span class="op">*</span>a<span class="op">*</span>c</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>(<span class="op">-</span>b <span class="op">+</span> <span class="fu">sqrt</span>(discr))<span class="op">/</span>(<span class="fl">2</span>a), (<span class="op">-</span>b <span class="op">-</span> <span class="fu">sqrt</span>(discr))<span class="op">/</span>(<span class="fl">2</span>a)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -390,7 +390,7 @@ Alert
 </div>
 </div>
 <p>If you wanted to write a function to do this, it would be straightforward, save the detail of needing to make a negative number complex in order to take its square root:</p>
-<div id="e33893cc" class="cell" data-execution_count="5">
+<div id="446587ae" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">## find roots of ax^2 + bx + c</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">quadratic</span>(a, b, c)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  discr <span class="op">=</span> b<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">4</span><span class="op">*</span>a<span class="op">*</span>c</span>
@@ -416,7 +416,7 @@ Alert
 </div>
 </div>
 <p>To find the roots of <span class="math inline">\(x^2 + x - 1\)</span> we could simply use:</p>
-<div id="22b70201" class="cell" data-execution_count="6">
+<div id="1b2da019" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quadratic</span>(<span class="fl">1</span>, <span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <pre><code>2-element Vector{Float64}:
@@ -436,7 +436,7 @@ Alert
 j(x) = \tan(\theta) x - (1/2) \cdot g(\frac{x}{v_0 \cos\theta})^2.
 \]</span></p>
 <p>In <code>Julia</code> we have, taking <span class="math inline">\(v_0=200\)</span>:</p>
-<div id="6c1f11d9" class="cell" data-execution_count="7">
+<div id="48565747" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">j</span>(x; theta<span class="op">=</span><span class="cn">pi</span><span class="op">/</span><span class="fl">4</span>, g<span class="op">=</span><span class="fl">32</span>, v0<span class="op">=</span><span class="fl">200</span>) <span class="op">=</span> <span class="fu">tan</span>(theta)<span class="op">*</span>x <span class="op">-</span> (<span class="fl">1</span><span class="op">/</span><span class="fl">2</span>)<span class="fu">*g*</span>(x<span class="op">/</span>(<span class="fu">v0*cos</span>(theta)))<span class="op">^</span><span class="fl">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <pre><code>j (generic function with 1 method)</code></pre>
@@ -448,7 +448,7 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
       \frac{g}{\gamma^2}\log(\frac{v_0\cos(\theta) - \gamma x}{v_0\cos(\theta)})
 \]</span></p>
 <p>Again, <span class="math inline">\(v_0\)</span> is the initial velocity and is taken to be <span class="math inline">\(200\)</span> and <span class="math inline">\(\gamma\)</span> a resistance, which we take to be <span class="math inline">\(1\)</span>. With this, we have the following <code>Julia</code> definition (with a slight reworking of <span class="math inline">\(\gamma\)</span>):</p>
-<div id="7569fe83" class="cell" data-execution_count="8">
+<div id="a5830d14" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">y</span>(x; theta<span class="op">=</span><span class="cn">pi</span><span class="op">/</span><span class="fl">4</span>, g<span class="op">=</span><span class="fl">32</span>, v0<span class="op">=</span><span class="fl">200</span>, gamma<span class="op">=</span><span class="fl">1</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>     a <span class="op">=</span> gamma <span class="op">*</span> v0 <span class="op">*</span> <span class="fu">cos</span>(theta)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>     (g<span class="op">/</span>a <span class="op">+</span> <span class="fu">tan</span>(theta)) <span class="op">*</span> x <span class="op">+</span> g<span class="op">/</span>gamma<span class="op">^</span><span class="fl">2</span> <span class="op">*</span> <span class="fu">log</span>((a<span class="op">-</span>gamma<span class="op">^</span><span class="fl">2</span> <span class="op">*</span> x)<span class="op">/</span>a)</span>
@@ -459,10 +459,10 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
 </div>
 <p>For each model, we wish to find the value of <span class="math inline">\(x\)</span> after launching where the height is modeled to be 0. That is how far will the arrow travel before touching the ground?</p>
 <p>For the model without wind resistance, we can graph the function easily enough. Let’s guess the distance is no more than 500 feet:</p>
-<div id="2840d907" class="cell" data-execution_count="9">
+<div id="996d309d" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(j, <span class="fl">0</span>, <span class="fl">500</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
-    <div id="65e7f39b-854b-471a-88c7-79693387fcac" style="width:672px;height:480px;"></div>
+    <div id="82412ff2-bc21-45ed-bc82-08d5ba15c23e" style="width:672px;height:480px;"></div>
     <script>
         requirejs.config({
         paths: {
@@ -471,7 +471,7 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
     });
     require(['plotly'], function (Plotly) {
 
-    Plotly.newPlot('65e7f39b-854b-471a-88c7-79693387fcac', [
+    Plotly.newPlot('82412ff2-bc21-45ed-bc82-08d5ba15c23e', [
     {
         "showlegend": true,
         "mode": "lines",
@@ -706,10 +706,10 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
 </div>
 </div>
 <p>Well, we haven’t even seen the peak yet. Plotting over a wider interval will show that <span class="math inline">\(1250\)</span> is the largest root. So we plot over this domain to visualize the flight:</p>
-<div id="fe6158e1" class="cell" data-execution_count="10">
+<div id="ece1eadc" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(j, <span class="fl">0</span>, <span class="fl">1250</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
-    <div id="e7e3f436-eaff-433e-a2dc-ed1e7cb2e22c" style="width:672px;height:480px;"></div>
+    <div id="ebb99368-fb6d-4cb5-af9f-4228a3d385e9" style="width:672px;height:480px;"></div>
     <script>
         requirejs.config({
         paths: {
@@ -718,7 +718,7 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
     });
     require(['plotly'], function (Plotly) {
 
-    Plotly.newPlot('e7e3f436-eaff-433e-a2dc-ed1e7cb2e22c', [
+    Plotly.newPlot('ebb99368-fb6d-4cb5-af9f-4228a3d385e9', [
     {
         "showlegend": true,
         "mode": "lines",
@@ -1047,10 +1047,10 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
 </div>
 </div>
 <p>As for the model with wind resistance, a quick plot over the same interval, <span class="math inline">\([0, 1250]\)</span> yields:</p>
-<div id="aa30a9ae" class="cell" data-execution_count="11">
+<div id="61ccf1ca" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(y, <span class="fl">0</span>, <span class="fl">1250</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
-    <div id="ec2f43d2-9f60-4650-8209-6ce1aa8b6c40" style="width:672px;height:480px;"></div>
+    <div id="4361d8f7-de5b-4845-a1ab-c9b706c07b49" style="width:672px;height:480px;"></div>
     <script>
         requirejs.config({
         paths: {
@@ -1059,7 +1059,7 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
     });
     require(['plotly'], function (Plotly) {
 
-    Plotly.newPlot('ec2f43d2-9f60-4650-8209-6ce1aa8b6c40', [
+    Plotly.newPlot('4361d8f7-de5b-4845-a1ab-c9b706c07b49', [
     {
         "showlegend": true,
         "mode": "lines",
@@ -1391,7 +1391,7 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
 </div>
 <p>Oh, “Domain Error.” Of course, when the argument to the logarithm is negative we will have issues.</p>
 <p>We solve for when <span class="math inline">\(a-\gamma^2 x\)</span> is <span class="math inline">\(0\)</span>:</p>
-<div id="efc18aec" class="cell" data-execution_count="12">
+<div id="58f58458" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>gamma <span class="op">=</span> <span class="fl">1</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="fl">200</span> <span class="op">*</span> <span class="fu">cos</span>(<span class="cn">pi</span><span class="op">/</span><span class="fl">4</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> a<span class="op">/</span>gamma<span class="op">^</span><span class="fl">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1400,10 +1400,10 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
 </div>
 </div>
 <p>We try on the reduced interval avoiding the obvious <em>asymptote</em> at <code>b</code> by subtracting <span class="math inline">\(1\)</span>:</p>
-<div id="d2bf1777" class="cell" data-execution_count="13">
+<div id="c98869eb" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(y, <span class="fl">0</span>, b <span class="op">-</span> <span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="14">
-    <div id="a59eb665-984f-4117-967f-5dc8a90b8534" style="width:672px;height:480px;"></div>
+    <div id="e2f3072d-a310-4ac9-9ab8-6dbf881c81af" style="width:672px;height:480px;"></div>
     <script>
         requirejs.config({
         paths: {
@@ -1412,7 +1412,7 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
     });
     require(['plotly'], function (Plotly) {
 
-    Plotly.newPlot('a59eb665-984f-4117-967f-5dc8a90b8534', [
+    Plotly.newPlot('e2f3072d-a310-4ac9-9ab8-6dbf881c81af', [
     {
         "showlegend": true,
         "mode": "lines",
@@ -1765,10 +1765,10 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
 </div>
 </div>
 <p>Now we can see the zero is around 140. We re-plot:</p>
-<div id="626d3070" class="cell" data-execution_count="14">
+<div id="3a465dfc" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(y, <span class="fl">135</span>, <span class="fl">141</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="15">
-    <div id="978ca5d5-d52c-4605-a405-a94ceace000e" style="width:672px;height:480px;"></div>
+    <div id="3a28bf9d-f623-4621-9495-2f7bcd11ebd9" style="width:672px;height:480px;"></div>
     <script>
         requirejs.config({
         paths: {
@@ -1777,7 +1777,7 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
     });
     require(['plotly'], function (Plotly) {
 
-    Plotly.newPlot('978ca5d5-d52c-4605-a405-a94ceace000e', [
+    Plotly.newPlot('3a28bf9d-f623-4621-9495-2f7bcd11ebd9', [
     {
         "showlegend": true,
         "mode": "lines",
@@ -2057,11 +2057,11 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
     </script>
 </div>
 </div>
-<div id="f4ed9e69" class="cell" data-execution_count="15">
+<div id="5131e1b0" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(y, <span class="fl">140</span>, <span class="fl">141</span>)</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot!</span>(zero)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="16">
-    <div id="afed4f92-f5c4-4531-b0e7-fff990a55599" style="width:672px;height:480px;"></div>
+    <div id="f45fb7e1-8c65-47e7-91c1-c4a0c3cad3f8" style="width:672px;height:480px;"></div>
     <script>
         requirejs.config({
         paths: {
@@ -2070,7 +2070,7 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
     });
     require(['plotly'], function (Plotly) {
 
-    Plotly.newPlot('afed4f92-f5c4-4531-b0e7-fff990a55599', [
+    Plotly.newPlot('f45fb7e1-8c65-47e7-91c1-c4a0c3cad3f8', [
     {
         "showlegend": true,
         "mode": "lines",
@@ -2403,12 +2403,12 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
 </div>
 <p>The answer is approximately <span class="math inline">\(140.7\)</span></p>
 <p>Finally, we plot both graphs at once to see that it was a very windy day indeed.</p>
-<div id="938343ae" class="cell" data-execution_count="16">
+<div id="4eda4297" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="fl">140.7</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(j , <span class="fl">0</span>, <span class="fl">1250</span>)</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot!</span>(y, <span class="fl">0</span>, b)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="17">
-    <div id="caec9609-dba5-4dbd-87df-c2704be3073f" style="width:672px;height:480px;"></div>
+    <div id="e1f60685-2d66-4d20-a8b4-5f472f0fe0ab" style="width:672px;height:480px;"></div>
     <script>
         requirejs.config({
         paths: {
@@ -2417,7 +2417,7 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
     });
     require(['plotly'], function (Plotly) {
 
-    Plotly.newPlot('caec9609-dba5-4dbd-87df-c2704be3073f', [
+    Plotly.newPlot('e1f60685-2d66-4d20-a8b4-5f472f0fe0ab', [
     {
         "showlegend": true,
         "mode": "lines",
@@ -2967,7 +2967,7 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
 </section>
 <section id="example-finding-a-zero" class="level5">
 <h5 class="anchored" data-anchor-id="example-finding-a-zero">Example: Finding a zero</h5>
-<p>Sometimes, the equation <span class="math inline">\(f(x)=0\)</span> is actually presented as <span class="math inline">\(h(x)= g(x)\)</span>. This form can be rewritten as <span class="math inline">\(f(x) = h(x) - g(x) = 0\)</span>, or if working graphically we can just look for crossing points of the graphs of <span class="math inline">\(g(x)\)</span> and <span class="math inline">\(h(x)\)</span>. Here we shall do that.</p>
+<p>Sometimes, the equation <span class="math inline">\(f(x)=0\)</span> is actually presented as <span class="math inline">\(f(x)= g(x)\)</span>. This form can be rewritten as <span class="math inline">\(eqn(x) = f(x) - g(x) = 0\)</span>, or if working graphically we can just look for crossing points of the graphs of <span class="math inline">\(f(x)\)</span> and <span class="math inline">\(g(x)\)</span>. Here we shall do that.</p>
 <p>We wish to compare two trash collection plans</p>
 <ul>
 <li>Plan 1: You pay 47.49 plus 0.77 per bag.</li>
@@ -2975,7 +2975,7 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
 </ul>
 <p>There are some cases where plan 1 is cheaper and some where plan 2 is. Categorize them.</p>
 <p>Both plans are <em>linear models</em> and may be expressed in <em>slope-intercept</em> form:</p>
-<div id="7cafeab7" class="cell" data-execution_count="17">
+<div id="d4fd6ae7" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plan1</span>(x) <span class="op">=</span> <span class="fl">47.49</span> <span class="op">+</span> <span class="fl">0.77</span>x</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plan2</span>(x) <span class="op">=</span> <span class="fl">30.00</span> <span class="op">+</span> <span class="fl">2.00</span>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="18">
@@ -2983,11 +2983,11 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
 </div>
 </div>
 <p>Assuming this is a realistic problem and an average American household might produce 10-20 bags of trash a month (yes, that seems too much!) we plot in that range:</p>
-<div id="8d89fe4d" class="cell" data-execution_count="18">
+<div id="115d108b" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(plan1, <span class="fl">10</span>, <span class="fl">20</span>)</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot!</span>(plan2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="19">
-    <div id="feafac1a-86b4-4206-b9a9-c7154ce6a930" style="width:672px;height:480px;"></div>
+    <div id="050a0352-cda1-483d-a37e-bbe3608e048c" style="width:672px;height:480px;"></div>
     <script>
         requirejs.config({
         paths: {
@@ -2996,7 +2996,7 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
     });
     require(['plotly'], function (Plotly) {
 
-    Plotly.newPlot('feafac1a-86b4-4206-b9a9-c7154ce6a930', [
+    Plotly.newPlot('050a0352-cda1-483d-a37e-bbe3608e048c', [
     {
         "showlegend": true,
         "mode": "lines",
@@ -3324,31 +3324,31 @@ y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
 <section id="question" class="level4">
 <h4 class="anchored" data-anchor-id="question">Question</h4>
 <p>Graphically estimate the one zero of <span class="math inline">\(f(x) = e^x - x^3\)</span> over the interval <span class="math inline">\([0,4]\)</span>.</p>
-<div id="63b53329" class="cell" data-execution_count="19">
+<div id="bd838808" class="cell" data-execution_count="19">
 <div class="cell-output cell-output-display" data-execution_count="20">
 <script>
-var ID = "VSFTDOpT"
+var ID = "A0mPSvQH"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="VSFTDOpT" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="A0mPSvQH" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_VSFTDOpT" correct="-1" attempts="0">
+      <div class="form" id="controls_A0mPSvQH" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <br>
 <div class="input-group" aria-label="Input form: Numeric answer">
-    <input id="VSFTDOpT" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
+    <input id="A0mPSvQH" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
 </div>
 
     
         </div>
       </div>
-      <div id="VSFTDOpT_message" style="padding-bottom: 15px"></div>
+      <div id="A0mPSvQH_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_VSFTDOpT').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_VSFTDOpT')
+document.getElementById('controls_A0mPSvQH').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_A0mPSvQH')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -3356,13 +3356,13 @@ document.getElementById('controls_VSFTDOpT').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.getElementById("VSFTDOpT").addEventListener("change", function() {
+document.getElementById("A0mPSvQH").addEventListener("change", function() {
   var correct = (Math.abs(this.value - 1.8571838602078352) <= 0.1);
-  var msgBox = document.getElementById('VSFTDOpT_message');
+  var msgBox = document.getElementById('A0mPSvQH_message');
   
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_VSFTDOpT")
+    var explanation = document.getElementById("explanation_A0mPSvQH")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -3372,7 +3372,7 @@ document.getElementById("VSFTDOpT").addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_VSFTDOpT")
+    var explanation = document.getElementById("explanation_A0mPSvQH")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -3391,21 +3391,21 @@ document.getElementById("VSFTDOpT").addEventListener("change", function() {
 <section id="question-1" class="level4">
 <h4 class="anchored" data-anchor-id="question-1">Question</h4>
 <p>Solving equations of the type <span class="math inline">\(f(x)=g(x)\)</span> for <span class="math inline">\(x\)</span> can also be done graphically. One method is to plot <em>both</em> functions and look for crossing points. Use this approach to graphically estimate all solutions to <span class="math inline">\(\cos(x) = x^2\)</span> over the interval <span class="math inline">\((-\pi/2, \pi/2)\)</span>. What are they?</p>
-<div id="7e7a85bc" class="cell" data-execution_count="20">
+<div id="e80accad" class="cell" data-execution_count="20">
 <div class="cell-output cell-output-display" data-execution_count="21">
 <script>
-var ID = "UCP0WTvC"
+var ID = "FjJ5tNKw"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="UCP0WTvC" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="FjJ5tNKw" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_UCP0WTvC" correct="-1" attempts="0">
+      <div class="form" id="controls_FjJ5tNKw" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label" for="radio_UCP0WTvC_1">
-      <input class="form-check-input" type="radio" name="radio_UCP0WTvC" id="radio_UCP0WTvC_1" value="1">
+    <label class="form-check-label" for="radio_FjJ5tNKw_1">
+      <input class="form-check-input" type="radio" name="radio_FjJ5tNKw" id="radio_FjJ5tNKw_1" value="1">
       
       <span class="label-body px-1">
         -0.82, 0.82
@@ -3413,20 +3413,20 @@ var ID = "UCP0WTvC"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_UCP0WTvC_2">
-      <input class="form-check-input" type="radio" name="radio_UCP0WTvC" id="radio_UCP0WTvC_2" value="2">
+    <label class="form-check-label" for="radio_FjJ5tNKw_2">
+      <input class="form-check-input" type="radio" name="radio_FjJ5tNKw" id="radio_FjJ5tNKw_2" value="2">
       
       <span class="label-body px-1">
-        0.0
+        -1.57, 1.57
       </span>
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_UCP0WTvC_3">
-      <input class="form-check-input" type="radio" name="radio_UCP0WTvC" id="radio_UCP0WTvC_3" value="3">
+    <label class="form-check-label" for="radio_FjJ5tNKw_3">
+      <input class="form-check-input" type="radio" name="radio_FjJ5tNKw" id="radio_FjJ5tNKw_3" value="3">
       
       <span class="label-body px-1">
-        -1.57, 1.57
+        0.0
       </span>
     </label>
 </div>
@@ -3435,13 +3435,13 @@ var ID = "UCP0WTvC"
     
         </div>
       </div>
-      <div id="UCP0WTvC_message" style="padding-bottom: 15px"></div>
+      <div id="FjJ5tNKw_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_UCP0WTvC').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_UCP0WTvC')
+document.getElementById('controls_FjJ5tNKw').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_FjJ5tNKw')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -3449,14 +3449,14 @@ document.getElementById('controls_UCP0WTvC').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_UCP0WTvC"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_FjJ5tNKw"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
     var correct = rb.value == 1;
-    var msgBox = document.getElementById('UCP0WTvC_message');
+    var msgBox = document.getElementById('FjJ5tNKw_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_UCP0WTvC")
+    var explanation = document.getElementById("explanation_FjJ5tNKw")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -3466,7 +3466,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_UCP0WTvC")
+    var explanation = document.getElementById("explanation_FjJ5tNKw")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -3485,31 +3485,31 @@ rb.addEventListener("change", function() {
 <section id="question-2" class="level4">
 <h4 class="anchored" data-anchor-id="question-2">Question</h4>
 <p>In an analysis of rainbows, <a href="http://en.wikipedia.org/wiki/Airy_function">Airy</a> developed a special function implemented as <code>airyai</code> in <code>Julia</code>’s <code>SpecialFunctions</code> package, which is loaded with the <code>MTH229</code> package. The zeros of this function are all negative. The first one is between <span class="math inline">\(-3\)</span> and <span class="math inline">\(-1\)</span>. Find it graphically.</p>
-<div id="a8efa9f7" class="cell" data-execution_count="21">
+<div id="09ff2ee1" class="cell" data-execution_count="21">
 <div class="cell-output cell-output-display" data-execution_count="22">
 <script>
-var ID = "KPx9g8vB"
+var ID = "dcJax5co"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="KPx9g8vB" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="dcJax5co" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_KPx9g8vB" correct="-1" attempts="0">
+      <div class="form" id="controls_dcJax5co" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <br>
 <div class="input-group" aria-label="Input form: Numeric answer">
-    <input id="KPx9g8vB" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
+    <input id="dcJax5co" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
 </div>
 
     
         </div>
       </div>
-      <div id="KPx9g8vB_message" style="padding-bottom: 15px"></div>
+      <div id="dcJax5co_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_KPx9g8vB').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_KPx9g8vB')
+document.getElementById('controls_dcJax5co').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_dcJax5co')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -3517,13 +3517,13 @@ document.getElementById('controls_KPx9g8vB').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.getElementById("KPx9g8vB").addEventListener("change", function() {
+document.getElementById("dcJax5co").addEventListener("change", function() {
   var correct = (Math.abs(this.value - -2.338107410459764) <= 0.1);
-  var msgBox = document.getElementById('KPx9g8vB_message');
+  var msgBox = document.getElementById('dcJax5co_message');
   
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_KPx9g8vB")
+    var explanation = document.getElementById("explanation_dcJax5co")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -3533,7 +3533,7 @@ document.getElementById("KPx9g8vB").addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_KPx9g8vB")
+    var explanation = document.getElementById("explanation_dcJax5co")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -3552,39 +3552,21 @@ document.getElementById("KPx9g8vB").addEventListener("change", function() {
 <section id="question-3" class="level4">
 <h4 class="anchored" data-anchor-id="question-3">Question</h4>
 <p>The polynomial <span class="math inline">\(f(x) = x^5 - 6x^3 - 6x^2 -7x - 6\)</span> has three real roots. Which of the following values is not one of them? Try to solve this graphically.</p>
-<div id="a6b553da" class="cell" data-execution_count="22">
+<div id="95df0b31" class="cell" data-execution_count="22">
 <div class="cell-output cell-output-display" data-execution_count="23">
 <script>
-var ID = "JfTEtH3p"
+var ID = "2Ij7xLDx"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="JfTEtH3p" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="2Ij7xLDx" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_JfTEtH3p" correct="-1" attempts="0">
+      <div class="form" id="controls_2Ij7xLDx" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label" for="radio_JfTEtH3p_1">
-      <input class="form-check-input" type="radio" name="radio_JfTEtH3p" id="radio_JfTEtH3p_1" value="1">
-      
-      <span class="label-body px-1">
-        3
-      </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label" for="radio_JfTEtH3p_2">
-      <input class="form-check-input" type="radio" name="radio_JfTEtH3p" id="radio_JfTEtH3p_2" value="2">
-      
-      <span class="label-body px-1">
-        -2
-      </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label" for="radio_JfTEtH3p_3">
-      <input class="form-check-input" type="radio" name="radio_JfTEtH3p" id="radio_JfTEtH3p_3" value="3">
+    <label class="form-check-label" for="radio_2Ij7xLDx_1">
+      <input class="form-check-input" type="radio" name="radio_2Ij7xLDx" id="radio_2Ij7xLDx_1" value="1">
       
       <span class="label-body px-1">
         -1
@@ -3592,11 +3574,29 @@ var ID = "JfTEtH3p"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_JfTEtH3p_4">
-      <input class="form-check-input" type="radio" name="radio_JfTEtH3p" id="radio_JfTEtH3p_4" value="4">
+    <label class="form-check-label" for="radio_2Ij7xLDx_2">
+      <input class="form-check-input" type="radio" name="radio_2Ij7xLDx" id="radio_2Ij7xLDx_2" value="2">
       
       <span class="label-body px-1">
         5
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_2Ij7xLDx_3">
+      <input class="form-check-input" type="radio" name="radio_2Ij7xLDx" id="radio_2Ij7xLDx_3" value="3">
+      
+      <span class="label-body px-1">
+        3
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_2Ij7xLDx_4">
+      <input class="form-check-input" type="radio" name="radio_2Ij7xLDx" id="radio_2Ij7xLDx_4" value="4">
+      
+      <span class="label-body px-1">
+        -2
       </span>
     </label>
 </div>
@@ -3605,13 +3605,13 @@ var ID = "JfTEtH3p"
     
         </div>
       </div>
-      <div id="JfTEtH3p_message" style="padding-bottom: 15px"></div>
+      <div id="2Ij7xLDx_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_JfTEtH3p').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_JfTEtH3p')
+document.getElementById('controls_2Ij7xLDx').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_2Ij7xLDx')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -3619,14 +3619,14 @@ document.getElementById('controls_JfTEtH3p').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_JfTEtH3p"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_2Ij7xLDx"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 4;
-    var msgBox = document.getElementById('JfTEtH3p_message');
+    var correct = rb.value == 2;
+    var msgBox = document.getElementById('2Ij7xLDx_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_JfTEtH3p")
+    var explanation = document.getElementById("explanation_2Ij7xLDx")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -3636,7 +3636,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_JfTEtH3p")
+    var explanation = document.getElementById("explanation_2Ij7xLDx")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -3655,31 +3655,31 @@ rb.addEventListener("change", function() {
 <section id="question-4" class="level4">
 <h4 class="anchored" data-anchor-id="question-4">Question</h4>
 <p>Let <span class="math inline">\(y(x)\)</span> be defined as above to model the flight of an arrow. If <span class="math inline">\(\gamma=1/2\)</span> when will the arrow strike the ground after launch?</p>
-<div id="8338010d" class="cell" data-execution_count="23">
+<div id="5dfff4d6" class="cell" data-execution_count="23">
 <div class="cell-output cell-output-display" data-execution_count="24">
 <script>
-var ID = "KHrMQttB"
+var ID = "sQweaEDy"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="KHrMQttB" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="sQweaEDy" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_KHrMQttB" correct="-1" attempts="0">
+      <div class="form" id="controls_sQweaEDy" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <br>
 <div class="input-group" aria-label="Input form: Numeric answer">
-    <input id="KHrMQttB" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
+    <input id="sQweaEDy" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
 </div>
 
     
         </div>
       </div>
-      <div id="KHrMQttB_message" style="padding-bottom: 15px"></div>
+      <div id="sQweaEDy_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_KHrMQttB').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_KHrMQttB')
+document.getElementById('controls_sQweaEDy').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_sQweaEDy')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -3687,13 +3687,13 @@ document.getElementById('controls_KHrMQttB').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.getElementById("KHrMQttB").addEventListener("change", function() {
+document.getElementById("sQweaEDy").addEventListener("change", function() {
   var correct = (Math.abs(this.value - 0.0) <= 2);
-  var msgBox = document.getElementById('KHrMQttB_message');
+  var msgBox = document.getElementById('sQweaEDy_message');
   
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_KHrMQttB")
+    var explanation = document.getElementById("explanation_sQweaEDy")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -3703,7 +3703,7 @@ document.getElementById("KHrMQttB").addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_KHrMQttB")
+    var explanation = document.getElementById("explanation_sQweaEDy")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -3722,38 +3722,38 @@ document.getElementById("KHrMQttB").addEventListener("change", function() {
 <section id="question-5" class="level4">
 <h4 class="anchored" data-anchor-id="question-5">Question</h4>
 <p>Let <span class="math inline">\(y(x)\)</span> be defined as above to model the flight of an arrow. Suppose a hill is in the path of the arrow. The hill is given by this function:</p>
-<div id="ca1ef452" class="cell" data-execution_count="24">
+<div id="d302aabc" class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hill</span>(x) <span class="op">=</span> x <span class="op">&gt;</span> <span class="fl">100</span> ? <span class="fl">2.0</span> <span class="op">*</span> (x<span class="op">-</span><span class="fl">100</span>) <span class="op">:</span> <span class="fl">0.0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="25">
 <pre><code>hill (generic function with 1 method)</code></pre>
 </div>
 </div>
 <p>By solving <code>y(x) = hill(x)</code> solve for how far the arrow will fly before hitting the hill.</p>
-<div id="9692f7ba" class="cell" data-execution_count="25">
+<div id="094f8a3b" class="cell" data-execution_count="25">
 <div class="cell-output cell-output-display" data-execution_count="26">
 <script>
-var ID = "lQUeiuay"
+var ID = "noTyQ1UH"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="lQUeiuay" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="noTyQ1UH" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_lQUeiuay" correct="-1" attempts="0">
+      <div class="form" id="controls_noTyQ1UH" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <br>
 <div class="input-group" aria-label="Input form: Numeric answer">
-    <input id="lQUeiuay" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
+    <input id="noTyQ1UH" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
 </div>
 
     
         </div>
       </div>
-      <div id="lQUeiuay_message" style="padding-bottom: 15px"></div>
+      <div id="noTyQ1UH_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_lQUeiuay').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_lQUeiuay')
+document.getElementById('controls_noTyQ1UH').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_noTyQ1UH')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -3761,13 +3761,13 @@ document.getElementById('controls_lQUeiuay').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.getElementById("lQUeiuay").addEventListener("change", function() {
+document.getElementById("noTyQ1UH").addEventListener("change", function() {
   var correct = (Math.abs(this.value - 117.12786286825508) <= 2);
-  var msgBox = document.getElementById('lQUeiuay_message');
+  var msgBox = document.getElementById('noTyQ1UH_message');
   
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_lQUeiuay")
+    var explanation = document.getElementById("explanation_noTyQ1UH")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -3777,7 +3777,7 @@ document.getElementById("lQUeiuay").addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_lQUeiuay")
+    var explanation = document.getElementById("explanation_noTyQ1UH")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -3801,12 +3801,12 @@ document.getElementById("lQUeiuay").addEventListener("change", function() {
 <p><strong>The intermediate value theorem</strong>: If <span class="math inline">\(f(x)\)</span> is a continuous function on <span class="math inline">\([a,b]\)</span> then at some point in the interval <span class="math inline">\(f(x)\)</span> takes on any value between <span class="math inline">\(f(a)\)</span> and <span class="math inline">\(f(b)\)</span>.</p>
 <p>In particular if <span class="math inline">\(f(x)\)</span> is continuous with <span class="math inline">\(f(a)\)</span> and <span class="math inline">\(f(b)\)</span> having <em>different</em> signs then there must be a point <span class="math inline">\(c\)</span> in <span class="math inline">\([a,b]\)</span> where <span class="math inline">\(f(c) = 0\)</span>. (When <span class="math inline">\(f(a)\)</span> and <span class="math inline">\(f(b)\)</span> have different signs, we say <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> <em>bracket</em> a root.) This observation is due to Bolzano.</p>
 <p>The bisection algorithm finds a zero <em>between</em> two bracketing value, as illustrated in this graphic:</p>
-<div id="0e34d878" class="cell" data-execution_count="26">
+<div id="7c8b8686" class="cell" data-execution_count="26">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(sin, <span class="fl">1</span>, <span class="fl">5</span>)</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot!</span>(zero)</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="fu">vline!</span>([<span class="fl">3</span>,<span class="fl">4</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="27">
-    <div id="a784abc0-6561-406b-9930-8ee4da17bf84" style="width:672px;height:480px;"></div>
+    <div id="40ee9157-9cee-4280-b23e-354e053ffac6" style="width:672px;height:480px;"></div>
     <script>
         requirejs.config({
         paths: {
@@ -3815,7 +3815,7 @@ document.getElementById("lQUeiuay").addEventListener("change", function() {
     });
     require(['plotly'], function (Plotly) {
 
-    Plotly.newPlot('a784abc0-6561-406b-9930-8ee4da17bf84', [
+    Plotly.newPlot('40ee9157-9cee-4280-b23e-354e053ffac6', [
     {
         "showlegend": true,
         "mode": "lines",
@@ -4284,14 +4284,14 @@ Alert
 <p>Mathematically the basic idea is simple.</p>
 <p>Starting with <span class="math inline">\([a,b]\)</span>, the midpoint <span class="math inline">\(M = (a + b)/2\)</span>, is tested for its function value. If <span class="math inline">\(f(M) = 0\)</span>, great, we are done. If it has opposite sign of <span class="math inline">\(f(a)\)</span>, then a root must be in the interval <span class="math inline">\([a,M]\)</span>, so the problem is reduced a smaller interval. Otherwise, it has opposite sign of <span class="math inline">\(f(b)\)</span> and the problem is reduced to <span class="math inline">\([M,b]\)</span>. Either way, the algorithm is repeated for the smaller interval where a root is known. As each step halves the interval length, it must eventually converge to an answer.</p>
 <p>Graphically, we could do this. For example, Let’s consider <span class="math inline">\(f(x) = x^2 - 2\)</span> with the bracketing interval <span class="math inline">\([1,2]\)</span>. We first plot:</p>
-<div id="a71eb032" class="cell" data-execution_count="27">
+<div id="7524af82" class="cell" data-execution_count="27">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">2</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>a,b <span class="op">=</span> <span class="fl">1</span>, <span class="fl">2</span></span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(f, <span class="fl">0</span>, <span class="fl">3</span>; legend<span class="op">=</span><span class="cn">false</span>)</span>
 <span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot!</span>(zero)</span>
 <span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="fu">vline!</span>([a, (a<span class="op">+</span>b)<span class="op">/</span><span class="fl">2</span>, b])  <span class="co"># add vertical lines at a, b and midway</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="28">
-    <div id="60d1a501-e3f3-449f-8214-73120c4b1c60" style="width:672px;height:480px;"></div>
+    <div id="c57cde42-2966-4526-8a16-388d22bb98fa" style="width:672px;height:480px;"></div>
     <script>
         requirejs.config({
         paths: {
@@ -4300,7 +4300,7 @@ Alert
     });
     require(['plotly'], function (Plotly) {
 
-    Plotly.newPlot('60d1a501-e3f3-449f-8214-73120c4b1c60', [
+    Plotly.newPlot('c57cde42-2966-4526-8a16-388d22bb98fa', [
     {
         "showlegend": true,
         "mode": "lines",
@@ -4699,14 +4699,14 @@ Alert
 </div>
 </div>
 <p>We can see that <span class="math inline">\(c = (a + b)/2 = 3/2\)</span> will have <span class="math inline">\(f(c) &gt; 0\)</span>, so the new bracket is <span class="math inline">\([a,c]\)</span>:</p>
-<div id="b84be5f1" class="cell" data-execution_count="28">
+<div id="c6829897" class="cell" data-execution_count="28">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>a, b <span class="op">=</span> a, (a <span class="op">+</span> b)<span class="op">/</span><span class="fl">2</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(f, a, b; legend<span class="op">=</span><span class="cn">false</span>)</span>
 <span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot!</span>(zero)</span>
 <span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">vline!</span>([(a<span class="op">+</span>b)<span class="op">/</span><span class="fl">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="29">
-    <div id="ede9f2b2-5253-48c0-87e3-d1b896cf6e3d" style="width:672px;height:480px;"></div>
+    <div id="9727302b-2fd0-4060-a1c4-30e09fc8d515" style="width:672px;height:480px;"></div>
     <script>
         requirejs.config({
         paths: {
@@ -4715,7 +4715,7 @@ Alert
     });
     require(['plotly'], function (Plotly) {
 
-    Plotly.newPlot('ede9f2b2-5253-48c0-87e3-d1b896cf6e3d', [
+    Plotly.newPlot('9727302b-2fd0-4060-a1c4-30e09fc8d515', [
     {
         "showlegend": true,
         "mode": "lines",
@@ -5042,14 +5042,14 @@ Alert
 </div>
 </div>
 <p>Now the function value at the midpoint is negative, so we modify <code>a</code>:</p>
-<div id="2a1d9adc" class="cell" data-execution_count="29">
+<div id="fca75815" class="cell" data-execution_count="29">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>a, b <span class="op">=</span> (a <span class="op">+</span> b)<span class="op">/</span><span class="fl">2</span>, b</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(f, a, b; legend<span class="op">=</span><span class="cn">false</span>)</span>
 <span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot!</span>(zero)</span>
 <span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="fu">vline!</span>([(a<span class="op">+</span>b)<span class="op">/</span><span class="fl">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="30">
-    <div id="e62559d2-f174-4a42-96e5-a21d2265fdce" style="width:672px;height:480px;"></div>
+    <div id="aedad701-8d9b-4672-ba3f-8d241fdef0ab" style="width:672px;height:480px;"></div>
     <script>
         requirejs.config({
         paths: {
@@ -5058,7 +5058,7 @@ Alert
     });
     require(['plotly'], function (Plotly) {
 
-    Plotly.newPlot('e62559d2-f174-4a42-96e5-a21d2265fdce', [
+    Plotly.newPlot('aedad701-8d9b-4672-ba3f-8d241fdef0ab', [
     {
         "showlegend": true,
         "mode": "lines",
@@ -5391,14 +5391,14 @@ Alert
 </div>
 </div>
 <p>And again, this has a function value at the midpoint in the negative territory so again we modify <code>a</code>:</p>
-<div id="fc91cdc8" class="cell" data-execution_count="30">
+<div id="7e1ba010" class="cell" data-execution_count="30">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>a, b <span class="op">=</span> (a <span class="op">+</span> b)<span class="op">/</span><span class="fl">2</span>, b</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(f, a, b; legend<span class="op">=</span><span class="cn">false</span>)</span>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot!</span>(zero)</span>
 <span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">vline!</span>([(a<span class="op">+</span>b)<span class="op">/</span><span class="fl">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="31">
-    <div id="c6eb5345-421b-4d8f-858a-75c34247340a" style="width:672px;height:480px;"></div>
+    <div id="1216b85b-10d2-4593-8f59-cf6fb0f81220" style="width:672px;height:480px;"></div>
     <script>
         requirejs.config({
         paths: {
@@ -5407,7 +5407,7 @@ Alert
     });
     require(['plotly'], function (Plotly) {
 
-    Plotly.newPlot('c6eb5345-421b-4d8f-858a-75c34247340a', [
+    Plotly.newPlot('1216b85b-10d2-4593-8f59-cf6fb0f81220', [
     {
         "showlegend": true,
         "mode": "lines",
@@ -5737,7 +5737,7 @@ Alert
 </div>
 <p>And now, as the midpoint is in positive territory we would modify <span class="math inline">\(b\)</span> …</p>
 <p>This gets tedious to do graphically. But it can be easily programmed. The main step might look something like this:</p>
-<div id="2455dc6b" class="cell" data-execution_count="31">
+<div id="aa7f9552" class="cell" data-execution_count="31">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">2</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>a, b <span class="op">=</span> <span class="fl">1</span>, <span class="fl">2</span></span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -5758,7 +5758,7 @@ Alert
 <p>It seems as though we could be here all day. Indeed, if doing this by hand it might take up quite a bit of time. We should automate this. Before automating this, we need to think: <em>when would we stop?</em></p>
 <p>Mathematically we can keep taking halves using the concept of a limit. See for example <a href="http://en.wikipedia.org/wiki/Zenos_paradoxes">Zeno’s paradox</a>. On a computer we don’t have such a luxury. In fact, for floating point numbers we couldn’t keep taking halves – even if we wanted – as ultimately we should expect to get <code>a</code> and <code>b</code> being floating point values that are next to each other – and hence there is no midpoint. (Well, there are some cases that suggest a more careful numeric approach to the above.)</p>
 <p>So even though this doesn’t make mathematical sense we can try stopping when the following condition is no longer true:</p>
-<div id="38c95b65" class="cell" data-execution_count="32">
+<div id="480aef16" class="cell" data-execution_count="32">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">&lt;</span> c <span class="op">&lt;</span> b</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="33">
 <pre><code>false</code></pre>
@@ -5767,7 +5767,7 @@ Alert
 <p>A <code>while</code> loop is used to repeat the central step until the above (or some variant) is <code>false</code>.</p>
 <p>The <code>MTH229</code> package has a <code>bisection</code> method implemented for this which also outputs a graphical indication of the first few steps taken.</p>
 <p>Okay, let’s look at the function <span class="math inline">\(f(x) = -16x^2 + 32x\)</span>. We know that <span class="math inline">\(0\)</span> and <span class="math inline">\(2\)</span> are roots. Let’s see if our algorithm finds them:</p>
-<div id="0edbbb70" class="cell" data-execution_count="33">
+<div id="9b5996b3" class="cell" data-execution_count="33">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="op">-</span><span class="fl">16</span>x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">32</span>x</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bisection</span>(f, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>) <span class="co">## should find 0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -5779,7 +5779,7 @@ a###############################################################b
 <pre><code>0.0</code></pre>
 </div>
 </div>
-<div id="730d1170" class="cell" data-execution_count="34">
+<div id="fb5096c7" class="cell" data-execution_count="34">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bisection</span>(f, <span class="fl">1</span>, <span class="fl">3</span>)  <span class="co">## should find 2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -5791,7 +5791,7 @@ a###############################################################b
 </div>
 </div>
 <p>Okay, it seems to work. Lets try it on a less trivial problem. We know <span class="math inline">\(\sin(x)\)</span> and <span class="math inline">\(\cos(x)\)</span> cross in the interval <span class="math inline">\([0, \pi/2]\)</span>. If we are too tired to remember where, we can simply ask:</p>
-<div id="d4ca5094" class="cell" data-execution_count="35">
+<div id="2ccdde7f" class="cell" data-execution_count="35">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">cos</span>(x) <span class="op">-</span> <span class="fu">sin</span>(x)</span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="fu">bisection</span>(f, <span class="fl">0</span>, <span class="cn">pi</span><span class="op">/</span><span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -5811,7 +5811,7 @@ a###############################################################b
 </div>
 </div>
 <p>Is <code>x</code> really a zero?</p>
-<div id="1d4f797f" class="cell" data-execution_count="36">
+<div id="fedbd064" class="cell" data-execution_count="36">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>x, <span class="fu">f</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="37">
 <pre><code>(0.7853981633974483, 1.1102230246251565e-16)</code></pre>
@@ -5819,7 +5819,7 @@ a###############################################################b
 </div>
 <p>Hmm, the answer is <code>1.1102230246251565e-16</code>. So technically this is not a zero. But <em>computationally</em> it is a zero! First it should be clear that it is <em>really close</em> to zero. We will see it is as close as computationally possible to a zero.</p>
 <p>The <code>nextfloat</code> and <code>prevfloat</code> functions find the floating point values just bigger than <code>x</code> and just smaller. In this case we have that <code>f(x)</code> and <code>f(nextfloat(x))</code> have different signs:</p>
-<div id="ada90c15" class="cell" data-execution_count="37">
+<div id="78ad444a" class="cell" data-execution_count="37">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x),  <span class="fu">f</span>(<span class="fu">nextfloat</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="38">
 <pre><code>(1.1102230246251565e-16, -1.1102230246251565e-16)</code></pre>
@@ -5829,7 +5829,7 @@ a###############################################################b
 <section id="question-6" class="level4">
 <h4 class="anchored" data-anchor-id="question-6">Question</h4>
 <p>Plot <code>airyai</code> over <code>[-3,3]</code>. Which of the following is a <em>bracketing</em> interval?</p>
-<div id="b3ce610e" class="cell" data-execution_count="38">
+<div id="2e17fc9c" class="cell" data-execution_count="38">
 <div class="cell-output cell-output-error">
 <div class="ansi-escaped-output">
 <pre>ParseError:
@@ -5843,39 +5843,21 @@ choices = ["[$i, $(i+1)]" for in<span style="background-color:rgb(120,70,70)"> -
 <section id="question-7" class="level4">
 <h4 class="anchored" data-anchor-id="question-7">Question</h4>
 <p>Let <span class="math inline">\(f(x) = e^x - x^4\)</span> which of these intervals is a <em>bracketing interval</em> for a zero of <span class="math inline">\(f\)</span>?</p>
-<div id="e3de1f83" class="cell" data-execution_count="39">
+<div id="c2ca46c8" class="cell" data-execution_count="39">
 <div class="cell-output cell-output-display" data-execution_count="40">
 <script>
-var ID = "7KDHPZUB"
+var ID = "DAc7q6DQ"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="7KDHPZUB" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="DAc7q6DQ" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_7KDHPZUB" correct="-1" attempts="0">
+      <div class="form" id="controls_DAc7q6DQ" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label" for="radio_7KDHPZUB_1">
-      <input class="form-check-input" type="radio" name="radio_7KDHPZUB" id="radio_7KDHPZUB_1" value="1">
-      
-      <span class="label-body px-1">
-        [3, 4]
-      </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label" for="radio_7KDHPZUB_2">
-      <input class="form-check-input" type="radio" name="radio_7KDHPZUB" id="radio_7KDHPZUB_2" value="2">
-      
-      <span class="label-body px-1">
-        [0, 1]
-      </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label" for="radio_7KDHPZUB_3">
-      <input class="form-check-input" type="radio" name="radio_7KDHPZUB" id="radio_7KDHPZUB_3" value="3">
+    <label class="form-check-label" for="radio_DAc7q6DQ_1">
+      <input class="form-check-input" type="radio" name="radio_DAc7q6DQ" id="radio_DAc7q6DQ_1" value="1">
       
       <span class="label-body px-1">
         [2, 3]
@@ -5883,20 +5865,38 @@ var ID = "7KDHPZUB"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_7KDHPZUB_4">
-      <input class="form-check-input" type="radio" name="radio_7KDHPZUB" id="radio_7KDHPZUB_4" value="4">
+    <label class="form-check-label" for="radio_DAc7q6DQ_2">
+      <input class="form-check-input" type="radio" name="radio_DAc7q6DQ" id="radio_DAc7q6DQ_2" value="2">
       
       <span class="label-body px-1">
-        [4, 5]
+        [1, 2]
       </span>
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_7KDHPZUB_5">
-      <input class="form-check-input" type="radio" name="radio_7KDHPZUB" id="radio_7KDHPZUB_5" value="5">
+    <label class="form-check-label" for="radio_DAc7q6DQ_3">
+      <input class="form-check-input" type="radio" name="radio_DAc7q6DQ" id="radio_DAc7q6DQ_3" value="3">
       
       <span class="label-body px-1">
-        [1, 2]
+        [3, 4]
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_DAc7q6DQ_4">
+      <input class="form-check-input" type="radio" name="radio_DAc7q6DQ" id="radio_DAc7q6DQ_4" value="4">
+      
+      <span class="label-body px-1">
+        [0, 1]
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_DAc7q6DQ_5">
+      <input class="form-check-input" type="radio" name="radio_DAc7q6DQ" id="radio_DAc7q6DQ_5" value="5">
+      
+      <span class="label-body px-1">
+        [4, 5]
       </span>
     </label>
 </div>
@@ -5905,13 +5905,13 @@ var ID = "7KDHPZUB"
     
         </div>
       </div>
-      <div id="7KDHPZUB_message" style="padding-bottom: 15px"></div>
+      <div id="DAc7q6DQ_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_7KDHPZUB').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_7KDHPZUB')
+document.getElementById('controls_DAc7q6DQ').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_DAc7q6DQ')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -5919,14 +5919,14 @@ document.getElementById('controls_7KDHPZUB').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_7KDHPZUB"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_DAc7q6DQ"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 5;
-    var msgBox = document.getElementById('7KDHPZUB_message');
+    var correct = rb.value == 2;
+    var msgBox = document.getElementById('DAc7q6DQ_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_7KDHPZUB")
+    var explanation = document.getElementById("explanation_DAc7q6DQ")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -5936,7 +5936,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_7KDHPZUB")
+    var explanation = document.getElementById("explanation_DAc7q6DQ")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -5955,21 +5955,30 @@ rb.addEventListener("change", function() {
 <section id="question-8" class="level4">
 <h4 class="anchored" data-anchor-id="question-8">Question</h4>
 <p>Let <span class="math inline">\(f(x) = 1/2 + \sin(3x) + \sin(7x)\)</span>. Which of these is a *bracketing interval$?</p>
-<div id="354ee362" class="cell" data-execution_count="40">
+<div id="b60d7e83" class="cell" data-execution_count="40">
 <div class="cell-output cell-output-display" data-execution_count="41">
 <script>
-var ID = "bOrmaBBz"
+var ID = "MoGLNuc6"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="bOrmaBBz" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="MoGLNuc6" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_bOrmaBBz" correct="-1" attempts="0">
+      <div class="form" id="controls_MoGLNuc6" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label" for="radio_bOrmaBBz_1">
-      <input class="form-check-input" type="radio" name="radio_bOrmaBBz" id="radio_bOrmaBBz_1" value="1">
+    <label class="form-check-label" for="radio_MoGLNuc6_1">
+      <input class="form-check-input" type="radio" name="radio_MoGLNuc6" id="radio_MoGLNuc6_1" value="1">
+      
+      <span class="label-body px-1">
+        [0, 1]
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_MoGLNuc6_2">
+      <input class="form-check-input" type="radio" name="radio_MoGLNuc6" id="radio_MoGLNuc6_2" value="2">
       
       <span class="label-body px-1">
         [-2, -1]
@@ -5977,20 +5986,11 @@ var ID = "bOrmaBBz"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_bOrmaBBz_2">
-      <input class="form-check-input" type="radio" name="radio_bOrmaBBz" id="radio_bOrmaBBz_2" value="2">
+    <label class="form-check-label" for="radio_MoGLNuc6_3">
+      <input class="form-check-input" type="radio" name="radio_MoGLNuc6" id="radio_MoGLNuc6_3" value="3">
       
       <span class="label-body px-1">
         [-1, 0]
-      </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label" for="radio_bOrmaBBz_3">
-      <input class="form-check-input" type="radio" name="radio_bOrmaBBz" id="radio_bOrmaBBz_3" value="3">
-      
-      <span class="label-body px-1">
-        [0, 1]
       </span>
     </label>
 </div>
@@ -5999,13 +5999,13 @@ var ID = "bOrmaBBz"
     
         </div>
       </div>
-      <div id="bOrmaBBz_message" style="padding-bottom: 15px"></div>
+      <div id="MoGLNuc6_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_bOrmaBBz').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_bOrmaBBz')
+document.getElementById('controls_MoGLNuc6').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_MoGLNuc6')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -6013,14 +6013,14 @@ document.getElementById('controls_bOrmaBBz').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_bOrmaBBz"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_MoGLNuc6"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 2;
-    var msgBox = document.getElementById('bOrmaBBz_message');
+    var correct = rb.value == 3;
+    var msgBox = document.getElementById('MoGLNuc6_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_bOrmaBBz")
+    var explanation = document.getElementById("explanation_MoGLNuc6")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -6030,7 +6030,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_bOrmaBBz")
+    var explanation = document.getElementById("explanation_MoGLNuc6")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -6051,7 +6051,7 @@ rb.addEventListener("change", function() {
 <h2 data-number="4.5" class="anchored" data-anchor-id="the-roots-package-and-find_zero"><span class="header-section-number">4.5</span> The Roots package and find_zero</h2>
 <p>The bisection method, while easy to describe and understand, can be made a bit more efficient. The <code>find_zero</code> function from the <code>Roots</code> package does so. This package is loaded when <code>MTH229</code> is. This function uses a tuple to specify the bracketing interval.</p>
 <p>For example, to find a zero of <span class="math inline">\(f(x) = 2x \cdot \exp(-20) - 2 \cdot \exp(-20x) + 1\)</span> in the <em>bracketing</em> interval <span class="math inline">\([0,1]\)</span> we have:</p>
-<div id="ec257b21" class="cell" data-execution_count="41">
+<div id="4db26087" class="cell" data-execution_count="41">
 <div class="sourceCode cell-code" id="cb49"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fl">2</span>x <span class="op">*</span> <span class="fu">exp</span>(<span class="op">-</span><span class="fl">20</span>) <span class="op">-</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu">exp</span>(<span class="op">-</span><span class="fl">20</span>x) <span class="op">+</span> <span class="fl">1</span></span>
 <span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zero</span>(f, (<span class="fl">0</span>, <span class="fl">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="42">
@@ -6060,7 +6060,7 @@ rb.addEventListener("change", function() {
 </div>
 <p>The <code>find_zero</code> function is actually an interface to various root-finding algorithms. When called as above – with two intial starting points – it uses a bracketing approach as discussed here, though with a different notion of the midpoint.</p>
 <p>A slightly different interface is given by the <code>fzero</code> function, where that above would be:</p>
-<div id="a9b62e74" class="cell" data-execution_count="42">
+<div id="67a18dca" class="cell" data-execution_count="42">
 <div class="sourceCode cell-code" id="cb51"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fzero</span>(f, <span class="fl">0</span>, <span class="fl">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="43">
 <pre><code>0.03465735902085385</code></pre>
@@ -6074,13 +6074,13 @@ rb.addEventListener("change", function() {
 <li>use the bisection method to find the zero to many decimal points.</li>
 </ul>
 <p>Here we illustrate with the problem of finding all intersection points of <span class="math inline">\(e^x = x^4\)</span> over the interval <span class="math inline">\([0,10]\)</span>.</p>
-<p>Recall, solving for <span class="math inline">\(g(x) = h(x)\)</span> is identical to the problem of solving <span class="math inline">\(f(x) = 0\)</span>, where we define <span class="math inline">\(f(x) = g(x) - h(x)\)</span>. So our problem is to find solutions to <span class="math inline">\(e^x - x^4 = 0\)</span>.</p>
+<p>Recall, solving for <span class="math inline">\(f(x) = g(x)\)</span> is identical to the problem of solving <span class="math inline">\(eqn(x) = 0\)</span>, where we define <span class="math inline">\(eqn(x) = f(x) - g(x)\)</span>. So our problem is to find solutions to <span class="math inline">\(e^x - x^4 = 0\)</span>.</p>
 <p>A quick plot shows that the function has such a wide range that looking over the entire domain at once will be problematic:</p>
-<div id="eaf8ffea" class="cell" data-execution_count="43">
+<div id="5a70e027" class="cell" data-execution_count="43">
 <div class="sourceCode cell-code" id="cb53"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">exp</span>(x) <span class="op">-</span> x<span class="op">^</span><span class="fl">4</span></span>
 <span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(f, <span class="fl">0</span>, <span class="fl">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="44">
-    <div id="acf08b16-363c-4514-8dcc-13c2a2ce85db" style="width:672px;height:480px;"></div>
+    <div id="c1dda3ec-a8f7-492f-82e8-ff152dfe813d" style="width:672px;height:480px;"></div>
     <script>
         requirejs.config({
         paths: {
@@ -6089,7 +6089,7 @@ rb.addEventListener("change", function() {
     });
     require(['plotly'], function (Plotly) {
 
-    Plotly.newPlot('acf08b16-363c-4514-8dcc-13c2a2ce85db', [
+    Plotly.newPlot('c1dda3ec-a8f7-492f-82e8-ff152dfe813d', [
     {
         "showlegend": true,
         "mode": "lines",
@@ -6424,10 +6424,10 @@ rb.addEventListener("change", function() {
 </div>
 </div>
 <p>Instead, we look between <span class="math inline">\([0,3]\)</span> and <span class="math inline">\([8,9]\)</span>. A quick confirmation shows these are good choices to use. For example, between <span class="math inline">\(8\)</span> and <span class="math inline">\(9\)</span> we have:</p>
-<div id="e9b78e36" class="cell" data-execution_count="44">
+<div id="c3d268be" class="cell" data-execution_count="44">
 <div class="sourceCode cell-code" id="cb54"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(f, <span class="fl">8</span>, <span class="fl">9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="45">
-    <div id="fbfc9357-6998-4db4-9e26-92c7a646d6ba" style="width:672px;height:480px;"></div>
+    <div id="8060547d-dee3-47d7-9aa6-d924d6fc2264" style="width:672px;height:480px;"></div>
     <script>
         requirejs.config({
         paths: {
@@ -6436,7 +6436,7 @@ rb.addEventListener("change", function() {
     });
     require(['plotly'], function (Plotly) {
 
-    Plotly.newPlot('fbfc9357-6998-4db4-9e26-92c7a646d6ba', [
+    Plotly.newPlot('8060547d-dee3-47d7-9aa6-d924d6fc2264', [
     {
         "showlegend": true,
         "mode": "lines",
@@ -6681,14 +6681,14 @@ rb.addEventListener("change", function() {
 </div>
 </div>
 <p>So we find the values of the zero in the bracketed region <span class="math inline">\([8,9]\)</span>:</p>
-<div id="840e18f0" class="cell" data-execution_count="45">
+<div id="db3b830b" class="cell" data-execution_count="45">
 <div class="sourceCode cell-code" id="cb55"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zero</span>(f, (<span class="fl">8</span>, <span class="fl">9</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="46">
 <pre><code>8.6131694564414</code></pre>
 </div>
 </div>
 <p>The root within <span class="math inline">\([0, 3]\)</span> is found with:</p>
-<div id="9d30e950" class="cell" data-execution_count="46">
+<div id="0b54d018" class="cell" data-execution_count="46">
 <div class="sourceCode cell-code" id="cb57"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zero</span>(f, (<span class="fl">0</span>, <span class="fl">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="47">
 <pre><code>1.4296118247255556</code></pre>
@@ -6697,29 +6697,29 @@ rb.addEventListener("change", function() {
 </section>
 <section id="example-solving-fx-c" class="level3" data-number="4.5.2">
 <h3 data-number="4.5.2" class="anchored" data-anchor-id="example-solving-fx-c"><span class="header-section-number">4.5.2</span> Example: Solving <span class="math inline">\(f(x) = c\)</span></h3>
-<p>There are two reasonable means to solve <span class="math inline">\(f(x) = c\)</span> for <span class="math inline">\(x\)</span> when <span class="math inline">\(c\)</span> is non-zero. As above, we can define a new function <span class="math inline">\(h(x) = f(x) - c\)</span>. Then when <span class="math inline">\(h(x)\)</span> is <span class="math inline">\(0\)</span> we will have <span class="math inline">\(f(x)\)</span> equal to c.</p>
+<p>There are two reasonable means to solve <span class="math inline">\(f(x) = c\)</span> for <span class="math inline">\(x\)</span> when <span class="math inline">\(c\)</span> is non-zero. As above, we can define a new function <span class="math inline">\(eqn(x) = f(x) - c\)</span>. Then when <span class="math inline">\(eqn(x)\)</span> is <span class="math inline">\(0\)</span> we will have <span class="math inline">\(f(x)\)</span> equal to c.</p>
 <p>Alternatively, we can pass in <span class="math inline">\(c\)</span> as a parameter by defining a two-argument version of <span class="math inline">\(f.\)</span></p>
 <p>Suppose we aim to find when <span class="math inline">\(\tan(x) = c\)</span> for <span class="math inline">\(c &gt; 0\)</span>. For any <span class="math inline">\(c &gt; 0\)</span>, say <span class="math inline">\(c = 1.23\)</span>, we can see from the shape of the graph of <span class="math inline">\(\tan(x)\)</span> that there is one intersection point between <span class="math inline">\(0\)</span> and <span class="math inline">\(\pi/2\)</span>.</p>
 <p>The easiest way is to create a simple function:</p>
-<div id="fb973d41" class="cell" data-execution_count="47">
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">h</span>(x) <span class="op">=</span> <span class="fu">tan</span>(x) <span class="op">-</span> <span class="fl">1.23</span></span>
-<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zero</span>(h, (<span class="fl">0</span>, <span class="cn">pi</span><span class="op">/</span><span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="e1494768" class="cell" data-execution_count="47">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">eqn</span>(x) <span class="op">=</span> <span class="fu">tan</span>(x) <span class="op">-</span> <span class="fl">1.23</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zero</span>(eqn, (<span class="fl">0</span>, <span class="cn">pi</span><span class="op">/</span><span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="48">
 <pre><code>0.8881737743776796</code></pre>
 </div>
 </div>
 <p>We can be more formal (as it is a more general pattern) and use two functions to define the problem:</p>
-<div id="30de157a" class="cell" data-execution_count="48">
+<div id="7c0c4ed7" class="cell" data-execution_count="48">
 <div class="sourceCode cell-code" id="cb61"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">tan</span>(x)</span>
 <span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a><span class="fu">g</span>(x) <span class="op">=</span> <span class="fl">1.23</span></span>
-<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a><span class="fu">h</span>(x) <span class="op">=</span> <span class="fu">f</span>(x) <span class="op">-</span> <span class="fu">g</span>(x)</span>
-<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zero</span>(h, (<span class="fl">0</span>, <span class="cn">pi</span><span class="op">/</span><span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a><span class="fu">eqn</span>(x) <span class="op">=</span> <span class="fu">f</span>(x) <span class="op">-</span> <span class="fu">g</span>(x)</span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zero</span>(eqn, (<span class="fl">0</span>, <span class="cn">pi</span><span class="op">/</span><span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="49">
 <pre><code>0.8881737743776796</code></pre>
 </div>
 </div>
 <p>We compare with the arc tangent, as there is a built-in function to do this particular problem:</p>
-<div id="49d8a1d9" class="cell" data-execution_count="49">
+<div id="d3312634" class="cell" data-execution_count="49">
 <div class="sourceCode cell-code" id="cb63"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">atan</span>(<span class="fl">1.23</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="50">
 <pre><code>0.8881737743776796</code></pre>
@@ -6727,14 +6727,14 @@ rb.addEventListener("change", function() {
 </div>
 <hr>
 <p>An alternate approach is to define our function with a <em>parameter</em>:</p>
-<div id="9e156794" class="cell" data-execution_count="50">
+<div id="1df9cca0" class="cell" data-execution_count="50">
 <div class="sourceCode cell-code" id="cb65"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x, p) <span class="op">=</span> <span class="fu">tan</span>(x) <span class="op">-</span> p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="51">
 <pre><code>f (generic function with 2 methods)</code></pre>
 </div>
 </div>
 <p>We can then pass values for <code>p</code> to <code>find_zero</code> to <code>solve</code>:<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
-<div id="26005153" class="cell" data-execution_count="51">
+<div id="2c371336" class="cell" data-execution_count="51">
 <div class="sourceCode cell-code" id="cb67"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zero</span>(f, (<span class="fl">0</span>, <span class="cn">pi</span><span class="op">/</span><span class="fl">2</span>); p<span class="op">=</span><span class="fl">1.23</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="52">
 <pre><code>0.8881737743776796</code></pre>
@@ -6744,23 +6744,23 @@ rb.addEventListener("change", function() {
 </section>
 <section id="example-solving-fx-gx" class="level3" data-number="4.5.3">
 <h3 data-number="4.5.3" class="anchored" data-anchor-id="example-solving-fx-gx"><span class="header-section-number">4.5.3</span> Example: Solving <span class="math inline">\(f(x) = g(x)\)</span></h3>
-<p>The <code>find_zero</code> function finds a value solving <span class="math inline">\(f(x) = 0\)</span>. When the question involves two function, e.g.&nbsp;<span class="math inline">\(f(x) = g(x)\)</span> it can’t be immediately used. However, forming an auxiliary function <span class="math inline">\(h(x) = f(x) - g(x)\)</span> works as solutions to <span class="math inline">\(h(x) = 0\)</span> satisfy <span class="math inline">\(f(x) = g(x)\)</span>.</p>
+<p>The <code>find_zero</code> function finds a value solving <span class="math inline">\(f(x) = 0\)</span>. When the question involves two function, e.g.&nbsp;<span class="math inline">\(f(x) = g(x)\)</span> it can’t be immediately used. However, forming an auxiliary function <span class="math inline">\(eqn(x) = f(x) - g(x)\)</span> works as solutions to <span class="math inline">\(eqn(x) = 0\)</span> satisfy <span class="math inline">\(f(x) = g(x)\)</span>.</p>
 <p>For example, identifying when <span class="math inline">\(\cos(x) = 2x\)</span> may be of interest. By simple geometry, the line through zero with positive slope will intersect the cosine somewhere in <span class="math inline">\([0, \pi/2]\)</span>:</p>
 <p>We can do this with the following approach:</p>
-<div id="c0383563" class="cell" data-execution_count="52">
+<div id="d6667f98" class="cell" data-execution_count="52">
 <div class="sourceCode cell-code" id="cb69"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">cos</span>(x)</span>
 <span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a><span class="fu">g</span>(x) <span class="op">=</span> <span class="fl">2</span>x</span>
-<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a><span class="fu">h</span>(x) <span class="op">=</span> <span class="fu">f</span>(x) <span class="op">-</span> <span class="fu">g</span>(x)</span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a><span class="fu">eqn</span>(x) <span class="op">=</span> <span class="fu">f</span>(x) <span class="op">-</span> <span class="fu">g</span>(x)</span>
 <span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zero</span>(h, (<span class="fl">0</span>, <span class="cn">pi</span><span class="op">/</span><span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zero</span>(eqn, (<span class="fl">0</span>, <span class="cn">pi</span><span class="op">/</span><span class="fl">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="53">
 <pre><code>0.45018361129487355</code></pre>
 </div>
 </div>
 <p>More generally, we might be interested in solving <span class="math inline">\(\cos(x) - px\)</span> for different <span class="math inline">\(p &gt; 0\)</span>. The parameter approach can be readily used:</p>
-<div id="c3991924" class="cell" data-execution_count="53">
-<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">h</span>(x, p) <span class="op">=</span> <span class="fu">cos</span>(x) <span class="op">-</span> p <span class="op">*</span> x</span>
-<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zero</span>(h, (<span class="fl">0</span>, <span class="cn">pi</span><span class="op">/</span><span class="fl">2</span>); p <span class="op">=</span> <span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="f3706129" class="cell" data-execution_count="53">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x, p) <span class="op">=</span> <span class="fu">cos</span>(x) <span class="op">-</span> p <span class="op">*</span> x</span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zero</span>(f, (<span class="fl">0</span>, <span class="cn">pi</span><span class="op">/</span><span class="fl">2</span>); p <span class="op">=</span> <span class="fl">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="54">
 <pre><code>0.45018361129487355</code></pre>
 </div>
@@ -6769,13 +6769,13 @@ rb.addEventListener("change", function() {
 <h4 class="anchored" data-anchor-id="example">Example</h4>
 <p>The <code>secant(f, a, b)</code> function returns a <em>function</em> representing the secant line between <span class="math inline">\((a, f(a))\)</span> and <span class="math inline">\((b, f(b))\)</span>. In the following we see where the secant line between <span class="math inline">\(1\)</span> and <span class="math inline">\(2\)</span> intersects that between <span class="math inline">\(-2\)</span> and <span class="math inline">\(-1\)</span> for <span class="math inline">\(f(x) = e^x\)</span>.</p>
 <p>Graphically, we have</p>
-<div id="7d3a2097" class="cell" data-execution_count="54">
+<div id="1ea762d0" class="cell" data-execution_count="54">
 <div class="sourceCode cell-code" id="cb73"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">exp</span>(x)</span>
 <span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(f, <span class="op">-</span><span class="fl">2.1</span>, <span class="fl">2.1</span>; legend<span class="op">=</span><span class="cn">false</span>, ylims<span class="op">=</span>(<span class="fl">0</span>, <span class="fl">10</span>))</span>
 <span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot!</span>(<span class="fu">secant</span>(f, <span class="fl">1</span>, <span class="fl">2</span>))</span>
 <span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot!</span>(<span class="fu">secant</span>(f, <span class="op">-</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="55">
-    <div id="227d1f2f-4061-4ae5-9104-033192a0c740" style="width:672px;height:480px;"></div>
+    <div id="e41aabbe-87ad-44e2-8c76-81c6ce6b6842" style="width:672px;height:480px;"></div>
     <script>
         requirejs.config({
         paths: {
@@ -6784,7 +6784,7 @@ rb.addEventListener("change", function() {
     });
     require(['plotly'], function (Plotly) {
 
-    Plotly.newPlot('227d1f2f-4061-4ae5-9104-033192a0c740', [
+    Plotly.newPlot('e41aabbe-87ad-44e2-8c76-81c6ce6b6842', [
     {
         "showlegend": true,
         "mode": "lines",
@@ -7219,17 +7219,17 @@ rb.addEventListener("change", function() {
 </div>
 </div>
 <p>The intersection point near <span class="math inline">\(0.5\)</span> is clear. In the following we show how an infinite bracketing interval is possible. As two non-parallel lines intersect in one point, any open interval containing the intersection point will be a bracketing interval. The bisection algorithm of <code>find_zero</code> handles without fuss any signed value, even infinite ones (though does stop if it encounters a <code>NaN</code> value).</p>
-<div id="9e5e2c93" class="cell" data-execution_count="55">
+<div id="7ffdb4e9" class="cell" data-execution_count="55">
 <div class="sourceCode cell-code" id="cb74"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">exp</span>(x)</span>
 <span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>sl_12 <span class="op">=</span> <span class="fu">secant</span>(f, <span class="fl">1</span>, <span class="fl">2</span>)</span>
 <span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>sl_21 <span class="op">=</span> <span class="fu">secant</span>(f, <span class="op">-</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">1</span>)</span>
-<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a><span class="fu">h</span>(x) <span class="op">=</span> <span class="fu">sl_12</span>(x) <span class="op">-</span> <span class="fu">sl_21</span>(x)</span>
-<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zero</span>(h, (<span class="op">-</span><span class="cn">Inf</span>, <span class="cn">Inf</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a><span class="fu">eqn</span>(x) <span class="op">=</span> <span class="fu">sl_12</span>(x) <span class="op">-</span> <span class="fu">sl_21</span>(x)</span>
+<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zero</span>(eqn, (<span class="op">-</span><span class="cn">Inf</span>, <span class="cn">Inf</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="56">
 <pre><code>0.5752103826044416</code></pre>
 </div>
 </div>
-<p>The above follows the pattern of using <code>h(x)= f(x) - g(x)</code> to solve <span class="math inline">\(f(x) = g(x)\)</span>. The intermediate names, <code>sl12</code> and <code>sl21</code>, are used for the two function here that we are finding the intersection of.</p>
+<p>The above follows the pattern of using <code>eqn(x)= f(x) - g(x)</code> to solve <span class="math inline">\(f(x) = g(x)\)</span>. The intermediate names, <code>sl12</code> and <code>sl21</code>, are used for the two function here that we are finding the intersection of.</p>
 </section>
 </section>
 <section id="problems" class="level3" data-number="4.5.4">
@@ -7237,21 +7237,30 @@ rb.addEventListener("change", function() {
 <section id="question-9" class="level4">
 <h4 class="anchored" data-anchor-id="question-9">Question</h4>
 <p>In the bisection method algorithm we checked that the value of <span class="math inline">\(f\)</span> at <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> had opposite signs by looking at <span class="math inline">\(f(a)\cdot f(b)\)</span>. Why did this work?</p>
-<div id="4cab9991" class="cell" data-execution_count="56">
+<div id="d692a7a8" class="cell" data-execution_count="56">
 <div class="cell-output cell-output-display" data-execution_count="57">
 <script>
-var ID = "py7zuSmm"
+var ID = "SuQHT7F9"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="py7zuSmm" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="SuQHT7F9" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_py7zuSmm" correct="-1" attempts="0">
+      <div class="form" id="controls_SuQHT7F9" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label" for="radio_py7zuSmm_1">
-      <input class="form-check-input" type="radio" name="radio_py7zuSmm" id="radio_py7zuSmm_1" value="1">
+    <label class="form-check-label" for="radio_SuQHT7F9_1">
+      <input class="form-check-input" type="radio" name="radio_SuQHT7F9" id="radio_SuQHT7F9_1" value="1">
+      
+      <span class="label-body px-1">
+        The product of 2 numbers with opposite signs is negative, the product of 2 numbers with the same signs is positive
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_SuQHT7F9_2">
+      <input class="form-check-input" type="radio" name="radio_SuQHT7F9" id="radio_SuQHT7F9_2" value="2">
       
       <span class="label-body px-1">
         The product of two numbers is never negative
@@ -7259,20 +7268,11 @@ var ID = "py7zuSmm"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_py7zuSmm_2">
-      <input class="form-check-input" type="radio" name="radio_py7zuSmm" id="radio_py7zuSmm_2" value="2">
+    <label class="form-check-label" for="radio_SuQHT7F9_3">
+      <input class="form-check-input" type="radio" name="radio_SuQHT7F9" id="radio_SuQHT7F9_3" value="3">
       
       <span class="label-body px-1">
         The product of two numbers will have the sign of the first one.
-      </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label" for="radio_py7zuSmm_3">
-      <input class="form-check-input" type="radio" name="radio_py7zuSmm" id="radio_py7zuSmm_3" value="3">
-      
-      <span class="label-body px-1">
-        The product of 2 numbers with opposite signs is negative, the product of 2 numbers with the same signs is positive
       </span>
     </label>
 </div>
@@ -7281,13 +7281,13 @@ var ID = "py7zuSmm"
     
         </div>
       </div>
-      <div id="py7zuSmm_message" style="padding-bottom: 15px"></div>
+      <div id="SuQHT7F9_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_py7zuSmm').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_py7zuSmm')
+document.getElementById('controls_SuQHT7F9').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_SuQHT7F9')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -7295,14 +7295,14 @@ document.getElementById('controls_py7zuSmm').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_py7zuSmm"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_SuQHT7F9"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 3;
-    var msgBox = document.getElementById('py7zuSmm_message');
+    var correct = rb.value == 1;
+    var msgBox = document.getElementById('SuQHT7F9_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_py7zuSmm")
+    var explanation = document.getElementById("explanation_SuQHT7F9")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -7312,7 +7312,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_py7zuSmm")
+    var explanation = document.getElementById("explanation_SuQHT7F9")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -7331,31 +7331,31 @@ rb.addEventListener("change", function() {
 <section id="question-are-there-other-roots-in--10-0" class="level4">
 <h4 class="anchored" data-anchor-id="question-are-there-other-roots-in--10-0">Question: are there other roots in <span class="math inline">\([-10, 0]\)</span>?</h4>
 <p>There is another root in the interval <span class="math inline">\([-10, 0]\)</span> for the function <span class="math inline">\(f(x) = e^x - x^4\)</span>. Find its value numerically:</p>
-<div id="b23f4034" class="cell" data-execution_count="57">
+<div id="94cc4d98" class="cell" data-execution_count="57">
 <div class="cell-output cell-output-display" data-execution_count="58">
 <script>
-var ID = "sYd6RWP8"
+var ID = "kdKl0US8"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="sYd6RWP8" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="kdKl0US8" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_sYd6RWP8" correct="-1" attempts="0">
+      <div class="form" id="controls_kdKl0US8" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <br>
 <div class="input-group" aria-label="Input form: Numeric answer">
-    <input id="sYd6RWP8" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
+    <input id="kdKl0US8" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
 </div>
 
     
         </div>
       </div>
-      <div id="sYd6RWP8_message" style="padding-bottom: 15px"></div>
+      <div id="kdKl0US8_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_sYd6RWP8').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_sYd6RWP8')
+document.getElementById('controls_kdKl0US8').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_kdKl0US8')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -7363,13 +7363,13 @@ document.getElementById('controls_sYd6RWP8').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.getElementById("sYd6RWP8").addEventListener("change", function() {
+document.getElementById("kdKl0US8").addEventListener("change", function() {
   var correct = (Math.abs(this.value - -0.7034674224983917) <= 0.001);
-  var msgBox = document.getElementById('sYd6RWP8_message');
+  var msgBox = document.getElementById('kdKl0US8_message');
   
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_sYd6RWP8")
+    var explanation = document.getElementById("explanation_kdKl0US8")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -7379,7 +7379,7 @@ document.getElementById("sYd6RWP8").addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_sYd6RWP8")
+    var explanation = document.getElementById("explanation_kdKl0US8")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -7398,31 +7398,31 @@ document.getElementById("sYd6RWP8").addEventListener("change", function() {
 <section id="question-relation-between-x2-and-x-logx" class="level4">
 <h4 class="anchored" data-anchor-id="question-relation-between-x2-and-x-logx">Question: relation between <span class="math inline">\(x^2\)</span> and <span class="math inline">\(x \log(x)\)</span></h4>
 <p>Let <span class="math inline">\(f(x) = x^2 - 10 \cdot x \cdot \log(x)\)</span>. This function has two zeros on the positive <span class="math inline">\(x\)</span> axis. You are asked to find the largest (graph and bracket…):</p>
-<div id="9d25c57c" class="cell" data-execution_count="58">
+<div id="b92e5d0f" class="cell" data-execution_count="58">
 <div class="cell-output cell-output-display" data-execution_count="59">
 <script>
-var ID = "i2mZ5qy3"
+var ID = "2MfBscT2"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="i2mZ5qy3" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="2MfBscT2" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_i2mZ5qy3" correct="-1" attempts="0">
+      <div class="form" id="controls_2MfBscT2" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <br>
 <div class="input-group" aria-label="Input form: Numeric answer">
-    <input id="i2mZ5qy3" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
+    <input id="2MfBscT2" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
 </div>
 
     
         </div>
       </div>
-      <div id="i2mZ5qy3_message" style="padding-bottom: 15px"></div>
+      <div id="2MfBscT2_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_i2mZ5qy3').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_i2mZ5qy3')
+document.getElementById('controls_2MfBscT2').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_2MfBscT2')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -7430,13 +7430,13 @@ document.getElementById('controls_i2mZ5qy3').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.getElementById("i2mZ5qy3").addEventListener("change", function() {
+document.getElementById("2MfBscT2").addEventListener("change", function() {
   var correct = (Math.abs(this.value - 35.77152063957298) <= 0.001);
-  var msgBox = document.getElementById('i2mZ5qy3_message');
+  var msgBox = document.getElementById('2MfBscT2_message');
   
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_i2mZ5qy3")
+    var explanation = document.getElementById("explanation_2MfBscT2")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -7446,7 +7446,7 @@ document.getElementById("i2mZ5qy3").addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_i2mZ5qy3")
+    var explanation = document.getElementById("explanation_2MfBscT2")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -7465,31 +7465,31 @@ document.getElementById("i2mZ5qy3").addEventListener("change", function() {
 <section id="question-10" class="level4">
 <h4 class="anchored" data-anchor-id="question-10">Question</h4>
 <p>The <code>airyai</code> function has infinitely many negative roots, as the function oscillates when <span class="math inline">\(x &lt; 0\)</span>. In a previous problem we graphically found the largest root. Now find the <em>second largest root</em> using the graph to bracket the answer, and then solving.</p>
-<div id="73e9db88" class="cell" data-execution_count="59">
+<div id="fcc13738" class="cell" data-execution_count="59">
 <div class="cell-output cell-output-display" data-execution_count="60">
 <script>
-var ID = "JmZWhraC"
+var ID = "CKOkKAPZ"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="JmZWhraC" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="CKOkKAPZ" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_JmZWhraC" correct="-1" attempts="0">
+      <div class="form" id="controls_CKOkKAPZ" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <br>
 <div class="input-group" aria-label="Input form: Numeric answer">
-    <input id="JmZWhraC" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
+    <input id="CKOkKAPZ" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
 </div>
 
     
         </div>
       </div>
-      <div id="JmZWhraC_message" style="padding-bottom: 15px"></div>
+      <div id="CKOkKAPZ_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_JmZWhraC').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_JmZWhraC')
+document.getElementById('controls_CKOkKAPZ').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_CKOkKAPZ')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -7497,13 +7497,13 @@ document.getElementById('controls_JmZWhraC').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.getElementById("JmZWhraC").addEventListener("change", function() {
+document.getElementById("CKOkKAPZ").addEventListener("change", function() {
   var correct = (Math.abs(this.value - -4.087949444130973) <= 1.0e-8);
-  var msgBox = document.getElementById('JmZWhraC_message');
+  var msgBox = document.getElementById('CKOkKAPZ_message');
   
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_JmZWhraC")
+    var explanation = document.getElementById("explanation_CKOkKAPZ")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -7513,7 +7513,7 @@ document.getElementById("JmZWhraC").addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_JmZWhraC")
+    var explanation = document.getElementById("explanation_CKOkKAPZ")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -7540,30 +7540,30 @@ document.getElementById("JmZWhraC").addEventListener("change", function() {
 <p>In 1638, according to <a href="http://books.google.com/books?id=kvGt2OlUnQ4C&amp;pg=PA28&amp;lpg=PA28&amp;dq=mersenne+cannon+ball+tests&amp;source=bl&amp;ots=wEUd7e0jFk&amp;sig=LpFuPoUvODzJdaoug4CJsIGZZHw&amp;hl=en&amp;sa=X&amp;ei=KUGcU6OAKJCfyASnioCoBA&amp;ved=0CCEQ6AEwAA#v=onepage&amp;q=mersenne%20cannon%20ball%20tests&amp;f=false">Amir D. Aczel</a>, an experiment was performed in the French Countryside. A monk, Marin Mersenne, launched a cannonball straight up into the air in an attempt to help Descartes prove facts about the rotation of the earth. Though the experiment was not successful, Mersenne later observed that the time for the cannonball to go up was greater than the time to come down. <a href="http://www.maa.org/publications/periodicals/american-mathematical-monthly/american-mathematical-monthly-contents-junejuly-2014">According to “Vertical Projection in a Resisting Medium: Reflections on Observations of Mersenne”.</a></p>
 <p>This isn’t the case for simple ballistic motion where the time to go up is equal to the time to come down. We can “prove” this numerically. For simple ballistic motion, <span class="math inline">\(f(t) = -(1/2)\cdot 32 t^2 + v_0t\)</span>. The time to go up and down are found by the two zeros of this function. The peak time is related to a zero of a function given by <code>D(f)</code>, which for now we’ll take as a mystery function, but later will be known as the derivative.</p>
 <p>Let <span class="math inline">\(v_0= 390\)</span>. The three times in question can be found from the zeros of <code>f</code> and <code>f'</code>. What are they?</p>
-<div id="7e05391e" class="cell" data-execution_count="60">
+<div id="d55beacd" class="cell" data-execution_count="60">
 <div class="cell-output cell-output-display" data-execution_count="61">
 <script>
-var ID = "MEkJfGnb"
+var ID = "5FU4De7Z"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="MEkJfGnb" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="5FU4De7Z" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_MEkJfGnb" correct="-1" attempts="0">
+      <div class="form" id="controls_5FU4De7Z" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label" for="radio_MEkJfGnb_1">
-      <input class="form-check-input" type="radio" name="radio_MEkJfGnb" id="radio_MEkJfGnb_1" value="1">
+    <label class="form-check-label" for="radio_5FU4De7Z_1">
+      <input class="form-check-input" type="radio" name="radio_5FU4De7Z" id="radio_5FU4De7Z_1" value="1">
       
       <span class="label-body px-1">
-        \((0.0, 12.1875, 24.375)\)
+        \((0.0, 625.0, 1250.0)\)
       </span>
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_MEkJfGnb_2">
-      <input class="form-check-input" type="radio" name="radio_MEkJfGnb" id="radio_MEkJfGnb_2" value="2">
+    <label class="form-check-label" for="radio_5FU4De7Z_2">
+      <input class="form-check-input" type="radio" name="radio_5FU4De7Z" id="radio_5FU4De7Z_2" value="2">
       
       <span class="label-body px-1">
         \((-4.9731, 0.0, 4.9731)\)
@@ -7571,11 +7571,11 @@ var ID = "MEkJfGnb"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_MEkJfGnb_3">
-      <input class="form-check-input" type="radio" name="radio_MEkJfGnb" id="radio_MEkJfGnb_3" value="3">
+    <label class="form-check-label" for="radio_5FU4De7Z_3">
+      <input class="form-check-input" type="radio" name="radio_5FU4De7Z" id="radio_5FU4De7Z_3" value="3">
       
       <span class="label-body px-1">
-        \((0.0, 625.0, 1250.0)\)
+        \((0.0, 12.1875, 24.375)\)
       </span>
     </label>
 </div>
@@ -7584,13 +7584,13 @@ var ID = "MEkJfGnb"
     
         </div>
       </div>
-      <div id="MEkJfGnb_message" style="padding-bottom: 15px"></div>
+      <div id="5FU4De7Z_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_MEkJfGnb').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_MEkJfGnb')
+document.getElementById('controls_5FU4De7Z').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_5FU4De7Z')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -7598,14 +7598,14 @@ document.getElementById('controls_MEkJfGnb').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_MEkJfGnb"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_5FU4De7Z"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 1;
-    var msgBox = document.getElementById('MEkJfGnb_message');
+    var correct = rb.value == 3;
+    var msgBox = document.getElementById('5FU4De7Z_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_MEkJfGnb")
+    var explanation = document.getElementById("explanation_5FU4De7Z")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -7615,7 +7615,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_MEkJfGnb")
+    var explanation = document.getElementById("explanation_5FU4De7Z")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -7639,28 +7639,28 @@ h(t) = (\frac{g}{\gamma^2} + \frac{v_0}{\gamma})(1 - e^{-\gamma t}) - \frac{gt}{
 \]</span></p>
 <p>(<a href="http://www.researchgate.net/publication/230963032_On_the_trajectories_of_projectiles_depicted_in_early_ballistic_woodcuts">From “On the trajectories of projectiles depicted in early ballistic Woodcuts”</a>)</p>
 <p>Here <span class="math inline">\(g=32\)</span>, again we take <span class="math inline">\(v_0=390\)</span>, and <span class="math inline">\(\gamma\)</span> is a drag coefficient that we will take to be <span class="math inline">\(1\)</span>. This is valid when <span class="math inline">\(h(t) \geq 0\)</span>. In <code>Julia</code>, rather than hard-code the parameter values, for added flexibility we can pass them in as keyword arguments:</p>
-<div id="18e70678" class="cell" data-execution_count="61">
+<div id="69f63eb4" class="cell" data-execution_count="61">
 <div class="sourceCode cell-code" id="cb76"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">h</span>(t; g<span class="op">=</span><span class="fl">32</span>, v0<span class="op">=</span><span class="fl">390</span>, gamma<span class="op">=</span><span class="fl">1</span>) <span class="op">=</span> (g<span class="op">/</span>gamma<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> v0<span class="op">/</span>gamma)<span class="fu">*</span>(<span class="fl">1</span> <span class="op">-</span> <span class="fu">exp</span>(<span class="op">-</span>gamma<span class="op">*</span>t)) <span class="op">-</span> g<span class="op">*</span>t<span class="op">/</span>gamma</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="62">
-<pre><code>h (generic function with 2 methods)</code></pre>
+<pre><code>h (generic function with 1 method)</code></pre>
 </div>
 </div>
 <p>Now find the three times: <span class="math inline">\(t_0\)</span>, the starting time; <span class="math inline">\(t_a\)</span>, the time at the apex of the flight; and <span class="math inline">\(t_f\)</span>, the time the object returns to the ground.</p>
-<div id="56ee8180" class="cell" data-execution_count="62">
+<div id="530ace23" class="cell" data-execution_count="62">
 <div class="cell-output cell-output-display" data-execution_count="63">
 <script>
-var ID = "Fh3MIBR8"
+var ID = "hZtRdcBm"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="Fh3MIBR8" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="hZtRdcBm" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_Fh3MIBR8" correct="-1" attempts="0">
+      <div class="form" id="controls_hZtRdcBm" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label" for="radio_Fh3MIBR8_1">
-      <input class="form-check-input" type="radio" name="radio_Fh3MIBR8" id="radio_Fh3MIBR8_1" value="1">
+    <label class="form-check-label" for="radio_hZtRdcBm_1">
+      <input class="form-check-input" type="radio" name="radio_hZtRdcBm" id="radio_hZtRdcBm_1" value="1">
       
       <span class="label-body px-1">
         \((0, 32.0, 390.0)\)
@@ -7668,20 +7668,20 @@ var ID = "Fh3MIBR8"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_Fh3MIBR8_2">
-      <input class="form-check-input" type="radio" name="radio_Fh3MIBR8" id="radio_Fh3MIBR8_2" value="2">
+    <label class="form-check-label" for="radio_hZtRdcBm_2">
+      <input class="form-check-input" type="radio" name="radio_hZtRdcBm" id="radio_hZtRdcBm_2" value="2">
       
       <span class="label-body px-1">
-        \((0, 13.187, 30.0)\)
+        \((0, 2.579, 13.187)\)
       </span>
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_Fh3MIBR8_3">
-      <input class="form-check-input" type="radio" name="radio_Fh3MIBR8" id="radio_Fh3MIBR8_3" value="3">
+    <label class="form-check-label" for="radio_hZtRdcBm_3">
+      <input class="form-check-input" type="radio" name="radio_hZtRdcBm" id="radio_hZtRdcBm_3" value="3">
       
       <span class="label-body px-1">
-        \((0, 2.579, 13.187)\)
+        \((0, 13.187, 30.0)\)
       </span>
     </label>
 </div>
@@ -7690,13 +7690,13 @@ var ID = "Fh3MIBR8"
     
         </div>
       </div>
-      <div id="Fh3MIBR8_message" style="padding-bottom: 15px"></div>
+      <div id="hZtRdcBm_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_Fh3MIBR8').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_Fh3MIBR8')
+document.getElementById('controls_hZtRdcBm').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_hZtRdcBm')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -7704,14 +7704,14 @@ document.getElementById('controls_Fh3MIBR8').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_Fh3MIBR8"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_hZtRdcBm"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 3;
-    var msgBox = document.getElementById('Fh3MIBR8_message');
+    var correct = rb.value == 2;
+    var msgBox = document.getElementById('hZtRdcBm_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_Fh3MIBR8")
+    var explanation = document.getElementById("explanation_hZtRdcBm")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -7721,7 +7721,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_Fh3MIBR8")
+    var explanation = document.getElementById("explanation_hZtRdcBm")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -7742,7 +7742,7 @@ rb.addEventListener("change", function() {
 <section id="polynomials-of-higher-degrees" class="level2" data-number="4.6">
 <h2 data-number="4.6" class="anchored" data-anchor-id="polynomials-of-higher-degrees"><span class="header-section-number">4.6</span> Polynomials of higher degrees</h2>
 <p>For Polynomials of higher degree, there are some specific methods that can be used to identify the roots. We will demonstrate the methods from the <code>SymPy</code> package. These work on symbolic expressions. These will be described in more detail later, but for now, we have to make a <em>symbolic</em> variable, <code>x</code> to proceed:</p>
-<div id="f71722a0" class="cell" data-execution_count="63">
+<div id="1a8f643a" class="cell" data-execution_count="63">
 <div class="sourceCode cell-code" id="cb78"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@syms</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="64">
 <pre><code>(x,)</code></pre>
@@ -7750,29 +7750,25 @@ rb.addEventListener("change", function() {
 </div>
 <p>The two functions we discuss are <code>sympy.roots</code> and <code>sympy.real_roots</code>.</p>
 <p>First consider the quadratic equation below. We can identify the real roots of algebraic type with:</p>
-<div id="88ad4250" class="cell" data-execution_count="64">
+<div id="d154c66a" class="cell" data-execution_count="64">
 <div class="sourceCode cell-code" id="cb80"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> x <span class="op">-</span> <span class="fl">1</span></span>
 <span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>sympy.<span class="fu">real_roots</span>(<span class="fu">f</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="65">
-<pre><code>2-element Vector{Sym{PyCall.PyObject}}:
- -sqrt(5)/2 - 1/2
- -1/2 + sqrt(5)/2</code></pre>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="65">
+<p><span class="math inline">\(\left[\begin{smallmatrix}- \frac{\sqrt{5}}{2} - \frac{1}{2}\\- \frac{1}{2} + \frac{\sqrt{5}}{2}\end{smallmatrix}\right]\)</span></p>
 </div>
 </div>
 <p>That was so easy, we’ll do it again. What are the roots of the polynomial <span class="math inline">\(f(x) = -16x^2 + 32x + 6\)</span>?</p>
-<div id="efaa5dca" class="cell" data-execution_count="65">
-<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="op">-</span><span class="fl">16</span>x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">32</span>x <span class="op">+</span> <span class="fl">6</span></span>
-<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>sympy.<span class="fu">real_roots</span>(<span class="fu">f</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="66">
-<pre><code>2-element Vector{Sym{PyCall.PyObject}}:
- 1 - sqrt(22)/4
- 1 + sqrt(22)/4</code></pre>
+<div id="91585c30" class="cell" data-execution_count="65">
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="op">-</span><span class="fl">16</span>x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">32</span>x <span class="op">+</span> <span class="fl">6</span></span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>sympy.<span class="fu">real_roots</span>(<span class="fu">f</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="66">
+<p><span class="math inline">\(\left[\begin{smallmatrix}1 - \frac{\sqrt{22}}{4}\\1 + \frac{\sqrt{22}}{4}\end{smallmatrix}\right]\)</span></p>
 </div>
 </div>
 <p>As can be seen, <span class="math inline">\(f\)</span> has two real roots. This next polynomial has none:</p>
-<div id="28e862e1" class="cell" data-execution_count="66">
-<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> x <span class="op">+</span> <span class="fl">1</span></span>
-<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>sympy.<span class="fu">real_roots</span>(<span class="fu">f</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="14931b39" class="cell" data-execution_count="66">
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> x <span class="op">+</span> <span class="fl">1</span></span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>sympy.<span class="fu">real_roots</span>(<span class="fu">f</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="67">
 <pre><code>Any[]</code></pre>
 </div>
@@ -7782,49 +7778,38 @@ rb.addEventListener("change", function() {
 <p>These are examples of the general template <strong>action(function_object, args…)</strong> for performing some action on a function. In this case, the action is to find the roots of a function which specifies a polynomial function and the additional <em>args…</em> are not necessary–if only complex values are desired.</p>
 <p>For some problems only the possible real roots are desired.</p>
 <p>The following polynomial has both real roots and complex roots. The real one are</p>
-<div id="d2bd4df3" class="cell" data-execution_count="67">
-<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> (x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> x <span class="op">+</span> <span class="fl">1</span>) <span class="op">*</span> (x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> x <span class="op">-</span> <span class="fl">1</span>)</span>
-<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>sympy.<span class="fu">real_roots</span>(<span class="fu">f</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="68">
-<pre><code>2-element Vector{Sym{PyCall.PyObject}}:
- -sqrt(5)/2 - 1/2
- -1/2 + sqrt(5)/2</code></pre>
+<div id="9d5c5675" class="cell" data-execution_count="67">
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> (x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> x <span class="op">+</span> <span class="fl">1</span>) <span class="op">*</span> (x<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> x <span class="op">-</span> <span class="fl">1</span>)</span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>sympy.<span class="fu">real_roots</span>(<span class="fu">f</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="68">
+<p><span class="math inline">\(\left[\begin{smallmatrix}- \frac{\sqrt{5}}{2} - \frac{1}{2}\\- \frac{1}{2} + \frac{\sqrt{5}}{2}\end{smallmatrix}\right]\)</span></p>
 </div>
 </div>
 <p>Compare to</p>
-<div id="0162eb69" class="cell" data-execution_count="68">
-<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>sympy.<span class="fu">roots</span>(<span class="fu">f</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="69">
-<pre><code>Dict{Sym{PyCall.PyObject}, Sym{PyCall.PyObject}} with 4 entries:
-  -1/2 + sqrt(5)/2   =&gt; 1
-  -sqrt(5)/2 - 1/2   =&gt; 1
-  -1/2 - sqrt(3)*I/2 =&gt; 1
-  -1/2 + sqrt(3)*I/2 =&gt; 1</code></pre>
+<div id="b2aa357e" class="cell" data-execution_count="68">
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a>sympy.<span class="fu">roots</span>(<span class="fu">f</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="69">
+<p><span class="math display">\[\begin{equation*}\begin{cases}- \frac{\sqrt{5}}{2} - \frac{1}{2} &amp; \text{=&gt;} &amp;1\\- \frac{1}{2} + \frac{\sqrt{5}}{2} &amp; \text{=&gt;} &amp;1\\- \frac{1}{2} + \frac{\sqrt{3} i}{2} &amp; \text{=&gt;} &amp;1\\- \frac{1}{2} - \frac{\sqrt{3} i}{2} &amp; \text{=&gt;} &amp;1\\\end{cases}\end{equation*}\]</span></p>
 </div>
 </div>
 <p>The word “algebraic” was used, as some problems have answers, but not readily expressible ones. For example, <code>x^5 -x - 1</code>:</p>
-<div id="0da22146" class="cell" data-execution_count="69">
-<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">5</span> <span class="op">-</span> x <span class="op">-</span> <span class="fl">1</span></span>
-<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>sympy.<span class="fu">roots</span>(<span class="fu">f</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="e1dd513a" class="cell" data-execution_count="69">
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">5</span> <span class="op">-</span> x <span class="op">-</span> <span class="fl">1</span></span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>sympy.<span class="fu">roots</span>(<span class="fu">f</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="70">
 <pre><code>Dict{Any, Any}()</code></pre>
 </div>
 </div>
 <p>However, the <code>solve</code> function (which solves <code>f(x)=0</code>) does hint at answers:</p>
-<div id="9b7c79d4" class="cell" data-execution_count="70">
-<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="fu">solve</span>(<span class="fu">f</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="71">
-<pre><code>5-element Vector{Sym{PyCall.PyObject}}:
- CRootOf(x^5 - x - 1, 0)
- CRootOf(x^5 - x - 1, 1)
- CRootOf(x^5 - x - 1, 2)
- CRootOf(x^5 - x - 1, 3)
- CRootOf(x^5 - x - 1, 4)</code></pre>
+<div id="0bd22498" class="cell" data-execution_count="70">
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">solve</span>(<span class="fu">f</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="71">
+<p><span class="math inline">\(\left[\begin{smallmatrix}\operatorname{CRootOf} {\left(x^{5} - x - 1, 0\right)}\\\operatorname{CRootOf} {\left(x^{5} - x - 1, 1\right)}\\\operatorname{CRootOf} {\left(x^{5} - x - 1, 2\right)}\\\operatorname{CRootOf} {\left(x^{5} - x - 1, 3\right)}\\\operatorname{CRootOf} {\left(x^{5} - x - 1, 4\right)}\end{smallmatrix}\right]\)</span></p>
 </div>
 </div>
 <p>These can be revealed, but converting them to numeric with <code>N</code>:</p>
-<div id="bfcadaf6" class="cell" data-execution_count="71">
-<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">N</span>.(<span class="fu">solve</span>(<span class="fu">f</span>(x)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="b05a907a" class="cell" data-execution_count="71">
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">N</span>.(<span class="fu">solve</span>(<span class="fu">f</span>(x)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="72">
 <pre><code>5-element Vector{Number}:
                      1.1673039782614187
@@ -7840,30 +7825,21 @@ rb.addEventListener("change", function() {
 <section id="question-11" class="level4">
 <h4 class="anchored" data-anchor-id="question-11">Question</h4>
 <p>Find all roots of the function <span class="math inline">\(f(x) = x^4 - 4x^2 -4x + 2\)</span>. Are they all real numbers?</p>
-<div id="c2c1c078" class="cell" data-execution_count="72">
+<div id="256e0e64" class="cell" data-execution_count="72">
 <div class="cell-output cell-output-display" data-execution_count="73">
 <script>
-var ID = "nnBHj1op"
+var ID = "P9PPKhNa"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="nnBHj1op" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="P9PPKhNa" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_nnBHj1op" correct="-1" attempts="0">
+      <div class="form" id="controls_P9PPKhNa" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label" for="radio_nnBHj1op_1">
-      <input class="form-check-input" type="radio" name="radio_nnBHj1op" id="radio_nnBHj1op_1" value="1">
-      
-      <span class="label-body px-1">
-        Yes, the are all real
-      </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label" for="radio_nnBHj1op_2">
-      <input class="form-check-input" type="radio" name="radio_nnBHj1op" id="radio_nnBHj1op_2" value="2">
+    <label class="form-check-label" for="radio_P9PPKhNa_1">
+      <input class="form-check-input" type="radio" name="radio_P9PPKhNa" id="radio_P9PPKhNa_1" value="1">
       
       <span class="label-body px-1">
         No, some are real, some are complex
@@ -7871,11 +7847,20 @@ var ID = "nnBHj1op"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_nnBHj1op_3">
-      <input class="form-check-input" type="radio" name="radio_nnBHj1op" id="radio_nnBHj1op_3" value="3">
+    <label class="form-check-label" for="radio_P9PPKhNa_2">
+      <input class="form-check-input" type="radio" name="radio_P9PPKhNa" id="radio_P9PPKhNa_2" value="2">
       
       <span class="label-body px-1">
         No, none are real
+      </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label" for="radio_P9PPKhNa_3">
+      <input class="form-check-input" type="radio" name="radio_P9PPKhNa" id="radio_P9PPKhNa_3" value="3">
+      
+      <span class="label-body px-1">
+        Yes, the are all real
       </span>
     </label>
 </div>
@@ -7884,13 +7869,13 @@ var ID = "nnBHj1op"
     
         </div>
       </div>
-      <div id="nnBHj1op_message" style="padding-bottom: 15px"></div>
+      <div id="P9PPKhNa_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_nnBHj1op').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_nnBHj1op')
+document.getElementById('controls_P9PPKhNa').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_P9PPKhNa')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -7898,14 +7883,14 @@ document.getElementById('controls_nnBHj1op').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_nnBHj1op"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_P9PPKhNa"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 2;
-    var msgBox = document.getElementById('nnBHj1op_message');
+    var correct = rb.value == 1;
+    var msgBox = document.getElementById('P9PPKhNa_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_nnBHj1op")
+    var explanation = document.getElementById("explanation_P9PPKhNa")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -7915,7 +7900,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_nnBHj1op")
+    var explanation = document.getElementById("explanation_P9PPKhNa")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -7934,31 +7919,31 @@ rb.addEventListener("change", function() {
 <section id="question-12" class="level4">
 <h4 class="anchored" data-anchor-id="question-12">Question</h4>
 <p>Find the largest real root of the polynomial <span class="math inline">\(x^2 + x - 5\)</span></p>
-<div id="74205bb4" class="cell" data-execution_count="73">
+<div id="033cc42d" class="cell" data-execution_count="73">
 <div class="cell-output cell-output-display" data-execution_count="74">
 <script>
-var ID = "qY4zq0h2"
+var ID = "NIwuDo3y"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="qY4zq0h2" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="NIwuDo3y" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_qY4zq0h2" correct="-1" attempts="0">
+      <div class="form" id="controls_NIwuDo3y" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <br>
 <div class="input-group" aria-label="Input form: Numeric answer">
-    <input id="qY4zq0h2" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
+    <input id="NIwuDo3y" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
 </div>
 
     
         </div>
       </div>
-      <div id="qY4zq0h2_message" style="padding-bottom: 15px"></div>
+      <div id="NIwuDo3y_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_qY4zq0h2').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_qY4zq0h2')
+document.getElementById('controls_NIwuDo3y').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_NIwuDo3y')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -7966,13 +7951,13 @@ document.getElementById('controls_qY4zq0h2').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.getElementById("qY4zq0h2").addEventListener("change", function() {
+document.getElementById("NIwuDo3y").addEventListener("change", function() {
   var correct = (Math.abs(this.value - 1.79128784747792) <= 0.001);
-  var msgBox = document.getElementById('qY4zq0h2_message');
+  var msgBox = document.getElementById('NIwuDo3y_message');
   
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_qY4zq0h2")
+    var explanation = document.getElementById("explanation_NIwuDo3y")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -7982,7 +7967,7 @@ document.getElementById("qY4zq0h2").addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_qY4zq0h2")
+    var explanation = document.getElementById("explanation_NIwuDo3y")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -8001,31 +7986,31 @@ document.getElementById("qY4zq0h2").addEventListener("change", function() {
 <section id="question-13" class="level4">
 <h4 class="anchored" data-anchor-id="question-13">Question</h4>
 <p>Find the largest real root of the polynomial <span class="math inline">\(x^3 - x - 17\)</span></p>
-<div id="4c0455d4" class="cell" data-execution_count="74">
+<div id="c2ebea2f" class="cell" data-execution_count="74">
 <div class="cell-output cell-output-display" data-execution_count="75">
 <script>
-var ID = "rSiXTZ1Z"
+var ID = "nDic67Pj"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="rSiXTZ1Z" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="nDic67Pj" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_rSiXTZ1Z" correct="-1" attempts="0">
+      <div class="form" id="controls_nDic67Pj" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <br>
 <div class="input-group" aria-label="Input form: Numeric answer">
-    <input id="rSiXTZ1Z" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
+    <input id="nDic67Pj" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
 </div>
 
     
         </div>
       </div>
-      <div id="rSiXTZ1Z_message" style="padding-bottom: 15px"></div>
+      <div id="nDic67Pj_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_rSiXTZ1Z').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_rSiXTZ1Z')
+document.getElementById('controls_nDic67Pj').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_nDic67Pj')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -8033,13 +8018,13 @@ document.getElementById('controls_rSiXTZ1Z').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.getElementById("rSiXTZ1Z").addEventListener("change", function() {
+document.getElementById("nDic67Pj").addEventListener("change", function() {
   var correct = (Math.abs(this.value - 2.700814308977347) <= 0.001);
-  var msgBox = document.getElementById('rSiXTZ1Z_message');
+  var msgBox = document.getElementById('nDic67Pj_message');
   
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_rSiXTZ1Z")
+    var explanation = document.getElementById("explanation_nDic67Pj")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -8049,7 +8034,7 @@ document.getElementById("rSiXTZ1Z").addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_rSiXTZ1Z")
+    var explanation = document.getElementById("explanation_nDic67Pj")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -8069,42 +8054,42 @@ document.getElementById("rSiXTZ1Z").addEventListener("change", function() {
 <h4 class="anchored" data-anchor-id="question-14">Question</h4>
 <p><a href="http://en.wikipedia.org/wiki/Descartes_rule_of_signs">The rule of signs of Descartes</a> is a simple means to give an upper bound on the number of positive real roots a polynomial has. One counts the number of sign changes amongst the polynomials coefficients. Suppose this is <span class="math inline">\(k\)</span>, then the number of <em>positive</em> real roots (counting multiplicities) is one of <span class="math inline">\(k\)</span>, <span class="math inline">\(k-2\)</span>, <span class="math inline">\(k-4\)</span>, … . In particular if <span class="math inline">\(k\)</span> is odd, there must be at least one real root.</p>
 <p>For example, the polynomial <span class="math inline">\(x^3 -x^2 -x - 1\)</span> has signs <code>+ - - -</code>, so there is just one sign change. This implies there must be exactly one <em>positive</em> real root, which is identifyied with:</p>
-<div id="18bacd69" class="cell" data-execution_count="75">
-<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">3</span> <span class="op">-</span>x<span class="op">^</span><span class="fl">2</span> <span class="op">-</span>x <span class="op">-</span> <span class="fl">1</span></span>
-<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a><span class="fu">N</span>.(sympy.<span class="fu">real_roots</span>(<span class="fu">f</span>(x)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="54bd1d25" class="cell" data-execution_count="75">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> x<span class="op">^</span><span class="fl">3</span> <span class="op">-</span>x<span class="op">^</span><span class="fl">2</span> <span class="op">-</span>x <span class="op">-</span> <span class="fl">1</span></span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a><span class="fu">N</span>.(sympy.<span class="fu">real_roots</span>(<span class="fu">f</span>(x)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="76">
 <pre><code>1-element Vector{Float64}:
  1.8392867552141612</code></pre>
 </div>
 </div>
 <p>For the polynomial <span class="math inline">\(f(x) = x^5 -x + 1\)</span> has potentially 2 <em>positive</em>, real roots? Are there <span class="math inline">\(0\)</span> or <span class="math inline">\(2\)</span> positive, real roots?</p>
-<div id="daf84c99" class="cell" data-execution_count="76">
+<div id="d2c5893a" class="cell" data-execution_count="76">
 <div class="cell-output cell-output-display" data-execution_count="77">
 <script>
-var ID = "cPm3i8kl"
+var ID = "OEup1nEf"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="cPm3i8kl" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="OEup1nEf" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_cPm3i8kl" correct="-1" attempts="0">
+      <div class="form" id="controls_OEup1nEf" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label" for="radio_cPm3i8kl_1">
-      <input class="form-check-input" type="radio" name="radio_cPm3i8kl" id="radio_cPm3i8kl_1" value="1">
+    <label class="form-check-label" for="radio_OEup1nEf_1">
+      <input class="form-check-input" type="radio" name="radio_OEup1nEf" id="radio_OEup1nEf_1" value="1">
       
       <span class="label-body px-1">
-        zero
+        two
       </span>
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label" for="radio_cPm3i8kl_2">
-      <input class="form-check-input" type="radio" name="radio_cPm3i8kl" id="radio_cPm3i8kl_2" value="2">
+    <label class="form-check-label" for="radio_OEup1nEf_2">
+      <input class="form-check-input" type="radio" name="radio_OEup1nEf" id="radio_OEup1nEf_2" value="2">
       
       <span class="label-body px-1">
-        two
+        zero
       </span>
     </label>
 </div>
@@ -8113,13 +8098,13 @@ var ID = "cPm3i8kl"
     
         </div>
       </div>
-      <div id="cPm3i8kl_message" style="padding-bottom: 15px"></div>
+      <div id="OEup1nEf_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_cPm3i8kl').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_cPm3i8kl')
+document.getElementById('controls_OEup1nEf').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_OEup1nEf')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -8127,14 +8112,14 @@ document.getElementById('controls_cPm3i8kl').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_cPm3i8kl"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_OEup1nEf"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 1;
-    var msgBox = document.getElementById('cPm3i8kl_message');
+    var correct = rb.value == 2;
+    var msgBox = document.getElementById('OEup1nEf_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_cPm3i8kl")
+    var explanation = document.getElementById("explanation_OEup1nEf")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -8144,7 +8129,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_cPm3i8kl")
+    var explanation = document.getElementById("explanation_OEup1nEf")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -8164,31 +8149,31 @@ rb.addEventListener("change", function() {
 <h4 class="anchored" data-anchor-id="question-15">Question</h4>
 <p>The number of possible <em>negative</em>, real roots can also be found from Descartes’ rule. Instead of looking at the sign changes of <span class="math inline">\(f(x)\)</span>, one must look at the sign changes of <span class="math inline">\(g(x) = f(-x)\)</span>.</p>
 <p>If <span class="math inline">\(f(x) = x^5 - x +1\)</span> we have <span class="math inline">\(g(x) = -x^5 +x + 1\)</span> (just change the signs of the coefficients of the odd powers). Then <span class="math inline">\(g(x)\)</span> has one sign change. This means there is one <em>negative</em> real root. What is it?</p>
-<div id="f036a1b1" class="cell" data-execution_count="77">
+<div id="a04d7f9a" class="cell" data-execution_count="77">
 <div class="cell-output cell-output-display" data-execution_count="78">
 <script>
-var ID = "Qzzj7KAd"
+var ID = "2DBYk9lD"
 </script>
-<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="Qzzj7KAd" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100" name="WeaveQuestion" data-id="2DBYk9lD" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_Qzzj7KAd" correct="-1" attempts="0">
+      <div class="form" id="controls_2DBYk9lD" correct="-1" attempts="0">
         <div style="padding-top: 5px">
     <br>
 <div class="input-group" aria-label="Input form: Numeric answer">
-    <input id="Qzzj7KAd" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
+    <input id="2DBYk9lD" type="number" class="form-control" placeholder="Numeric answer" aria-label="Numeric answer">
 </div>
 
     
         </div>
       </div>
-      <div id="Qzzj7KAd_message" style="padding-bottom: 15px"></div>
+      <div id="2DBYk9lD_message" style="padding-bottom: 15px"></div>
     </div>
   </div>
 </form>
 <script>
-document.getElementById('controls_Qzzj7KAd').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_Qzzj7KAd')
+document.getElementById('controls_2DBYk9lD').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_2DBYk9lD')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -8196,13 +8181,13 @@ document.getElementById('controls_Qzzj7KAd').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.getElementById("Qzzj7KAd").addEventListener("change", function() {
+document.getElementById("2DBYk9lD").addEventListener("change", function() {
   var correct = (Math.abs(this.value - -1.1673039782614185) <= 0.01);
-  var msgBox = document.getElementById('Qzzj7KAd_message');
+  var msgBox = document.getElementById('2DBYk9lD_message');
   
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'><span> 👍&nbsp; Correct </span></div>";
-    var explanation = document.getElementById("explanation_Qzzj7KAd")
+    var explanation = document.getElementById("explanation_2DBYk9lD")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -8212,7 +8197,7 @@ document.getElementById("Qzzj7KAd").addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'><span>👎&nbsp; Incorrect </span></div>";
-    var explanation = document.getElementById("explanation_Qzzj7KAd")
+    var explanation = document.getElementById("explanation_2DBYk9lD")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -8241,24 +8226,24 @@ Environment of <code>Julia</code> when generated
 <div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p><code>Julia</code> version:</p>
-<div id="a7a87e0b" class="cell" data-execution_count="78">
-<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="cn">VERSION</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="b4f9f010" class="cell" data-execution_count="78">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="cn">VERSION</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="79">
-<pre><code>v"1.10.2"</code></pre>
+<pre><code>v"1.10.3"</code></pre>
 </div>
 </div>
 <p>Packages and versions:</p>
-<div id="d9b7618e" class="cell" data-execution_count="79">
-<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pkg</span></span>
-<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a><span class="bu">Pkg</span>.<span class="fu">status</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="665cf311" class="cell" data-execution_count="79">
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pkg</span></span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a><span class="bu">Pkg</span>.<span class="fu">status</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Status `~/work/mth229.github.io/mth229.github.io/Project.toml`
-  [a2e0e22d] CalculusWithJulia v0.2.1
+  [a2e0e22d] CalculusWithJulia v0.2.3
   [7073ff75] IJulia v1.24.2
   [b964fa9f] LaTeXStrings v1.3.1
-  [ebaf19f5] MTH229 v0.3.1
+  [ebaf19f5] MTH229 v0.3.2
   [91a5bcdd] Plots v1.40.4
-  [f27b6e38] Polynomials v4.0.7
+  [f27b6e38] Polynomials v4.0.8
   [438e738f] PyCall v1.96.4
   [612c44de] QuizQuestions v0.3.23
   [295af30f] Revise v3.5.14
