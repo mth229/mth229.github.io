@@ -35,7 +35,7 @@ $$
 f(x) = g(x)
 $$
 
-Conceptually this is identical to the above, as we just set $h(x) = f(x) - g(x)$ and solve for when $h(x)$ is $0$.
+Conceptually this is identical to the above, as we just set $eqn(x) = f(x) - g(x)$ and solve for when $eqn(x)$ is $0$.
 
 
 Here we discuss a few different elementary means to do find zeros with `Julia`, leaving some others for a later time.
@@ -227,7 +227,7 @@ plot!(y, 0, b)
 ##### Example: Finding a zero
 
 
-Sometimes, the equation $f(x)=0$ is actually presented as $h(x)= g(x)$. This form can be rewritten as $f(x) = h(x) - g(x) = 0$, or if working graphically we can just look for crossing points of the graphs of $g(x)$ and $h(x)$. Here we shall do that.
+Sometimes, the equation $f(x)=0$ is actually presented as $f(x)= g(x)$. This form can be rewritten as $eqn(x) = f(x) - g(x) = 0$, or if working graphically we can just look for crossing points of the graphs of $f(x)$ and $g(x)$. Here we shall do that.
 
 
 We wish to compare two trash collection plans
@@ -603,7 +603,7 @@ One needs to know where to look in order to use the bisection method. The basic 
 Here we illustrate with the problem of finding all intersection points of $e^x = x^4$ over the interval $[0,10]$.
 
 
-Recall, solving for $g(x) = h(x)$ is identical to the problem of solving $f(x) = 0$, where we define $f(x) = g(x) - h(x)$. So our problem is to find solutions to $e^x - x^4 = 0$.
+Recall, solving for $f(x) = g(x)$ is identical to the problem of solving $eqn(x) = 0$, where we define $eqn(x) = f(x) - g(x)$. So our problem is to find solutions to $e^x - x^4 = 0$.
 
 
 A quick plot shows that the function has such a wide range that looking over the entire domain at once will be problematic:
@@ -639,7 +639,7 @@ find_zero(f, (0, 3))
 
 ### Example: Solving $f(x) = c$
 
-There are two reasonable means to solve $f(x) = c$ for $x$ when $c$ is non-zero. As above, we can define a new function $h(x) = f(x) - c$. Then when $h(x)$ is $0$ we will have $f(x)$ equal to c.
+There are two reasonable means to solve $f(x) = c$ for $x$ when $c$ is non-zero. As above, we can define a new function $eqn(x) = f(x) - c$. Then when $eqn(x)$ is $0$ we will have $f(x)$ equal to c.
 
 Alternatively, we can pass in $c$ as a parameter by defining a two-argument version of $f.$
 
@@ -650,8 +650,8 @@ For any $c > 0$, say $c = 1.23$, we can see from the shape of the graph of $\tan
 The easiest way is to create a simple function:
 
 ```{julia}
-h(x) = tan(x) - 1.23
-find_zero(h, (0, pi/2))
+eqn(x) = tan(x) - 1.23
+find_zero(eqn, (0, pi/2))
 ```
 
 We can be more formal (as it is a more general pattern) and use two functions to define the problem:
@@ -659,8 +659,8 @@ We can be more formal (as it is a more general pattern) and use two functions to
 ```{julia}
 f(x) = tan(x)
 g(x) = 1.23
-h(x) = f(x) - g(x)
-find_zero(h, (0, pi/2))
+eqn(x) = f(x) - g(x)
+find_zero(eqn, (0, pi/2))
 ```
 
 We compare with the arc tangent, as there is a built-in function to do this particular problem:
@@ -689,7 +689,7 @@ For this problem, the two approaches are about equal in effort. The first style 
 
 ### Example: Solving $f(x) = g(x)$
 
-The `find_zero` function finds a value solving $f(x) = 0$. When the question involves two function, e.g. $f(x) = g(x)$ it can't be immediately used. However, forming an auxiliary function $h(x) = f(x) - g(x)$ works as solutions to $h(x) = 0$ satisfy $f(x) = g(x)$.
+The `find_zero` function finds a value solving $f(x) = 0$. When the question involves two function, e.g. $f(x) = g(x)$ it can't be immediately used. However, forming an auxiliary function $eqn(x) = f(x) - g(x)$ works as solutions to $eqn(x) = 0$ satisfy $f(x) = g(x)$.
 
 For example, identifying when $\cos(x) = 2x$ may be of interest. By simple geometry, the line through zero with positive slope will intersect the cosine somewhere in $[0, \pi/2]$:
 
@@ -698,16 +698,16 @@ We can do this with the following approach:
 ```{julia}
 f(x) = cos(x)
 g(x) = 2x
-h(x) = f(x) - g(x)
+eqn(x) = f(x) - g(x)
 
-find_zero(h, (0, pi/2))
+find_zero(eqn, (0, pi/2))
 ```
 
 More generally, we might be interested in solving $\cos(x) - px$ for different $p > 0$. The parameter approach can be readily used:
 
 ```{julia}
-h(x, p) = cos(x) - p * x
-find_zero(h, (0, pi/2); p = 2)
+f(x, p) = cos(x) - p * x
+find_zero(f, (0, pi/2); p = 2)
 ```
 
 #### Example
@@ -729,11 +729,11 @@ The intersection point near $0.5$ is clear. In the following we show how an infi
 f(x) = exp(x)
 sl_12 = secant(f, 1, 2)
 sl_21 = secant(f, -2, -1)
-h(x) = sl_12(x) - sl_21(x)
-find_zero(h, (-Inf, Inf))
+eqn(x) = sl_12(x) - sl_21(x)
+find_zero(eqn, (-Inf, Inf))
 ```
 
-The above follows the pattern of using `h(x)= f(x) - g(x)` to solve $f(x) = g(x)$. The intermediate names, `sl12` and `sl21`, are used for the two function here that we are finding the intersection of.
+The above follows the pattern of using `eqn(x)= f(x) - g(x)` to solve $f(x) = g(x)$. The intermediate names, `sl12` and `sl21`, are used for the two function here that we are finding the intersection of.
 
 ### Problems
 
