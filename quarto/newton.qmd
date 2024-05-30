@@ -17,16 +17,21 @@ $$
 f(x) = 0
 $$
 
-Previously we discussed the *bisection method* which applied for some continuous function $f(x)$ which changed signs between $a$ and $b$, points which bracket a zero. Not only did we need to find these bracketing points – which wasn't hard from a graph, more importantly the actual algorithm is pretty slow.
+Previously we discussed the *bisection method* which applied for some continuous function $f(x)$ which changed signs *between* $a$ and $b$, points which bracket a zero. Not only did we need to find these bracketing points – which wasn't hard from a graph, more importantly the actual algorithm is pretty slow.
 
 
-If the function $f$ is sufficiently differentiable, then Newton's method may work to find a zero.  Unlike the bisection method which is slow but guaranteed to find a root by the intermediate value theorem, Newton's method is fast (once it is close) but has no such guarantee of converging. In this section, we'll see how to implement the algorithm, try some examples, and then look at what can go wrong.
+If the function $f$ is sufficiently differentiable, then Newton's method may work to find a zero.  Unlike the bisection method which is slow but guaranteed to find a root by the intermediate value theorem, Newton's method is fast (once it is close) but has no such guarantee of converging.
+
+Newton's method is useful to rapidly find a zero when there is a *nearby* initial guess (and a good function); the bisection method is useful when there is a zero *between* two values, which need not be nearby.
+
+
+In this section, we'll see how to implement the algorithm, try some examples, and then look at what can go wrong.
 
 
 The `MTH229` package provides a function `newton` for easily performing Newton's method, utilizing a function from the `Roots` package. More usefully, we will see that `find_zero`, which we used for bisection, can also be used for root finding with an algorithm that is a bit more robust than Newton's method.
 
 
-To begin, we load `MTH229` and `Plots`, in the background this loads `Roots` and its functions.
+To begin, we load `MTH229` (and `Plots`); in the background loading `MTH229` loads `Roots` and its functions.
 
 
 ```{julia}
@@ -43,11 +48,14 @@ using QuizQuestions
 ## Basic idea
 
 
-The idea behind Newton's method is simple – *linear approximation*. That is, most functions at any given point are well approximated by the tangent line at that point. If we have a good guess $x_n$, then we can improve this guess iteratively by replacing it with the zero, $x_{n+1}$, of the tangent line at $(x_n, f(x_n))$.
+The idea behind Newton's method is simple – *linear approximation*.
+
+
+That is, most functions at any given point are well approximated by the tangent line at that point. If we have a good, *nearby*, guess $x_n$, then we can improve this guess by replacing it with the easy to find zero, $x_{n+1}$, of the tangent line at $(x_n, f(x_n))$.
 
 ```{julia}
 #| echo: false
-#| fig-cap: Newton, one step
+#| fig-cap: One step of Newton's method illustrating how each step of the algorithm improves the previous one.
 #| fig-alt: One step of Newton's method
 #![Newton, one step](figures/newton/newton-one-step.png){fig-alt="One step of Newton's method"}
 
@@ -84,7 +92,7 @@ $$
 Some books write the right-hand side as $x_n - f'(x_n)^{-1} f(x_n)$, a form that generalizes to different settings.
 
 
-Like the bisection method, Newton's method is an *iterative method*. One begins with a (suitable) guess $x_0$. From that the algorithm produces $x_1$ which is used to produce $x_2$, etc. The idea is that one eventually will settle on a value $x_n$ sufficiently close to the desired root.
+Like the bisection method, Newton's method is an *iterative method*. One begins with a (suitable, usually nearby) guess $x_1$. From that the algorithm produces $x_2$ which is used to produce $x_3$, etc. The idea is that the algorithm eventually will settle on a value $x_n$ sufficiently close to the desired root. We then call $x_n$ an *approximate* zero.
 
 
 Mathematically, the indices indicate that the right hand side is computed and assigned to the left hand side. This is exactly what is done in assignment within `Julia`, so  the above simply becomes:
@@ -118,34 +126,26 @@ Here we improve the estimate for the root near 2 using Newton's method. We will 
 
 ```{julia}
 fp(x) = 3x^2 - 2
-x = 2				# starting value, x_0
+x = 2				    # starting value, x_1
 
-x = x - f(x)/fp(x)		# new value, x_1
+x = x - f(x)/fp(x)		# new value, x_2
 
 x, f(x)
 ```
 
-We can visualize our progress as follows, noting that `x` holds $x_1$, and zooming into the domain $[1.9, 2.2]$:
+We can visualize our progress as follows, noting that `x` holds $x_2$, and zooming into the domain $[1.9, 2.2]$:
 
 
 ```{julia}
 #| fig-alt: plot of  function and steps in algorithm
-x0, x1 = 2, x
+x1, x2 = 2, x
 plot(f, 1.9, 2.2, legend=false)
 plot!(zero)
-plot!([x0, x0, x1], [0, f(x0), 0])  # why these values?
-scatter!([x0, x1], [0, 0])
+plot!([x1, x1, x2], [0, f(x1), 0])  # why these values?
+scatter!([x1, x2], [0, 0])
 ```
 
-Continuing, though without visualizing the progress, this next step will compute $x_2$:
-
-
-```{julia}
-x = x - f(x)/fp(x)
-x, f(x)
-```
-
-This next step will compute $x_3$:
+Continuing, though without visualizing the progress, this next step will compute $x_3$:
 
 
 ```{julia}
@@ -165,17 +165,25 @@ This next step will compute $x_5$:
 
 
 ```{julia}
+x = x - f(x)/fp(x)
+x, f(x)
+```
+
+This next step will compute $x_6$:
+
+
+```{julia}
 x = x - f(x)/fp(x)		# x stopped changing
 x, f(x)
 ```
 
-We see that $x_4=x_5$, so the algorithm has stabilized. We also see that $f(x_4)$ is basically $0$ (Recall, `eps()` is the machine precision, or the size of the difference between floating point values at $1.0$ is basically $10^{-16}$, the size of $f(x_4)$.)
+We see that $x_5=x_6$, so the algorithm has stabilized. We also see that $f(x_5)$ is basically $0$ (Recall, `eps()` is the machine precision, or the size of the difference between floating point values at $1.0$ is basically $10^{-16}$, the size of $f(x_5)$.)
 
 
 You can see in this case that the convergence happens quickly as soon as the algorithm gets close.
 
 
-The approximate root is $x_4$.  It is important to realize that the actual, *exact*, answer is not likely to be the value computed by Newton's method, which we call `xstar` at times. In most cases, the true answer will be irrational and `xstar` a floating point number, which ultimately can never be better than an approximation to an irrational number.
+The approximate root is $x_5$.  It is important to realize that the actual, *exact*, answer is not likely to be the value computed by Newton's method, which we call `xstar` at times. In most cases, the true answer will be irrational and `xstar` a floating point number, which ultimately can never be better than an approximation to an irrational number.
 
 
 The above example iterated until it was clear the algorithm does not improve itself, as the values returned did not change. This need not be the case for every problem.
@@ -235,12 +243,12 @@ $$
 is described by the first-century [Greek mathematician Hero of Alexandria](http://en.wikipedia.org/wiki/Babylonian_method).
 
 
-Let $k=15$ and $x_0$ be $4$. What is the value of $x_3$?
+Let $k=15$ and $x_1$ be $4$. What is the value of $x_4$?
 
 
 ```{julia}
 #| echo: false
-x0 = 4
+x1 = 4
 f(x) =  1/2*(x + 15/x)
 val = f(f(f(x0)))
 numericq(val, 1e-4)
@@ -266,7 +274,7 @@ numericq(val, 1e-14)
 #### Question
 
 
-Let $f(x) = x^2 - 3^x$. This has derivative $2x - 3^x \cdot \log(3)$. Starting with $x_0=0$, what does Newton's method converge on?
+Let $f(x) = x^2 - 3^x$. This has derivative $2x - 3^x \cdot \log(3)$. Starting with $x_1=0$, what does Newton's method converge on?
 
 
 ```{julia}
@@ -477,29 +485,29 @@ $$
 #### Question
 
 
-Use the secant method to find a root to $f(x) = \cos(x) - x^3$ starting with $x_0=1/2$ and $x_1=1$.
+Use the secant method to find a root to $f(x) = \cos(x) - x^3$ starting with $x_1=1/2$ and $x_2=1$.
 
 
 ```{julia}
 #| echo: false
 using Roots
 f(x) = cos(x) - x^3
-x1, x0 = 1, 1/2
-x = find_zero(f, (x0, x1), Roots.Secant())
+x2, x1 = 1, 1/2
+x = find_zero(f, (x2, x1), Roots.Secant())
 numericq(x, 1e-10)
 ```
 
 #### Question
 
 
-Use the secant method to find a root to $f(x) = x^5 + x - 1$ starting with $x_0=1/2$ and $x_1=1$.
+Use the secant method to find a root to $f(x) = x^5 + x - 1$ starting with $x_1=1/2$ and $x_2=1$.
 
 
 ```{julia}
 #| echo: false
 f(x) = x^5 + x - 1
-x1, x0 = 1, 1/2
-x = find_zero(f, (x0, x1), Roots.Secant())
+x2, x1 = 1, 1/2
+x = find_zero(f, (x1, x2), Roots.Secant())
 numericq(x, 1e-10)
 ```
 
@@ -622,7 +630,7 @@ $$
 f(x) = 4x^4 -5x^3 + 4x^2 -20x - 6
 $$
 
-Apply Newton's method with $x_0=0$ using an automatic derivative. What value does it converge to?
+Apply Newton's method with $x_1=0$ using an automatic derivative. What value does it converge to?
 
 
 ```{julia}
@@ -741,7 +749,7 @@ Now we look at some cases where the above three points do not hold.
 ### The initial guess is no where near the end results
 
 
-Let $f(x) = \sin(x) - x/4$ and $x_0 = 2\pi$. This value is deliberately a poor choice:
+Let $f(x) = \sin(x) - x/4$ and $x_1 = 2\pi$. This value is deliberately a poor choice:
 
 
 ```{julia}
@@ -905,7 +913,7 @@ Sometimes, the process can cycle even for reasonable functions.
 
 #### Question
 
-Let $f(x) = x^3 - 5x$. Starting with $x_0=1$, compute three steps of
+Let $f(x) = x^3 - 5x$. Starting with $x_1=1$, compute three steps of
 Newton's method. What are the terms in the series produced?
 
 ```{julia}
