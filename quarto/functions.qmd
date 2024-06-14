@@ -17,7 +17,7 @@ We see in this section how to easily create functions in `Julia`. In the followi
 For basic things creating a new function and plotting it is as familiar as this:
 
 
-We begin by loading some packages:^[Packages are a means to extend base `Julia`. There are thousands of add-on packages for `Julia`, but thees notes basically use just the two here, which rely of a handful of other add-on packages.]
+We begin by loading some packages:^[Packages are a means to extend base `Julia`. There are thousands of add-on packages for `Julia`, but these notes basically use just the two here, which rely on a handful of other add-on packages.]
 
 
 ```{julia}
@@ -131,7 +131,7 @@ But implicit multiplication won't work with expressions such as `(x+1)(x-1)`, as
 :::{.callout-note}
 ## Implicit multiplication is not recommended
 
-Because of certain idiosyncracies with order of precedence we don't recommend the use of implicit multiplication.
+Because of certain idiosyncrasies with order of precedence we don't recommend the use of implicit multiplication.
 
 :::
 
@@ -559,7 +559,7 @@ $$
     32 \log\left(\frac{200 \cos\theta}{200\cos\theta - x}\right).
 $$
 
-where $k$ is the constant 1/2 and $\theta=\pi/4$. To avoid errors in transcribing, it can be be useful to break such definitions up into steps. Here we note the repeated use of $200\cos(\theta)$ in the defintion of $g(x)$, so we give that value the intermediate name of `a`
+where $k$ is the constant 1/2 and $\theta=\pi/4$. To avoid errors in transcribing, it can be be useful to break such definitions up into steps. Here we note the repeated use of $200\cos(\theta)$ in the definition of $g(x)$, so we give that value the intermediate name of `a`
 
 
 ```{julia}
@@ -1498,6 +1498,113 @@ Types in `Julia` are a more complicated matter than we want to get into here, bu
 
 
 Clearly the latter ones should nest, in that an object of type `Integer` should also be of type `Real`. This means when we specialize a mathematical function, it is enough to specify values of `Real`.
+
+
+### Expressions as functions
+
+The `MTH229` package loads a small package, `SimpleExpressions`, which can be used to blur the distinction between an expression and a function. Later on, the `SymPy` package will be illustrated which allows this blurring and *much* more.
+
+Consider the polynomial $p = 100 + 20x - 16x^2$. Polynomials can be viewed either as [a mathematical expression consisting of indeterminates](https://en.wikipedia.org/wiki/Polynomial) or as a polynomial function.
+
+As an expression of indeterminates, polynomials can be algebraically combined, eg. added, multiplied, etc. They can be factored; in calculus integrated and differentiated.
+
+As functions they can be evaluated; used as examples of continuous and differentiable functions;  integrated and differentiated, etc.
+
+Within `Julia` the distinction is important:
+
+* *expressions* are immediately evaluated
+* functions have their evaluation delayed until they are called
+
+Unlike expressions, function's can't be added or subtracted without the effort of creating a new function, as previously illustrated.
+
+To illustrate, without first setting a value for `x`, the expression below would error:
+
+```{julia}
+x = 2
+p = 100 + 20x - 16x^2
+```
+
+As `2` is assigned to `x`, the value `2` is substituted in for the symbol `x` and the expression is immediately evaluated and assigned to `p`.
+
+Contrast this with the definition as a  polynomial function:
+
+```{julia}
+f(x) = 100 + 20x - 16x^2
+```
+
+The variable `x` need not be defined when `f` is defined, a value for the variable is assigned when the function is called. For example:
+
+
+```{julia}
+f(2)
+```
+
+The `SimpleExpressions` package allows the creation of one symbolic variable and optionally one symbolic parameter. These can be used in an expression as above. However, rather than being evaluated immediately in the expression, the evaluation steps involving the variable are queued up and deferred until a value is assigned.
+
+The `@symbolic` macro is used to create the variable, which is then used within other expressions:^[The `SymPy` package will be used later on in these notes. It too has symbolic variables, but those variables have much more flexibility and the `SymPy` package has many, many more features. `SimpleExpressions` sole purpose is very modest, just to make basic expressions of a single variable and optional parameter act like functions.]
+
+```{julia}
+@symbolic x
+p = 100 + 20x - 16x^2
+```
+
+This symbolic expression can be added and multiplied, as is typically done by hand:
+
+```{julia}
+q = (1 + 2p)*p^2
+```
+
+A new expression is returned and assigned to `q` above. These symbolic expressions are not simplified.^[Later, when `SymPy` is used for symbolic computations, some basic simplification happens automatically.]
+
+The expressions in `SimpleExpressions` are also functions^[The type holding a simple expression subtypes `Function` and has a "call" method defined to allow the expressions to have the same calling style as a function.] and can be used where functions would be.
+
+For example, we can easily call them:
+
+```{julia}
+p(2)
+```
+
+or
+
+```{julia}
+q(3)
+```
+
+Importantly, these expressions can be passed in as functions to other
+functions.  Skipping ahead a bit, we see that a simple expression can be
+used in place of a function when plotting:
+
+```{julia}
+plot(x^5 - x - 1, -1, 1.5)  # Plots is loaded
+```
+
+One final feature of simple expressions is they can also represent equations. This is done by separating the left and right hand sides with a `~`.
+
+A plot recipe is defined, so plotting of these equations is straightforward and highlights the two sides as separate functions:
+
+```{julia}
+eqn = sin(x^2) ~ x/2
+
+plot(eqn, 0, pi)
+```
+
+Again, skipping ahead, we see the three intersection points in $[0,\pi]$ can be identified with:^[The `solve` generic finds solutions to a problem. It is widely used within the `Julia` ecosystem, but not so much in these notes. The call `solve(f::Function, ...)` has too many different possible interpretations to privilege just one; to call a desired one, the function is typically wrapped into a distinguishing type. So, the use of `solve` here would be `solve(ZeroProblem(f,...),...)` which gets a bit verbose for this level, where a different name will suffice, as seen later. However, in this example, the `eqn` expression has a specific type, so `eqn` need not be wrapped into another special type.]
+
+```{julia}
+solve(eqn, 0, pi)
+```
+
+Finally, to show that having a parameter might be useful, what if the intersection points in terms of the slope of the line ($1/2$ above) was of interest? In the following we parameterize it and show how to substitute in a value for the parameter:
+
+```{julia}
+@symbolic x p
+eqn1 = sin(x^2) ~ x/p
+solve(eqn1(:, 3), 0, pi)
+```
+
+As can be imagined, the number of intersection points depends on how flat the line is. This shows for `p=2` three intersection points, but for `p=3` five such.
+
+The `@symbolic` macro treats the first symbol as a symbolic variable, the second (when given) as a symbolic parameter. The notation `eqn(:, 3)` substitutes `3` in for the symbolic parameter `p`, returning an equation in `x` that can be passed to the zero-finding function.
 
 
 ----
