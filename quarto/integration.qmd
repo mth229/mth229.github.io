@@ -310,7 +310,7 @@ function riemann(f::Function, a::Real, b::Real, n::Int; method="right")
 end
 ```
 
-### The integrate function in action
+### Our integrate function in action
 
 
 The basic usage of the `riemann` function is straightforward. Here we approximate the integral of $e^{-x^2}$ from $0$ to $3$ using $10,000$ subintervals:
@@ -549,11 +549,11 @@ a, err = quadgk(sin, 0, pi)		## 2 is exact
 Two values are returned, the answer and an estimate of the error. In the above, $2$ is the exact answer to this integral, the estimated value a just a bit more $2$, but is estimated to be off my no more than the second value, $1.78 \cdot 10^{-12}$.
 
 
-If just the answer is of interest, then it can be extracted using *index notation*:
+If just the answer is of interest, then it can be extracted using *index notation* or `first`:
 
 
 ```{julia}
-quadgk(sin, 0, pi)[1]		# [1] picks out the first component or two
+first(quadgk(sin, 0, pi))		# `first` returns first component of container
 ```
 
 ---
@@ -566,7 +566,7 @@ For another illustration, since Archimedes the known answer for $\int_0^1 x^2 dx
 quadgk(x -> x^2, 0, 1)
 ```
 
-The `riemann` function is good for pedagogical purposes, but the `quadgk` function should be used instead of the `riemann` function – besides being built-in to `Julia` it is more accurate, more robust, fast, and less work to use.
+The `riemann` function is good for pedagogical purposes, but the `quadgk` function should be used instead of the `riemann` function – besides being part of a standard package for `Julia` it is more accurate, more robust, fast, and less work to use.
 
 
 (That `quadgk` is exact with polynomials is no surprise, as the underlying choice of nodes and weights makes it so for polynomials of certain degree.)
@@ -716,7 +716,7 @@ We wish to look at our intuition relating the height of the fluid in the vessel 
 The answer, of course, depends on the shape of the glass.  That is the shape of the function $r(h)$. Note, if $r(h)$ is a constant – the glass is a cylinder – then the half-height mark is also the half-volume mark. Not so in general.
 
 
-For a standard measuring cup, the answer for different `b`'s is printed on the side:
+For a standard measuring cup, the answer for different `b`'s is printed on the side. The gap in heights between the marks for equal volumes seem to be a bit different.
 
 
 ![Measuring cup](figures/integration/measuring_cup.png){fig-alt="A measuring cup is calibrated according to actual volume, which is shape dependent"}
@@ -731,7 +731,7 @@ In Glass Shape Influences Consumption Rate for [Alcoholic Beverages](http://www.
 This figure shows some of the wide variety of beer-serving glasses:
 
 
-[Beer glasses](figures/integration/beer_glasses.jpg)
+![Beer glasses](figures/integration/beer_glasses.jpg)
 
 
 We work with metric units, as there is a natural relation between volume in cm$^3$ and liquid measure (1 liter = 1000 cm$^3$, so a 16-oz pint glass is roughly $450$ cm$^3$.)
@@ -751,7 +751,7 @@ $$
 s(h) = 3 + \log(1 + h), \quad 0 \leq h \leq b
 $$
 
-[Half full](figures/integration/glass-half-full.png)
+![Half full](figures/integration/glass-half-full.png)
 
 
 One could also consider a fluted one, such as appears in the comparison noted in the article.
@@ -782,11 +782,11 @@ For the two types of glasses in the figure, we create functions in `Julia` as fo
 ```{julia}
 r(h) = 3 + h/5
 s(h) = 3 + log(1 + h)
-r_vol(b) = quadgk(x -> pi*r(x)^2, 0, b)[1]
-s_vol(b) = quadgk(x -> pi*s(x)^2, 0, b)[1]
+r_vol(b) = first(quadgk(x -> pi*r(x)^2, 0, b))
+s_vol(b) = first(quadgk(x -> pi*s(x)^2, 0, b))
 ```
 
-Then we can easily find the volume as a function of height. For example at 10cm we have:
+Then we can easily find the volume as a function of height. For example at $10$cm we have:
 
 
 ```{julia}
@@ -924,7 +924,8 @@ The basic indefinite integral for a positive function answers the amount of area
 
 ```{julia}
 #| fig-alt: plot of x^2 over (0,1)
-plot(x -> x^2, 0, 1)
+f(x) = x^2
+plot(f, 0, 1)
 ```
 
 This curve has length no more than $2 = 1 + 1$ – the distance along the $x$ axis starting at $0$ to $1$ and then going up. It is also longer than $\sqrt{2} = \sqrt{1^2 + 1^2}$ – the straight line distance between the two endpoints. But how long is it?
@@ -940,7 +941,7 @@ $$
 The formula is from the length of the hypotenuse of a right triangle with lengths $1$ and $f'(x)$, This image suggests an approximation for the length and why the hypotenuse of some triangle might be involved.
 
 
-[Arc length](figures/integration/arclength.gif)
+![Arc length](figures/integration/arclength.gif)
 
 
 Rather than focus on a derivation, we do some examples illustrating that to compute the arclength of the graph of a function is relatively straightforward  using numeric integration. For example, our answer for $f(x) = x^2$ is given by
@@ -948,7 +949,8 @@ Rather than focus on a derivation, we do some examples illustrating that to comp
 
 ```{julia}
 f(x) = x^2
-quadgk(x -> sqrt(1 + f'(x)^2), 0, 1)      # using f' notation defined in MTH229
+dL(x) = sqrt(1 + f'(x)^2) # using f' notation defined in MTH229
+quadgk(dL, 0, 1)
 ```
 
 (We use an *anonymous function* for the integrand which involved the derivative being found through `f'`. If the graph is described by `f`, then this expression be the same for all these problems.)
@@ -962,7 +964,8 @@ Whereas, the length of the $f(x) = \sin(x)$ over $[0, \pi]$ would be:
 
 ```{julia}
 f(x) = sin(x)
-quadgk(x -> sqrt(1 + f'(x)^2), 0, pi)
+dL(x) = sqrt(1 + f'(x)^2)
+quadgk(dL, 0, pi)
 ```
 
 Next we look at a more practical problem.
@@ -991,7 +994,8 @@ How long is the chain? Looking at the graph we can guess an answer is between $2
 
 
 ```{julia}
-quadgk(x -> sqrt(1 + f'(x)^2), -1, 1)
+dL(x) = sqrt(1 + f'(x)^2)
+quadgk(dL, -1, 1)
 ```
 
 ### Practice
