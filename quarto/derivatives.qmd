@@ -1044,6 +1044,41 @@ Do they show the smallest error around $10^{-6}$ as expected?
 booleanq(true)
 ```
 
+## Symbolic derivatives
+
+The `SymPy` package can differentiate a symbolic expression and return a symbolic expression, similar to what one would get by hand.
+
+The key function is `diff(ex)` or `diff(ex, x)` when specifying which variable to differentiate in is needed. Higher order derivatives can be computed by repeating the variable (eg. `diff(ex, x, x)`) or specifying a number after the variable (eg. `diff(ex, x, 2)`),
+
+
+Consider the function $f(x) = x \cdot \tanh(\exp(x))$. We define it and then create a symbolic expression:
+
+```{julia}
+@syms x
+f(x) = x * tanh(exp(x))
+ex = f(x)
+```
+
+This expression has first and second derivatives computed by:
+
+```{julia}
+diff(ex, x)
+```
+
+and
+
+```{julia}
+diff(ex, x, x)
+```
+
+If there is one or more parameters, the variable must be specified.
+
+```{julia}
+@syms a0 a1 a2 a3 x
+p = a0 + a1*x + a2*x^2 + a3*x^3
+diff(p, x)   # diff(p) will error
+```
+
 ----
 
 
