@@ -35,7 +35,7 @@ $$
 f(x) = g(x)
 $$
 
-Conceptually this is identical to the above, as we just set $eqn(x) = f(x) - g(x)$ and solve for when $eqn(x)$ is $0$.
+Conceptually this is identical to the above, as we just set $aux(x) = f(x) - g(x)$ and solve for when $aux(x)$ is $0$.
 
 
 Here we discuss a few different elementary means to do find zeros with `Julia`, leaving some others for a later time.
@@ -227,7 +227,7 @@ plot!(y, 0, b)
 ##### Example: Finding a zero
 
 
-Sometimes, the equation $f(x)=0$ is actually presented as $f(x)= g(x)$. This form can be rewritten as $eqn(x) = f(x) - g(x) = 0$, or if working graphically we can just look for crossing points of the graphs of $f(x)$ and $g(x)$. Here we shall do that.
+Sometimes, the equation $f(x)=0$ is actually presented as $f(x)= g(x)$. This form can be rewritten as $aux(x) = f(x) - g(x) = 0$, or if working graphically we can just look for crossing points of the graphs of $f(x)$ and $g(x)$. Here we shall do that.
 
 
 We wish to compare two trash collection plans
@@ -566,7 +566,7 @@ radioq(choices, answer)
 
 
 
-## The Roots package and find_zero
+## The Roots package and find_zero to solve $f(x) = 0$
 
 
 The bisection method, while easy to describe and understand, can be made a bit more efficient. The `find_zero` function from the `Roots` package does so. This package is loaded when `MTH229` is. This function uses a tuple to specify the bracketing interval.
@@ -590,20 +590,20 @@ A slightly different interface is given by the `fzero` function, where that abov
 fzero(f, 0, 1)
 ```
 
-### Example: Graphical and numerical answers
-
+### From a graph to a more accurate numeric answers
 
 One needs to know where to look in order to use the bisection method. The basic "one-two punch" is:
 
 
-  * graph the function to identify bracketing values for which the zero is *between$ $a$ and $b$. These need not be very precise, indeed can even be infinite.
-  * use the bisection method to find the zero to many decimal points.
+* graph the function to identify bracketing values for which the zero is *between$ $a$ and $b$. These need not be very precise, indeed can even be infinite.
+
+* use the bisection method to find the zero to many decimal points.
 
 
 Here we illustrate with the problem of finding all intersection points of $e^x = x^4$ over the interval $[0,10]$.
 
 
-Recall, solving for $f(x) = g(x)$ is identical to the problem of solving $eqn(x) = 0$, where we define $eqn(x) = f(x) - g(x)$. So our problem is to find solutions to $e^x - x^4 = 0$.
+Recall, solving for $f(x) = g(x)$ is identical to the problem of solving $aux(x) = 0$, where we define $aux(x) = f(x) - g(x)$. So our problem is to find solutions to $e^x - x^4 = 0$.
 
 
 A quick plot shows that the function has such a wide range that looking over the entire domain at once will be problematic:
@@ -637,9 +637,9 @@ The root within $[0, 3]$ is found with:
 find_zero(f, (0, 3))
 ```
 
-### Example: Solving $f(x) = c$
+### Solving $f(x) = c$
 
-There are two reasonable means to solve $f(x) = c$ for $x$ when $c$ is non-zero. As above, we can define a new function $eqn(x) = f(x) - c$. Then when $eqn(x)$ is $0$ we will have $f(x)$ equal to c.
+There are two reasonable means to solve $f(x) = c$ for $x$ when $c$ is non-zero. As above, we can define a new function $aux(x) = f(x) - c$. Then when $aux(x)$ is $0$ we will have $f(x)$ equal to c.
 
 Alternatively, we can pass in $c$ as a parameter by defining a two-argument version of $f.$
 
@@ -650,8 +650,8 @@ For any $c > 0$, say $c = 1.23$, we can see from the shape of the graph of $\tan
 The easiest way is to create a simple function:
 
 ```{julia}
-eqn(x) = tan(x) - 1.23
-find_zero(eqn, (0, pi/2))
+aux(x) = tan(x) - 1.23
+find_zero(aux, (0, pi/2))
 ```
 
 We can be more formal (as it is a more general pattern) and use two functions to define the problem:
@@ -659,8 +659,8 @@ We can be more formal (as it is a more general pattern) and use two functions to
 ```{julia}
 f(x) = tan(x)
 g(x) = 1.23
-eqn(x) = f(x) - g(x)
-find_zero(eqn, (0, pi/2))
+aux(x) = f(x) - g(x)
+find_zero(aux, (0, pi/2))
 ```
 
 We compare with the arc tangent, as there is a built-in function to do this particular problem:
@@ -687,9 +687,9 @@ find_zero(f, (0, pi/2); p=1.23)
 
 For this problem, the two approaches are about equal in effort. The first style lends itself to more complicated expressions on both sides of the equals sign, the second is useful when more than one value for $p$ is to be sought.
 
-### Example: Solving $f(x) = g(x)$
+### Solving $f(x) = g(x)$
 
-The `find_zero` function finds a value solving $f(x) = 0$. When the question involves two function, e.g. $f(x) = g(x)$ it can't be immediately used. However, forming an auxiliary function $eqn(x) = f(x) - g(x)$ works as solutions to $eqn(x) = 0$ satisfy $f(x) = g(x)$.
+The `find_zero` function finds a value solving $f(x) = 0$. When the question involves two function, e.g. $f(x) = g(x)$ it can't be immediately used. However, forming an auxiliary function $aux(x) = f(x) - g(x)$ works as solutions to $aux(x) = 0$ satisfy $f(x) = g(x)$.
 
 For example, identifying when $\cos(x) = 2x$ may be of interest. By simple geometry, the line through zero with positive slope will intersect the cosine somewhere in $[0, \pi/2]$:
 
@@ -698,9 +698,9 @@ We can do this with the following approach:
 ```{julia}
 f(x) = cos(x)
 g(x) = 2x
-eqn(x) = f(x) - g(x)
+aux(x) = f(x) - g(x)
 
-find_zero(eqn, (0, pi/2))
+find_zero(aux, (0, pi/2))
 ```
 
 More generally, we might be interested in solving $\cos(x) - px$ for different $p > 0$. The parameter approach can be readily used:
@@ -729,11 +729,55 @@ The intersection point near $0.5$ is clear. In the following we show how an infi
 f(x) = exp(x)
 sl_12 = secant(f, 1, 2)
 sl_21 = secant(f, -2, -1)
-eqn(x) = sl_12(x) - sl_21(x)
-find_zero(eqn, (-Inf, Inf))
+aux(x) = sl_12(x) - sl_21(x)
+find_zero(aux, (-Inf, Inf))
 ```
 
-The above follows the pattern of using `eqn(x)= f(x) - g(x)` to solve $f(x) = g(x)$. The intermediate names, `sl12` and `sl21`, are used for the two function here that we are finding the intersection of.
+The above follows the pattern of using `aux(x)= f(x) - g(x)` to solve $f(x) = g(x)$. The intermediate names, `sl12` and `sl21`, are used for the two function here that we are finding the intersection of.
+
+### Using an equation to solve $f(x) = g(x)$
+
+Symbolic math is touched on in section 5 using the powerful `SymPy` package. In anticipation we mention an alternate way to solve an equation $f(x) = g(x)$ using a symbolic variable.
+
+The `MTH229` package loads the `SimpleExpressions` package which provides a means to create basic symbolic variable (and parameter) through the macro `@symbolic`. `SymPy` will uses the more powerful `@syms` macro for a related task.
+
+With a symbolic variable, computed expressions stay symbolic until needed.  Symbolic expressions can be paired together with a `~` to create a *symbolic equation*. Such equations can be `solve`ed with the `solve` function. While `SymPy` can solve symbolic equations for algebraic answers, `SimpleExpressions` uses `find_zero` behind the scenes.
+
+So to solve when $\cos(x) = 2x$ we might have:
+
+```{julia}
+@symbolic x  # make a symbolic variable
+eq = cos(x) ~ 2x
+find_zero(eq, (0, pi/2))
+```
+
+(In the above, `cos(x)` and `2x` are examples of symbolic expressions.)
+
+To solve an equation like $f(x) = c$, $c$ possibly zero is straightforward. For example we might have something like this:
+
+```{julia}
+f(x) = x * tanh(exp(x))
+c = 1/2
+find_zero(f(x) ~ c, (-5, 5))
+```
+
+(In the above, applying `f(x)` to the symbolic `x` leaves a symbolic expression.)
+
+To solve an equation like $f(x) = g(x)$, when two secant lines intersect, we have:
+
+```{julia}
+f(x) = exp(x)
+sl_12 = secant(f, 1, 2)
+sl_21 = secant(f, -2, -1)
+find_zero(sl_12(x) ~ sl_21(x), (-Inf, Inf))
+```
+
+For such symbolic equations, the `plot` function plots both the left and right hand sides, so we could visualize the above with:
+
+```{julia}
+plot(f, -2.25, 2.25)
+plot!(sl_12(x) ~ sl_21(x))
+```
 
 ### Problems
 
