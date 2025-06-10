@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="CSI Math department">
-<meta name="dcterms.date" content="2025-05-29">
+<meta name="dcterms.date" content="2025-06-10">
 
 <title>MTH229 with Julia</title>
 <style>
@@ -233,6 +233,7 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#lab-notebook" id="toc-lab-notebook" class="nav-link" data-scroll-target="#lab-notebook">Lab notebook</a></li>
   </ul></li>
+  <li><a href="#webwork" id="toc-webwork" class="nav-link" data-scroll-target="#webwork">WeBWorK</a></li>
   <li><a href="#basic-ideas" id="toc-basic-ideas" class="nav-link" data-scroll-target="#basic-ideas">Basic ideas</a></li>
   <li><a href="#installing-julia-on-a-personal-laptop-or-computer." id="toc-installing-julia-on-a-personal-laptop-or-computer." class="nav-link" data-scroll-target="#installing-julia-on-a-personal-laptop-or-computer.">Installing <code>Julia</code> on a personal laptop or computer.</a></li>
   </ul></li>
@@ -261,7 +262,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 29, 2025</p>
+      <p class="date">June 10, 2025</p>
     </div>
   </div>
   
@@ -306,7 +307,7 @@ using Plots</code></pre>
 <li>Binder. Binder is a free service for small images though it can be very tempermental. Binder has an inactivity time out of a few minutes. Two images are available, the one without <code>SymPy</code> loads much faster and would typically suffice, though has no symbolic capabilities.</li>
 </ul>
 <p><a href="https://mybinder.org/v2/gh/mth229/229-projects/lite?labpath=blank-notebook.ipynb"><img src="https://mybinder.org/badge_logo.svg" class="img-fluid" alt="Run on Binder"></a> Run on binder (with SymPy)</p>
-<p><a href="https://mybinder.org/v2/gh/mth229/MTH229Lite.jl/main?labpath=blank-notebook.ipynb"><img src="https://mybinder.org/badge_logo.svg" class="img-fluid" alt="Run on Binder w/o SymPy"></a> Run on binder (without SymPy)</p>
+<p><a href="https://mybinder.org/v2/gh/jverzani/MTH229Lite.jl/symengine?urlpath=%2Fdoc%2Ftree%2Fmth229lite.ipynb"><img src="https://mybinder.org/badge_logo.svg" class="img-fluid" alt="Run on Binder w/o SymPy"></a> Run on binder (without SymPy)</p>
 <hr>
 <p>These notes are broken into different sections, where most all sections have some self-grading questions at the end that allow you to test your knowledge of that material. The code should be copy-and-pasteable into a <code>Julia</code> session. The code output is similar to what would be shown if evaluated in an <code>IJulia</code> cell, our recommended interface while learning <code>Julia</code>, though some may like the <code>Pluto</code> interface as well.</p>
 <p>The notes mostly follow topics of a standard first-semester calculus course after some background material is presented for learning <code>Julia</code> within a mathematical framework.</p>
@@ -316,19 +317,47 @@ using Plots</code></pre>
 <section id="lab-notebook" class="level3">
 <h3 class="anchored" data-anchor-id="lab-notebook">Lab notebook</h3>
 <p>A <a href="https://en.wikipedia.org/wiki/Lab_notebook">laboratory notebook</a> is a useful tool for keeping notes. One specific for this class is available for printing out: <a href="https://raw.githubusercontent.com/mth229/LabNotebook/main/LabNotebook.pdf">LabNotebook</a></p>
-<section id="questions-and-answers" class="level4">
-<h4 class="anchored" data-anchor-id="questions-and-answers">Questions and Answers</h4>
-<p>Question and answers are now presented and completed through <code>WeBWorK</code>. The provided <code>.ipynb</code> notebooks only contain modest background details and a few examples.</p>
+</section>
+</section>
+<section id="webwork" class="level2">
+<h2 class="anchored" data-anchor-id="webwork">WeBWorK</h2>
+<p>Most background material, and the questions are now presented and completed through <code>WeBWorK</code>.</p>
+<p>The provided <code>.ipynb</code> notebooks only contain modest background details and a few examples.</p>
+<p>Each <code>WeBWorK</code> page has an introduction to some part of the material and a series of questions and comments related to the introduction.</p>
 <p>There are a few idiosyncrasies in the <code>WeBWorK</code> pages to be aware of:</p>
-<ul>
-<li><p>The code examples may be typeset in <code>WeBWorK</code> as though they appear in a <em>terminal</em>. A terminal displays the output of each command immediately after execution. In a notebook, when a cell is executed, all the commands are computed and <em>only</em> the last value is shown. (The use of <code>@show</code> or <code>print(...)</code> can be used to display intermediate values in a cell.)</p></li>
-<li><p>Copy and paste from a <code>WeBWorK</code> page into a notebook will usually be unsuccessful, as numbers in the font used to display computer markup do not copy as ASCII numbers into a cell. The numbers can be hand edited though.</p></li>
-<li><p>While <code>Julia</code> is very happy to express its output using scientific notation, <code>WeBWorK</code> is not happy to receive the exact output for an answer. Either replace <code>e</code> with <code>E</code> (as in <code>1.23e4</code> would be <code>1.23E4</code>) or use decimals.</p></li>
-<li><p>For <em>most</em> questions with a numeric answer it is best to copy all 16 digits of output. Several digits are expected to match a correct answer. For numeric questions where an estimate is made, say from a graph, this is significantly relaxed.</p></li>
-<li><p>If the answer is to be a function, the automatic grader is expecting just the rule of the function (an expression), as in for <code>f(x) = sin(x)</code> just enter <code>sin(x)</code>.</p></li>
-</ul>
-</section>
-</section>
+<blockquote class="blockquote">
+<p>Typesetting of code examples</p>
+</blockquote>
+<p>The code examples may be typeset in <code>WeBWorK</code> as though they appear in a <em>terminal</em>. The terminal formatting (or REPL, read-evaluate-print-loop) is indicated with a leading prompt <code>julia&gt;</code>. Interacting with terminal is interactive: a command is read in, evaluated, its output is printed. The output displayed directly below the command which is prefixed with the prompt.</p>
+<p>This is in contrast to some examples where a block of code is typeset as though it were the input for a notebook cell. Notebooks take a block of input, evaluate the block, and then print out the last command that was executed. (The use of <code>@show</code> or <code>print(...)</code> can be used to display intermediate values in a cell.) Notebooks are how you are expected to interact with <code>Julia</code>.</p>
+<blockquote class="blockquote">
+<p>Comments in code</p>
+</blockquote>
+<p>The pound sign (<code>#</code>) in <code>Julia</code> instructs the interpreter that everything afterwards on the line is a <em>comment</em>. While the <code>Julia</code> interpreter can ignore what comes after the pound sign, it is expected that the human interpreter gets some additional bit of detail about why the command is as it is.</p>
+<blockquote class="blockquote">
+<p>Typesetting of math</p>
+</blockquote>
+<p><code>WeBWorK</code> allows the use of MathJax, a JavaScript display engine, for mathematics giving math a distinct look. In contrast, code is typeset using a typewriter style, fixed width font.</p>
+<blockquote class="blockquote">
+<p>Copy and paste from a <code>WeBWorK</code> page</p>
+</blockquote>
+<p>Copying and pasting from <code>WeBWorK</code> into a notebook will usually be unsuccessful as the interesting parts are typeset with MathJax. For the intrepid, the rendered text can be selected by using “right-click” (or “control-click” on a mac) and the “Copy to Clipboard” with “TeX Commands”. Some editing will be necessary.</p>
+<blockquote class="blockquote">
+<p>Numeric answers</p>
+</blockquote>
+<p>For <em>most</em> questions with a numeric answer it is best to copy all 16 digits of output. Several digits are expected to match a correct answer. For numeric questions where an estimate is made, say from a graph, this is significantly relaxed.</p>
+<blockquote class="blockquote">
+<p>Scientific notation</p>
+</blockquote>
+<p>While <code>Julia</code> is very happy to express its output using scientific notation, <code>WeBWorK</code> is not happy to receive the exact output for an answer. Either replace <code>e</code> with <code>E</code> (as in <code>1.23e4</code> would be <code>1.23E4</code>) or use decimals.</p>
+<blockquote class="blockquote">
+<p>Lists of numbers</p>
+</blockquote>
+<p>Many questions expect one or more answers. Separating each one with a comma is needed for <code>WeBWorK</code> to distinguish the different answers.</p>
+<blockquote class="blockquote">
+<p>Other answers</p>
+</blockquote>
+<p>If the answer is to be a function, the automatic grader is expecting just the rule of the function (an expression), as in for <code>f(x) = sin(x)</code> just enter <code>sin(x)</code>.</p>
 </section>
 <section id="basic-ideas" class="level2">
 <h2 class="anchored" data-anchor-id="basic-ideas">Basic ideas</h2>
