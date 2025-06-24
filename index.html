@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.7.32">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="CSI Math department">
-<meta name="dcterms.date" content="2025-06-10">
+<meta name="dcterms.date" content="2025-06-24">
 
 <title>MTH229 with Julia</title>
 <style>
@@ -39,10 +39,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f03a03335597dc5da33af5e93e509466.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-ae87ac7bc736a908afb824acd5217158.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -235,6 +235,10 @@ ul.task-list li input[type="checkbox"] {
   </ul></li>
   <li><a href="#webwork" id="toc-webwork" class="nav-link" data-scroll-target="#webwork">WeBWorK</a></li>
   <li><a href="#basic-ideas" id="toc-basic-ideas" class="nav-link" data-scroll-target="#basic-ideas">Basic ideas</a></li>
+  <li><a href="#help-and-errors" id="toc-help-and-errors" class="nav-link" data-scroll-target="#help-and-errors">Help and errors</a>
+  <ul class="collapse">
+  <li><a href="#errors" id="toc-errors" class="nav-link" data-scroll-target="#errors">Errors</a></li>
+  </ul></li>
   <li><a href="#installing-julia-on-a-personal-laptop-or-computer." id="toc-installing-julia-on-a-personal-laptop-or-computer." class="nav-link" data-scroll-target="#installing-julia-on-a-personal-laptop-or-computer.">Installing <code>Julia</code> on a personal laptop or computer.</a></li>
   </ul></li>
   </ul>
@@ -262,7 +266,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 10, 2025</p>
+      <p class="date">June 24, 2025</p>
     </div>
   </div>
   
@@ -379,6 +383,49 @@ using Plots</code></pre>
 <li><code>integrate(f(x), (x, a, b))</code> to find the definite integral over <code>[a,b]</code> symbolically (from the <code>SymPy</code> package).</li>
 </ul>
 <p>With just this basic set of actions, akin to buttons on the calculator, a rich variety of problems can be addressed.</p>
+</section>
+<section id="help-and-errors" class="level2">
+<h2 class="anchored" data-anchor-id="help-and-errors">Help and errors</h2>
+<p>Most functions in <code>Julia</code> are documented. To access the documentation we issue the command prefixed with a question mark, as in <code>?sin</code>. At the REPL, typing a leading <code>?</code> turns on the help mode. In Jupyter, the query should be the only thing in the cell.</p>
+<p>Help can be narrowed to respond to just certain argument types.</p>
+<section id="errors" class="level3">
+<h3 class="anchored" data-anchor-id="errors">Errors</h3>
+<p>There are a variety of common errors encountered when first interacting with <code>Julia</code>. We try to enumerate them here.</p>
+<section id="parsing-errors" class="level4">
+<h4 class="anchored" data-anchor-id="parsing-errors">Parsing errors</h4>
+<ul>
+<li><p><code>ERROR: MethodError: no method matching ^(::typeof(sin), ::Int64)</code>: This error is thrown when trying to execute <code>sin^2(3)</code>. The issue is there is no means to square the function object, rather we square the value of the function after calling it on <code>3</code>: <code>sin(3)^2</code></p></li>
+<li><p><code>ERROR: ParseError:...space required before '?' operator</code> This came when trying to use the ternary operator <strong>without</strong> spaces around the <code>?</code> and <code>:</code> (by typing <code>x&lt;1?2:3</code> and not <code>x&lt;1 ? 2 : 3</code>).</p></li>
+<li><p><code>ERROR: ParseError: whitespace is not allowed here</code> The error came by including a space after the function name and before the opening parentheses when calling the function. That is <code>sin (3)</code> errors, <code>sin(3)</code> does not.</p></li>
+<li><p><code>ParseError: Expected ')'</code> This came because a non-matching number of parentheses was used – fewer closing than opening. The explanatory message will be <code>extra tokens after end of expression</code> if there are more closing than opening.</p></li>
+</ul>
+</section>
+<section id="incorrect-function-usage" class="level4">
+<h4 class="anchored" data-anchor-id="incorrect-function-usage">Incorrect function usage</h4>
+<ul>
+<li><p><code>ERROR: DomainError with -1.0:</code> This happened when putting a negative (real) number into the <code>log</code> function, in particular entering <code>log(-1)</code>. A similar error will happen with <code>sqrt(-1)</code> and with <code>sin(Inf)</code>, though each has particular clarifying language.</p></li>
+<li><p><code>ERROR: MethodError: objects of type Float64 are not callable</code> This occurs when there is a missing multiplication sign. For example the expression <code>(sin(3))(sin(4))</code> will error, as it sees the parentheses around <code>sin(4)</code> as a function call. However, such notation does work with numeric literals, so it can be confusing. We recommend using <code>*</code> when you mean multiply.</p></li>
+</ul>
+</section>
+<section id="technical-errors" class="level4">
+<h4 class="anchored" data-anchor-id="technical-errors">Technical errors</h4>
+<ul>
+<li><code>ERROR: cannot define function h; it already has a value</code>. <code>Julia</code> has two types of functions anonymous and generic. Generic functions are what we mostly model in this class. They are called generic as each function can have many different implementations (methods). To make this work, a lookup-table is used to store the function name <em>and</em> the number and type of arguments the method is defined for. To do this, once a generic function is defined, it can’t be repurposed as a different variable. Similarly, if you use a name as a variable (eg. <code>h=2</code>) it can no longer be used as a generic function name (eg. <code>h(x) = sin(x)</code>). We recommend sticking to familiar math names for variables (e.g.&nbsp;<code>x</code>, <code>y</code>, <code>a</code>, …) and familiar math names for functions (e.g., <code>f</code>, <code>g</code>, …). This works pretty well, but sometimes there is crossover, such as with <code>h</code>.</li>
+</ul>
+</section>
+<section id="oops-and-not-an-error" class="level4">
+<h4 class="anchored" data-anchor-id="oops-and-not-an-error">Oops and not an error</h4>
+<ul>
+<li>It is possible to <em>redefine</em> and shadow basic math operations. For example, if you were to type the following equation into <code>Julia</code>:</li>
+</ul>
+<pre><code>x + y = 3</code></pre>
+<p>you will not get an equation, rather this will <strong>redefine</strong> the addition of two variables, always returning <code>3</code>. Oops. Often redefinition causes and error, such entering this equation</p>
+<pre><code>sin(x) = 3   # ERROR: invalid method definition in Main: function Base.sin must be explicitly imported to be extended</code></pre>
+<p>To break out of this is tough, you need to redefine <code>+</code>, reaching into <code>Base.:+</code> to do so</p>
+<pre><code>x + y = Base.:+(x,y)</code></pre>
+<p>We recommend learning fast that equations are not entered directly into <code>Julia</code>.</p>
+</section>
+</section>
 </section>
 <section id="installing-julia-on-a-personal-laptop-or-computer." class="level2">
 <h2 class="anchored" data-anchor-id="installing-julia-on-a-personal-laptop-or-computer.">Installing <code>Julia</code> on a personal laptop or computer.</h2>
