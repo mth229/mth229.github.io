@@ -162,7 +162,57 @@ For example, the notes use:
 
 With just this basic set of actions, akin to buttons on the calculator, a rich variety of problems can be addressed.
 
+## Help and errors
 
+Most functions in `Julia` are documented. To access the documentation we issue the command prefixed with a question mark, as in `?sin`. At the REPL, typing a leading `?` turns on the help mode. In Jupyter, the query should be the only thing in the cell.
+
+Help can be narrowed to respond to just certain argument types.
+
+### Errors
+
+There are a variety of common errors encountered when first interacting with `Julia`. We try to enumerate them here.
+
+#### Parsing errors
+
+* `ERROR: MethodError: no method matching ^(::typeof(sin), ::Int64)`: This error is thrown when trying to execute `sin^2(3)`. The issue is there is no means to square the function object, rather we square the value of the function after calling it on `3`: `sin(3)^2`
+
+* `ERROR: ParseError:...space required before '?' operator` This came when trying to use the ternary operator **without** spaces around the `?` and `:` (by typing `x<1?2:3` and not `x<1 ? 2 : 3`).
+
+* `ERROR: ParseError: whitespace is not allowed here` The error came by including a space after the function name and before the opening parentheses when calling the function. That is `sin (3)` errors, `sin(3)` does not.
+
+* `ParseError: Expected ')'` This came because a non-matching number of parentheses was used -- fewer closing than opening. The explanatory message will be `extra tokens after end of expression` if there are more closing than opening.
+
+#### Incorrect function usage
+
+* `ERROR: DomainError with -1.0:` This happened when putting a negative (real) number into the `log` function, in particular entering `log(-1)`. A similar error will happen with `sqrt(-1)` and with `sin(Inf)`, though each has particular clarifying language.
+
+* `ERROR: MethodError: objects of type Float64 are not callable` This occurs when there is a missing multiplication sign. For example the expression `(sin(3))(sin(4))` will error, as it sees the parentheses around `sin(4)` as a function call. However, such notation does work with numeric literals, so it can be confusing. We recommend using `*` when you mean multiply.
+
+#### Technical errors
+
+* `ERROR: cannot define function h; it already has a value`. `Julia` has two types of functions anonymous and generic. Generic functions are what we mostly model in this class. They are called generic as each function can have many different implementations (methods). To make this work, a lookup-table is used to store the function name *and* the number and type of arguments the method is defined for. To do this, once a generic function is defined, it can't be repurposed as a different variable. Similarly, if you use a name as a variable (eg. `h=2`) it can no longer be used as a generic function name (eg. `h(x) = sin(x)`). We recommend sticking to familiar math names for variables (e.g. `x`, `y`, `a`, ...) and familiar math names for functions (e.g., `f`, `g`, ...). This works pretty well, but sometimes there is crossover, such as with `h`.
+
+#### Oops and not an error
+
+* It is possible to *redefine* and shadow basic math operations. For example, if you were to type the following equation into `Julia`:
+
+```
+x + y = 3
+```
+
+you will not get an equation, rather this will **redefine** the addition of two variables, always returning `3`. Oops. Often redefinition causes and error, such entering this equation
+
+```
+sin(x) = 3   # ERROR: invalid method definition in Main: function Base.sin must be explicitly imported to be extended
+```
+
+To break out of this is tough, you need to redefine `+`, reaching into `Base.:+` to do so
+
+```
+x + y = Base.:+(x,y)
+```
+
+We recommend learning fast that equations are not entered directly into `Julia`.
 
 ## Installing `Julia` on a personal laptop or computer.
 
