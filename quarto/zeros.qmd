@@ -38,7 +38,7 @@ $$
 Conceptually this is identical to the above, as we just set $aux(x) = f(x) - g(x)$ and solve for when $aux(x)$ is $0$.
 
 
-Here we discuss a few different elementary means to do find zeros with `Julia`, leaving some others for a later time.
+Here we discuss a few different elementary means to find zeros with `Julia`, leaving some other methods for a later lesson.
 
 
 We will use the add-on package `Roots`  which provides implementations of a few zero- and root-finding algorithms. This package is loaded when the `MTH229` package is loaded.
@@ -106,7 +106,7 @@ To find the roots of $x^2 + x - 1$ we could simply use:
 quadratic(1, 1, -1)
 ```
 
-There are also such formula for third and fourth degree polynomials. The [Abel-Ruffini theorem](https://en.wikipedia.org/wiki/Abel%E2%80%93Ruffini_theorem) states there is no solution in radicals to general polynomial equations of degree five or higher with arbitrary coefficients. Galois – at the tender age of 20 – demonstrated that, in general, there can be no such formula for the roots of a fifth or higher degree polynomial in a manner showing that $x^5-x-1$ can be be solved in this manner. There are still *many* facts known about such polynomials. For example, the *Fundamental theorem of algebra* states that every real-valued polynomial of degree $n$ will have $n$ roots, where we count complex roots and multiplicities.
+There are also such formula for third and fourth degree polynomials. The [Abel-Ruffini theorem](https://en.wikipedia.org/wiki/Abel%E2%80%93Ruffini_theorem) states there is no solution in radicals to general polynomial equations of degree five or higher with arbitrary coefficients. Galois---at the tender age of 20---demonstrated that, in general, there can be no such formula for the roots of a fifth or higher degree polynomial in a manner showing that $x^5-x-1$ can be be solved in this manner. There are still *many* facts known about such polynomials. For example, the *Fundamental theorem of algebra* states that every real-valued polynomial of degree $n$ will have $n$ roots, when we count complex roots and multiplicities.
 
 
 ## Graphical solutions
@@ -132,12 +132,14 @@ In `Julia` we have, taking $v_0=200$:
 j(x; theta=pi/4, g=32, v0=200) = tan(theta)*x - (1/2)*g*(x/(v0*cos(theta)))^2
 ```
 
+If we can ignore all the constants, we might recognize $j(x)$ has the form $ax - bx^2$, so that it is a parabola that opens downward with one root at $x=0$.
+
 With a velocity-dependent wind resistance given by $\gamma$, again with some units, a similar equation can be constructed. It takes a different form:
 
 
 $$
-y(x) = (\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
-      \frac{g}{\gamma^2}\log(\frac{v_0\cos(\theta) - \gamma x}{v_0\cos(\theta)})
+y(x) = \big(\frac{g}{\gamma v_0 \cos(\theta)} + \tan(\theta)) \cdot x  +
+      \frac{g}{\gamma^2}\log(\frac{v_0\cos(\theta) - \gamma x}{v_0\cos(\theta)}\big)
 $$
 
 Again, $v_0$ is the initial velocity and is taken to be $200$ and $\gamma$ a resistance, which we take to be $1$. With this, we have the following `Julia` definition (with a slight reworking of $\gamma$):
@@ -177,6 +179,12 @@ As for the model with wind resistance,  a quick plot over the same interval, $[0
 plot(y, 0, 1250)
 ```
 
+The doesn't show any values past $150$ or so. What happens if we try to evaluate at $1250$?
+
+```{julia}
+y(1250)
+```
+
 Oh, "Domain Error." Of course, when the argument to the logarithm is negative we will have issues.
 
 
@@ -211,7 +219,7 @@ plot(y, 140, 141)
 plot!(zero)
 ```
 
-The answer is approximately $140.7$
+The answer is approximately $140.75$
 
 
 Finally, we plot both graphs at once to see that it was a very windy day indeed.
@@ -219,7 +227,7 @@ Finally, we plot both graphs at once to see that it was a very windy day indeed.
 
 ```{julia}
 #| fig-alt: plot of j and y
-b = 140.7
+b = 140.75
 plot(j , 0, 1250)
 plot!(y, 0, b)
 ```
@@ -266,7 +274,7 @@ We can see the intersection point is around 14 and that if a family generates be
 #### Question
 
 
-Graphically estimate the one zero of $f(x) = e^x - x^3$ over the interval $[0,4]$.
+Graphically estimate the one zero of $f(x) = e^x - x^3$ in the interval $[0,4]$.
 
 
 ```{julia}
@@ -369,7 +377,7 @@ The last example had us graphically "zoom" in on a zero, and led us to an estima
 
 In particular if $f(x)$ is continuous with $f(a)$ and $f(b)$ having *different* signs then there must be a point $c$ in $[a,b]$ where $f(c) = 0$. (When $f(a)$ and $f(b)$ have different signs, we say $a$ and $b$ *bracket* a root.)  This observation is due to Bolzano.
 
-The bisection algorithm finds a zero *between* two bracketing value, as illustrated in this graphic:
+The bisection algorithm finds a zero *between* two bracketing values, as illustrated in this graphic:
 
 ```{julia}
 #| fig-alt: A zero of sin is between 3 and 4
@@ -472,7 +480,7 @@ Here $c=1.5$ and the new interval is $[1.0, 1.5]$, as we had graphically. We jus
 It seems as though we could be here all day. Indeed, if doing this by hand it might take up quite a bit of time. We should automate this. Before automating this, we need to think: *when would we stop?*
 
 
-Mathematically we can keep taking halves using the concept of a limit. See for example [Zeno's paradox](http://en.wikipedia.org/wiki/Zenos_paradoxes). On a computer we don't have such a luxury. In fact, for floating point numbers we couldn't keep taking halves – even if we wanted – as ultimately we should expect to get `a` and `b` being floating point values that are next to each other – and hence there is no midpoint. (Well, there are some cases that suggest a more careful numeric approach to the above.)
+Mathematically we can keep taking halves using the concept of a limit. See for example [Zeno's paradox](http://en.wikipedia.org/wiki/Zenos_paradoxes). On a computer we don't have such a luxury. In fact, for floating point numbers we couldn't keep taking halves---even if we wanted---as ultimately we should expect to get `a` and `b` being floating point values that are next to each other – and hence there is no midpoint. (Well, there are some cases that suggest a more careful numeric approach to the above.)
 
 
 So even though this doesn't make mathematical sense we can try stopping when the following condition is no longer true:
@@ -535,7 +543,7 @@ Plot `airyai` over `[-3,3]`. Which of the following is a *bracketing* interval?
 
 ```{julia}
 #| echo: false
-choices = ["[$i, $(i+1)]" for in -3:2]
+choices = ["[$i, $(i+1)]" for i in -3:2]
 answer = 1
 radioq(choices, answer)
 ```
@@ -553,7 +561,7 @@ radioq(choices, answer)
 
 #### Question
 
-Let $f(x) = 1/2 + \sin(3x) + \sin(7x)$. Which of these is a *bracketing interval$?
+Let $f(x) = 1/2 + \sin(3x) + \sin(7x)$. Which of these is a *bracketing interval*?
 
 
 ```{julia}
@@ -580,7 +588,7 @@ f(x) = 2x * exp(-20) - 2 * exp(-20x) + 1
 find_zero(f, (0, 1))
 ```
 
-The `find_zero` function is actually an interface to various root-finding algorithms. When called as above – with two initial starting points – it uses a bracketing approach as discussed here, though with a different notion of the midpoint.
+The `find_zero` function is actually an interface to various root-finding algorithms. When called as above---with two initial starting points---it uses a bracketing approach as discussed here, though with a different notion of the midpoint.
 
 
 A slightly different interface is given by the `fzero` function, where that above would be:
@@ -595,7 +603,7 @@ fzero(f, 0, 1)
 One needs to know where to look in order to use the bisection method. The basic "one-two punch" is:
 
 
-* graph the function to identify bracketing values for which the zero is *between$ $a$ and $b$. These need not be very precise, indeed can even be infinite.
+* graph the function to identify bracketing values for which the zero is *between* $a$ and $b$. These need not be very precise, indeed for some problems $a$ and $b$ can even be infinite.
 
 * use the bisection method to find the zero to many decimal points.
 
@@ -615,26 +623,44 @@ f(x) = exp(x) - x^4
 plot(f, 0, 10)
 ```
 
-Instead, we look between $[0,3]$ and $[8,9]$. A quick confirmation shows these are good choices to use. For example, between $8$ and $9$ we have:
+The function is an exponential and a polynomial. A basic fact is that *eventually* exponentials grow *faster* so $f(x)$ will rapidly head towards $+\infty$, a fact that can be easily be observed bu plotting over a wider interval, such as $[0, 20]$. However, at $0$ we easily see that $f(x)$ is positive, it being $1-0$. So if the function dips negative, it must come back up, so we expect $2$ zeros. From the initial graph, it appears we can find them between
+$[0,7.5]$ and between $[7.5, 10]$.
+
+So we find the values of the zero in the bracketed region $[7.5, 10]$:
 
 
 ```{julia}
-#| fig-alt: plot of exp(x) - x^4 over (8,9)
-plot(f, 8, 9)
+find_zero(f, (7.5, 10))
 ```
 
-So we find the values of the zero in the bracketed region $[8,9]$:
+The root within $[0, 7.5]$ is found with:
 
 
 ```{julia}
-find_zero(f, (8, 9))
+find_zero(f, (0, 7.5))
 ```
 
-The root within $[0, 3]$ is found with:
+----
 
+We do this again. Find a zero of the function `f(x) = asinh(x) - e^2`.
+
+As we don't know much about this function, we first plot over $[-10,10}$:
 
 ```{julia}
-find_zero(f, (0, 3))
+f(x) = asinh(x) - e^2
+plot(f, -10, 10)
+```
+
+If we believe that the function is increasing, we can see then that any zero happens far to the right of $10$. Seeing this, we replot over $[0,1000]$:
+
+```{julia}
+plot(f, 0, 1000)
+```
+
+From the graph, we confirm that $[0,1000]$ contains a zero and is a bracketing interval. With this, we are ready to call `find_zero`:
+
+```{julia}
+find_zero(f, (0, 1000))
 ```
 
 ### Solving $f(x) = c$
@@ -689,11 +715,11 @@ For this problem, the two approaches are about equal in effort. The first style 
 
 ### Solving $f(x) = g(x)$
 
-The `find_zero` function finds a value solving $f(x) = 0$. When the question involves two function, e.g. $f(x) = g(x)$ it can't be immediately used. However, forming an auxiliary function $aux(x) = f(x) - g(x)$ works as solutions to $aux(x) = 0$ satisfy $f(x) = g(x)$.
+The `find_zero` function finds a value solving $f(x) = 0$. When the question involves two functions, e.g. $f(x) = g(x)$ it can't be immediately used. However, forming an auxiliary function $aux(x) = f(x) - g(x)$ works as solutions to $aux(x) = 0$ satisfy $f(x) = g(x)$.
 
-For example, identifying when $\cos(x) = 2x$ may be of interest. By simple geometry, the line through zero with positive slope will intersect the cosine somewhere in $[0, \pi/2]$:
+For example, identifying when $\cos(x) = 2x$ may be of interest. By simple geometry, the line through zero with positive slope will intersect the cosine graph somewhere in $[0, \pi/2]$:
 
-We can do this with the following approach:
+We find where with the following approach:
 
 ```{julia}
 f(x) = cos(x)
@@ -739,7 +765,7 @@ The above follows the pattern of using `aux(x)= f(x) - g(x)` to solve $f(x) = g(
 
 Symbolic math is touched on in section 5 using the powerful `SymPy` package. In anticipation we mention an alternate way to solve an equation $f(x) = g(x)$ using a symbolic variable.
 
-The `MTH229` package loads the `SimpleExpressions` package which provides a means to create basic symbolic variable (and parameter) through the macro `@symbolic`. `SymPy` will uses the more powerful `@syms` macro for a related task.
+The `MTH229` package loads the `SimpleExpressions` package which provides a means to create a basic symbolic variable (and parameter) through the macro `@symbolic`. `SymPy` will uses the more powerful `@syms` macro for a related task.
 
 With a symbolic variable, computed expressions stay symbolic until needed.  Symbolic expressions can be paired together with a `~` to create a *symbolic equation*. Such equations can be `solve`ed with the `solve` function. While `SymPy` can solve symbolic equations for algebraic answers, `SimpleExpressions` uses `find_zero` behind the scenes.
 
