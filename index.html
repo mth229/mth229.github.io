@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.8.27">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="CSI Math department">
-<meta name="dcterms.date" content="2025-06-24">
+<meta name="dcterms.date" content="2026-03-05">
 
 <title>MTH229 with Julia</title>
 <style>
@@ -22,6 +22,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -35,14 +70,15 @@ ul.task-list li input[type="checkbox"] {
 <link href="./calculator.html" rel="next">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-ae87ac7bc736a908afb824acd5217158.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-e7dba8c0ca640b9c293bd7f28e16c27c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -233,13 +269,26 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#lab-notebook" id="toc-lab-notebook" class="nav-link" data-scroll-target="#lab-notebook">Lab notebook</a></li>
   </ul></li>
-  <li><a href="#webwork" id="toc-webwork" class="nav-link" data-scroll-target="#webwork">WeBWorK</a></li>
+  <li><a href="#webwork" id="toc-webwork" class="nav-link" data-scroll-target="#webwork">WeBWorK</a>
+  <ul class="collapse">
+  <li><a href="#typesetting-of-code-examples" id="toc-typesetting-of-code-examples" class="nav-link" data-scroll-target="#typesetting-of-code-examples">Typesetting of code examples</a></li>
+  <li><a href="#comments-in-code" id="toc-comments-in-code" class="nav-link" data-scroll-target="#comments-in-code">Comments in code</a></li>
+  <li><a href="#typesetting-of-math" id="toc-typesetting-of-math" class="nav-link" data-scroll-target="#typesetting-of-math">Typesetting of math</a></li>
+  <li><a href="#copy-and-paste-from-a-webwork-page" id="toc-copy-and-paste-from-a-webwork-page" class="nav-link" data-scroll-target="#copy-and-paste-from-a-webwork-page">Copy and paste from a <code>WeBWorK</code> page</a></li>
+  <li><a href="#numeric-answers" id="toc-numeric-answers" class="nav-link" data-scroll-target="#numeric-answers">Numeric answers</a></li>
+  <li><a href="#scientific-notation" id="toc-scientific-notation" class="nav-link" data-scroll-target="#scientific-notation">Scientific notation</a></li>
+  <li><a href="#lists-of-numbers" id="toc-lists-of-numbers" class="nav-link" data-scroll-target="#lists-of-numbers">Lists of numbers</a></li>
+  <li><a href="#other-answers" id="toc-other-answers" class="nav-link" data-scroll-target="#other-answers">Other answers</a></li>
+  </ul></li>
   <li><a href="#basic-ideas" id="toc-basic-ideas" class="nav-link" data-scroll-target="#basic-ideas">Basic ideas</a></li>
   <li><a href="#help-and-errors" id="toc-help-and-errors" class="nav-link" data-scroll-target="#help-and-errors">Help and errors</a>
   <ul class="collapse">
   <li><a href="#errors" id="toc-errors" class="nav-link" data-scroll-target="#errors">Errors</a></li>
   </ul></li>
-  <li><a href="#installing-julia-on-a-personal-laptop-or-computer." id="toc-installing-julia-on-a-personal-laptop-or-computer." class="nav-link" data-scroll-target="#installing-julia-on-a-personal-laptop-or-computer.">Installing <code>Julia</code> on a personal laptop or computer.</a></li>
+  <li><a href="#installing-julia-on-a-personal-laptop-or-computer." id="toc-installing-julia-on-a-personal-laptop-or-computer." class="nav-link" data-scroll-target="#installing-julia-on-a-personal-laptop-or-computer.">Installing <code>Julia</code> on a personal laptop or computer.</a>
+  <ul class="collapse">
+  <li><a href="#using-julia-for-free-online" id="toc-using-julia-for-free-online" class="nav-link" data-scroll-target="#using-julia-for-free-online">Using Julia for free online</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/MTH229/mth229.github.io/edit/master/quarto/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/MTH229/mth229.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -266,7 +315,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 24, 2025</p>
+      <p class="date">March 5, 2026</p>
     </div>
   </div>
   
@@ -284,40 +333,12 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
 <p>MTH229 at the College of Staten Island is a course to introduce a programming language to reinforce concepts of a first-semester calculus course from numerical and graphical points of view.</p>
 <p>Some sections use the <a href="http://julialang.org">Julia</a> programming language. For <code>Julia</code>, the computer-lab “projects” are on WeBWorK and there <em>should</em> be sufficient background material therein to work through the details. In the notes here can be found additional detail for those seeking it. For a more thorough introduction, visit <a href="http://calculuswithjulia.github.io">Calculus with Julia</a>.</p>
-<p>Installation details for <code>Julia</code> are at the end of this page, but most students will use a departmental web server to access <code>Julia</code>. In a pinch, there are online instances (resource-constrained) that can be used:</p>
-<ul>
-<li>Colab. Google’s <code>colab</code> service allows the free user more computing power than does <code>binder</code> but does require more setup. This is working as of March 2025:</li>
-</ul>
-<blockquote class="blockquote">
-<p>Go to google colab:</p>
-</blockquote>
-<p><a href="https://colab.research.google.com/">https://colab.research.google.com/</a></p>
-<blockquote class="blockquote">
-<p>Click on “Runtime” menu and then “Change Runtime Type”</p>
-</blockquote>
-<blockquote class="blockquote">
-<p>Select Julia as the “Runtime Type” then save</p>
-</blockquote>
-<blockquote class="blockquote">
-<p>Copy and paste then run this set of commands</p>
-</blockquote>
-<pre><code>using Pkg
-Pkg.add("Plots")
-Pkg.add("MTH229")
-using MTH229
-using Plots</code></pre>
-<p>This may take 2-3 minutes to load. The <code>plotly()</code> backend doesn’t work out of the box. Use <code>gr()</code> to recover if that command is issued.</p>
-<ul>
-<li>Binder. Binder is a free service for small images though it can be very tempermental. Binder has an inactivity time out of a few minutes. Two images are available, the one without <code>SymPy</code> loads much faster and would typically suffice, though has no symbolic capabilities.</li>
-</ul>
-<p><a href="https://mybinder.org/v2/gh/mth229/229-projects/lite?labpath=blank-notebook.ipynb"><img src="https://mybinder.org/badge_logo.svg" class="img-fluid" alt="Run on Binder"></a> Run on binder (with SymPy)</p>
-<p><a href="https://mybinder.org/v2/gh/jverzani/MTH229Lite.jl/symengine?urlpath=%2Fdoc%2Ftree%2Fmth229lite.ipynb"><img src="https://mybinder.org/badge_logo.svg" class="img-fluid" alt="Run on Binder w/o SymPy"></a> Run on binder (without SymPy)</p>
-<hr>
-<p>These notes are broken into different sections, where most all sections have some self-grading questions at the end that allow you to test your knowledge of that material. The code should be copy-and-pasteable into a <code>Julia</code> session. The code output is similar to what would be shown if evaluated in an <code>IJulia</code> cell, our recommended interface while learning <code>Julia</code>, though some may like the <code>Pluto</code> interface as well.</p>
+<p>Installation details for <code>Julia</code> are at the end of this page, but most students will use a departmental web server to access <code>Julia</code>.</p>
+<p>These notes are broken into different sections, where most all sections have some self-grading questions at the end that allow you to test your knowledge of that material. The code should be copy-and-pasteable into a <code>Julia</code> session. The code output is similar to what would be shown if evaluated in an <code>IJulia</code> cell, our recommended interface while learning <code>Julia</code> (though some may like the <code>Pluto</code> interface as well).</p>
 <p>The notes mostly follow topics of a standard first-semester calculus course after some background material is presented for learning <code>Julia</code> within a mathematical framework.</p>
-<p>Each topic has a lab project. At CSI, sufficient time is allotted to complete these projects during the lab class. These projects are available as <code>IJulia</code> notebooks or <code>Pluto</code> notebooks. (There are also <code>Pluto</code> notebooks with 5-10 minutes of commentary.) Find links for these near the top of each page of notes.</p>
+<p>Each topic has a lab project. At CSI, sufficient time is allotted to complete these projects during the lab class. These projects are available as <code>IJulia</code> notebooks. (The <code>Pluto</code> notebooks are also available, though those haven’t been updated in a while. These have recordings with 5-10 minutes of commentary, should that prove interesting.) Find links for these near the top of each page of notes.</p>
 <p>For example, blank notebooks for test taking, etc. are found by following these links:</p>
-<p><a href="https://raw.githubusercontent.com/mth229/229-projects/master/00-blank-notebook.ipynb">ipynb</a> <a href="./229-projects/00-blank-notebook.html">(Pluto html)</a></p>
+<p><a href="https://raw.githubusercontent.com/mth229/229-projects/master/00-blank-notebook.ipynb">ipynb</a></p>
 <section id="lab-notebook" class="level3">
 <h3 class="anchored" data-anchor-id="lab-notebook">Lab notebook</h3>
 <p>A <a href="https://en.wikipedia.org/wiki/Lab_notebook">laboratory notebook</a> is a useful tool for keeping notes. One specific for this class is available for printing out: <a href="https://raw.githubusercontent.com/mth229/LabNotebook/main/LabNotebook.pdf">LabNotebook</a></p>
@@ -329,39 +350,39 @@ using Plots</code></pre>
 <p>The provided <code>.ipynb</code> notebooks only contain modest background details and a few examples.</p>
 <p>Each <code>WeBWorK</code> page has an introduction to some part of the material and a series of questions and comments related to the introduction.</p>
 <p>There are a few idiosyncrasies in the <code>WeBWorK</code> pages to be aware of:</p>
-<blockquote class="blockquote">
-<p>Typesetting of code examples</p>
-</blockquote>
+<section id="typesetting-of-code-examples" class="level3">
+<h3 class="anchored" data-anchor-id="typesetting-of-code-examples">Typesetting of code examples</h3>
 <p>The code examples may be typeset in <code>WeBWorK</code> as though they appear in a <em>terminal</em>. The terminal formatting (or REPL, read-evaluate-print-loop) is indicated with a leading prompt <code>julia&gt;</code>. Interacting with terminal is interactive: a command is read in, evaluated, its output is printed. The output displayed directly below the command which is prefixed with the prompt.</p>
 <p>This is in contrast to some examples where a block of code is typeset as though it were the input for a notebook cell. Notebooks take a block of input, evaluate the block, and then print out the last command that was executed. (The use of <code>@show</code> or <code>print(...)</code> can be used to display intermediate values in a cell.) Notebooks are how you are expected to interact with <code>Julia</code>.</p>
-<blockquote class="blockquote">
-<p>Comments in code</p>
-</blockquote>
+</section>
+<section id="comments-in-code" class="level3">
+<h3 class="anchored" data-anchor-id="comments-in-code">Comments in code</h3>
 <p>The pound sign (<code>#</code>) in <code>Julia</code> instructs the interpreter that everything afterwards on the line is a <em>comment</em>. While the <code>Julia</code> interpreter can ignore what comes after the pound sign, it is expected that the human interpreter gets some additional bit of detail about why the command is as it is.</p>
-<blockquote class="blockquote">
-<p>Typesetting of math</p>
-</blockquote>
+</section>
+<section id="typesetting-of-math" class="level3">
+<h3 class="anchored" data-anchor-id="typesetting-of-math">Typesetting of math</h3>
 <p><code>WeBWorK</code> allows the use of MathJax, a JavaScript display engine, for mathematics giving math a distinct look. In contrast, code is typeset using a typewriter style, fixed width font.</p>
-<blockquote class="blockquote">
-<p>Copy and paste from a <code>WeBWorK</code> page</p>
-</blockquote>
+</section>
+<section id="copy-and-paste-from-a-webwork-page" class="level3">
+<h3 class="anchored" data-anchor-id="copy-and-paste-from-a-webwork-page">Copy and paste from a <code>WeBWorK</code> page</h3>
 <p>Copying and pasting from <code>WeBWorK</code> into a notebook will usually be unsuccessful as the interesting parts are typeset with MathJax. For the intrepid, the rendered text can be selected by using “right-click” (or “control-click” on a mac) and the “Copy to Clipboard” with “TeX Commands”. Some editing will be necessary.</p>
-<blockquote class="blockquote">
-<p>Numeric answers</p>
-</blockquote>
+</section>
+<section id="numeric-answers" class="level3">
+<h3 class="anchored" data-anchor-id="numeric-answers">Numeric answers</h3>
 <p>For <em>most</em> questions with a numeric answer it is best to copy all 16 digits of output. Several digits are expected to match a correct answer. For numeric questions where an estimate is made, say from a graph, this is significantly relaxed.</p>
-<blockquote class="blockquote">
-<p>Scientific notation</p>
-</blockquote>
+</section>
+<section id="scientific-notation" class="level3">
+<h3 class="anchored" data-anchor-id="scientific-notation">Scientific notation</h3>
 <p>While <code>Julia</code> is very happy to express its output using scientific notation, <code>WeBWorK</code> is not happy to receive the exact output for an answer. Either replace <code>e</code> with <code>E</code> (as in <code>1.23e4</code> would be <code>1.23E4</code>) or use decimals.</p>
-<blockquote class="blockquote">
-<p>Lists of numbers</p>
-</blockquote>
+</section>
+<section id="lists-of-numbers" class="level3">
+<h3 class="anchored" data-anchor-id="lists-of-numbers">Lists of numbers</h3>
 <p>Many questions expect one or more answers. Separating each one with a comma is needed for <code>WeBWorK</code> to distinguish the different answers.</p>
-<blockquote class="blockquote">
-<p>Other answers</p>
-</blockquote>
+</section>
+<section id="other-answers" class="level3">
+<h3 class="anchored" data-anchor-id="other-answers">Other answers</h3>
 <p>If the answer is to be a function, the automatic grader is expecting just the rule of the function (an expression), as in for <code>f(x) = sin(x)</code> just enter <code>sin(x)</code>.</p>
+</section>
 </section>
 <section id="basic-ideas" class="level2">
 <h2 class="anchored" data-anchor-id="basic-ideas">Basic ideas</h2>
@@ -396,8 +417,8 @@ using Plots</code></pre>
 <ul>
 <li><p><code>ERROR: MethodError: no method matching ^(::typeof(sin), ::Int64)</code>: This error is thrown when trying to execute <code>sin^2(3)</code>. The issue is there is no means to square the function object, rather we square the value of the function after calling it on <code>3</code>: <code>sin(3)^2</code></p></li>
 <li><p><code>ERROR: ParseError:...space required before '?' operator</code> This came when trying to use the ternary operator <strong>without</strong> spaces around the <code>?</code> and <code>:</code> (by typing <code>x&lt;1?2:3</code> and not <code>x&lt;1 ? 2 : 3</code>).</p></li>
-<li><p><code>ERROR: ParseError: whitespace is not allowed here</code> The error came by including a space after the function name and before the opening parentheses when calling the function. That is <code>sin (3)</code> errors, <code>sin(3)</code> does not.</p></li>
-<li><p><code>ParseError: Expected ')'</code> This came because a non-matching number of parentheses was used – fewer closing than opening. The explanatory message will be <code>extra tokens after end of expression</code> if there are more closing than opening.</p></li>
+<li><p><code>ERROR: ParseError:...whitespace is not allowed here</code> The error came by including a space after the function name and before the opening parentheses when calling the function. That is <code>sin (3)</code> errors, <code>sin(3)</code> does not.</p></li>
+<li><p><code>ParseError:...Expected ')'</code> This came because a non-matching number of parentheses was used – fewer closing than opening. The explanatory message will be <code>extra tokens after end of expression</code> if there are more closing than opening.</p></li>
 </ul>
 </section>
 <section id="incorrect-function-usage" class="level4">
@@ -410,16 +431,14 @@ using Plots</code></pre>
 <section id="technical-errors" class="level4">
 <h4 class="anchored" data-anchor-id="technical-errors">Technical errors</h4>
 <ul>
-<li><code>ERROR: cannot define function h; it already has a value</code>. <code>Julia</code> has two types of functions anonymous and generic. Generic functions are what we mostly model in this class. They are called generic as each function can have many different implementations (methods). To make this work, a lookup-table is used to store the function name <em>and</em> the number and type of arguments the method is defined for. To do this, once a generic function is defined, it can’t be repurposed as a different variable. Similarly, if you use a name as a variable (eg. <code>h=2</code>) it can no longer be used as a generic function name (eg. <code>h(x) = sin(x)</code>). We recommend sticking to familiar math names for variables (e.g.&nbsp;<code>x</code>, <code>y</code>, <code>a</code>, …) and familiar math names for functions (e.g., <code>f</code>, <code>g</code>, …). This works pretty well, but sometimes there is crossover, such as with <code>h</code>.</li>
+<li><code>ERROR: cannot define function h; it already has a value</code>. <code>Julia</code> has two types of functions: anonymous and generic. Generic functions are what we mostly model in this class. They are called generic as each function can have many different implementations (methods). To make this work, a lookup-table is used to store the function name <em>and</em> the number and type of arguments the method is defined for. To do this, once a generic function is defined, it can’t be repurposed as a different variable. Similarly, if you use a name as a variable (eg. <code>h=2</code>) it can no longer be used as a generic function name (eg. <code>h(x) = sin(x)</code>). We recommend sticking to familiar math names for variables (e.g.&nbsp;<code>x</code>, <code>y</code>), familiar names for parameters, (<code>a</code>, <code>b</code>, <code>m</code>, …), and familiar math names for functions (e.g., <code>f</code>, <code>g</code>, …). This works pretty well, but sometimes there is crossover, such as with <code>h</code>.</li>
 </ul>
 </section>
 <section id="oops-and-not-an-error" class="level4">
 <h4 class="anchored" data-anchor-id="oops-and-not-an-error">Oops and not an error</h4>
-<ul>
-<li>It is possible to <em>redefine</em> and shadow basic math operations. For example, if you were to type the following equation into <code>Julia</code>:</li>
-</ul>
+<p>It is possible to <em>redefine</em> and shadow basic math operations. For example, if you were to type the following equation into <code>Julia</code>:</p>
 <pre><code>x + y = 3</code></pre>
-<p>you will not get an equation, rather this will <strong>redefine</strong> the addition of two variables, always returning <code>3</code>. Oops. Often redefinition causes and error, such entering this equation</p>
+<p>you will not get an equation, rather this will <strong>redefine</strong> the addition of two variables, always returning <code>3</code>. Oops. Often redefinition causes and error, such as entering this equation</p>
 <pre><code>sin(x) = 3   # ERROR: invalid method definition in Main: function Base.sin must be explicitly imported to be extended</code></pre>
 <p>To break out of this is tough, you need to redefine <code>+</code>, reaching into <code>Base.:+</code> to do so</p>
 <pre><code>x + y = Base.:+(x,y)</code></pre>
@@ -436,6 +455,38 @@ using Plots</code></pre>
 <pre><code>curl -fsSL https://install.julialang.org | sh</code></pre>
 <p>These two command install <code>juliaup</code>, which you then run from the command line to install <code>Julia</code>.</p>
 <p>Details on additional packages to install for MTH229 are listed at <a href="https://github.com/mth229/MTH229.jl/">https://github.com/mth229/MTH229.jl/</a>.</p>
+<section id="using-julia-for-free-online" class="level3">
+<h3 class="anchored" data-anchor-id="using-julia-for-free-online">Using Julia for free online</h3>
+<p>In a pinch, there are online instances (resource-constrained) that can be used:</p>
+<ul>
+<li>Colab. Google’s <code>colab</code> service allows the free user more computing power than does <code>binder</code> but does require more setup. This is working as of March 2025:</li>
+</ul>
+<blockquote class="blockquote">
+<p>Go to google colab:</p>
+</blockquote>
+<p><a href="https://colab.research.google.com/">https://colab.research.google.com/</a></p>
+<blockquote class="blockquote">
+<p>Click on “Runtime” menu and then “Change Runtime Type”</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Select Julia as the “Runtime Type” then save</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Copy and paste then run this set of commands</p>
+</blockquote>
+<div id="2" class="cell" data-execution_count="0">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pkg</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">Pkg</span>.<span class="fu">add</span>(<span class="st">"Plots"</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">Pkg</span>.<span class="fu">add</span>(<span class="st">"MTH229"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MTH229</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Plots</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>This may take 2-3 minutes to load. The <code>plotly()</code> backend doesn’t work out of the box. Use <code>gr()</code> to recover if that command is issued.</p>
+<ul>
+<li>Binder. Binder is a free service for small images though it can be very temperamental. Binder has an inactivity time out of a few minutes. Two images are available, the one without <code>SymPy</code> loads much faster and would typically suffice, though has no symbolic capabilities.</li>
+</ul>
+<p><a href="https://mybinder.org/v2/gh/mth229/229-projects/lite?labpath=blank-notebook.ipynb"><img src="https://mybinder.org/badge_logo.svg" class="img-fluid" alt="Run on Binder"></a> Run on binder (with SymPy)</p>
+<p><a href="https://mybinder.org/v2/gh/jverzani/MTH229Lite.jl/symengine?urlpath=%2Fdoc%2Ftree%2Fmth229lite.ipynb"><img src="https://mybinder.org/badge_logo.svg" class="img-fluid" alt="Run on Binder w/o SymPy"></a> Run on binder (without SymPy)</p>
 <hr>
 <p>This table covers pros and cons for the approaches mentioned above:</p>
 <pre><code>                         Using server    Colab   Binder  Local Installation
@@ -450,6 +501,7 @@ Free                        ✓              ✓       ✓          ✓
 Use at home                 ✓              ✓       ✓          ✓</code></pre>
 
 
+</section>
 </section>
 </section>
 
@@ -505,13 +557,14 @@ Use at home                 ✓              ✓       ✓          ✓</code></
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy
@@ -868,9 +921,8 @@ Use at home                 ✓              ✓       ✓          ✓</code></
   </div>
 </nav>
 </div> <!-- /content -->
-<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/MTH229/mth229.github.io/edit/master/quarto/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/MTH229/mth229.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer><script src="https://cdn.jsdelivr.net/gh/yasserelsaid/chatbot@v0.1.4/index.min.js" data-chatbotid="index-pdf-k527qtaap"></script>
 
 
 
 
-</body></html>
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/MTH229/mth229.github.io/edit/master/quarto/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/MTH229/mth229.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
