@@ -23,7 +23,7 @@ The programming language `Julia` (www.julialang.org) is a new language that buil
 These notes will use `Julia` to explore calculus concepts. Unlike some other programs used with calculus (e.g., Mathematica, Maple, and Sage) `Julia` is not a symbolic math language. Rather, we will use a numeric approach. This gives a different viewpoint on the calculus material supplementing that of the text book. Though there are a few idiosyncrasies we will see along the way, for the most part the `Julia` language will be both powerful and easy to learn.
 
 
-In this project we start with baby steps – how to use `Julia` to perform operations we can do on the calculator. The use of a calculator requires knowledge about several things we take for granted here:
+In this project we start with baby steps---how to use `Julia` to perform operations we can do on the calculator. The use of a calculator requires knowledge about several things we take for granted here:
 
 
   * the use of the basic math operators
@@ -38,7 +38,7 @@ Parallels of each of these will be discussed in the following.
 ## Expressions
 
 
-`Julia` can replicate the basics of a calculator with the standard notations. The familiar binary operators are `+`, `-`, `*`, `/`, and `^`.  With a calculator you "punch" in numbers and operators and to get an answer push the `=` key. Using `Julia` is not much different: you type in an expression then send to `Julia` to compute. The "equals key" on a calculator is replaced by the *enter* key on the keyboard (or *shift-enter* if using `IJulia`). Beyond that there isn't much difference.
+`Julia` can replicate the basics of a calculator with the standard notations. The familiar binary operators are `+`, `-`, `*`, `/`, and `^`.  With a calculator you "punch" in numbers and operators and to get an answer push the `=` key. Using `Julia` is not much different: you *type* in an expression then *send* to `Julia` to compute. The "equals key" on a calculator is replaced by the *enter* key on the keyboard (or *shift-enter* if using `IJulia`). Beyond that there isn't much difference.
 
 
 For example, to add two and two we simply execute:
@@ -111,7 +111,7 @@ numericq(val, 1e-5)
 ## Precedence
 
 
-One drawback about using a calculator is the expression gets evaluated as it gets entered. For simple computations this is a convenience, but for more complicated ones it requires some thinking about the order of how an expression will be computed. In `Julia` you still need to be mindful of the order that operations are carried out, but as the entire expression is typed – and can be edited – before evaluation, you can more closely control what you want.
+One drawback about using a calculator is the expression gets evaluated as it gets entered. For simple computations this is a convenience, but for more complicated ones it requires some thinking about the order of how an expression will be computed. In `Julia` you still need to be mindful of the order that operations are carried out, but as the entire expression is typed---and can be edited---before evaluation, you can more closely control what you want.
 
 
 *Order of operations* refers to conventions used to decide which operation will happen first, when there is a choice of more than one. A simple example, is what is the value of $3 \cdot 2 + 1$?
@@ -152,13 +152,12 @@ We know that the subtraction needs to be done before the division, as this is ho
 
 
 ```{julia}
-#| echo: false
 (12 - 10)/2,  12 - 10/2
 ```
 
 :::{.callout-note}
 ## Alert
-Using a comma to separate expressions will cause both to print out – not just the last one evaluated. This trick is also a useful trick within an `IJulia` notebook.
+Using a comma to separate expressions will cause both to print out---not just the last one evaluated. This trick is also a useful trick within an `IJulia` notebook.
 
 :::
 
@@ -172,7 +171,7 @@ Using a comma to separate expressions will cause both to print out – not just 
 There is a little more to the story, as we need to understand what happens when we have more then one operation with the same level. For instance, what is $2 - 3- 4$? Is it $(2 - 3) - 4$ or $2 - (3 - 4)$.
 
 
-Unlike addition, subtraction is *not associative* so this really matters.  The subtraction operator is [left associative](http://en.wikipedia.org/wiki/Operator_associativity) meaning the evaluation of $2 - 3 - 4$ is done by $(2-3) - 4$. The operations are performed in a left-to-right manner. Most – but not all operations – are left associative, some are right associative and performed in a right-to-left manner.
+Unlike addition, subtraction is *not associative* so this really matters.  The subtraction operator is [left associative](http://en.wikipedia.org/wiki/Operator_associativity) meaning the evaluation of $2 - 3 - 4$ is done by $(2-3) - 4$. The operations are performed in a left-to-right manner. Most---but not all operations---are left associative, some are right associative and performed in a right-to-left manner.
 
 
 :::{.callout-note}
@@ -195,7 +194,7 @@ Not all operations are processed left-to-right. The power operation, `^`, is *ri
 4^3^2, (4^3)^2, 4^(3^2)
 ```
 
-What about the case where we have different operations with the same precedence? What happens then? A simple example would be $2 / 3 * 4$? Is this done in a left to right manner as in:
+What about the case where we have different operations with the same precedence, what happens then? A simple example would be $2 / 3 \cdot 4$? Is this done in a left to right manner as in:
 
 
 ```{julia}
@@ -216,6 +215,53 @@ And the answer is *left-to-right*:
 2 / 3 * 4
 ```
 
+### Implied grouping
+
+There are  notations in math notation where there is *implied grouping*, one of which requires attention when translating mathematical notation into `Julia` commands.
+
+The notations use a *vinculum*, a horizontal line used in mathematical notation  placed as an overline or underline above or below a mathematical expression to group the expression's elements (wikipedia definition).
+
+The main notation is when the vinculum is used for division, as in
+
+$$
+\frac{1 + 2}{3 + 4}
+$$
+
+That long bar implies that *both* the numerator and denominator are evaluated *before* the division. That is this is a *mathematical* equivalent:
+
+$$
+(1 + 2) / (3 + 4)
+$$
+
+With that in mind, always use parentheses when transcribing this notation *when* there is some operation indicated in the numerator or denominator.
+
+
+So to evaluate
+
+$$
+\sin(\frac{1 + x}{x})
+$$
+
+we would use `sin((1 + x) / x)`. The denominator has no operation, so we need not group the last `x`.
+
+#### Exponents
+
+Another place where there is implied grouping in math notation is the use of superscripts to indicate powers. The expression in the exponent must be grouped with parentheses. That is, this expression, that migth be found in a probability question:
+
+$$
+e^{-\frac{1}{2}(4 - 3)^2}
+$$
+
+is transcribed as:
+
+```
+e^(1/2 * (4 - 3)^2)
+```
+
+Forgetting the parentheses, as in `e^1/2*(4-3)^2` would be equivalent to just $e^1 \cdot (1/2)\cdot(4-3)^2$.
+
+For a base of $e$, the use of function `exp` avoids this point, as to pass an argument to a function requires parentheses already. So the above could be `exp(1/2*(4-3)^2)`
+
 ### Practice
 
 
@@ -234,7 +280,7 @@ that uses the least number of parentheses?
 
 ```{julia}
 #| echo: false
-choices = ["`(3 - 2)/ 4 - 1`", "`3 - 2 / (4 - 1)`", "`(3 - 2) / (4 - 1)`"]
+choices = ["`(3 - 2) / 4 - 1`", "`3 - 2 / (4 - 1)`", "`(3 - 2) / (4 - 1)`"]
 answer = 3
 radioq(choices, answer)
 ```
@@ -413,7 +459,7 @@ numericq(answer)
 ## Using functions
 
 
-Most all calculators used are not limited to these basic arithmetic operations. So-called scientific calculators provide buttons for many of the common mathematical functions, such as exponential, logs, and trigonometric functions. `Julia` provides these too, of course.
+Most all calculators used are not limited to these basic arithmetic operations. So-called scientific calculators provide buttons for many of the common mathematical functions, such as the exponential, logarithmic, and trigonometric functions. `Julia` provides these too, of course.
 
 
 There are special functions to perform common powers. For example, the square-root function is used as:
@@ -423,7 +469,16 @@ There are special functions to perform common powers. For example, the square-ro
 sqrt(15)
 ```
 
-This shows how to evaluate a function – using its name and parentheses, as in `function_name(arguments)`. Parentheses are also used to group expressions, as would be done to do this using the power notation:
+This shows how to evaluate a function:
+
+* Functions are referred to by name.
+* Arguments are passed to the function inside parentheses.
+* Between the function name and the opening parentheses there is *no* space.
+* Functions may have $0$, $1$, or more arguments. When there are multiple, they are separated by a comma.
+* There are *positional* arguments and *keyword arguments* the latter specified through a `key=value` format.
+
+
+Parentheses are also used to group expressions, as would be done to do this using the power notation:
 
 
 ```{julia}
@@ -454,7 +509,7 @@ cbrt(-8)			## correct
 (The latter is an error as the power function has an output type that depends on the power being real, not a specific value of a real. For 1/2 the above would clearly be an error, so then for 1/3 `Julia` makes this an error.)
 
 
-### trigonometric functions
+### Trigonometric functions
 
 
 The basic trigonometric functions in `Julia` work with radians:
@@ -508,10 +563,10 @@ However, this isn't true for all values of $x$, as $\sin(x)$ is not monotonic ev
 asin(sin(100))
 ```
 
-Other inverse trigonometric functions are `acos`, `atan` and for completeness `asec`, `acsc`, and `acot` are available for use.
+Other inverse trigonometric functions are `acos`, `atan`, and, for completeness, `asec`, `acsc`, and `acot` are available for use.
 
 
-### Exponential and logs
+### Exponential and logarithmic functions
 
 
 The values $e^x$ can be computed through the function `exp(x)`:
@@ -528,6 +583,8 @@ The constant value of `e` is only available on demand:
 using Base.MathConstants
 e
 ```
+
+(The `MTH229` package, which is used in subsequent sections, defines `e` as `exp(1)`, for convenience.)
 
 The logarithm function, `log` (and **not**  `ln`) does log base $e$:
 
@@ -550,7 +607,7 @@ There is also a `log2` function for base 2. However, there are many more possibl
 log(10, exp(2))
 ```
 
-### Some useful functions
+### Some other useful functions
 
 
 There are some other useful functions For example, `abs` for the absolute value, `round` for rounding, `floor` for rounding down and `ceil` for rounding up. Here are some examples
@@ -696,7 +753,7 @@ some_ridiculously_long_name = 3
 some_ridiculously_long_name^2
 ```
 
-The basic tradeoff being: longer names are usually more expressive and easier to remember, whereas short names are simpler to type. To get a list of the currently bound names, the `whos` function may be called. Not all names are syntactically valid, for example names can't begin with a number or include spaces.
+The basic tradeoff being: longer names are usually more expressive and easier to remember, whereas short names are simpler to type. Not all names are syntactically valid, for example names can't begin with a number or include spaces.
 
 
 :::{.callout-note}
@@ -931,6 +988,7 @@ A number in `Julia` may be represented in scientific notation. The basic canonic
 > The second limitation is numbers are often only an approximation.
 
 
+This isn't the case for values stored as integers, but is the case for *floating point* values, which are only exact when a number can be written as a sum of powers of $2$.
 
 This means expressions which are mathematically true, need not be true once approximated on the computer. For example,  $\sqrt{2}$ is an irrational number, that is, its decimal representation does not repeat the way a rational number does. Hence it is impossible to store on the computer an exact representation, at some level there is a truncation or round off. This will show up when you try something like:
 
@@ -949,6 +1007,12 @@ $$
 but on the computer, you can't have the "..." in a decimal expansion – it must truncate – so instead values round to something like $0.9999999999999999$ or $1$, with nothing in between.
 
 
+Maybe more surprisingly, the following very simple mathematical calculation won't be exact:
+
+```{julia}
+1/10 + 2/10 - 3/10
+```
+
 ##### Comparing values
 
 
@@ -964,7 +1028,7 @@ sqrt(2) * sqrt(2) == 2		## surprising?
 The last one would be surprising were you not paying attention to the last paragraph. Comparisons with `==` work well for integers and strings, but not with floating point numbers. (For these the `isapprox` function can be used.)
 
 
-Comparisons do a promotion prior to comparing, so even though these numbers are of different types, the `==` operation treats them as equal:
+Comparisons with `==` do a promotion prior to comparing, so even though these numbers are of different types, the `==` operation treats them as equal:
 
 
 ```{julia}
@@ -978,11 +1042,22 @@ The `===` operator has an even more precise notion of equality:
 1 === 1.0
 ```
 
+For most purposes, testing equality with `==` is appropriate.
+
 ### Scientific notation
 
 
 As mentioned, one can write `3e8` for  $3 \cdot 10^8$, but in fact to `Julia` the two values `3e8` and `3*10^8` are not quite the same, as one is stored in floating point, and one as an integer. One can use `3.0 * 10.0^8` to get a floating point equivalent to `3e8`.
 
+::: {.callout-note}
+## `e` is not an $e$
+
+The `e` in scientific notation is **not** the $e$ used in mathematics. The `e` in scientific notation specifies a format that separates a *mantissa* (a normalized number in $[1,10)$ and an exponent (for a base of $10$). For 64-bit numbers, the printed version represents the bits that store these parts. There are 52 bits used for the mantissa, 11 for the exponent, and 1 for a sign.
+
+:::
+
+
+### Special floating point values
 
 > Floating point includes the special values: `NaN`, `Inf`. (Not so with integers.)
 
@@ -1005,6 +1080,12 @@ These values can come up in unexpected circumstances. For example division by $0
 ```{julia}
 x = 1e-17
 x^2/(1-cos(x))			## should be about 2
+```
+
+Another special floating point number is `-0.0`, which is technically different from `0.0` though the following holds:
+
+```{julia}
+-0.0 == 0.0  # separate but equal...
 ```
 
 ### Rational numbers
@@ -1077,7 +1158,7 @@ The value of $i$ comes from taking the square root of $-1$. This is almost true 
 sqrt(-1.0 + 0im)
 ```
 
-Complex numbers have a big role to play in higher level mathematics. In calculus, they primarily occur as roots of polynomial equation.
+Complex numbers have a big role to play in higher level mathematics. In calculus, they primarily occur as roots of a polynomial.
 
 
 ### Practice

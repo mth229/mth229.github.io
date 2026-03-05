@@ -11,7 +11,7 @@ A notebook for this material:
 ## Introduction
 
 
-We see in this section how to easily create functions in `Julia`. In the following sections we begin to do things with function, such as learning how to graph functions with `Julia`.
+We see in this section how to easily create functions in `Julia`. In the following sections we begin to do things with functions, such as learning how to graph functions with `Julia`.
 
 
 For basic things creating a new function and plotting it is as familiar as this:
@@ -21,9 +21,10 @@ We begin by loading some packages:^[Packages are a means to extend base `Julia`.
 
 
 ```{julia}
-using MTH229
-using Plots
-plotly()
+#| eval: false
+using MTH229   # miscellaneous functions provided for a MTH 229 class
+using Plots    # a package to provide ability to make plots
+plotly()       # a selection of an interactive means to render plots
 ```
 
 ```{julia}
@@ -101,7 +102,17 @@ f(212)
 
 :::{.callout-note}
 ## Alert
-**Calling a function** Evaluating a function for a given value is also known in programming languages as "calling" `f`. When we work with functions in `Julia`, the distinction between the function object and calling the function is important to keep straight – though not too hard to do. In mathematical notation, it is sort of like the difference between writing $f$ – as opposed to $f(x)$ – to describe the function, the latter implying there is some $x$ to be evaluated, so we think of $f(x)$ as a $y$-value and $f$ as a function.
+
+We have three *different* things we do with functions:
+
+* **Defining a function**, as above, can be done with the same syntax as mathematics. The function name with parentheses surrounds any arguments, and equal sign to indicated a *definition* and a rule on the right of the equals sign, indicating what becomes of the arugments.
+
+* **Calling a function** Evaluating a function for a given value is also known in programming languages as "calling" `f`. Again, the `Julia` syntax follows the mathematical notation: the function name, with the *values* to define the function at enclosed in paretheses.
+
+* **Referring to a function** A function in `Julia` has a name, in the above this is just `f` (no parentheses, and definitely not `f(x)`.)
+
+
+Though a function in `Julia` is typically *generic* and has different methods depending on the various inputs, this is a detail we don't  need to consider in these notes.
 
 :::
 
@@ -116,8 +127,7 @@ g(x) = 2x^2 - 3x + 2
 g(2)
 ```
 
-The convention is that when variables are immediately preceded by a numeric literal (and by immediately it is meant no spaces are in between) `Julia` will assume multiplication is intended. (This can bypass the usual order of operations, e.g.  `5/9(x-32)` is not `5/9*(x-32)`.)
-
+The convention is that when variables are immediately preceded by a numeric literal (and by immediately it is meant no spaces are in between) `Julia` will assume multiplication is intended.
 
 Implicit multiplication can also be used when simple parentheses are involved:
 
@@ -128,10 +138,13 @@ k(x) = 2(x - 1)^2 + 3(x+1)
 
 But implicit multiplication won't work with expressions such as `(x+1)(x-1)`, as `Julia` will then think the first parenthetical pair is a function and try to call it with a value of `x-1`.
 
+
+
+
 :::{.callout-note}
 ## Implicit multiplication is not recommended
 
-Because of certain idiosyncrasies with order of precedence we don't recommend the use of implicit multiplication.
+The precedence of *implicit multiplication* is **different** from explicit multiplication. While convenient, this can cause confusion while learning. (The expressions `1/2x` and `1/2*x` are **not** the same, as the first evaluates `2x` before the division.) As such we recommend against the use of implicit multiplication at the outset.
 
 :::
 
@@ -239,7 +252,7 @@ f(x) = cos(x) - sin(x)^2
 
 :::{.callout-note}
 ## About exponents and functions...
-The conversion from the commonly written form ($\sin^2(x)$) to the far less ambiguous $\sin(x)^2$ is very important. This is necessary with `Julia` – as it is with calculators – as there is no function `sin^2`. In Julia, squaring is done on values – not functions, like `sin`. (And most likely squaring of a function is more likely to be composition, which is not the usage here.) So, to have success, learn to drop the notations $\sin^2(x)$ or for the arc sine function $\sin^{-1}(x)$. These shortcuts are best left in the age when mathematics was done just on paper.
+The conversion from the commonly written form ($\sin^2(x)$) to the far less ambiguous $\sin(x)^2$ is very important. This is necessary with `Julia`---as it is with calculators---as there is no function `sin^2`. In Julia, squaring is done on values---not functions, like `sin`. (And most likely squaring of a function is more likely to be composition, which is not the usage here.) So, to have success, learn to drop the notations $\sin^2(x)$ or for the arc sine function $\sin^{-1}(x)$. These shortcuts are best left in the age when mathematics was done just on paper.
 
 :::
 
@@ -281,7 +294,7 @@ This particular function is just an alternative expression for the arc cosine (m
 f(.5) - acos(.5) ## nearly 0
 ```
 
-The exponent in the inverse trigonometric functions is *just* mathematical notation for the longer expression "arctan" or "arccos". (It definitely is not a reciprocal.)  The `Julia` functions – like most all computer languages – abbreviate these names to `atan`, `acos` or `asin`.
+The exponent in the inverse trigonometric functions is *just* mathematical notation for the longer expression "arctan" or "arccos". (It definitely is not a reciprocal.)  The `Julia` functions---like most all computer languages---abbreviate these names to `atan`, `acos` or `asin`.
 
 
 ### Exponential function
@@ -387,6 +400,20 @@ h(x) = g(f(x))			# g ∘ f or (sin(x))^2
 ```
 
 This operation is fundamentally non-commutative, as the above example illustrates.
+
+
+::: {.callout-note}
+## Use with equations
+
+A very common use of this is to represent an equation of the form $f(x) = g(x)$ as $h(x) = f(x) - g(x) = 0$. We might use this kind of code:
+
+```{julia}
+f(x) = cos(x)
+g(x) = x/2
+aux(x) = f(x) - g(x)
+```
+
+:::
 
 
 ### Practice
@@ -607,7 +634,7 @@ cell_phone(720)
 
 :::{.callout-note}
 ## A subtlety
-We return `30.0` above – and not the integer `30` – when $x<500$ so that the function always returns a floating point value and not an integer if less than 0 and a floating point value if bigger.  In general it is a good programming practice to have functions return only one type of variable for a given type of input. In this case, as the answer could be real-valued – and not just integer-valued, we want to return floating point values.
+We return `30.0` above---and not the integer `30`---when $x<500$ so that the function always returns a floating point value and not an integer if less than 0 and a floating point value if bigger.  In general it is a good programming practice to have functions return only one type of variable for a given type of input. In this case, as the answer could be real-valued---and not just integer-valued, we want to return floating point values.
 
 :::
 
@@ -796,7 +823,7 @@ Volume(r, h) = pi * r^2 * h	               # of a cylinder
 SurfaceArea(r, h) = pi * r * (r + sqrt(h^2 + r^2)) # of a right circular cone
 ```
 
-The right-hand sides may or may not be familiar, but it should be reasonable to believe that if push came to shove, they could be looked up. However, the left-hand sides are subtly different – they have two arguments, not one. In `Julia` it is trivial to define functions with multiple arguments – we just did. However, `Julia` has two means to specify additional arguments, as described briefly in the following.
+The right-hand sides may or may not be familiar, but it should be reasonable to believe that if push came to shove, they could be looked up. However, the left-hand sides are subtly different---they have two arguments, not one. In `Julia` it is trivial to define functions with multiple arguments---we just did. However, `Julia` has two means to specify additional arguments, as described briefly in the following.
 
 
 ### Positional arguments
@@ -879,7 +906,7 @@ We used a comma to separate the positional argument from the keyword argument. C
 Earlier we saw the `log` function can use a second argument to express the base. This function is defined by `log(b, x) = log(x) / log(b)`. The `log(x)` value is the natural log, and this definition just uses the change-of-base formula for logarithms.
 
 
-But not so fast, on the left side is a function with two arguments and on the right side the functions have one argument – yet they share the same name. How does `Julia` know which to use? `Julia` uses the number, order, and *type* of the *positional* arguments passed to a function to determine which *method* for the generic function to use.
+But not so fast, on the left side is a function with two arguments and on the right side the functions have one argument---yet they share the same name. How does `Julia` know which to use? `Julia` uses the number, order, and *type* of the *positional* arguments passed to a function to determine which *method* for the generic function to use.
 
 This is technically known as **multiple dispatch** or **polymorphism**. As a feature of the language, it can be used to greatly simplify the number of functions the user must learn. The basic idea is that many functions are "generic" in that they will work for many different scenarios.
 
@@ -949,7 +976,7 @@ Representing the area of a rectangle in terms of two variables is easy:
 Area(w, h) = w * h
 ```
 
-But the other fact about this problem – the constraint that the perimeter is $20$ – means that height depends on width. For this question, we can see that $P=2w + 2h$ so that
+But the other fact about this problem---the constraint that the perimeter is $20$---means that height depends on width. For this question, we can see that $P=2w + 2h$ so that
 
 
 ```{julia}
@@ -1437,7 +1464,7 @@ Tuples have many uses, but here we want to focus on their use as return values. 
 f(x) = x > 0 ?  (x^x, "") : (NaN, "You can't use non-positive numbers")
 ```
 
-We include a message even when the value of $x$ is okay, as it is good practice –though not a requirement of `Julia` – to always return the same type of object, regardless the input.
+We include a message even when the value of $x$ is okay, as it is good practice –though not a requirement of `Julia`---to always return the same type of object, regardless the input.
 
 
 A simple call would be:
