@@ -23,6 +23,7 @@ First load the necessary package:
 
 
 ```{julia}
+#| eval: false
 using MTH229
 using Plots
 plotly()
@@ -106,7 +107,7 @@ f(x) = x^2 - 2x + 2
 plot(f, -3, 3)
 ```
 
-### Adding layers using "plot!"
+### Adding layers using "plot!", "scatter!"
 
 
 A graph can have layers added to it using `plot!` or other such functions. For example, adding the function `zero` will emphasize the `x` axis:
@@ -119,8 +120,7 @@ plot(f, -3, 3)
 plot!(zero)     # x axis
 ```
 
-The automatic legend can be suppressed by passing the keyword argument `legend=false` to the initial `plot` command.
-
+----
 
 Adding points can be done with the `scatter!` command. We put the `x` and `y` values into containers defined by `[]`. For example, the polynomial $x^2 - 3x +2$ has roots at $2$ and $1$, we emphasize this through:
 
@@ -133,6 +133,15 @@ plot(f, 0, 3)
 scatter!(rts, [0, 0])
 ```
 
+#### Adjustments
+
+When adding multiple plots, there are a few concepts that can clarify the plot for the user:
+
+* A legend is automatically included. The different things added can be included in the legend with a given name by passing the keyword argument `label="name to give"` to each layer.
+* The legend can be suppressed by passing the keyword `legend=false` to the initial `plot` command
+* The color of a new line can be specified with `linecolor="color"`. The color can be specified by name in many cases
+* The width of a new line can be specified with `linewidth=n` where `n` is the pixel width. A width of 5 is already kinds prounounced.
+* The style of the line can be specified with `linestyle=style`. There are many styles, but `:dash`, `:dot`, and `:dashdot` are useful. (These are "symbols" and start with a leading colon.
 
 ### Inf, NaN values
 
@@ -186,7 +195,7 @@ f(x) = 1/x
 plot(f, -3, 3, ylims = (-10, 10))
 ```
 
-
+:::
 
 ### Plotting with anonymous functions
 
@@ -300,7 +309,7 @@ radioq(choices, answer)
 A rational function is nothing more than a ratio of polynomial functions, say $f(x) = p(x)/q(x)$. One interesting thing about such function is there can be asymptotes. These can be vertical (which can happen when $q(x)=0$), horizontal (as $x$ gets large or small), or even slanted.
 
 
-The vertical asymptotes require care when plotting, as the naive style of plotting where a collection of points is connected by straight lines can render poor graphs when the scale of $y$ values get too large. The really large values plotted near the asymptote can wipe out the possibility of seeing other features of interest in a graph.
+The vertical asymptotes require care when plotting, as the naive style of plotting where a collection of points is connected by straight lines can render poor and even misleading graphs when the scale of $y$ values get too large. The really large values plotted near the asymptote can wipe out the possibility of seeing other features of interest in a graph.
 
 
 Some features of interest for a graph that are identifiable by calculus concepts are:
@@ -483,7 +492,7 @@ val = 2;
 numericq(val, 1e-16)
 ```
 
-## Arrays
+##  The "T" method
 
 
 When we learn how to make a graph using paper and pencil, the "T" method is employed, so called as we draw a "T" and fill in values to plot for $x$ and $y$.
@@ -513,7 +522,7 @@ As these are the steps done to create the ordered pairs for a plot, we would lik
 We have seen how variables can be used to refer to a single value, but we want to refer to more than one value now. A container for holding such is an `Array`. Arrays are implemented in most all computer languages, though the term can mean different things.  We are looking for vectors, or one-dimensional arrays.  In general, an array is a multidimensional grid of values – all of the same type (integer, floating point, *functions*, ..., or ANY).
 
 
-For our purposes, we want vectors (one dimensional, $n$ by 1 arrays in `Julia`). These can be easily constructed in different ways.
+For our purposes, we want vectors (mathematically one dimensional, $n$ by 1 arrays.). In `Julia` vectors or functional replacements can be easily constructed in different ways, some discussed in the following.
 
 
 ### Creating 1-dimensional arrays with `[]`
@@ -522,7 +531,7 @@ For our purposes, we want vectors (one dimensional, $n$ by 1 arrays in `Julia`).
 In many different contexts, `Julia` uses `[]` to create collections from individual components.
 
 
-For example, to directly create a 1-dimensional array with the `[]` syntax one simply types in the values separated by commas:
+For example, to directly create a 1-dimensional array with the `[]` syntax one simply type in the values separated by commas:
 
 
 ```{julia}
@@ -546,7 +555,7 @@ These create "vectors."  Row vectors (which are arrays, but not of type `Vector`
 The notation is that `[a, b, c]` combines `a`, `b`, and `c` vertically and `[a b c]` combines them horizontally. The former is good to make column vectors for single values (scalars).
 
 
-Row and column vectors are different! We will primarily use column vectors going forward.
+Row and column vectors are different! We  use column vectors going forward.
 
 
 **Containers are for like values...**
@@ -591,6 +600,8 @@ The `range` function returns an object which is a sub-type of `AbstractVector`, 
 ```{julia}
 collect(range(0, pi/2, length=5))
 ```
+
+Collecting values allows one to inspect them, but for most uses this is unnecessary as the functions these objects are passed to allow for the necessary abstraction which only requires an indexable containers.
 
 ### The range operator
 
@@ -742,6 +753,15 @@ x[2:end]
 
 (But not without indexing, as you can see by typing `2:end` by itself.)
 
+### Assignment
+
+Indexing can be used with assignment to modify a specific entry in a *mutable* array. The syntax is:
+
+```{julia}
+x[2] = 2
+```
+
+This assigns the second value of `x` a value of `2`---after conversion of `2` to the type of the array. There are mechanisms to assign more than one value not mentioned here.
 
 :::{.callout-note}
 ## Left side of an equals sign
@@ -749,11 +769,12 @@ x[2:end]
 
   * a variable name, as in `x = 42`,
   * a function definition, as in `f(x) = x^2 - 2`, or
-  * a assignment setting an index, as in `x[1] = 2`.
+  * a assignment setting an index, as in `x[2] = 2`.
 
 The left side is quite unlike a math equation, where arbitrary expressions are typical.
 
 :::
+
 
 ### Practice
 
@@ -856,7 +877,7 @@ Then the `map` function will create the corresponding $y$ values:
 map(f, x)
 ```
 
-The syntax of `map` requires a slight pause. Here we do not actually call the function `f`, as in `f(2)`. Rather, we pass the name of the function object to the `map` argument – and `map` calls the function for each value in the column vector `x` and returns a corresponding column vector.
+The syntax of `map` requires a slight pause. Here we do not actually call the function `f`, as in `f(2)`. Rather, we pass the name of the function object to the `map` argument---and `map` calls the function for each value in the column vector `x` and returns a corresponding column vector.
 
 
 It is also quite common to use anonymous functions with `map`. For example:
