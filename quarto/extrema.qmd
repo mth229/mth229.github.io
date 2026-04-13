@@ -157,7 +157,7 @@ From this we can solve as before. This approach exploits `Julia`'s multiple disp
 ### Norman Windows
 
 
-Here is a similar, though more complicated, example where the analytic approach can be a bit more tedious, but the graphical one mostly satisfying, though we do use  the `find_zero` function to find the exact final answer.
+Here is a similar, though more complicated, example where the analytic approach can be a bit more tedious, but the graphical one mostly satisfying, though we do use  the `fzero` function to find the exact final answer.
 
 
 Let a "Norman" window consist of a rectangular window of top length $x$ and side length $y$ and a half circle on top. The goal is to maximize the area for a fixed value of the perimeter. Again, assume this perimeter is 20 units.
@@ -274,17 +274,17 @@ plot(A', 5.5, 5.7)     # uses A' notation defined in MTH229
 We confirm that the critical point is around $5.6$.
 
 
-### Using find_zero to locate critical points.
+### Using fzero to locate critical points.
 
 
-Rather than zoom in graphically, we now use a root-finding algorithm, to find a more precise value. We know that the maximum will occur at a critical point, a zero of the derivative. Newton's method, for example, can locate the precise values of these zeros. The `find_zero` function from the `Roots` package provides a non-linear root-finding algorithm similar to Newton's method. The only thing to keep track of is that solving $f'(x) = 0$ means we use the derivative and not the original function.
+Rather than zoom in graphically, we now use a root-finding algorithm, to find a more precise value. We know that the maximum will occur at a critical point, a zero of the derivative. Newton's method, for example, can locate the precise values of these zeros. The `fzero` function from the `Roots` package provides a non-linear root-finding algorithm similar to Newton's method. The only thing to keep track of is that solving $f'(x) = 0$ means we use the derivative and not the original function.
 
 
-Our initial guess will be taken from the graph we made, or $x=5.6$. Here is how we use `find_zero`:
+Our initial guess will be taken from the graph we made, or $x=5.6$. Here is how we use `fzero`:
 
 
 ```{julia}
-x = find_zero(A', 5.6)
+x = fzero(A', 5.6)
 ```
 
 The value `x` is the critical point, and in this case gives the position of the value that will maximize the function. This value is sometimes referred to as the *argmax*, or argument which maximizes the function. The value and maximum area is then given by:
@@ -309,7 +309,7 @@ A rancher with 20 meters of fence, wishes to make a pen adjacent to an existing 
 ```{julia}
 #| echo: false
 Area(y) = (20-2y)*y;
-val = find_zero(Area',  10) |> Area;
+val = fzero(Area',  10) |> Area;
 numericq(val, 1e-3)
 ```
 
@@ -414,7 +414,7 @@ The minimum occurs between 0.5 and 1.0 radians, we will use a bracketing method:
 
 
 ```{julia}
-x = find_zero(l', (0.5, 1.0))
+x = fzero(l', (0.5, 1.0))
 ```
 
 So the minimum of the function $l$ is
@@ -433,7 +433,7 @@ That is, any ladder less than this length can get around the hallway.
 #### Question
 
 
-Rather than use a bracketing method to solve for the root of $l'(t)=0$, we might have tried using `find_zero(l', 0.8)`. Do so. What do you find?
+Rather than use a bracketing method to solve for the root of $l'(t)=0$, we might have tried using `fzero(l', 0.8)`. Do so. What do you find?
 
 
 ```{julia}
@@ -466,7 +466,7 @@ function A(t)
 	 adj = 10 * cos(t)
 	 2 * opp * adj/2 + opp * 10
 end
-t = find_zero(A', pi/4, Roots.Order16());	## Has issues with order=8 algorithm, tol > 1e-14 is needed
+t = fzero(A', pi/4, Roots.Order16());	## Has issues with order=8 algorithm, tol > 1e-14 is needed
 val = t * 180/pi;
 numericq(val, 1e-3)
 ```
@@ -511,7 +511,7 @@ What is the value of theta in degrees?
 ```{julia}
 #| echo: false
 theta(x) = atan(30/x) - atan(10/x)
-val = find_zero(theta', 20); ## careful where one starts
+val = fzero(theta', 20); ## careful where one starts
 val = theta(val) * 180/pi
 numericq(val, 1e-1)
 ```
@@ -570,11 +570,11 @@ The minimum happens way out near 8. We zoom in a bit:
 plot(T, 7, 9)
 ```
 
-It appears to be around 8.3. We now use `find_zero` to refine our guess at the critical point using a bracketing algorithm:
+It appears to be around 8.3. We now use `fzero` to refine our guess at the critical point using a bracketing algorithm:
 
 
 ```{julia}
-x = find_zero(T', (7, 9))
+x = fzero(T', 7, 9)
 ```
 
 Okay, got it. Around 8.23. So is  our minimum time
@@ -604,7 +604,7 @@ Then $L(t)$ is continuous and has single peak, so the maximum occurs at the lone
 
 
 ```{julia}
-x = find_zero(L',  (0.1, 0.5))
+x = fzero(L',  0.1, 0.5)
 ```
 
 Now if $L(t) = \exp(-3t) \cdot \exp(-2t) \cdot \exp(-4t), \quad 0 \leq t \leq 10$, explain why the same approach won't work:
@@ -648,11 +648,11 @@ Clearly the action is nearer to 1 than 100. We try graphing the derivative near 
 plot(f', 0, 5)
 ```
 
-This shows the value near $0.7$. We use `find_zero` starting there:
+This shows the value near $0.7$. We use `fzero` starting there:
 
 
 ```{julia}
-x = find_zero(f', 0.7)
+x = fzero(f', 0.7)
 ```
 
 The convergence is quick. The maximum is at
@@ -714,11 +714,11 @@ We start by making a graph, making an educated guess that the answer is somewher
 plot(SA, 2, 10)
 ```
 
-The minimum looks to be around 4cm. We can use `find_zero` to zero in on the answer:
+The minimum looks to be around 4cm. We can use `fzero` to zero in on the answer:
 
 
 ```{julia}
-r0 = find_zero(SA', 4)
+r0 = fzero(SA', 4)
 ```
 
 Okay, $3.837...$ is our computation for $r$. To get $h$, we use:
@@ -743,7 +743,7 @@ Minimize the function $f(x) = 2x + 3/x$ over $(0, \infty)$.
 ```{julia}
 #| echo: false
 f(x) = 2x + 3/x;
-val = find_zero(f', 1);
+val = fzero(f', 1);
 numericq(val, 1e-3)
 ```
 
@@ -757,7 +757,7 @@ Of all rectangles of area 4, find the one with smallest perimeter. What is the p
 #| echo: false
 # 4 = xy
 P(x) = 2x + 2*(4/x);
-val = find_zero(P', 1);
+val = fzero(P', 1);
 numericq(P(val), 1e-3)		## a square!
 ```
 
@@ -884,7 +884,7 @@ That is, if we start with $x$ and solve this equation for $y$ the resulting valu
 ```{julia}
 function g(x)
    h(y) = f(x, y) - Len
-   find_zero(h, zero(x))  # not 0, but zero(x) to get type right
+   fzero(h, zero(x))  # not 0, but zero(x) to get type right
 end
 ```
 
@@ -916,11 +916,11 @@ plot(g, 0.2, 0.8)
 (The implicit function theorem will tell us that locally for any $x$ we can find a function to return $y$ provided a certain derivative is not $0$ and the equation is reasonably behaved.)
 
 
-Okay, now to find the lowest point. This is what we minimize to find the resting position of the ring. Again, we turn to `find_zero`, but for minimization we use the first derivative, as we are finding critical points.
+Okay, now to find the lowest point. This is what we minimize to find the resting position of the ring. Again, we turn to `fzero`, but for minimization we use the first derivative, as we are finding critical points.
 
 
 ```{julia}
-x = find_zero(g', (0.3, 0.6))
+x = fzero(g', (0.3, 0.6))
 ```
 
 (The above only works due to how we defined `g` using `zero(x)` and *not* `0` for technical reasons related to automatic differentiation.)

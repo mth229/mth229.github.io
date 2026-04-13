@@ -73,7 +73,7 @@ f(x) = g(x-1/2)
 grey = RGBA(.5, .5, .5, 0.5)
 
 xlims = (-2, 2)
-cps = find_zeros(f', xlims)
+cps = fzeros(f', xlims)
 m, M = minimum(f.(xlims)), maximum(f.(cps))
 ylims=(m, M+1)
 p = plot(;xlims = (-2.1, 2.1), ylims=ylims,
@@ -801,11 +801,11 @@ $$
 V(b) = \int_0^b \pi r(h)^2 dh = 450.
 $$
 
-Not to worry, we can use `find_zero` from the `Roots` package for that (again, this is loaded with the `MTH229` package). To solve for when `V(b) = r_vol(b) - 450 = 0` we have
+Not to worry, we can use `fzero` from the `Roots` package for that (again, this is loaded with the `MTH229` package). To solve for when `V(b) = r_vol(b) - 450 = 0` we have
 
 
 ```{julia}
-r_b = find_zero(x -> r_vol(x) - 450,  10)
+r_b = fzero(x -> r_vol(x) - 450,  10)
 ```
 
 So $b$ is basically $9.17$.  Given this, how much volume is left at `b/2`?
@@ -829,7 +829,7 @@ Now compare to the height to get half the volume (225 ml):
 
 
 ```{julia}
-r_half = find_zero(x -> r_vol(x) - 225,  5)
+r_half = fzero(x -> r_vol(x) - 225,  5)
 ```
 
 This value is more than half of $b$:
@@ -858,7 +858,7 @@ What is the height of the glass, `b`, needed to make the volume 450?
 #| echo: false
 s(h) = 3 + log(1 + h)
 s_vol(b) = quadgk(x -> pi*s(x)^2, 0, b)[1]
-b = find_zero(x -> s_vol(x) - 450, 8);
+b = fzero(x -> s_vol(x) - 450, 8);
 val = b
 numericq(val, 1e-3)
 ```
@@ -884,7 +884,7 @@ Report your answer in terms of a percentage of $b$, the height of the glass.
 
 ```{julia}
 #| echo: false
-b12 = find_zero(x -> s_vol(x) - 450/2, 4)
+b12 = fzero(x -> s_vol(x) - 450/2, 4)
 val = b12/b*100;
 numericq(val, .1)
 ```

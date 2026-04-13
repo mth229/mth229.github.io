@@ -28,7 +28,7 @@ Newton's method is useful to rapidly find a zero when there is a *nearby* initia
 In this section, we'll see how to implement the algorithm, try some examples, and then look at what can go wrong.
 
 
-The `MTH229` package provides a function `newton` for easily performing Newton's method, utilizing a function from the `Roots` package. More usefully, we will see that `find_zero`, which we used for bisection, can also be used for root finding with an algorithm that is a bit more robust than Newton's method.
+The `MTH229` package provides a function `newton` for easily performing Newton's method, utilizing a function from the `Roots` package. More usefully, we will see that `fzero`, which we used for bisection, can also be used for root finding with an algorithm that is a bit more robust than Newton's method.
 
 
 To begin, we load `MTH229` (and `Plots`); in the background loading `MTH229` loads `Roots` and its functions.
@@ -493,7 +493,7 @@ Use the secant method to find a root to $f(x) = \cos(x) - x^3$ starting with $x_
 using Roots
 f(x) = cos(x) - x^3
 x2, x1 = 1, 1/2
-x = find_zero(f, (x2, x1), Roots.Secant())
+x = fzero(f, (x2, x1), Roots.Secant())
 numericq(x, 1e-10)
 ```
 
@@ -507,42 +507,42 @@ Use the secant method to find a root to $f(x) = x^5 + x - 1$ starting with $x_1=
 #| echo: false
 f(x) = x^5 + x - 1
 x2, x1 = 1, 1/2
-x = find_zero(f, (x1, x2), Roots.Secant())
+x = fzero(f, (x1, x2), Roots.Secant())
 numericq(x, 1e-10)
 ```
 
-## The `find_zero` function
+## The `fzero` function
 
 
-There are also very fast algorithms which do not require a derivative. The `Roots` package provides an interface to these through the `find_zero` function.
+There are also very fast algorithms which do not require a derivative. The `Roots` package provides an interface to these through the `fzero` function.
 
 
-The `find_zero` function has two interfaces:
+The `fzero` function has two interfaces:
 
 
-  * when called with a bracketing interval, as in `find_zero(f, (a,b))`, it will use a bisection method to find a root.
-  * when called with a starting point, as in `find_zero(f, a)`, it will use an iterative algorithm to search for a root.
+  * when called with a bracketing interval, as in `fzero(f, (a,b))`, it will use a bisection method to find a root.
+  * when called with a starting point, as in `fzero(f, a)`, it will use an iterative algorithm to search for a root.
 
 
-Many bracketing methods (like bisection) are guaranteed to converge, but can be slow. The iterative algorithm used by default with `find_zero` tries to speed the convergence up, but if along the way it finds a bracketing interval, that will guarantee convergence.
+Many bracketing methods (like bisection) are guaranteed to converge, but can be slow. The iterative algorithm used by default with `fzero` tries to speed the convergence up, but if along the way it finds a bracketing interval, that will guarantee convergence.
 
 
-We focus on the simplest usage of `find_zero` where an initial guess is supplied and the default order is used. Here is an example to find $-\sqrt{2}$:
+We focus on the simplest usage of `fzero` where an initial guess is supplied and the default order is used. Here is an example to find $-\sqrt{2}$:
 
 
 ```{julia}
 f(x) = x^2 - 2
-find_zero(f, -1)
+fzero(f, -1)
 ```
 
-### Using `find_zero` and a graph to find all roots.
+### Using `fzero` and a graph to find all roots.
 
 
 Let's look, again, at the task of finding all zeros to the function $e^x - x^4$. We follow a standard approach:
 
 
   * graph the function to roughly identify potential zeros
-  * use these as starting points for `find_zero` to improve
+  * use these as starting points for `fzero` to improve
 
 
 The following graph suggests, perhaps, there may be $3$ zeros, one near $9$, one near $2$ and one near $-1$.
@@ -558,24 +558,24 @@ We can improve these guesses with
 
 
 ```{julia}
-find_zero(f, 9), find_zero(f, 2), find_zero(f, -1)
+fzero(f, 9), fzero(f, 2), fzero(f, -1)
 ```
 
 ::: {.callout-note}
 ## Avoiding repetition
 
-The above can be written without repeating `find_zero` by using a comprehension:
+The above can be written without repeating `fzero` by using a comprehension:
 
 
 ```{julia}
-[find_zero(f, x) for x in [9, 2, -1]]
+[fzero(f, x) for x in [9, 2, -1]]
 ```
 
 Or even more compactly, using the broadcast notation:
 
 
 ```{julia}
-find_zero.(f, [-1, 2, 9])
+fzero.(f, [-1, 2, 9])
 ```
 
 :::
@@ -596,7 +596,7 @@ We see there are 3 potential zeros, one near 0, one near 1.2 and close to 1.7. H
 
 
 ```{julia}
-xs = find_zero.(f', [0, 1.2, 1.7])   # or [find_zero(f', x) for x in [0, 1.2, 1.7]]
+xs = fzero.(f', [0, 1.2, 1.7])   # or [fzero(f', x) for x in [0, 1.2, 1.7]]
 ```
 
 The function values at these points can be found with
@@ -614,7 +614,7 @@ Solving $f(x) = g(x)$ requires representing the difference of the two sides. For
 f(x) = cos(x)
 g(x) = 7x
 aux(x) = f(x) - g(x)
-find_zero(aux, 0.2)
+fzero(aux, 0.2)
 ```
 
 ##### Example: using a symbolic equation
@@ -625,7 +625,7 @@ The following would be an alternate to using the `aux` method above:
 
 ```{julia}
 @syms x
-find_zero(cos(x) ~ 7x, 0.2)
+fzero(cos(x) ~ 7x, 0.2)
 ```
 
 ### Practice
@@ -689,26 +689,26 @@ numericq(xstar, 1e-8)
 #### Question
 
 
-Use `find_zero` to find the one root of `x^5 - x - 1`. First plot to get an estimate.
+Use `fzero` to find the one root of `x^5 - x - 1`. First plot to get an estimate.
 
 
 ```{julia}
 #| echo: false
 f(x) = x^5 - x - 1
-xstar = find_zero(f, 1)
+xstar = fzero(f, 1)
 numericq(xstar, 1e-8)
 ```
 
 #### Question
 
 
-Let $f(x) = 5/\sin(x) + 8/\cos(x)$, Starting at $x=\pi/4$, use `find_zero` to find a root of the derivative of $f(x)$ given by `f'`.
+Let $f(x) = 5/\sin(x) + 8/\cos(x)$, Starting at $x=\pi/4$, use `fzero` to find a root of the derivative of $f(x)$ given by `f'`.
 
 
 ```{julia}
 #| echo: false
 f(x) = 5/sin(x) + 8/cos(x)
-xstar = find_zero(f', pi/4)
+xstar = fzero(f', pi/4)
 numericq(xstar, 1e-8)
 ```
 
@@ -717,10 +717,10 @@ numericq(xstar, 1e-8)
 
 The tangent line of `f` at `c` can be computed using the point-slope form, $f(x) = f(c) + f'(c) \cdot (x - c)$. However, we employ the `tangent(f,c)` function of the `MTH229` package, which returns a function that represents the tangent line.
 
-Let $f(x) = x^2 - 3x + 5$. Use `find_zero` to find the intersection point of the tangent line at $1$ and the tangent line at $3$. Where does this happen?
+Let $f(x) = x^2 - 3x + 5$. Use `fzero` to find the intersection point of the tangent line at $1$ and the tangent line at $3$. Where does this happen?
 
 
-(Hint, let `t1` and `t3` be defined using `tangent(f,c)` for the appropriate `c` and then apply `find_zero` to `aux(x) = t1(x) -  t3(x)` starting at $1$.)
+(Hint, let `t1` and `t3` be defined using `tangent(f,c)` for the appropriate `c` and then apply `fzero` to `aux(x) = t1(x) -  t3(x)` starting at $1$.)
 
 
 ```{julia}
@@ -728,7 +728,7 @@ Let $f(x) = x^2 - 3x + 5$. Use `find_zero` to find the intersection point of the
 f(x) = x^2 - 3x + 5
 t1, t3 = tangent.(f, (1, 3))
 aux1(x) = t1(x) - t3(x)
-xstar = find_zero(aux, 1)
+xstar = fzero(aux, 1)
 numericq(xstar, 1e-8)
 ```
 

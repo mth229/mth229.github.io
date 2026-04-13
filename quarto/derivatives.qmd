@@ -351,7 +351,7 @@ plot!(zero)
 If you want, we can find the roots numerically.
 
 ```{julia}
-find_zero(fp, (-2, -1)), find_zero(f', (1, 2))
+fzero(fp, -2, -1), fzero(f', 1, 2)
 ```
 
 
@@ -734,7 +734,7 @@ Grass clippings are placed in a bin, where they decompose. For $0 \leq t \leq 30
   * For $t > 30$, $L(t)$, the linear approximation to $A$ at $t=30$ is a better model for the amount of grass clippings remaining in the bin. Use $L(t)$ to predict the time at which there will be 0.5% pound of grass clippings remaining in the bin. Show the work that leads to your answer.
 
 
-We can do all this relatively quickly with the `find_zero` function from the `Roots` package.
+We can do all this relatively quickly with the `fzero` function from the `Roots` package.
 
 
 First, we define $A(t)$:
@@ -769,7 +769,7 @@ The mean value theorem tells us that there is at least one time where the instan
 
 ```{julia}
 eqn(t) = A'(t) - m
-find_zero(eqn, (0, 30))
+fzero(eqn, 0, 30)
 ```
 
 So at 12.4 days, the instantaneous rate is equal to the average rate of decomposition over the first 30 days.
@@ -782,7 +782,7 @@ But this doesn't really answer the question asked, which is about the average am
 a, err = quadgk(A, 0, 30)	# area under A from 0,30
 avg = a/(30-0)
 eqn(t) = A(t) - avg
-find_zero(eqn, (0, 30))
+fzero(eqn, 0, 30)
 ```
 
 We get the same answer – think about whether that is a coincidence.
@@ -795,7 +795,7 @@ Finally, we can define $L(t)$ using the point-slope form of the line. The point 
 L(t) = A(30) + A'(30) * (t - 30) # t > 30
 ```
 
-We could restrict $L$ to insist that $t > 30$, but this isn't necessary. We are asked to solve this. Using `find_zero` requires a bracket. We check that $L(30) > 0.5$ and that $L(100)$ is negative:
+We could restrict $L$ to insist that $t > 30$, but this isn't necessary. We are asked to solve this. Using `fzero` requires a bracket. We check that $L(30) > 0.5$ and that $L(100)$ is negative:
 
 
 ```{julia}
@@ -807,7 +807,7 @@ So, we can use $[30, 100]$ as a bracket for $L(t) - 0.5 = 0$:
 
 ```{julia}
 eqn(t) = L(t) - 0.5
-find_zero(eqn, (30, 100))
+fzero(eqn, 30, 100)
 ```
 
 So a bit over 35 days to decompose to half a pound.

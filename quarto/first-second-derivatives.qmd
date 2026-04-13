@@ -106,28 +106,28 @@ plotif(f, f, -2, 1)
 The `plotif` function shows when `g` is non-negative, not just positive, so wouldn't show a different color for the graph near $-1.57$ where `f` is zero but doesn't cross the $x$ axis.
 
 
-### Numerically find zeros of a function over $[a,b]$; the `find_zeros` function
+### Numerically find zeros of a function over $[a,b]$; the `fzeros` function
 
 We have discussed two means to find zeros of a function $f$:
 
 * when the zero is *between* two values which form a bracketing interval. The zero in the graph above between $-1$ and $-0.5$ is an example. Such zeros are readily identified through *bisection*
 
-* when a zero is *near* a value, such as these four which are near $-1.5$, $-0.75$, $0.0$ and $0.8$. Such zeros may typically be found with *Newton's* method (or `find_zero`)
+* when a zero is *near* a value, such as these four which are near $-1.5$, $-0.75$, $0.0$ and $0.8$. Such zeros may typically be found with *Newton's* method (or `fzero`)
 
-The `Roots` package, exported with `MTH229`, provides a convenience function, `find_zeros`, which uses bisection or `fzero` to identify *heuristically* all zeros in an interval $[a,b]$. It is easy to use: the interval is specified by pairing off the interval:
+The `Roots` package, exported with `MTH229`, provides a convenience function, `fzeros`, which uses bisection or `fzero` to identify *heuristically* all zeros in an interval $[a,b]$. It is easy to use: the interval is specified by pairing off the interval:
 
 ```{julia}
-find_zeros(f, (-2, 1))  # note the s in find_zeros
+fzeros(f, -2, 1)  # note the s in fzeros
 ```
 
-The algorithm isn't guaranteed to always work the way bisection is, but works fairly well to identify all the zeros except for cases where there are *many* zeros in the interval or the interval chosen is *too wide*. (A bracketing interval specified to bisection may be infinite, but such wide intervals can be problematic with `find_zeros`, though can work in some cases.)
+The algorithm isn't guaranteed to always work the way bisection is, but works fairly well to identify all the zeros except for cases where there are *many* zeros in the interval or the interval chosen is *too wide*. (A bracketing interval specified to bisection may be infinite, but such wide intervals can be problematic with `fzeros`, though can work in some cases.)
 
 Here is another example, find the zeros of $f(x) = e^x - x^4$ over $[-10, 10]$:
 
 
 ```{julia}
 f(x) = exp(x) - x^4
-find_zeros(f, -10, 10)
+fzeros(f, -10, 10)
 ```
 
 The above also shows the interval can also be specified using two values, as is done with `plot`.
@@ -136,18 +136,18 @@ A related problem might be find all zeros of $f(x) = e^x - x^6$. Where should on
 
 ```{julia}
 f(x) = exp(x) - x^6
-find_zeros(f, (-1, 50))
+fzeros(f, -1, 50)
 ```
 
 
 #### Discontinuous functions
 
-The algorithm used by `find_zeros` relies on both bisection and a method like Newton's method. The bisection implementation will pick up on places where the function changes sign, even if not continuous. In the example below, the two vertical asymptotes at $3$ and $4$ are found:
+The algorithm used by `fzeros` relies on both bisection and a method like Newton's method. The bisection implementation will pick up on places where the function changes sign, even if not continuous. In the example below, the two vertical asymptotes at $3$ and $4$ are found:
 
 
 ```{julia}
 f(x) = (x-1)*(x-2) / ((x-3)*(x-4))
-zs = find_zeros(f, -10, 10)
+zs = fzeros(f, -10, 10)
 ```
 
 
@@ -169,7 +169,7 @@ However, for our usage below it is quite helpful that these points are identifie
 
 ### The `sign_chart` function
 
-The technique above to find where a function is positive can be automated if `find_zeros` is used to find the zeros. This is done in `sign_chart`.
+The technique above to find where a function is positive can be automated if `fzeros` is used to find the zeros. This is done in `sign_chart`.
 
 For example,
 
@@ -206,13 +206,13 @@ $$
 
 ```{julia}
 #| echo: false
-val = length(find_zeros(x -> exp(-x/2)*(sin(11x) + sin(13x)), -2, 1))
+val = length(fzeros(x -> exp(-x/2)*(sin(11x) + sin(13x)), -2, 1))
 numericq(val)
 ```
 
 #### Question
 
-What is the largest value identified in $[-2,1]$ by `find_zeros` for the function
+What is the largest value identified in $[-2,1]$ by `fzeros` for the function
 
 $$
 f(x) = e^{-x/2} \cdot (\sin(11x) + \sin(13x))
@@ -220,7 +220,7 @@ $$
 
 ```{julia}
 #| echo: false
-val = maximum(find_zeros(x -> exp(-x/2)*(sin(11x) + sin(13x)), -2, 1))
+val = maximum(fzeros(x -> exp(-x/2)*(sin(11x) + sin(13x)), -2, 1))
 numericq(val)
 ```
 
@@ -357,15 +357,15 @@ radioq(choices, answer)
 
 ### Numerically finding zeros, critical points, and inflection point candidates
 
-The `find_zeros` function can readily identify when some function is zero (or undefined). It can be used, as seen, to find zeros. However, if passed `f'` it will identify critical points. When passed `f''` it will find when $f''(x) = 0$ (or undefined). Such points are *candidates* for inflection points, though a check on whether the concavity changes is necessary to say such is an inflection point.
+The `fzeros` function can readily identify when some function is zero (or undefined). It can be used, as seen, to find zeros. However, if passed `f'` it will identify critical points. When passed `f''` it will find when $f''(x) = 0$ (or undefined). Such points are *candidates* for inflection points, though a check on whether the concavity changes is necessary to say such is an inflection point.
 
 In the following we use `scatter!` to show these values on the graph.
 
 ```{julia}
 f(x) = exp(-x/2) * (sin(3x) + sin(5x))
-zs = find_zeros(f, -2, 1)
-cps = find_zeros(f', -2, 1)
-ips = find_zeros(f'', -2, 1)
+zs = fzeros(f, -2, 1)
+cps = fzeros(f', -2, 1)
+ips = fzeros(f'', -2, 1)
 
 plot(f, -2, 1)
 scatter!(zs, f.(zs), markercolor="blue", markersize=7)
@@ -532,11 +532,11 @@ plot(f', 0, 2pi)
 
 We see four: one near $0.8$, one near $1.5$, one near $2.5$ and one near $5$.
 
-As explained, we could use `find_zeros` to identify these more precisely:
+As explained, we could use `fzeros` to identify these more precisely:
 
 
 ```{julia}
-cps = find_zeros(f', 0, 6)
+cps = fzeros(f', 0, 6)
 ```
 
 From the graph of `f'` we can see at the first critical point the derivative is changing sign from positive to negative at the first one (hence a local maximum), and this alternates as we go along.
@@ -568,7 +568,7 @@ The following graphic is to illustrate why the second derivative test works as i
 
 ```{julia}
 plot(f, 0, 2pi; legend=false, linewidth=4)
-cps = find_zeros(f', 0, 2pi)
+cps = fzeros(f', 0, 2pi)
 plot_parabola!(c, fc, fppc) = plot!(x -> fc + fppc * (x - c)^2/2, c-3/4, c+3/4; linewidth=2)
 plot_parabola!.(cps, f.(cps), f''.(cps))
 current()
