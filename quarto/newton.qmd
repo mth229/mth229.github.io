@@ -17,7 +17,7 @@ $$
 f(x) = 0
 $$
 
-Previously we discussed the *bisection method* which applied for some continuous function $f(x)$ which changed signs *between* $a$ and $b$, points which bracket a zero. Not only did we need to find these bracketing points – which wasn't hard from a graph, more importantly the actual algorithm is pretty slow.
+Previously we discussed the *bisection method* which applied for some continuous function $f(x)$ which changed signs *between* $a$ and $b$, points which bracket a zero. Not only did we need to find these bracketing points---which wasn't hard from a graph, more importantly the actual algorithm is pretty slow.
 
 
 If the function $f$ is sufficiently differentiable, then Newton's method may work to find a zero.  Unlike the bisection method which is slow but guaranteed to find a root by the intermediate value theorem, Newton's method is fast (once it is close) but has no such guarantee of converging.
@@ -28,7 +28,7 @@ Newton's method is useful to rapidly find a zero when there is a *nearby* initia
 In this section, we'll see how to implement the algorithm, try some examples, and then look at what can go wrong.
 
 
-The `MTH229` package provides a function `newton` for easily performing Newton's method, utilizing a function from the `Roots` package. More usefully, we will see that `fzero`, which we used for bisection, can also be used for root finding with an algorithm that is a bit more robust than Newton's method.
+The `MTH229` package provides a function `newton` for easily performing Newton's method, utilizing a function from the `Roots` package. More usefully, we will see that `fzero`, which we used for bisection, can also be used for root finding with an algorithm that is similar, but a bit more robust than Newton's method.
 
 
 To begin, we load `MTH229` (and `Plots`); in the background loading `MTH229` loads `Roots` and its functions.
@@ -43,15 +43,16 @@ plotly()
 ```{julia}
 #| echo: false
 using QuizQuestions
+using LaTeXStrings
 ```
 
 ## Basic idea
 
 
-The idea behind Newton's method is simple – *linear approximation*.
+The idea behind Newton's method is simple---*linear approximation*.
 
 
-That is, most functions at any given point are well approximated by the tangent line at that point. If we have a good, *nearby*, guess $x_n$, then we can improve this guess by replacing it with the easy to find zero, $x_{n+1}$, of the tangent line at $(x_n, f(x_n))$.
+That is, most functions at any given point are well approximated by the tangent line at that point. If we have a good, *nearby*, guess $x_n$, then we can improve this guess by replacing it with the easy to find zero, $x_{n+1}$, of the tangent line to $f(x)$ at $(x_n, f(x_n))$.
 
 ```{julia}
 #| echo: false
@@ -68,9 +69,9 @@ x1 = 0.6
 x2 = x1 - f(x1)/f'(x1)
 plot!([x1, x1, x2], [0,f(x1), 0], linestyle=:dash)
 scatter!([x1], [f(x1)])
-annotate!([(x1, 0, text("xᵢ",:bottom)), (x2, 0,  text("xᵢ₊₁",:bottom)),
-           (x1, f(x1), text("(xᵢ, f(xᵢ))",:left)),
-            (1,0, text("xᵅ", :top))])
+annotate!([(x1, 0, text(L"x_n",:bottom)), (x2, 0,  text(L"x_{n+1}",:bottom)),
+           (x1, f(x1), text(L"(x_n, f(x_n))",:left)),
+            (1,0, text(L"x^\alpha", :top))])
 ```
 
 
@@ -82,7 +83,7 @@ $$
 f'(x_n) = \frac{-f(x_n)}{x_{n+1} - x_{n}}.
 $$
 
-The basic algorithm of Newton's methods solves this to get:
+The basic algorithm of Newton's methods solves this for $x_{n+1}$ to get:
 
 
 $$
@@ -92,7 +93,7 @@ $$
 Some books write the right-hand side as $x_n - f'(x_n)^{-1} f(x_n)$, a form that generalizes to different settings.
 
 
-Like the bisection method, Newton's method is an *iterative method*. One begins with a (suitable, usually nearby) guess $x_1$. From that the algorithm produces $x_2$ which is used to produce $x_3$, etc. The idea is that the algorithm eventually will settle on a value $x_n$ sufficiently close to the desired root. We then call $x_n$ an *approximate* zero.
+Like the bisection method, Newton's method is an *iterative method*. One begins with a (suitable, ideally *nearby*) guess $x_1$. From that the algorithm produces $x_2$ which is used to produce $x_3$, etc. The idea is that the algorithm, when successful, will  eventually will settle on a value $x_n$ sufficiently close to the desired root. We then call $x_n$ an *approximate* zero, $x^\alpha$ being the exact mathematical zero.
 
 
 Mathematically, the indices indicate that the right hand side is computed and assigned to the left hand side. This is exactly what is done in assignment within `Julia`, so  the above simply becomes:
@@ -106,7 +107,7 @@ x = x - f(x)/f'(x)
 Where `f(x)` is the function and `f'(x)` its derivative. (In this case found by automatic differentiation.) This line starts with a previously defined value of `x` and updates it accordingly.
 
 
-The updating is continued – by executing the exact same command – until either the algorithm has gotten close enough to an answer (i.e., it has converged) or we have given up on it converging.
+The updating is continued---by executing the exact same command---until either the algorithm has gotten close enough to an answer (i.e., it has converged) or we have given up on it converging.
 
 
 Here is an example to find a zero of the function: $f(x) = x^3 - 2x - 5$.
@@ -196,13 +197,13 @@ Rather, we can determine two ways that the number is close enough to the answer:
   * the values `f(x)` get close enough to zero.
 
 
-In the above, the first one was used. In either case, rather than look for values to be equal (e.g. $x_{n+1} = x_{n}$ or $f(x_n) = 0$, we look at whether these two things are close enough to be so. That means for some tolerance, we stop when the change in the `x`'s is smaller than the tolerance or `f(x)` is smaller – in absolute value – than the tolerance.
+In the above, the first one was used. In either case, rather than look for values to be equal (e.g. $x_{n+1} = x_{n}$ or $f(x_n) = 0$, we look at whether these two things are close enough to be so. That means for some tolerance, we stop when the change in the `x`'s is smaller than the tolerance or `f(x)` is smaller---in absolute value---than the tolerance.
 
 
 ### Repeating steps
 
 
-The above approach – basically repeating steps – can be tedious. There will be a function to do this for you (`newton`). One can use copy and paste to do much of this though:
+The above approach---basically repeating steps---can be tedious. There will be a function to do this for you (`newton`). One can use copy and paste to do much of this though:
 
 
 ```{julia}
@@ -248,7 +249,7 @@ Let $k=15$ and $x_1$ be $4$. What is the value of $x_4$?
 
 ```{julia}
 #| echo: false
-x1 = 4
+x0 = 4
 f(x) =  1/2*(x + 15/x)
 val = f(f(f(x0)))
 numericq(val, 1e-4)
@@ -289,7 +290,7 @@ numericq(val, 1e-14)
 ## Implementing a Newton's method function
 
 
-For iterative algorithms it is better to repeat the expression until something happens – not a fixed number of times.  In this case, we need a criteria to decide if the algorithm has converged. We shall use the following:
+For iterative algorithms it is better to repeat the expression until something happens---not a fixed number of times.  In this case, we need a criteria to decide if the algorithm has converged. We shall use the following:
 
 
   * If the value of $|x_{n+1} - x_n| < tol$ the algorithm has converged
@@ -339,8 +340,7 @@ fp(x) = 3x^2 - 5
 xstar, ctr = nm(f, fp, 0)	# takes 6 steps
 ```
 
-However, the `MTH229` package provides the `newton` function. So we shall use that in the sequel. To see the number of steps, the argument `verbose=true` may be given.
-
+However, the `MTH229` package provides the `newton` function. So we shall use that in the sequel.
 
 ---
 
@@ -420,10 +420,10 @@ However, Newton's method is actually fairly robust to using other related values
 ### The secant method
 
 
-The [secant method](http://en.wikipedia.org/wiki/Secant_method) is perhaps the oldest numerical linear algebra tool dating back over [3000 years](http://scholarship.rice.edu/bitstream/handle/1911/20568/1442093.PDF?sequence=1) well before Newton's method. Rather than use the derivative at $x_i$ to compute $x_{i+1}$, the secant line is used between $x_{i-1}$ and $x_i$. This method will also converge to a zero with a good starting point, though not nearly as quickly as Newton's method.
+The [secant method](http://en.wikipedia.org/wiki/Secant_method) is perhaps the oldest numerical linear algebra tool dating back over [3000 years](http://scholarship.rice.edu/bitstream/handle/1911/20568/1442093.PDF?sequence=1) well before Newton's method. Rather than use the derivative at $x_i$ to compute $x_{i+1}$, the secant line is used between $x_{i-1}$ and $x_i$. This method will also converge to a zero with a good starting point, though not quite as rapidly as Newton's method.
 
 
-You can check – if you want – by repeating the last command until the change in `x2` is within your tolerance:
+You can check-–-if you want---by repeating the last command until the change in `x2` is within your tolerance:
 
 
 ```{julia}
@@ -608,7 +608,7 @@ f.(xs)               # or map(f, xs) or [f(x) for x in xs]
 
 ----
 
-Solving $f(x) = g(x)$ requires representing the difference of the two sides. For example, find the zero of $cos(x) = 7x$ in $(0, \pi/2)$. A graph will show a zero left of $0.2$, which we take as an initial value:
+Solving $f(x) = g(x)$ requires representing the difference of the two sides. For example, find the zero of $\cos(x) = 7x$ in $(0, \pi/2)$. A graph will show a zero left of $0.2$, which we take as an initial value:
 
 ```{julia}
 f(x) = cos(x)
@@ -738,7 +738,7 @@ numericq(xstar, 1e-8)
 As great as Newton's method is, it won't always work for various reasons, some of which are described in the following. Here is what you need to keep in mind. Newton's method works well if
 
 
-  * The zero is a simple root – that is of multiplicity 1
+  * The zero is a simple root---that is of multiplicity 1
   * The magnitude, $|f'(x)|$, is not too small (If the tangent line is nearly flat, the next guess is far from the previous)
   * The magnitude, $|f''(x)|$, is not too big (function doesn't have so much curve that the tangent line is a poor approximation)
   * The initial guess is not to far from a zero
@@ -833,7 +833,7 @@ Still an issue. Why?
 #### Question
 
 
-Despite all our care with the derivative, the method did not converge in $200$ steps. Can you see why from this trace?
+Despite all our care with the derivative, the method did not converge in $200$ steps. Can you see why from this trace, which starts at $x_0=3$?
 
 ```{julia}
 #| echo: false
@@ -842,9 +842,10 @@ Despite all our care with the derivative, the method did not converge in $200$ s
 #![Newton, cubic](figures/newton/newton-cubic.png){fig-alt="Newton's method may not converge"}
 
 f(x) = cbrt(x)
-plot(f, -65, 28; legend=false, linewidth=2)
-plot!(zero)
-n!(f, x0; steps=5, annotate_steps=6)
+x0 = 3
+#plot(f, -65, 28; legend=false, linewidth=2)
+#plot!(zero)
+newton_vis(f, x0; steps=5, annotate_steps=6)
 ```
 
 ```{julia}

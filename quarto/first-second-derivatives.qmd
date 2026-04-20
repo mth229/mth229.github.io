@@ -59,7 +59,7 @@ You may be more familiar with these implications for functions with derivatives:
 
 :::{.callout-note}
 ## Positive and negative
-Pay attention to the difference between positive and non-negative. For example, an increasing, differentiable function on *I=(a,b)* is only guaranteed to have a *non-negative* derivative – not a *positive* derivative on *I*.
+Pay attention to the difference between positive and non-negative. For example, an increasing, differentiable function on *I=(a,b)* is only guaranteed to have a *non-negative* derivative---not a *positive* derivative on *I*.
 
 :::
 
@@ -92,6 +92,7 @@ $$
 A plot shows *roughly* that this function is positive between $-2$ and $-0.8$, save near $-1.57$ where $f$ is $0$ and between $0.0$ and $0.8$.
 
 ```{julia}
+#| fig-alt: plot of f with zero line added.
 f(x) = exp(-x) * (sin(3x) + sin(5x))
 plot(f, -2, 1)
 plot!(zero)
@@ -100,6 +101,7 @@ plot!(zero)
 The `MTH229` package loads a *convenience* function, `plotif`, to show the graph of `f` highlighting when a second function, `g` is *nonnegative*. In this case, to see where `f` is non-negative, we want `g` to be  `f`:
 
 ```{julia}
+#| fig-alt: plotif graph showing where the function f is non-negative
 plotif(f, f, -2, 1)
 ```
 
@@ -110,11 +112,11 @@ The `plotif` function shows when `g` is non-negative, not just positive, so woul
 
 We have discussed two means to find zeros of a function $f$:
 
-* when the zero is *between* two values which form a bracketing interval. The zero in the graph above between $-1$ and $-0.5$ is an example. Such zeros are readily identified through *bisection*
+* When the zero is *between* two values which form a bracketing interval. The zero in the graph above between $-1$ and $-0.5$ is an example. Such zeros are readily identified through *bisection*.
 
-* when a zero is *near* a value, such as these four which are near $-1.5$, $-0.75$, $0.0$ and $0.8$. Such zeros may typically be found with *Newton's* method (or `fzero`)
+* When a zero is *near* a value, such as these four which are near $-1.5$, $-0.75$, $0.0$ and $0.8$. Such zeros may typically be found with *Newton's* method (or `fzero`).
 
-The `Roots` package, exported with `MTH229`, provides a convenience function, `fzeros`, which uses bisection or `fzero` to identify *heuristically* all zeros in an interval $[a,b]$. It is easy to use: the interval is specified by pairing off the interval:
+The `Roots` package, exported with `MTH229`, provides a convenience function, `fzeros`, which uses bisection or `fzero` to identify *heuristically* all zeros in an interval $[a,b]$. It is easy to use: the interval is specified just as is done with plotting:
 
 ```{julia}
 fzeros(f, -2, 1)  # note the s in fzeros
@@ -130,8 +132,6 @@ f(x) = exp(x) - x^4
 fzeros(f, -10, 10)
 ```
 
-The above also shows the interval can also be specified using two values, as is done with `plot`.
-
 A related problem might be find all zeros of $f(x) = e^x - x^6$. Where should one look to ensure all of the zeros are identified? Too big an interval and the values of $e^x$ will be infinite (numerically) and that may cause problems. Too small an interval and zeros may be excluded. In this case a bit of analysis can help: any zero must be bigger than $-1$, as to the left of $-1$ the exponential is smaller than $1$ and the polynomial bigger than $1$ in absolute value. Further, as exponentials *eventually* dominate polynomials, the interval need not be too large. We could quickly check that $e^{20}$ is bigger than $20^6$ but instead we just try a somewhat larger right limit:
 
 ```{julia}
@@ -146,7 +146,7 @@ The algorithm used by `fzeros` relies on both bisection and a method like Newton
 
 
 ```{julia}
-f(x) = (x-1)*(x-2) / ((x-3)*(x-4))
+f(x) = (x-1) * (x-2) / ((x-3) * (x-4))
 zs = fzeros(f, -10, 10)
 ```
 
@@ -178,7 +178,7 @@ f(x) = exp(x) - x^6
 sign_chart(f, -1, 20)
 ```
 
-The output shows how the sign changes at the identified zeros (or other points). In this case we can infer that the function is positive on $(-0.8656\dots, 1.22688869\dots)$ and again on $(16.998887\dots, \infty)$.
+The output shows how the sign changes at the identified zeros (or other points). In this case we can infer that the function is positive on $(-0.8656\dots, 1.22688869\dots)$ and again on $(16.998887\dots, 20)$. Furthermore, it can be inferred that between $(-1, -0.8656\dots)$ the function is *negative* and as well in $(1.22688869\dots, 16.998887\dots)$.
 
 ----
 
@@ -263,6 +263,7 @@ For example, consider $f(x) =  x^3 - 2x - 1/2$.
 This graph shows where $f(x)$ is positive over $(-2,2)$:
 
 ```{julia}
+#| fig-alt: plot of polynomial x^3 - 2x - 1/2 showing where it is non-negative
 f(x) = x^3 - 2x - 1/2
 plotif(f, f, -2, 2)
 plot!(zero)
@@ -270,11 +271,13 @@ plot!(zero)
 
 In this graph, we estimate graphically that the intervals $(-1.2, 0.2)$ and $(1.5, 2)$ are where $f$ is positive within this viewing window.
 
+----
 
 If we change the screening function to the derivative of $f(x)$, then our graph will show when the function is increasing (or flat):
 
 
 ```{julia}
+#| fig-alt: plot of polynomial x^3 - 2x - 1/2 showing where it is increasing, as its derivative is positive
 plotif(f, f', -2, 2)
 ```
 
@@ -285,6 +288,7 @@ Using when the second derivative is non-negative indicates where `f` is concave 
 
 
 ```{julia}
+#| fig-alt: plot of polynomial x^3 - 2x - 1/2 showing where it is concave up, as its second derivative is positive
 plotif(f,  f'', -2, 2)
 ```
 
@@ -362,14 +366,15 @@ The `fzeros` function can readily identify when some function is zero (or undefi
 In the following we use `scatter!` to show these values on the graph.
 
 ```{julia}
+#| fig-alt: plot of f with zeros, critical points, and inflection points added
 f(x) = exp(-x/2) * (sin(3x) + sin(5x))
 zs = fzeros(f, -2, 1)
 cps = fzeros(f', -2, 1)
 ips = fzeros(f'', -2, 1)
 
 plot(f, -2, 1)
-scatter!(zs, f.(zs), markercolor="blue", markersize=7)
-scatter!(cps, f.(cps), markercolor="red", markersize=3)
+scatter!(zs,  f.(zs),  markercolor="blue",  markersize=7)
+scatter!(cps, f.(cps), markercolor="red",   markersize=3)
 scatter!(ips, f.(ips), markercolor="green", markershape=:diamond)
 ```
 
@@ -408,11 +413,13 @@ We make two graphs:
 
 
 ```{julia}
+#| fig-alt: plot of exp(x) over 0,4 showing it is always positive
 fp(x) = exp(x)
 plotif(fp, fp, 0, 4)
 ```
 
 ```{julia}
+#| fig-alt: plot of exp(x) over 0,4 showing ii iss always increasing
 plotif(fp, fp', 0, 4)
 ```
 
@@ -438,6 +445,7 @@ A plot to see where the second derivative is positive will show that this $f''(x
 
 
 ```{julia}
+#| fig-alt: plot of x^2 -2x  over -1, 3 showing where it is concave up
 fpp(x) = x^2 - 2x
 plotif(fpp, fpp, -1, 3)
 ```

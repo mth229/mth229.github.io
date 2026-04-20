@@ -280,7 +280,7 @@ In addition, we allow for the possibility of using different methods to approxim
   * making the cap a quadratic polynomial that goes through the left and right endpoints and the midpoint (`method="simpsons"`)
 
 
-For pedagocial use, this function is defined in `MTH229`:
+For pedagogical use, a function like this is defined in the `MTH229` package:
 
 
 ```{julia}
@@ -540,14 +540,14 @@ numericq(val, 1e-5)
 `Julia` provides the `quadgk` function to do adaptive Gauss-Konrod quadrature, a modern, fast and accurate means to compute 1-dimensional integrals numerically. This is in the `QuadGK` package which is loaded with `MTH229`.
 
 
-The use is straightforward, and similar to `riemann` above: you specify a function object, and the limits of integration. You don't specify $n$ – as this is computed adaptively – but you can optionally specify a tolerance which controls the accuracy, though we don't do so here. For example, a typical usage might be:
+The use is straightforward, and similar to `riemann` above: you specify a function object, and the limits of integration. You don't specify $n$---as this is computed adaptively---but you can optionally specify a tolerance which controls the accuracy, though we don't do so here. For example, a typical usage might be:
 
 
 ```{julia}
 a, err = quadgk(sin, 0, pi)		## 2 is exact
 ```
 
-Two values are returned, the answer and an estimate of the error. In the above, $2$ is the exact answer to this integral, the estimated value a just a bit more $2$, but is estimated to be off my no more than the second value, $1.78 \cdot 10^{-12}$.
+Two values are returned, the answer and an estimate of the error. In the above, $2$ is the exact answer to this integral, the estimated value a just a bit more than $2$, but is estimated to be off my no more than the second value, $1.78 \cdot 10^{-12}$.
 
 
 If just the answer is of interest, then it can be extracted using *index notation* or `first`:
@@ -723,8 +723,9 @@ For a standard measuring cup, the answer for different `b`'s is printed on the s
 ![Measuring cup](figures/integration/measuring_cup.png){fig-alt="A measuring cup is calibrated according to actual volume, which is shape dependent"}
 
 
-With the formula for the volume of a solid of revolution we can compute this marks numerically if we know the radius as a function of height.
+With the formula for the volume of a solid of revolution we can compute these marks numerically if we know the radius as a function of height.
 
+----
 
 In Glass Shape Influences Consumption Rate for [Alcoholic Beverages](http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0043007) the authors demonstrate that the shape of the glass can have an effect on the rate of consumption, presumably people drink faster when they aren't sure how much they have left. In particular, they comment that people have difficulty judging the half-finished-by-volume mark.
 
@@ -732,7 +733,7 @@ In Glass Shape Influences Consumption Rate for [Alcoholic Beverages](http://www.
 This figure shows some of the wide variety of beer-serving glasses:
 
 
-![Beer glasses](figures/integration/beer_glasses.jpg)
+![Beer glasses---and not one traditional pint glass](figures/integration/beer_glasses.jpg)
 
 
 We work with metric units, as there is a natural relation between volume in cm$^3$ and liquid measure (1 liter = 1000 cm$^3$, so a 16-oz pint glass is roughly $450$ cm$^3$.)
@@ -1024,7 +1025,7 @@ numericq(val, .001)
 This picture of Jasper Johns [Near the Lagoon](http://www.artic.edu/aic/collections/artwork/184095) was taken at The Art Institute Chicago.
 
 
-[Jasper Johns](figures/integration/johns-catenary.jpg)
+![Jasper Johns, Near the Lagoon](figures/integration/johns-catenary.jpg){fig-alt: image of Jasper Johns Near the Lagoon showing a catenary shape}
 
 
 The museum notes have
@@ -1100,7 +1101,7 @@ val = quadgk(x -> sqrt(1 + f'(x)^2), -a, a)[1]
 numericq(val, 1e-3)
 ```
 
-In the picture of the Verrazano-Narrows [bridge](http://observer.com/2012/09/staten-island/s-i-8/), would the shape during construction be a parabola or a catenary?
+In a picture of the Verrazano-Narrows [bridge](http://observer.com/2012/09/staten-island/s-i-8/), would the shape during construction be a parabola or a catenary?
 
 
 ```{julia}
@@ -1197,7 +1198,7 @@ sum(w * f(x) for (w,x) in zip(wts, xs))
 The compact code of the last line to compute the approximate integral shows there are three important things in this form of the integral: the weights, the *nodes* or $x$ values, and the function. The use of equally spaced nodes has been used by us so far, but it need not be the case. If fact Gauss showed he could get similar answers faster if it wasn't the case.
 
 
-The Gauss nodes and weights are computable (http://en.wikipedia.org/wiki/Gaussian_quadrature). The main tools are the so-called Legendre polynomials, which can be defined recursively with Bonnet's formula:
+The Gauss nodes and weights are computable [(Gaussian quadrature)](http://en.wikipedia.org/wiki/Gaussian_quadrature). The main tools are the so-called Legendre polynomials, which can be defined recursively with Bonnet's formula:
 
 
 $$
@@ -1256,7 +1257,7 @@ ws = [weights(xi) for xi in xs]
 From here `gauss_quadrature` will do the integration of `f` over the interval $[-1,1]$, though we can do it ourself quickly enough. Here we compute the integral of $\cos(\pi/2 x)$ over $[-1,1]$ (you can check this is very close to the answer $4/\pi$ even with just 4 nodes):
 
 
-```
+```{julia}
 f(x) = cos(pi/2*x)
 sum(w * f(x) for (w,x) in zip(ws, xs))
 ```
@@ -1264,7 +1265,7 @@ sum(w * f(x) for (w,x) in zip(ws, xs))
 ### Adaptive integration
 
 
-Next, we a have a brief discussion about an alternative means to compute integrals. The following function `adapt` implements a basic *adaptive quadrature* method for integration. The basic idea is that for a subinterval $[a,b]$ if the area of the trapezoid is not close to the area of Simpson's parabolic estimate then the subinterval is split into two pieces $[a,c]$ and $[c,b]$ and the same question is asked. If the area is close the Simpson's parabolic estimate is used to estimate the integral of $f$ over that subinterval.
+Next, we a have a brief discussion about an alternative means to compute integrals. The following function `adapt` implements a basic *adaptive quadrature* method for integration. The basic idea is that for a subinterval $[a,b]$ if the area of the trapezoid is not close to the area of Simpson's parabolic estimate then the subinterval is split into two pieces $[a,c]$ and $[c,b]$ and the same question is asked. If the area is close, then the Simpson's parabolic estimate is used to estimate the integral of $f$ over that subinterval.
 
 
 Again, we see *recursion* when  programming this algorithm.  To avoid infinite loops during this, we use a limit below to keep track.
@@ -1304,14 +1305,14 @@ end
 Does it work? Let's see it for the area of $f(x) = x^2(1-x)^{10}$ which is known to satisfy $\beta(2+1, 10+1)$
 
 
-```
+```{julia}
 out = adapt(x -> x^2 * (1 -x)^10, 0, 1, 10)
 ```
 
 Not too far off  (`1e-10`) from the known answer which is a beta function:
 
 
-```
+```{julia}
 out - beta(2 + 1, 10 + 1)
 ```
 
