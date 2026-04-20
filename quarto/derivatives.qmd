@@ -26,7 +26,9 @@ using Plots
 plotly()
 ```
 
-Single-variable calculus has two main concepts: the derivative and the integral, both defined in terms of a third important concept: the limit. The derivative is what we discuss here. The derivative allows us to talk about a tangent line to a curve. This is often called a line that touches the curve at just one point, but that isn't quite correct, though often the case locally. A better idea would be to say it is the line that best approximates the curve at that point. That is, if we were to zoom in to the graph it might appear to look straight, and that straightness would have a slope that would match the tangent line. This idea leads to a primary use of the derivative – to approximate functions with simpler lines.  Of course, this intuition is informal, a definition is in terms of the slope of approximating secant lines.
+Single-variable calculus has two main concepts: the derivative and the integral, both defined in terms of a third important concept: the limit. The derivative is what we discuss here.
+
+The derivative allows us to formally talk about a tangent line to a curve. This is often called a line that touches the curve at just one point, but that isn't quite correct, though often the case locally. A better idea would be to say it is the line that best approximates the curve at that point. That is, if we were to zoom in to the graph it might appear to look straight, and that straightness would have a slope that would match the tangent line. This idea leads to a primary use of the derivative---to approximate functions with simpler lines.  Of course, this intuition is informal, a definition is in terms of the slope of approximating secant lines.
 
 
 Historically, Fermat, in a treatise on finding maxima and minima, approached the problem of finding the tangent line by comparing the value of $f(x)$ to a nearby value $f(x+h)$. Working with polynomials, meant that subtracting $f(x+h) - f(x)$ led to a polynomial in $h$. Dividing by $h$ and then setting $h=0$ yields an answer for the slope.
@@ -50,11 +52,11 @@ This graph shows $f(x) = 2 - x^2$ and various secant lines when $c=-0.75$.
 f(x) = 2 - x^2
 c = -0.75
 slh(h) = secant(f, c, c+h)                # secant from the MTH229 package
-plot(f, -1, 1, legend=false)
-plot!(slh(1))
-plot!(slh(0.75))
-plot!(slh(0.5))
-plot!(slh(0.25))
+plot(f, -1, 1, legend=false, ylim=(1,3))
+plot!(secant(f, c, c + 1))
+plot!(secant(f, c, c + 3/4))
+plot!(secant(f, c, c + 1/2))
+plot!(secant(f, c, c + 1/4))
 ```
 
 As the value of $h$ goes towards 0 along the path $1$, $0.75$, $0.5$, $0.25$, ... the slope of the secant line heads towards the slope of the tangent line, in this case $2\cdot 0.75 = 1.5$.
@@ -113,7 +115,7 @@ c = pi/4; h = 0.0001
 ( f(c + h) - f(c) )/h - df(c)
 ```
 
-Not as good as we can get – the error is like `1e-5`, but not too bad already.
+Not as good as we can get---the error is like `1e-5`, but not too bad already.
 
 
 ##### Example Finding profit
@@ -122,7 +124,9 @@ Not as good as we can get – the error is like `1e-5`, but not too bad already.
 Suppose the tractor company John Deere models its profit per units sold through the function $P(x) = 50 e^{x/250}/(1 - e^{x/250})$. Find the marginal profit for $x=200$.
 
 
-The marginal profit is the change in profit per unit sold – or the derivative – at $x=200$.  We can find this quite simply by either differentiating directly, or as we do here, approximating the answer with `Julia`. We first note that the function above, is a composition, so it may be written using two functions:
+The marginal profit is the change in profit per unit sold---or the derivative---at $x=200$.
+
+We can find this quite simply by either differentiating directly, or as we do here, approximating the answer with `Julia`. We first note that the function above, is a composition, so it may be written using two functions:
 
 
 ```{julia}
@@ -215,10 +219,7 @@ numericq(val, 1e-6)
 #### Question
 
 
-The built-in `airyai` function, when called as `airyai(x)`, returns the so-called Airy function, a special function named after
-
-
-[George Biddell Airy](http://en.wikipedia.org/wiki/Airy_function).
+The built-in `airyai` function, when called as `airyai(x)`, returns the so-called Airy function, a special function named after [George Biddell Airy](http://en.wikipedia.org/wiki/Airy_function).
 
 
 Compute the derivative at $c=-3$ using $h=0.0001$.
@@ -323,7 +324,7 @@ plot(f, 0, 5)
 plot!(Df(f))
 ```
 
-If we look, we can see from the graph that `f` is increasing and `Df(f)` is positive – this is no coincidence, of course.
+If we look, we can see from the graph that `f` is increasing and `Df(f)` is positive---this is no coincidence, of course.
 
 
 ##### Example: Critical points
@@ -351,7 +352,7 @@ plot!(zero)
 If you want, we can find the roots numerically.
 
 ```{julia}
-find_zero(fp, (-2, -1)), find_zero(f', (1, 2))
+fzero(fp, -2, -1), fzero(f', 1, 2)
 ```
 
 
@@ -361,7 +362,7 @@ find_zero(fp, (-2, -1)), find_zero(f', (1, 2))
 Let $f(x) = \cos(x)$ over the interval $[0, 360]$ (in degrees). When is the function increasing?
 
 
-From the relationship of the derivative and the function, we know the answer is when $f'(x) > 0$. For this example, we can solve this directly as $f'(x) = -\sin(x)$ and we know when that is positive (well you are supposed to anyways: when the angle is in the third and fourth quadrants). Let's see how we would do this task with `Julia` and compare.
+From the relationship of the derivative and the function, we know the answer is when $f'(x) > 0$. (This is formalized using the mean value theorem.) For this example, we can solve this directly as $f'(x) = -\sin(x)$ and we know when that is positive (well you are supposed to anyways: when the angle is in the third and fourth quadrants). Let's see how we would do this task with `Julia` and compare.
 
 
 First, we only need the derivative, so we just ask:
@@ -451,23 +452,26 @@ out = [ Df(f,h=h)(.5) - fp(.5) for h in hs ];
 [hs out]
 ```
 
-When we look, we see that for awhile the approximation gets better (to about `1e-9`), but then does a U-turn and starts getting worse. The mathematical approximation gets better and better, but what happens is the computational error gets worse. We'll see below how to pick the $h$ that best balances these off, but first lets look at how using different approximations for the derivative can improve the "mathematical" error.
+When we look, we see that for awhile the approximation gets better (to about `1e-9`), but then does a U-turn and starts getting worse. The mathematical approximation gets better and better, but what happens is the computational error gets worse.  Recall this rule of thumb for floating point mathematics:
+
+> If we subtract two like-sized quantities our answer may have dramatically reduced precision.
+
+
+Of course $f(c+h)$ and $f(c)$ are two like-sized quantities for small $h$---as $f(x)$ is *continuous* if it is differentiable. We'll see below how to pick the $h$ that best balances these errors off, but first lets look at how using different approximations for the derivative can improve the "mathematical" error.
 
 
 ### Central difference quotient
 
 
-It turns out that just by looking to the left and the right we can improve the mathematical error from getting better at a rate of $h$ to a rate of $h^2$, provided our function is smooth enough and we don't have issues on the boundaries. The formula, called the *central difference quotient* approximation to the derivative is:
+It turns out that just by looking to the left and the right we can improve the mathematical error from getting better at a rate of $h$ to a rate of $h^2$, provided our function is smooth enough and we don't have issues on the boundaries. The formula we use, called the *central difference quotient* approximation to the derivative, is:
 
 
 $$
-f'(x) \approx \frac{ f(x + h) - f(x - h) }{2h}
+f'(x) \approx \frac{ f(x + h) - f(x - h) }{2h}.
 $$
 
-For this the mathematical error is like $h^2$, not $h$.
 
-
-Let's compare. To make our life easier we again create some functions, as we did with `Df` above.
+Let's compare to see the error is like $h^2$, not $h$. To make our life easier we again create some functions, as we did with `Df` above.
 
 
 ```{julia}
@@ -546,7 +550,7 @@ We could have defined `intersection_point` to accept a function with:
 intersection_point(f, c) = c  - f(c)/Dc(f)(c)
 ```
 
-Then it could easily be reused for other problems.
+Then this function could easily be reused for other problems.
 
 
 ### Practice
@@ -620,7 +624,7 @@ f(x) = x^x
 f'(1)
 ```
 
-Here `f` is a  function, `f'` is a derived function, and `f'(1)` is this derived function evaluated at `1` – just as with the use within a math text book.
+Here `f` is a  function, `f'` is a derived function, and `f'(1)` is this derived function evaluated at `1`---just as with the use within a math text book.
 
 
 Unlike, finite difference quotients automatic differentiation does not have issues arising from the loss of precision encountered when subtracting two like-sized numbers. Unlike symbolic derivatives (such as those found by the Wolfram Alpha website used by your iPhone's Siri) they can be computed quickly, even if the computations defining the function involve many steps.
@@ -697,9 +701,9 @@ Second derivatives are also available:
 ```{julia}
 #| fig-alt: plot x^2 - 2x and its first and second derivatives
 f(x) = x^2 - 2x
-plot(f, -2, 2)
-plot!(f')
-plot!(f'')
+plot(f, -2, 2; label="f")
+plot!(f'; label="f'")
+plot!(f''; label="f''")
 ```
 
 Here is an example where we plot the tangent line and the function. The `MTH229` package provides a function `tangent` which takes values for `f` and `c` and returns a *function* that represents the tangent line. The use is illustrated below. First we define a function `f` and use `tangent` to define a function `tl`:
@@ -734,7 +738,7 @@ Grass clippings are placed in a bin, where they decompose. For $0 \leq t \leq 30
   * For $t > 30$, $L(t)$, the linear approximation to $A$ at $t=30$ is a better model for the amount of grass clippings remaining in the bin. Use $L(t)$ to predict the time at which there will be 0.5% pound of grass clippings remaining in the bin. Show the work that leads to your answer.
 
 
-We can do all this relatively quickly with the `find_zero` function from the `Roots` package.
+We can do all this relatively quickly with the `fzero` function from the `Roots` package.
 
 
 First, we define $A(t)$:
@@ -768,11 +772,11 @@ The mean value theorem tells us that there is at least one time where the instan
 
 
 ```{julia}
-eqn(t) = A'(t) - m
-find_zero(eqn, (0, 30))
+aux(t) = A'(t) - m
+fzero(aux, 0, 30)
 ```
 
-So at 12.4 days, the instantaneous rate is equal to the average rate of decomposition over the first 30 days.
+So at $12.41\cdots$ days, the instantaneous rate is equal to the average rate of decomposition over the first 30 days.
 
 
 But this doesn't really answer the question asked, which is about the average amount of grass clippings in the bin. For this we need the integral form of the mean value theorem. Skipping ahead a few lessons to solve this problem, we have:
@@ -782,10 +786,10 @@ But this doesn't really answer the question asked, which is about the average am
 a, err = quadgk(A, 0, 30)	# area under A from 0,30
 avg = a/(30-0)
 eqn(t) = A(t) - avg
-find_zero(eqn, (0, 30))
+fzero(eqn, 0, 30)
 ```
 
-We get the same answer – think about whether that is a coincidence.
+We get the same answer---think about whether that is a coincidence.
 
 
 Finally, we can define $L(t)$ using the point-slope form of the line. The point is $(30, A(30))$ and the slope is $A'(30)$:
@@ -795,7 +799,7 @@ Finally, we can define $L(t)$ using the point-slope form of the line. The point 
 L(t) = A(30) + A'(30) * (t - 30) # t > 30
 ```
 
-We could restrict $L$ to insist that $t > 30$, but this isn't necessary. We are asked to solve this. Using `find_zero` requires a bracket. We check that $L(30) > 0.5$ and that $L(100)$ is negative:
+We could restrict $L$ to insist that $t > 30$, but this isn't necessary. We are asked to solve this. Using `fzero` requires a bracket. We check that $L(30) > 0.5$ and that $L(100)$ is negative:
 
 
 ```{julia}
@@ -807,7 +811,7 @@ So, we can use $[30, 100]$ as a bracket for $L(t) - 0.5 = 0$:
 
 ```{julia}
 eqn(t) = L(t) - 0.5
-find_zero(eqn, (30, 100))
+fzero(eqn, 30, 100)
 ```
 
 So a bit over 35 days to decompose to half a pound.
@@ -828,15 +832,15 @@ plot(f, 0, 40)
 #### Question
 
 
-Which definition would be right for  $(x,dx) - (y, dy)$?
+Which definition would be right for  $(x,dx) - (y, dy)$ following the examples on forward mode automatic differentiation?
 
 
 ```{julia}
 #| echo: false
 choices = [
 "`(x - y, dx - y)`",
-"`(x-y, dx - dy)`",
-"`(x - dx, y -dy)`"
+"`(x - y, dx - dy)`",
+"`(x - dx, y - dy)`"
 ];
 answer = 2;
 radioq(choices, answer)
@@ -869,8 +873,8 @@ We can compare the error at many different points with the following construct
 
 ```{julia}
 #| eval: false
-f(x) = exp(-x)*sin(x)
-dfpx) = exp(-x)*(cos(x) - sin(x))
+f(x)  = exp(-x) * sin(x)
+df(x) = exp(-x) * (cos(x) - sin(x))
 [abs(f'(x) - df(x) ) for x in range(0, pi, 25)]
 ```
 
@@ -897,7 +901,7 @@ We end with a digression on how big `h` should be to have the approximate deriva
 The choice of $h$ in the derivative approximations above was done somewhat arbitrarily, with only the intuition that smaller $h$'s should produce more accurate approximations (which of course may be way off, as we are subtracting like-sized values in the derivative formula). Here we look a bit more closely at how to choose $h$.
 
 
-As mentioned, with a bit of work from the second semester of calculus one can learn that the *mathematical error* in the forward difference quotient is "order $h$" whereas the mathematical error in the central difference quotient is "order $h^2$. This means that as $h$ gets small the approximation error in the first is a multiple of $h$, but for the second a multiple of $h^2$ – a much smaller error in general.
+As mentioned, with a bit of work from the second semester of calculus one can learn that the *mathematical error* in the forward difference quotient is "order $h$" whereas the mathematical error in the central difference quotient is "order $h^2$. This means that as $h$ gets small the approximation error in the first is a multiple of $h$, but for the second a multiple of $h^2$---a much smaller error in general.
 
 
 However there is also error due to *floating point approximation*. Such error is different in that it gets bigger as $h$ gets smaller. So one error gets bigger, the other gets smaller. So clearly if $h$ gets too small, the floating point error will dominate and the overall error will not get smaller, rather larger.
@@ -914,7 +918,7 @@ $$
 The errors may or *may not* cancel so the algebra with $\epsilon$ is unusual to the untrained eye. It basically takes into account the worse case.
 
 
-The key is the $2\epsilon/h$ term – it gets bigger as $h$ gets smaller.
+The key is the $2\epsilon/h$ term---it gets bigger as $h$ gets smaller.
 
 
 So if each floating point approximation is no more off than $\epsilon$, we have this bound on the error:
@@ -924,21 +928,21 @@ $$
 \text{error} \leq \frac{2\epsilon}{h} + (M/2)h
 $$
 
-Where $M$ is a constant that depends on the maximum absolute value of the second derivative and the $1/2$ comes from second semester calculus. Choosing $h$ to make this as small as possible is possible with some calculus involving the derivative, but for now we simply note the answer is $h=((2\epsilon)/(M/2))^{1/2}$.
+Where $M$ is a constant that depends on the maximum absolute value of the second derivative and the $1/2$ comes from second semester calculus. Choosing $h$ to make this as small as possible is possible with some calculus involving the derivative, but for now we simply note the answer is $h=((2\epsilon)/(M/2))^{1/2} = 2\sqrt{\epsilon}/\sqrt{M}$.
 
 
 Taking $\epsilon$ as machine tolerance and (conveniently) $M=1$ we get
 
 
 $$
-h_{min} = \sqrt((2\epsilon)/(1/2)) \approx 10^{-8}
+h_{min} = 2\sqrt{epsilon}/1 \approx 10^{-8}
 $$
 
 Or more precisely:
 
 
 ```{julia}
-sqrt( (2*eps())/(1/2) )
+2 * sqrt(eps())
 ```
 
 We can check this is about right, by graphing on a different scale:
@@ -1072,11 +1076,14 @@ and
 diff(ex, x, x)
 ```
 
-If there is one or more parameters, the variable must be specified.
+If there are one or more parameters, the variable must be specified.
 
 ```{julia}
 @syms a0 a1 a2 a3 x
 p = a0 + a1*x + a2*x^2 + a3*x^3
+```
+
+```{julia}
 diff(p, x)   # diff(p) will error
 ```
 

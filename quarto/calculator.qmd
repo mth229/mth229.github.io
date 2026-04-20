@@ -16,14 +16,13 @@ A notebook for this material:
 
 ## Introduction
 
-
-The programming language `Julia` (www.julialang.org) is a new language that builds on a long history of so-called dynamic scripting languages (DSLs).  DSLs are widely used for exploratory work and are part of the toolbox of most all data scientists, a rapidly growing area of employment. The basic `Julia` language is reminiscent of is `MATLAB`, though it offers many improvements over that language. For these notes, the focus will be on its more transparent syntax, but in general a major selling point of `Julia` is that it is much faster that `MATLAB` at many tasks.  (Well it should be, `MATLAB` was started back in the 70s.) Even better, `Julia` is an open-source project which means it is free to download and install, unlike the commercial package `MATLAB`.
+The programming language `Julia` (www.julialang.org) is a relatively new programming language that builds on a long history of so-called dynamic scripting languages (DSLs).  DSLs are widely used for exploratory work and are part of the toolbox of most all data scientists, a rapidly growing area of employment. The basic `Julia` language is reminiscent of all of `MATLAB`, `R`, `python`, `LISP`, and even `Ruby`, though it has differences from each of these languages. For these notes, the focus will be on its more transparent syntax, but in general a major selling point of `Julia` is that it is much performant than the other languages at many tasks.
 
 
 These notes will use `Julia` to explore calculus concepts. Unlike some other programs used with calculus (e.g., Mathematica, Maple, and Sage) `Julia` is not a symbolic math language. Rather, we will use a numeric approach. This gives a different viewpoint on the calculus material supplementing that of the text book. Though there are a few idiosyncrasies we will see along the way, for the most part the `Julia` language will be both powerful and easy to learn.
 
 
-In this project we start with baby steps---how to use `Julia` to perform operations we can do on the calculator. The use of a calculator requires knowledge about several things we take for granted here:
+In this project we start with baby steps---how to use `Julia` to perform operations we can do on the calculator. The use of a calculator requires knowledge about several things, often taken for granted
 
 
   * the use of the basic math operators
@@ -87,12 +86,12 @@ numericq(val, 1e-5)
 #### Question
 
 
-Compute $\sqrt{220}$ in `Julia`.
+Compute $\sqrt{222}$ in `Julia`.
 
 
 ```{julia}
 #| echo: false
-val = sqrt(220)
+val = sqrt(222)
 numericq(val, 1e-5)
 ```
 
@@ -148,20 +147,20 @@ $$
 \frac{12 - 10}{2}
 $$
 
-We know that the subtraction needs to be done before the division, as this is how we interpret this form of division. How to make this happen? The precedence of parentheses is used to force the subtraction before the division, as in `(12-10)/2`. Without parentheses you get a different answer:
+We know that the subtraction needs to be done before the division, as this is how we interpret this form of division (with the horizontal bar). How to make this happen? The precedence of parentheses is used to force the subtraction before the division, as in `(12-10)/2`. Without parentheses you get a different answer:
 
 
 ```{julia}
 (12 - 10)/2,  12 - 10/2
 ```
 
+> Parentheses are used to force lower precedence operations to happen before higher precedence ones.
+
 :::{.callout-note}
 ## Alert
 Using a comma to separate expressions will cause both to print out---not just the last one evaluated. This trick is also a useful trick within an `IJulia` notebook.
 
 :::
-
-> Parentheses are used to force lower precedence operations to happen before higher precedence ones.
 
 
 
@@ -260,7 +259,7 @@ e^(1/2 * (4 - 3)^2)
 
 Forgetting the parentheses, as in `e^1/2*(4-3)^2` would be equivalent to just $e^1 \cdot (1/2)\cdot(4-3)^2$.
 
-For a base of $e$, the use of function `exp` avoids this point, as to pass an argument to a function requires parentheses already. So the above could be `exp(1/2*(4-3)^2)`
+For a base of $e$, the use of function `exp` avoids this point, as to pass an argument to a function requires parentheses already. So the above could be `exp(1/2*(4-3)^2)`. (As well, `e` is not exposed in base `Julia`, though the `MTH229` package defines it through `e=exp(1)`.)
 
 ### Practice
 
@@ -469,13 +468,13 @@ There are special functions to perform common powers. For example, the square-ro
 sqrt(15)
 ```
 
-This shows how to evaluate a function:
+This simple computation, or function call, shows how to evaluate a function:
 
-* Functions are referred to by name.
-* Arguments are passed to the function inside parentheses.
+* Functions are referred to by name (`sqrt`).
+* Arguments are passed to the function inside parentheses (`15`).
 * Between the function name and the opening parentheses there is *no* space.
-* Functions may have $0$, $1$, or more arguments. When there are multiple, they are separated by a comma.
-* There are *positional* arguments and *keyword arguments* the latter specified through a `key=value` format.
+* Functions may have $0$, $1$, or more arguments. When there are multiple, they are separated by a comma. (This call had 1.)
+* There are *positional* arguments and *keyword arguments* the latter specified through a `key=value` format. (This call only uses a positional argument.)
 
 
 Parentheses are also used to group expressions, as would be done to do this using the power notation:
@@ -536,7 +535,9 @@ sind(45)
 cosd(45)
 ```
 
-Be careful, an expression like $\cos^2(\pi/4)$ is a shorthand for squaring the output of the cosine of $\pi/4$, hence is expressed with
+(For simplicity, we fall back on direct conversion in the sequel.)
+
+Be careful, an expression like $\cos^2(\pi/4)$ is a shorthand for squaring the output of the cosine of $\pi/4$, hence is expressed with:
 
 
 ```{julia}
@@ -576,15 +577,7 @@ The values $e^x$ can be computed through the function `exp(x)`:
 exp(2)
 ```
 
-The constant value of `e` is only available on demand:
-
-
-```{julia}
-using Base.MathConstants
-e
-```
-
-(The `MTH229` package, which is used in subsequent sections, defines `e` as `exp(1)`, for convenience.)
+(The constant value of `e` is only available with the `Base.MathConstants` module. The `MTH229` package, which is used in subsequent sections, defines `e` as `exp(1)`, for convenience.)
 
 The logarithm function, `log` (and **not**  `ln`) does log base $e$:
 
@@ -718,7 +711,7 @@ numericq(pi - answer)
 ## Variables
 
 
-With a calculator, one can store values into a *memory* for later usage. This useful feature with calculators is greatly enhanced with computer languages, where one can bind, or assign, a variable to a value. For example the command `x=2` will bind `x` to  the value $2$:
+With a calculator, one can store values into a *memory* for later usage. This useful feature with calculators is greatly enhanced with computer languages, where one can bind, or assign, a value to an identifier, or variable. For example the command `x=2` will bind `x` to  the value $2$:
 
 
 ```{julia}
@@ -758,9 +751,11 @@ The basic tradeoff being: longer names are usually more expressive and easier to
 
 :::{.callout-note}
 ## Alert
-In fact, only *most* objects bound to a name can be arbitrarily redefined. When we discuss functions, we will see that redefining functions can be an issue and new names will need to be used. As such, it often works to stick to come convention for naming: numbers use values like `i`, `j`, `x`, `y`; functions like `f`, `g`, `h`, etc.
+In fact, only *most* objects bound to a name can be arbitrarily redefined. When we discuss functions, we will see that redefining generic functions as values (or vice versa) can be an issue and new names will need to be used. As such, it often works to stick to come convention for naming: numbers use values like `i`, `j`, `x`, `y`; functions like `f`, `g`, `h`, etc.
 
 :::
+
+#### The equals sign differs between mathematics and Julia
 
 To work with computer languages, it is important to appreciate that the equals sign in the variable assignment is unlike that of mathematics, where often it is used to indicate an equation which may be solved for a value. With the following computer command the right hand expression is evaluated and that value is assigned to the variable. So,
 
@@ -794,7 +789,7 @@ Note that `Julia` makes this task even easier, as one can do multiple assignment
 
 
 ```{julia}
-a, b  = 0, 1		## printed output is a "tuple"
+a, b  = 0, 1
 a + b
 ```
 
@@ -847,7 +842,8 @@ $$
 for $p=0.25$ and $q=0.2$ we might do:
 
 
-```
+```{julia}
+#| eval: false
 p, q = 0.25, 0.2
 top = p - q
 bottom = sqrt(p*(1-p))
@@ -898,7 +894,7 @@ The floating point value $1$ is specified by using a decimal point:
 1.0
 ```
 
-The two values are printed differently – integers never have a decimal point, floating point values always have a decimal point. This emphasizes the fact that the two values `1` and `1.0` are not the same – they are stored differently, they print differently, and can give different answers. In most cases – but not all – uses they can be used interchangeably.
+The two values are printed differently – integers *never* have a decimal point, floating point values *always& have a decimal point. This emphasizes the fact that the two values `1` and `1.0` are not the same – they are stored differently, they print differently, and can give different answers. In most cases – but not all – uses they can be used interchangeably.
 
 
 For example, we can add the two:
@@ -1074,11 +1070,11 @@ Floating point contains two special values: `NaN` and `Inf` to represent "not a 
 0/0				## indeterminate
 ```
 
-These values can come up in unexpected circumstances. For example division by $0$ can occur due to round off errors:
+These values can come up in unexpected circumstances. For example division by $0$ can occur due to round-off errors, especially when subtracting like-sized quantities:
 
 
 ```{julia}
-x = 1e-17
+x = 1e-18
 x^2/(1-cos(x))			## should be about 2
 ```
 
@@ -1109,12 +1105,12 @@ As you know, a rational number $m/n$ can be reduced to lowest terms by factoring
 2//4
 ```
 
-Rational numbers are used typically to avoid round off error when using floating point values. This is easy to do, as `Julia` will convert them when needed:
+Rational numbers are used typically to avoid round-off error, that can arise using floating point values. As `Julia` promotes values to a common type, rational numbers easily be mixed into expressions:
 
 
 ```{julia}
-1//2 - 5//2                         ## still a rational
-1//2 - sqrt(5)/2                    ## now a floating point
+1//2 - 5//2                         # still a rational
+1//2 - sqrt(5)/2                    # now a floating point
 ```
 
 However, we can't do the following, as the numerator would be non-integer when trying to make the rational number:
@@ -1127,7 +1123,7 @@ However, we can't do the following, as the numerator would be non-integer when t
 ### Complex numbers
 
 
-Complex numbers are an extension of the real numbers when the values $i = \sqrt{-1}$ is added. Complex numbers have two terms: a real and imaginary part. They are typically written as $a + bi$, though the polar form $r\cdot e^{i\theta}$ is also used. The complex numbers have the usual arithmetic operations defined for them.
+Complex numbers are an extension of the real numbers when the values $i = \sqrt{-1}$ is added. Complex numbers have two terms: a real and imaginary part. They are typically written as $a + bi$, though the polar form $r\cdot e^{i\theta}$ is also used. Complex numbers have the usual arithmetic operations defined for them.
 
 
 In `Julia` a complex number may be constructed by the `Complex` function:
@@ -1137,7 +1133,7 @@ In `Julia` a complex number may be constructed by the `Complex` function:
 z = Complex(1,2)
 ```
 
-We see that `Julia` uses `im` (and not `i`) for the $i$. It can be more direct to just use this value in constructing complex numbers:
+We see that `Julia` uses `im` (and not `i`) for the $i$. It can be more direct to just use this special constant in constructing complex numbers:
 
 
 ```{julia}
@@ -1331,7 +1327,7 @@ radioq(choices, answer)
 ## Alert
 Like the `BigInt` class, `Julia` also has a `BigFloat` class for storing decimal numbers with arbitrary precision.
 Due to some technical details of how floating point numbers are stored, the number of bits must be fixed in advance of any computation—unlike `BigInt`s whose precision can grow on-the-fly.
-`Julia` provides the `setprecision` command to set this number of bits (e.g. `setprecision(1024)`). The default precision is $256$.
+`Julia` provides the `setprecision` command to set this number of bits (e.g. `setprecision(1024)`). The default precision is $256$ (four times the size of `Float64`).
 :::
 ----
 

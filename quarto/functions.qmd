@@ -11,10 +11,8 @@ A notebook for this material:
 ## Introduction
 
 
-We see in this section how to easily create functions in `Julia`. In the following sections we begin to do things with functions, such as learning how to graph functions with `Julia`.
+We see in this section how to easily create mathematical functions in `Julia`. In the following sections we begin to do things with functions, such as graphing functions with `Julia`.
 
-
-For basic things creating a new function and plotting it is as familiar as this:
 
 
 We begin by loading some packages:^[Packages are a means to extend base `Julia`. There are thousands of add-on packages for `Julia`, but these notes basically use just the two here, which rely on a handful of other add-on packages.]
@@ -32,8 +30,7 @@ plotly()       # a selection of an interactive means to render plots
 using QuizQuestions
 ```
 
-Then we define a function and plot it over $[0, \pi]$:
-
+Once the environment is set up, for basic things, creating a new function and plotting it is as familiar as the following:
 
 ```{julia}
 #| fig-alt: plot of sin(3x^2 - 2x^3) over (0, pi)
@@ -41,10 +38,12 @@ f(x) = sin(3x^2 - 2x^3)
 plot(f, 0, pi)
 ```
 
+In the above, the first line defines a function---using the same notation used in mathematics; the second plots in a stratightforward manner only expecting the user to specify a function (by name) and a domain to plot over.
+
 Really, you'd be hard pressed to make this any shorter or more familiar.  Of course, not everything is this easy so there are still things to learn, but keep in mind that 90% of what we want to do in these projects is really this straightforward.
 
 
-Mathematically, a function can be viewed in many different ways. An abstract means is to think of a function as a mapping, assigning to each $x$ value in the function's domain, a corresponding $y$ value in the function's range. With computer languages, such as `Julia`, the same holds, though there may be more than one argument to the function and with `Julia` the number of arguments and type of each argument are consulted to see exactly which function is to be called.
+Mathematically, a function can be viewed in many different ways. An abstract means is to think of a function as a mapping, assigning to each $x$ value in the function's domain, a corresponding $y$ value in the function's range. With computer languages, such as `Julia`, the same holds, though there may be more than one argument to the function and with `Julia` the number of arguments and type of each argument are consulted to see exactly which function (technically method) is to be called.
 
 
 Here we don't work abstractly though. For a mathematical function (real-valued function of a single variable, $f: \mathbb{R} \rightarrow \mathbb{R}$), we typically just have some rule for what the function will do to $x$ to produce $y$, such as
@@ -105,7 +104,7 @@ f(212)
 
 We have three *different* things we do with functions:
 
-* **Defining a function**, as above, can be done with the same syntax as mathematics. The function name with parentheses surrounds any arguments, and equal sign to indicated a *definition* and a rule on the right of the equals sign, indicating what becomes of the arguments.
+* **Defining a function**, as above, can be done with the same syntax as mathematics. The function name with parentheses surrounds any arguments, an equal sign to indicate a *definition*, and a rule on the right of the equals sign, indicating what becomes of the arguments.
 
 * **Calling a function** Evaluating a function for a given value is also known in programming languages as "calling" `f`. Again, the `Julia` syntax follows the mathematical notation: the function name, with the *values* to define the function at enclosed in parentheses.
 
@@ -115,6 +114,25 @@ We have three *different* things we do with functions:
 Though a function in `Julia` is typically *generic* and has different methods depending on the various inputs, this is a detail we don't  need to consider in these notes.
 
 :::
+
+A familiar example from physics which models the height of a projectile is
+
+$$
+h(t) = -\frac{1}{2}g \cdot t^2 + v_0\cdot t + x_0
+$$
+
+If we take $g=32$ and $v_0 = 1$ and $x_0 = 100$, we can quickly write a `Julia` function:
+
+```{julia}
+h(t) = -(1/2)*32 * t^2 + t + 100
+```
+
+If this models the height of an object thrown upwards with a certain velocity from a certain height, what is this height when $t=2$?
+
+```{julia}
+h(2)
+```
+
 
 ### Numeric literals
 
@@ -136,7 +154,7 @@ Implicit multiplication can also be used when simple parentheses are involved:
 k(x) = 2(x - 1)^2 + 3(x+1)
 ```
 
-But implicit multiplication won't work with expressions such as `(x+1)(x-1)`, as `Julia` will then think the first parenthetical pair is a function and try to call it with a value of `x-1`.
+But implicit multiplication won't work with expressions such as `(x+1)(x-1)`, as `Julia` will then think the first parenthetical pair is a function and try to call it with a value of `x-1` typically resulting in a `MethodError` and mention of something not being "callable".
 
 
 
@@ -182,7 +200,7 @@ f(x) = 5/9 * (x - 32)
 f(72)				## room temperature
 ```
 
-will create a function which is called with a value of `x` at a later time. So the value of `x` defined when the function is created is not important here (as `x` is passed in as an argument).
+will create a function which is called with a value of `x` at a later time. So the value of `x` defined when the function is created is not important here---`x` is passed in as an argument.
 
 These notes almost always use functions not expressions, so becoming familiar with functions is necessary.
 
@@ -201,10 +219,23 @@ becomes
 
 
 ```{julia}
-f(x) = (x^2 - 2)/(x-2)
+f(x) = (x^2 - 2) / (x-2)
 ```
 
+:::{.callout-note}
+## Remember parentheses!
+
 Here, as with your calculator, it is important to remember to use parentheses around the top and bottom expressions, as otherwise the division operator will have higher precedence than the subtraction operators.
+
+Mathematically, the horizontal bar in division implies grouping of the top and bottom. Where as the `/` operation does not. (It doesn't in mathematics either.) so mentally be prepared to do something like this:
+
+$$
+\frac{\cdots}{\cdots} \Rightarrow \text{  ( ⋯ ) / ( ⋯ ) }
+$$
+
+:::
+
+
 
 
 ### Other powers
@@ -229,6 +260,11 @@ f(x) = sqrt(x) + cbrt(x) + x^(1/4)
 
 For the fractional power, this shows the required parentheses around `(1/4)` to ensure that division occurs before the higher-precedence power operation (compare `2^1/4` to `2^(1/4)`).
 
+:::{.callout-note}
+## `cbrt(x)` is not *always* `x^(1/3)`
+
+In math we are used to turning $\sqrt[n]{x}$ into $x^{1/n}$. In `Julia` that can bump into problems when `x` is negative. The `cbrt` function works with negative numbers to return a negative number, whereas `x^(1/3)` will error when `x` is negative. The issue is $x^y$ might need a complex number to represent the answer for *certain* values of $y$, and `Julia` doesn't specialize its return value based on the value of `y`, but on the type of the value of `y`, in this case just throwing an error as some values of `y` would need complex numbers to represent the answer. (Starting with a complex number for `x` won't error.)
+:::
 
 ## Common functions
 
@@ -266,7 +302,7 @@ If you want to work in degrees you can do so with the degree-based trigonometric
 fd(x) = cosd(x) - sind(x)^2
 ```
 
-This is not used in the following, rather, when needed converting from degrees to radians through multiplication by `pi/180` is. (There is also `deg2rad`.)
+To keep the number of functions to know small, these functions are avoided in the following, rather, when needed, converting from degrees to radians through multiplication by `pi/180` is used.
 :::
 
 
@@ -314,7 +350,7 @@ Can be expressed as
 f(x) = e^(-(1/2)*x^2)
 ```
 
-The value of $e$ is built-in to `Julia`, but not immediately available. It is s exposed by the `MTH229` package. But $e$ can be inadvertently redefined. As such, it is a safer practice to use the `exp` function, as in:
+The value of $e$ is built-in to `Julia`, but not immediately available. It is exposed by the `MTH229` package, so the above will work as long as that package has been loaded. But `e` is a convenient variable name, so `e` can be inadvertently redefined. As such, it is a safer practice to use the `exp` function, as in:
 
 
 ```{julia}
@@ -322,6 +358,28 @@ f(x) = exp(-(1/2)*x^2)
 ```
 
 There isn't much difference in use, but don't try to do both at once, as in `exp^(-(1/2)*x^2)`!
+
+----
+Let's do one more example which builds on the exponential function, the basic logistic function has this form
+
+$$
+f(x) = \frac{L}{1 + e^{-k\cdot(x - x_0)}
+$$
+
+Define a `Julia` function when $L=k=x_0=1$:
+
+This is done as follows:
+
+```{julia}
+f(x) = 1 / (1 + exp(-(x-1)))
+```
+
+The logistic function is always increasing. If we compare the value at $1$ and $2$ we should see that:
+
+```{julia}
+f(1), f(2)
+```
+
 
 
 ### Logarithms
@@ -741,7 +799,7 @@ Which of these definitions will be the equivalent of $f(x) = |x|$? (The `abs` fu
 #| echo: false
 choices =  ["`f(x) = x`",
 	    "`f(x) = x > 0 ? x : 0.0`",
-	    "`f(x) =   x > 0.0 ? x : -x`",
+	    "`f(x) = x > 0.0 ? x : -x`",
 		"`f(x) = x > 0.0 ? -x : x`"
 	     ];
 answer = 3;
@@ -809,7 +867,13 @@ Anonymous functions can be named. For example, we might have:
 motion_of_particle = x -> -16x^2 + 32x
 ```
 
-This names a function object; it does not create a method for a generic function (to be described later). One source of possible confusion is the name given to an anonymous function *can not* be used as a name for a function defined through the style `f(x) = ...`, as that creates a method for a *generic function*. Vice versa.
+This names a function object; it does not create a method for a generic function (to be described later).
+
+::: {.callout-note}
+## Two types of names
+
+One source of possible confusion is the name given to an anonymous function *can not* be used as a name for a function defined through the style `f(x) = ...`, as that creates a method for a *generic function*. Vice versa. That is, you can reuse names for variables for *other* variables, but not for new *methods* of generic functions. Further, you can reuse function (generic) names for other such, but not for variables. You will get an error if you try.
+:::
 
 
 ## Functions of multiple variables
@@ -828,7 +892,7 @@ The right-hand sides may or may not be familiar, but it should be reasonable to 
 
 ### Positional arguments
 
-Functions like `Area` above use *position* to match the values used when calling the function with the variables in the function definition. This is quite natural. We would expect `Area(5,6)` to use `w=5` and `h=6` when the evaluation is performed.
+	Functions like `Area` above use *position* to match the values used when calling the function with the variables in the function definition. This is quite natural. We would expect `Area(5, 6)` to use `w=5` and `h=6` when the evaluation is performed.
 
 ##### Question
 
@@ -897,7 +961,7 @@ g(50, theta=pi/8)		## smaller in this case.
 
 The pattern `g(theta=pi/8, 50)` would error.
 
-We used a comma to separate the positional argument from the keyword argument. Commas are used to separate different positional arguments; commas are used to separate different keyword arguments, so this is natural. However, a semicolon can also be used, to mirror their mandated use when *defining* a function with keyword arguments.
+We used a comma to separate the positional argument from the keyword argument. Commas are used to separate different positional arguments; commas are used to separate different keyword arguments, so this is natural. However, a semicolon can also be used, to mirror their **mandated** use when *defining* a function with keyword arguments.
 
 
 
@@ -914,7 +978,7 @@ A good example is addition. In experience, different algorithms are used for add
 
 Some upcoming example usage of generic functions will include:
 
-* `find_zero(f, c)` and `find_zero(f, a, b)` will both find a zero of `f`, but the first form will look for one *near* `c`; the second for a zero between `a` and `b` -- while using a *totally* different algorithm.
+* `fzero(f, c)` and `fzero(f, a, b)` will both find a zero of `f`, but the first form will look for one *near* `c`; the second for a zero between `a` and `b`---while using a *totally* different algorithm.
 
 * `plot(f, a, b)` will plot the function `f` over the interval `[a,b]`. However, `plot(xs, ys)` will plot the points $(x_1, y_1), (x_2, y_2), \dots (x_n, y_n)$ specified with two contains.
 
@@ -993,7 +1057,7 @@ Area(w) = Area(w, h(w))
 This might seem odd, as now we have two *different* but related functions named `Area`. Julia will decide which to use based on the number of arguments when the function is called. This allows both to be used on the same line, as above. This usage is not common with computer languages, but is a feature of `Julia` which is built around the concept of *generic* functions with multiple dispatch rules to decide which rule to call.
 
 
-For example, the `plot` function, when called as below, expects functions of a single numeric variable. Behind the scenes, then the function `A(w)` will be used in this graph:
+For example, the `plot` function, when called as below, expects functions of a single numeric variable. Behind the scenes, then the function `Area(w)` will be used in this graph:
 
 
 ```{julia}
@@ -1089,7 +1153,7 @@ In `Julia` it is natural to use functions which mirror mathematical
 operators: functions which accept other functions as inputs and
 output function objects. We call such functions operators here, though
 that term isn't so standard. In the example below, we give an
-illustration. However, the main example -- the derivative -- will wait
+illustration. However, the main example---the derivative---will wait
 until later.
 
 One difference we highlight is that since operators return functions we simply *assign* them names such as `f = ...`, when that is desirable, rather than use the function definition notation of `f(x) = ...`. Though we are mindful that the same name can't be used for both styles, as the former style assigns a variable to a function object, the latter creates a method for a function name.
@@ -1123,14 +1187,14 @@ This takes the values of `f`, `a`, and `b` (or the derived *parameters* `m`, `x1
 secant_line(3)
 ```
 
-While the above construction is easy to understand, it is also a bit of a fragile construction, as the values of the parameters, `m`, `x1`, and `y1` are *global* variables derived from the basic inputs `f`, `a`, and `b`. As mentioned earlier, when `secant_line` is called the current values assigned to the global variables are used --  not necessarily the same values as when `secant_line` is defined.
+While the above construction is easy to understand, it is also a bit of a fragile construction, as the values of the parameters, `m`, `x1`, and `y1` are *global* variables derived from the basic inputs `f`, `a`, and `b`. As mentioned earlier, when `secant_line` is called the current values assigned to the global variables are used--- not necessarily the same values as when `secant_line` is defined.
 
 To be explicit about the values of the parameters being *fixed*, a different approach is typically used.
 
 Below, we write a function to return an  *anonymous function* with the values for the parameters fixed. In computer science language, we are creating a *closure*:
 
 ```{julia}
-function Secant(f, a, b)
+function Secant_Line(f, a, b)
     m = (f(b) - f(a)) / (b -a)
     x1, y1 = a, f(a)
     x -> point_slope(x, m, x1, y1)
@@ -1140,7 +1204,7 @@ end
 The same "`secant_line`" function would be generated through:
 
 ```{julia}
-sl = Secant(f, a, b)
+sl = Secant_Line(f, a, b)
 ```
 
 To see they are the same, let's just call them at an arbitrary value of `x` and compare:
@@ -1150,18 +1214,18 @@ sl(3), secant_line(3)
 ```
 
 ::: {.callout_note}
-#### Note: "`sl`" -- not "`sl(x)`"
+## Note: "`sl`"---not "`sl(x)`"
 
-The `Secant` function above constructs and returns a *function*, so `sl` is a function object. We don't need to write `sl(x)` on the *left-hand side*, as we do when we define a generic function or method through an expression of its arguments. This *can* be done, were the following usage employed:
+The `Secant_Line` function above constructs and returns a *function*, so `sl` is a function object. We don't need to write `sl(x)` on the *left-hand side*, as we do when we define a generic function or method through an expression of its arguments. This *can* be done, were the following usage employed:
 
 ```{julia}
-sec_line(x) = Secant(f, a, b)(x)
+sec_line(x) = Secant_Line(f, a, b)(x)
 ```
 
 but this is not recommended: it is a bit awkward to type, is inefficient, and---*most importantly*---uses *global* values for `a` and `b` each time it is called.
 :::
 
-The `secant(f, a, b)` function in the `MTH229` package returns a function like `Secant` that has a reminder of what it does when used:
+The `secant(f, a, b)` function in the `MTH229` package returns a function like `Secant_Line` that has a reminder of what it does when used:
 
 ```{julia}
 f(x) = x^2
@@ -1198,7 +1262,7 @@ m = (sl(b) - sl(a)) / (b - a)
 
 ##### Question
 
-The package defines a related function `tangent(f, c)` to return a *function* which computes the tangent line to `f` at `c`:
+The `MTH229` package defines a related function `tangent(f, c)` to return a *function* which computes the tangent line to `f` at `c`:
 
 ```{julia}
 f(x) = x^2
@@ -1262,7 +1326,7 @@ SlopeIntercept(m, b) = x -> slope_intercept(x, m, b)
 
 When the function *returned* by `SlopeIntercept` is called, it uses the fixed values for `m` and `b`.
 
-The pattern of fixing a value of a function is common enough that there are also functions `Base.Fix1` and `Base.Fix2`. Both are for functions of *two* variables, `f(x,y)`. The first is used to create a function of `y` for a *fixed* `x`; the second to create a function of `x` for a fixed `y`. While the style of `SlopeIntercept` above, where an anonymous function is returned, is natural, the implementation of these two "fix" functions is more performant and their use appears often behind the scenes.
+The pattern of fixing a value of a function is common enough that there are also functions `Base.Fix1` and `Base.Fix2` (and more generally `Base.Fix{N}`). Applied to a function `f(x,y)`, `Fix1`  is used to create a function of `y` for a *fixed* `x`; `Fix2` to create a function of `x` for a fixed `y`. While the style of `SlopeIntercept` above, where an anonymous function is returned, is natural, the implementation of these two "fix" functions is more performant and their use appears often behind the scenes.
 
 :::
 
@@ -1501,7 +1565,7 @@ can be specialized to just integer values with:
 binom(n::Integer, k::Integer) = factorial(n)/(factorial(n-k) * factorial(k))
 ```
 
-The extra bit `::Integer` is called a *type annotation* and specializes `n` and `k` so that this function only is called with both `n` and `k` are of this type.
+The extra bit `::Integer` is called a *type annotation* and specializes `n` and `k` so that this function only is called when both `n` and `k` are of this type.
 
 
 As defined, we can call our `binom` function as:
@@ -1602,7 +1666,7 @@ functions.  Skipping ahead a bit, we see that a simple expression can be
 used in place of a function when plotting:
 
 ```{julia}
-plot(x^5 - x - 1, -1, 1.5)  # Plots is loaded
+plot(x^5 - x - 1, -1, 1.5)  # x is symbolic; Plots is loaded
 ```
 
 One final feature of simple expressions is they can also represent equations. This is done by separating the left and right hand sides with a `~`.

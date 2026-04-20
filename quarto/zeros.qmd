@@ -575,10 +575,10 @@ radioq(choices, answer)
 
 
 
-## The Roots package and find_zero to solve $f(x) = 0$
+## The Roots package and fzero to solve $f(x) = 0$
 
 
-The bisection method, while easy to describe and understand, can be made a bit more efficient. The `find_zero` function from the `Roots` package does so. This package is loaded when `MTH229` is. This function uses a tuple to specify the bracketing interval.
+The bisection method, while easy to describe and understand, can be made a bit more efficient. The `fzero` function from the `Roots` package does so. This package is loaded when `MTH229` is. This function uses a tuple to specify the bracketing interval.
 
 
 For example, to find a zero of $f(x) = 2x \cdot \exp(-20) - 2 \cdot \exp(-20x) + 1$ in the *bracketing* interval $[0,1]$ we have:
@@ -586,18 +586,18 @@ For example, to find a zero of $f(x) = 2x \cdot \exp(-20) - 2 \cdot \exp(-20x) +
 
 ```{julia}
 f(x) = 2x * exp(-20) - 2 * exp(-20x) + 1
-find_zero(f, (0, 1))
-```
-
-The `find_zero` function is actually an interface to various root-finding algorithms. When called as above---with two initial starting points---it uses a bracketing approach as discussed here, though with a different notion of the midpoint.
-
-
-A slightly different interface is given by the `fzero` function, where that above would be:
-
-
-```{julia}
 fzero(f, 0, 1)
 ```
+
+
+:::{.callout-note}
+## find_zero
+In the `Roots` package, `fzero` is an alias to the `find_zero` function. We use it hear to save typing and inertial.
+The `find_zero` function is actually an interface to various root-finding algorithms. The `find_zero` function uses a container to specify the bracketing interval, like `(a,b)`. The `fzero` function also supports that alternate form, though we use `fzero(f, a, b)`, as that is the same pattern as used by plotting.
+:::
+
+
+The bracketing interval can also be specified as a tuple, as in `(0,1)` which can offer some convenience, but isn't necessary for interactive usage.
 
 ### From a graph to a more accurate numeric answers
 
@@ -631,14 +631,14 @@ So we find the values of the zero in the bracketed region $[7.5, 10]$:
 
 
 ```{julia}
-find_zero(f, (7.5, 10))
+fzero(f, (7.5, 10))
 ```
 
 The root within $[0, 7.5]$ is found with:
 
 
 ```{julia}
-find_zero(f, (0, 7.5))
+fzero(f, (0, 7.5))
 ```
 
 ----
@@ -658,10 +658,10 @@ If we believe that the function is increasing, we can see then that any zero hap
 plot(f, 0, 1000)
 ```
 
-From the graph, we confirm that $[0,1000]$ contains a zero and is a bracketing interval. With this, we are ready to call `find_zero`:
+From the graph, we confirm that $[0,1000]$ contains a zero and is a bracketing interval. With this, we are ready to call `fzero`:
 
 ```{julia}
-find_zero(f, (0, 1000))
+fzero(f, 0, 1000)
 ```
 
 ### Solving $f(x) = c$
@@ -678,7 +678,7 @@ The easiest way is to create a simple function:
 
 ```{julia}
 aux(x) = tan(x) - 1.23
-find_zero(aux, (0, pi/2))
+fzero(aux, 0, pi/2)
 ```
 
 We can be more formal (as it is a more general pattern) and use two functions to define the problem:
@@ -687,7 +687,7 @@ We can be more formal (as it is a more general pattern) and use two functions to
 f(x) = tan(x)
 g(x) = 1.23
 aux(x) = f(x) - g(x)
-find_zero(aux, (0, pi/2))
+fzero(aux, 0, pi/2)
 ```
 
 We compare with the arc tangent, as there is a built-in function to do this particular problem:
@@ -704,11 +704,11 @@ An alternate approach is to define our function with a *parameter*:
 f(x, p) = tan(x) - p
 ```
 
-We can then pass values for `p` to `find_zero` to `solve`:^[
+We can then pass values for `p` to `fzero` to `solve`:^[
 We use a keyword argument in the example code, the last positional argument can also be used, which is useful for broadcasting, were we interested in finding solutions for multiple values of the parameter.]
 
 ```{julia}
-find_zero(f, (0, pi/2); p=1.23)
+fzero(f, 0, pi/2; p=1.23)
 ```
 
 
@@ -716,7 +716,7 @@ For this problem, the two approaches are about equal in effort. The first style 
 
 ### Solving $f(x) = g(x)$
 
-The `find_zero` function finds a value solving $f(x) = 0$. When the question involves two functions, e.g. $f(x) = g(x)$ it can't be immediately used. However, forming an auxiliary function $aux(x) = f(x) - g(x)$ works as solutions to $aux(x) = 0$ satisfy $f(x) = g(x)$.
+The `fzero` function finds a value solving $f(x) = 0$. When the question involves two functions, e.g. $f(x) = g(x)$ it can't be immediately used. However, forming an auxiliary function $aux(x) = f(x) - g(x)$ works as solutions to $aux(x) = 0$ satisfy $f(x) = g(x)$.
 
 For example, identifying when $\cos(x) = 2x$ may be of interest. By simple geometry, the line through zero with positive slope will intersect the cosine graph somewhere in $[0, \pi/2]$:
 
@@ -727,14 +727,14 @@ f(x) = cos(x)
 g(x) = 2x
 aux(x) = f(x) - g(x)
 
-find_zero(aux, (0, pi/2))
+fzero(aux, 0, pi/2)
 ```
 
 More generally, we might be interested in solving $\cos(x) - px$ for different $p > 0$. The parameter approach can be readily used:
 
 ```{julia}
 f(x, p) = cos(x) - p * x
-find_zero(f, (0, pi/2); p = 2)
+fzero(f, 0, pi/2; p = 2)
 ```
 
 #### Example
@@ -750,14 +750,14 @@ plot!(secant(f, 1, 2))
 plot!(secant(f, -2, -1))
 ```
 
-The intersection point near $0.5$ is clear. In the following we show how an infinite bracketing interval is possible. As two non-parallel lines intersect in one point, any open interval containing the intersection point will be a bracketing interval. The bisection algorithm of `find_zero` handles without fuss any signed value, even infinite ones (though does stop if it encounters a `NaN` value).
+The intersection point near $0.5$ is clear. In the following we show how an infinite bracketing interval is possible. As two non-parallel lines intersect in one point, any open interval containing the intersection point will be a bracketing interval. The bisection algorithm of `fzero` handles without fuss any signed value, even infinite ones (though does stop if it encounters a `NaN` value).
 
 ```{julia}
 f(x) = exp(x)
 sl_12 = secant(f, 1, 2)
 sl_21 = secant(f, -2, -1)
 aux(x) = sl_12(x) - sl_21(x)
-find_zero(aux, (-Inf, Inf))
+fzero(aux, -Inf, Inf)
 ```
 
 The above follows the pattern of using `aux(x)= f(x) - g(x)` to solve $f(x) = g(x)$. The intermediate names, `sl12` and `sl21`, are used for the two function here that we are finding the intersection of.
@@ -768,14 +768,14 @@ Symbolic math is touched on in section 5 using the powerful `SymPy` package. In 
 
 The `MTH229` package loads the `SimpleExpressions` package which provides a means to create a basic symbolic variable (and parameter) through the macro `@symbolic`. `SymPy` will uses the more powerful `@syms` macro for a related task.
 
-With a symbolic variable, computed expressions stay symbolic until needed.  Symbolic expressions can be paired together with a `~` to create a *symbolic equation*. Such equations can be `solve`ed with the `solve` function. While `SymPy` can solve symbolic equations for algebraic answers, `SimpleExpressions` uses `find_zero` behind the scenes.
+With a symbolic variable, computed expressions stay symbolic until needed.  Symbolic expressions can be paired together with a `~` to create a *symbolic equation*. Such equations can be `solve`ed with the `solve` function. While `SymPy` can solve symbolic equations for algebraic answers, `SimpleExpressions` uses `fzero` behind the scenes.
 
 So to solve when $\cos(x) = 2x$ we might have:
 
 ```{julia}
 @symbolic x  # make a symbolic variable
 eq = cos(x) ~ 2x
-find_zero(eq, (0, pi/2))
+fzero(eq, 0, pi/2)
 ```
 
 (In the above, `cos(x)` and `2x` are examples of symbolic expressions.)
@@ -785,7 +785,7 @@ To solve an equation like $f(x) = c$, $c$ possibly zero is straightforward. For 
 ```{julia}
 f(x) = x * tanh(exp(x))
 c = 1/2
-find_zero(f(x) ~ c, (-5, 5))
+fzero(f(x) ~ c, -5, 5)
 ```
 
 (In the above, applying `f(x)` to the symbolic `x` leaves a symbolic expression.)
@@ -796,7 +796,7 @@ To solve an equation like $f(x) = g(x)$, when two secant lines intersect, we hav
 f(x) = exp(x)
 sl_12 = secant(f, 1, 2)
 sl_21 = secant(f, -2, -1)
-find_zero(sl_12(x) ~ sl_21(x), (-Inf, Inf))
+fzero(sl_12(x) ~ sl_21(x), -Inf, Inf)
 ```
 
 For such symbolic equations, the `plot` function plots both the left and right hand sides, so we could visualize the above with:
@@ -834,7 +834,7 @@ There is another root in the interval $[-10, 0]$ for the function $f(x) = e^x - 
 ```{julia}
 #| echo: false
 f(x) = exp(x) - x^2
-val = find_zero(f, (-10, 0));
+val = fzero(f, -10, 0);
 numericq(val, 1e-3)
 ```
 
@@ -848,7 +848,7 @@ Let $f(x) = x^2 - 10 \cdot x \cdot \log(x)$. This function has two zeros on the 
 #| echo: false
 b = 10
 f(x) =  x^2 - b * x * log(x)
-val = find_zero(f, (10, 500))
+val = fzero(f, 10, 500)
 numericq(val, 1e-3)
 ```
 
@@ -860,7 +860,7 @@ The `airyai` function has infinitely many negative roots, as the function oscill
 
 ```{julia}
 #| echo: false
-val = find_zero(airyai, (-5, -4))
+val = fzero(airyai, -5, -4)
 numericq(val, 1e-8)
 ```
 
@@ -914,8 +914,8 @@ Now find the three times: $t_0$, the starting time; $t_a$, the time at the apex 
 ```{julia}
 #| echo: false
 t0 = 0.0
-tf = find_zero(h, (10, 20))
-ta = find_zero(D(h), (t0, tf))
+tf = fzero(h, 10, 20)
+ta = fzero(D(h), t0, tf)
 choices = ["``(0, 13.187, 30.0)``",
 	       "``(0, 32.0, 390.0)``",
 	       "``(0, 2.579, 13.187)``"]
@@ -1086,7 +1086,7 @@ If $f(x) = x^5 - x +1$ we have $g(x) = -x^5 +x + 1$ (just change the signs of th
 
 ```{julia}
 #| echo: false
-val = find_zeros(x -> x^5 - x +1, (-5, 5))[1]
+val = fzeros(x -> x^5 - x +1, -5, 5)[1]
 numericq(val, 1e-2)
 ```
 

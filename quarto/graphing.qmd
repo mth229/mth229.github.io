@@ -11,20 +11,19 @@ A notebook for this material:
 ## Introduction
 
 
-The `Julia` language is a new language and as such, certain design decisions are still being made. One key decision is the interface for creating graphics. At this point there are many different ones (`Makie`, `PyPlot`, plotly, plotlyjs, `GR`, `Winston`, `Gadfly`, `Gaston`,...), and perhaps more will be generated before a dominant one is arrived at. As such, we don't try to teach the details of any one of them.
+The `Julia` language is a relatively new language and as such, certain design decisions are still being made. One key decision is the interface for creating graphics. At this point there are many different ones (`Makie`, `PyPlot`, plotly, plotlyjs, `GR`, `Winston`, `Gadfly`, `Gaston`,...), and perhaps more will be generated before a dominant one is arrived at. As such, we don't try to teach the details of any one of them.
 
 
-Currently, the  `Plots` package  provides a unified interface to many backend plotting packages.  We will use the popular `Plots` package in these examples, but recognize that it is likely the `Makie` will eventually become the preferred plotting package.
+Currently, the  `Plots` package  provides a unified interface to many backend plotting packages.  We will use the popular `Plots` package in these examples, but recognize that it is likely that `Makie` will eventually become the preferred plotting package.
 
 
 For the impatient, this is all that is needed to know to get up and running to make a plot.
 
-First load the necessary package:
+First load the necessary package and set a backend:
 
 
 ```{julia}
 #| eval: false
-using MTH229
 using Plots
 plotly()
 ```
@@ -53,7 +52,6 @@ Once done, graphing a function is as easy as specifying the function and the dom
 f(x) = exp(-x^2 / 2)
 plot(f, -3, 3) 			# plot f over [-3,3]
 ```
-
 
 
 Graphs can be layered by using the `plot!` function (with an exclamation point indicating a current graph is begin modified):
@@ -135,13 +133,14 @@ scatter!(rts, [0, 0])
 
 #### Adjustments
 
-When adding multiple plots, there are a few concepts that can clarify the plot for the user:
+The `Plots` packages uses *positional* arguments for data (like the function and domain to plot over) and *keyword* arguments to adjust plotting attributes. When viewing multiple plots, there are a few adjustments to the default attributes that can clarify the graphic for the user, all specified with keyword arguments.
 
-* A legend is automatically included. The different things added can be included in the legend with a given name by passing the keyword argument `label="name to give"` to each layer.
+* A legend is automatically included. The different layers added to the graphic can be included in the legend with a given name by passing the keyword argument `label="name to give"` to each layer.
 * The legend can be suppressed by passing the keyword `legend=false` to the initial `plot` command
 * The color of a new line can be specified with `linecolor="color"`. The color can be specified by name in many cases
 * The width of a new line can be specified with `linewidth=n` where `n` is the pixel width. A width of 5 is already kinds prounounced.
 * The style of the line can be specified with `linestyle=style`. There are many styles, but `:dash`, `:dot`, and `:dashdot` are useful. (These are "symbols" and start with a leading colon.
+* For `scatter!` the markers can be adjusted using `markercolor`, `markersize`, and `markershape`.
 
 ### Inf, NaN values
 
@@ -162,8 +161,12 @@ trim(f; val=10) = x -> abs(f(x)) > val ? NaN : f(x)
 This action is very similar to  [clamping](http://en.wikipedia.org/wiki/Clamping_(graphics)).
 
 
-The `MTH229` package implements this in the function `rangeclamp(f, hi=20, lo=-hi)`. (Base `Julia` has a `clamp` function.)
+The `MTH229` package implements this in the function `rangeclamp(f, hi=20, lo=-hi)`. (Base `Julia` has a `clamp` function.) We first need to load the package before having access to any features:
 
+
+```{julia}
+using MTH229
+```
 
 Using `rangeclamp` is fairly simple. The output is a function, so can be passed directly to the `plot` call:
 
@@ -187,7 +190,7 @@ This trimming also works when `Inf` and `-Inf` values are encountered, as both c
 :::{.callout-note}
 ## ylims, xlims
 
-The range of `x` values comes from the choice of `a` and `b` in `plot(f, a, b)` and the range of `y` values comes from the range of `f` over the interval `[a,b]`. These can be adjusted manually through the keyword arguments `xlims=(l,r)` and `ylims=(m, M)`. An alternate to clamping `f` is to change the `y` limits, though as no `NaN` values are used, there can be artificacts in the resulting graphs:
+The range of `x` values comes from the choice of `a` and `b` in `plot(f, a, b)` and the range of `y` values comes from the range of `f` over the interval `[a,b]`. These can be adjusted manually through the keyword arguments `xlims=(l,r)` and `ylims=(m, M)`. An alternate to clamping `f` is to change the `y` limits, though as no `NaN` values are used, there can be artifacts in the resulting graphs:
 
 ```{julia}
 #| fig-alt: plot of 1/x with range narrowed using `ylims`
@@ -306,7 +309,7 @@ radioq(choices, answer)
 ## Asymptotes
 
 
-A rational function is nothing more than a ratio of polynomial functions, say $f(x) = p(x)/q(x)$. One interesting thing about such function is there can be asymptotes. These can be vertical (which can happen when $q(x)=0$), horizontal (as $x$ gets large or small), or even slanted.
+A rational function is nothing more than a ratio of polynomial functions, say $f(x) = p(x)/q(x)$. One interesting thing about such function is there can be asymptotes. These can be vertical (which can happen when $q(x)=0$), horizontal (as $x$ gets large or small), or even slanted (when $p(x)$ and $q(x)$ have the same degree).
 
 
 The vertical asymptotes require care when plotting, as the naive style of plotting where a collection of points is connected by straight lines can render poor and even misleading graphs when the scale of $y$ values get too large. The really large values plotted near the asymptote can wipe out the possibility of seeing other features of interest in a graph.
@@ -323,10 +326,10 @@ Some features of interest for a graph that are identifiable by calculus concepts
   * changes in inflection
 
 
-For example, if you want to find zeroes of a function, you really want to look at areas of the graph where the $y$ values are close to $0$. However, if you have a vertical asymptote on the same graph, the $y$ values might also be asked to show very large or small values. With only a finite number of pixels available, it is impossible to easily do both.
+For example, if you want to find zeroes of a function, you really want to look at areas of the graph where the $y$ values are close to $0$. However, if you have a vertical asymptote on the same graph, the $y$ values might also be required to show very large or small values. With only a finite number of pixels available, it is impossible to easily do both.
 
 
-What to do? If you were on a smartphone, you might be tempted to pan around to avoid the asymptotes, then pinch and zoom narrow the graph to the feature of interest.  With `Julia` you basically do the same thing, though panning and zooming is done by changing the domain of the $x$ values used in plotting.
+What to do? If you were on a smartphone, you might be tempted to pan around to avoid the asymptotes, then pinch and zoom to narrow the graph to the feature of interest.  With `Julia` you basically do the same thing, though panning and zooming is done by changing the domain of the $x$ values used in plotting.
 
 
 Let's look at the function $f(x) = 1/x$, which has an obvious vertical asymptote at $0$.
@@ -337,7 +340,8 @@ One can try a simple plot:
 
 ```{julia}
 #| fig-alt: plot of 1/x
-plot(x -> 1/x, -3, 3)
+f(x) = 1/x
+plot(f, -3, 3)
 ```
 
 The issue at $0$ is avoided, as the points chosen by `Plots` do not include $0$. The asymptote appears as a strongly slanted line, as individual points are simply connected in a dot-to-dot manner.
@@ -348,7 +352,7 @@ Doing better without much work is done by simply restricting the part that is pl
 
 ```{julia}
 #| fig-alt: plot of 1/x
-plot(x -> 1/x, 0, 3)
+plot(f, 0, 3)
 ```
 
 It is best to avoid the asymptote at $0$ completely by backing away by enough to avoid the large range on the $y$ axis. In this case, starting around $1/10$ is reasonable:
@@ -356,7 +360,7 @@ It is best to avoid the asymptote at $0$ completely by backing away by enough to
 
 ```{julia}
 #| fig-alt: plot of 1/x
-plot(x -> 1/x, 1/10,  3)
+plot(f, 1/10,  3)
 ```
 
 Let's look at the rational function
@@ -371,7 +375,7 @@ This will have a vertical asymptote at $1$, zeros at $2$ and $3$ and a slant asy
 
 ```{julia}
 #| fig-alt: plot of rational function
-f(x) = (x-2)*(x-3)/(x-1)
+f(x) = (x-2) * (x-3) / (x-1)
 plot(f, -10, 10)
 ```
 
@@ -397,7 +401,7 @@ plot(f, -3, 1 - 0.1)
 It appears that the relative maximum occurs between $-1$ and $0$.
 
 
-Here we see what happens to the asymptote. The scale of the $y$ values is huge.  We added a small amount to the left endpoint in case the function is not defined there, but this function takes the reciprocal of a small amount and makes it huge.  Clearly we need to really avoid the issue. It isn't hard – just add a little bit more to $0$.
+Here we see what happens to the asymptote. The scale of the $y$ values is huge.  We added a small amount to the left endpoint in case the function is not defined there, but this function takes the reciprocal of a small amount and makes it huge.  Clearly we need to really avoid the issue. It isn't hard---just add a little bit more to $0$.
 
 
 One solution to avoiding this issue is to use the `rangeclamp` function that was previously described. This just caps off really large values so that the vertical asymptotes don't affect the scale of the graph. We can see the asymptotes pretty clearly with:
@@ -435,7 +439,7 @@ As typical with vertical asymptotes, we can't see finer features of the graph wh
 
 ```{julia}
 #| fig-alt: plot of function with vertical asymptotes
-delta = 0.3;
+delta = 0.3
 plot(f, 0 + delta, pi/2 - delta)
 ```
 
@@ -519,7 +523,7 @@ As these are the steps done to create the ordered pairs for a plot, we would lik
   * plot the pairs $(x,y)$ and connect with lines
 
 
-We have seen how variables can be used to refer to a single value, but we want to refer to more than one value now. A container for holding such is an `Array`. Arrays are implemented in most all computer languages, though the term can mean different things.  We are looking for vectors, or one-dimensional arrays.  In general, an array is a multidimensional grid of values – all of the same type (integer, floating point, *functions*, ..., or ANY).
+We have seen how variables can be used to refer to a single value, but we want to refer to more than one value now. A container for holding such is an `Array`. Arrays are implemented in most all computer languages, though the term can mean different things.  We are looking for vectors, or one-dimensional arrays.  In general, an array is a multidimensional grid of values---all of the same type (integer, floating point, *functions*, ..., or ANY).
 
 
 For our purposes, we want vectors (mathematically one dimensional, $n$ by 1 arrays.). In `Julia` vectors or functional replacements can be easily constructed in different ways, some discussed in the following.
@@ -531,7 +535,7 @@ For our purposes, we want vectors (mathematically one dimensional, $n$ by 1 arra
 In many different contexts, `Julia` uses `[]` to create collections from individual components.
 
 
-For example, to directly create a 1-dimensional array with the `[]` syntax one simply type in the values separated by commas:
+For example, to directly create a 1-dimensional array with the `[]` syntax one simply types in the values separated by commas:
 
 
 ```{julia}
@@ -730,7 +734,7 @@ There are some special values. The `end` value refers to the last ($n$ th):
 x[end]
 ```
 
-The $n$ – or number of elements – can be returned by `length`:
+The $n$---or number of elements---can be returned by `length`:
 
 
 ```{julia}
@@ -900,7 +904,7 @@ We use `u` for the dummy variable in the anonymous function, so as not to get it
 sin.([1,2,3])
 ```
 
-In this use, the output is the same as though `map(sin, [1,2,3])` were called. In general, this "." notation is a bit different, as there can be multiple arguments passed and the size of the values is matched if possible by replication. For example, this command find the logarithm of $5$ for different bases. The value $5$ is replicated once for each of the bases:
+In this use, the output is the same as though `map(sin, [1,2,3])` were called. In general, this "." notation is a bit different, as there can be multiple arguments passed and the size of the values is matched if possible by replication. For example, this command find the logarithm of $5$ for different bases. The value $5$ is replicated---once for each of the bases:
 
 
 ```{julia}
@@ -920,7 +924,7 @@ Mathematicians are fond of set notation, as in this way to describe the $y$ valu
 
 
 $$
-y = \{ f(x): x \text{ in } [0, 2] \},
+y = \{ f(x): x \text{ in } [0, 2] \}.
 $$
 
 This is read: "the values $f(x)$ *for* each $x$ in the interval $[0,2]$."
@@ -1041,7 +1045,7 @@ Many options, but the shortest to type is simply `[xs f.(xs)]`, so that is what 
 #### Questions
 
 
-Does this command produce the values $\{.1, .01, .001, .0001\}$?
+Does this command produce the values $\{0.1, 0.01, 0.001, 0.0001\}$?
 
 
 ```{julia}
@@ -1065,7 +1069,7 @@ Let $f(x) = x^2 - 2x$. Which command will produce the $y$ values for plotting $f
 choices=[
 "`[f(x) for x in [0,2]]`",
 "`map(f(x), [0,2])`",
-"`f.(range(0, 2, length=100))`"];
+"`f.(range(0, 2; length=100))`"];
 answer = 3;
 radioq(choices, answer)
 ```
@@ -1104,7 +1108,7 @@ For example, to plot $y=x^2$ over $[-1,1]$ we might do:
 ```{julia}
 #| fig-alt: plot of x^2 showing how points can be chosen
 f(x) = x^2
-xs = range(-1, 1, length=101)
+xs = range(-1, 1; length=101)
 ys = f.(xs)
 plot(xs, ys)
 ```
@@ -1114,10 +1118,10 @@ One can place both to get both points and lines. The `scatter` function will plo
 
 ```{julia}
 #| fig-alt: plot of f with chosen points shown
-xs = range(-2, 2, length=5)
+xs = range(-2, 2; length=5)
 ys = f.(xs)
 plot(xs, ys)
-scatter!(xs, ys, markersize=5)
+scatter!(xs, ys; markersize=5)
 ```
 
 ### Practice
@@ -1249,7 +1253,7 @@ There are various ways with `Plots` to make multiple graphs at once. Two commonl
 
 ```{julia}
 #| fig-alt: plot of two series using a matrix to hold two columns
-x = range(0, 2pi, length=101)
+x = range(0, 2pi; length=101)
 ys = [sin.(x) cos.(x)]        # two columns
 plot(x, ys)
 ```
