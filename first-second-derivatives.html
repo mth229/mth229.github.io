@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.27">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>8&nbsp; Exploring first and second derivatives with Julia – MTH229 with Julia</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -69,15 +72,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="./newton.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-e7dba8c0ca640b9c293bd7f28e16c27c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-71001ee15682c074166ff37dee2ec51c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -110,7 +112,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -301,7 +303,7 @@ window.Quarto = {
   <li><a href="#identifying-when-a-function-is-positive" id="toc-identifying-when-a-function-is-positive" class="nav-link" data-scroll-target="#identifying-when-a-function-is-positive"><span class="header-section-number">8.2</span> Identifying when a function is <em>positive</em></a>
   <ul class="collapse">
   <li><a href="#graphically-identifying-zeros-of-a-function-over-ab" id="toc-graphically-identifying-zeros-of-a-function-over-ab" class="nav-link" data-scroll-target="#graphically-identifying-zeros-of-a-function-over-ab"><span class="header-section-number">8.2.1</span> Graphically identifying zeros of a function over <span class="math inline">\([a,b]\)</span></a></li>
-  <li><a href="#numerically-find-zeros-of-a-function-over-ab-the-find_zeros-function" id="toc-numerically-find-zeros-of-a-function-over-ab-the-find_zeros-function" class="nav-link" data-scroll-target="#numerically-find-zeros-of-a-function-over-ab-the-find_zeros-function"><span class="header-section-number">8.2.2</span> Numerically find zeros of a function over <span class="math inline">\([a,b]\)</span>; the <code>find_zeros</code> function</a></li>
+  <li><a href="#numerically-find-zeros-of-a-function-over-ab-the-fzeros-function" id="toc-numerically-find-zeros-of-a-function-over-ab-the-fzeros-function" class="nav-link" data-scroll-target="#numerically-find-zeros-of-a-function-over-ab-the-fzeros-function"><span class="header-section-number">8.2.2</span> Numerically find zeros of a function over <span class="math inline">\([a,b]\)</span>; the <code>fzeros</code> function</a></li>
   <li><a href="#the-sign_chart-function" id="toc-the-sign_chart-function" class="nav-link" data-scroll-target="#the-sign_chart-function"><span class="header-section-number">8.2.3</span> The <code>sign_chart</code> function</a></li>
   </ul></li>
   <li><a href="#graphically-identifying-increasing-concave-up-critical-points" id="toc-graphically-identifying-increasing-concave-up-critical-points" class="nav-link" data-scroll-target="#graphically-identifying-increasing-concave-up-critical-points"><span class="header-section-number">8.3</span> Graphically Identifying increasing, concave up, critical points, …</a>
@@ -384,7 +386,7 @@ window.Quarto = {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Pay attention to the difference between positive and non-negative. For example, an increasing, differentiable function on <em>I=(a,b)</em> is only guaranteed to have a <em>non-negative</em> derivative – not a <em>positive</em> derivative on <em>I</em>.</p>
+<p>Pay attention to the difference between positive and non-negative. For example, an increasing, differentiable function on <em>I=(a,b)</em> is only guaranteed to have a <em>non-negative</em> derivative—not a <em>positive</em> derivative on <em>I</em>.</p>
 </div>
 </div>
 </section>
@@ -425,16 +427,16 @@ f(x) = e^{-x} \cdot (\sin(3x) + \sin(5x)).
 </div>
 <p>The <code>plotif</code> function shows when <code>g</code> is non-negative, not just positive, so wouldn’t show a different color for the graph near <span class="math inline">\(-1.57\)</span> where <code>f</code> is zero but doesn’t cross the <span class="math inline">\(x\)</span> axis.</p>
 </section>
-<section id="numerically-find-zeros-of-a-function-over-ab-the-find_zeros-function" class="level3" data-number="8.2.2">
-<h3 data-number="8.2.2" class="anchored" data-anchor-id="numerically-find-zeros-of-a-function-over-ab-the-find_zeros-function"><span class="header-section-number">8.2.2</span> Numerically find zeros of a function over <span class="math inline">\([a,b]\)</span>; the <code>find_zeros</code> function</h3>
+<section id="numerically-find-zeros-of-a-function-over-ab-the-fzeros-function" class="level3" data-number="8.2.2">
+<h3 data-number="8.2.2" class="anchored" data-anchor-id="numerically-find-zeros-of-a-function-over-ab-the-fzeros-function"><span class="header-section-number">8.2.2</span> Numerically find zeros of a function over <span class="math inline">\([a,b]\)</span>; the <code>fzeros</code> function</h3>
 <p>We have discussed two means to find zeros of a function <span class="math inline">\(f\)</span>:</p>
 <ul>
-<li><p>when the zero is <em>between</em> two values which form a bracketing interval. The zero in the graph above between <span class="math inline">\(-1\)</span> and <span class="math inline">\(-0.5\)</span> is an example. Such zeros are readily identified through <em>bisection</em></p></li>
-<li><p>when a zero is <em>near</em> a value, such as these four which are near <span class="math inline">\(-1.5\)</span>, <span class="math inline">\(-0.75\)</span>, <span class="math inline">\(0.0\)</span> and <span class="math inline">\(0.8\)</span>. Such zeros may typically be found with <em>Newton’s</em> method (or <code>find_zero</code>)</p></li>
+<li><p>When the zero is <em>between</em> two values which form a bracketing interval. The zero in the graph above between <span class="math inline">\(-1\)</span> and <span class="math inline">\(-0.5\)</span> is an example. Such zeros are readily identified through <em>bisection</em>.</p></li>
+<li><p>When a zero is <em>near</em> a value, such as these four which are near <span class="math inline">\(-1.5\)</span>, <span class="math inline">\(-0.75\)</span>, <span class="math inline">\(0.0\)</span> and <span class="math inline">\(0.8\)</span>. Such zeros may typically be found with <em>Newton’s</em> method (or <code>fzero</code>).</p></li>
 </ul>
-<p>The <code>Roots</code> package, exported with <code>MTH229</code>, provides a convenience function, <code>find_zeros</code>, which uses bisection or <code>fzero</code> to identify <em>heuristically</em> all zeros in an interval <span class="math inline">\([a,b]\)</span>. It is easy to use: the interval is specified by pairing off the interval:</p>
+<p>The <code>Roots</code> package, exported with <code>MTH229</code>, provides a convenience function, <code>fzeros</code>, which uses bisection or <code>fzero</code> to identify <em>heuristically</em> all zeros in an interval <span class="math inline">\([a,b]\)</span>. It is easy to use: the interval is specified just as is done with plotting:</p>
 <div id="12" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zeros</span>(f, (<span class="op">-</span><span class="fl">2</span>, <span class="fl">1</span>))  <span class="co"># note the s in find_zeros</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fzeros</span>(f, <span class="op">-</span><span class="fl">2</span>, <span class="fl">1</span>)  <span class="co"># note the s in fzeros</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>4-element Vector{Float64}:
  -1.570796326120076
@@ -443,11 +445,11 @@ f(x) = e^{-x} \cdot (\sin(3x) + \sin(5x)).
   0.7853981633974483</code></pre>
 </div>
 </div>
-<p>The algorithm isn’t guaranteed to always work the way bisection is, but works fairly well to identify all the zeros except for cases where there are <em>many</em> zeros in the interval or the interval chosen is <em>too wide</em>. (A bracketing interval specified to bisection may be infinite, but such wide intervals can be problematic with <code>find_zeros</code>, though can work in some cases.)</p>
+<p>The algorithm isn’t guaranteed to always work the way bisection is, but works fairly well to identify all the zeros except for cases where there are <em>many</em> zeros in the interval or the interval chosen is <em>too wide</em>. (A bracketing interval specified to bisection may be infinite, but such wide intervals can be problematic with <code>fzeros</code>, though can work in some cases.)</p>
 <p>Here is another example, find the zeros of <span class="math inline">\(f(x) = e^x - x^4\)</span> over <span class="math inline">\([-10, 10]\)</span>:</p>
 <div id="14" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">exp</span>(x) <span class="op">-</span> x<span class="op">^</span><span class="fl">4</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zeros</span>(f, <span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fzeros</span>(f, <span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>3-element Vector{Float64}:
  -0.8155534188089606
@@ -455,11 +457,10 @@ f(x) = e^{-x} \cdot (\sin(3x) + \sin(5x)).
   8.613169456441398</code></pre>
 </div>
 </div>
-<p>The above also shows the interval can also be specified using two values, as is done with <code>plot</code>.</p>
 <p>A related problem might be find all zeros of <span class="math inline">\(f(x) = e^x - x^6\)</span>. Where should one look to ensure all of the zeros are identified? Too big an interval and the values of <span class="math inline">\(e^x\)</span> will be infinite (numerically) and that may cause problems. Too small an interval and zeros may be excluded. In this case a bit of analysis can help: any zero must be bigger than <span class="math inline">\(-1\)</span>, as to the left of <span class="math inline">\(-1\)</span> the exponential is smaller than <span class="math inline">\(1\)</span> and the polynomial bigger than <span class="math inline">\(1\)</span> in absolute value. Further, as exponentials <em>eventually</em> dominate polynomials, the interval need not be too large. We could quickly check that <span class="math inline">\(e^{20}\)</span> is bigger than <span class="math inline">\(20^6\)</span> but instead we just try a somewhat larger right limit:</p>
 <div id="16" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">exp</span>(x) <span class="op">-</span> x<span class="op">^</span><span class="fl">6</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">find_zeros</span>(f, (<span class="op">-</span><span class="fl">1</span>, <span class="fl">50</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fzeros</span>(f, <span class="op">-</span><span class="fl">1</span>, <span class="fl">50</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>3-element Vector{Float64}:
  -0.8656497043253173
@@ -469,10 +470,10 @@ f(x) = e^{-x} \cdot (\sin(3x) + \sin(5x)).
 </div>
 <section id="discontinuous-functions" class="level4">
 <h4 class="anchored" data-anchor-id="discontinuous-functions">Discontinuous functions</h4>
-<p>The algorithm used by <code>find_zeros</code> relies on both bisection and a method like Newton’s method. The bisection implementation will pick up on places where the function changes sign, even if not continuous. In the example below, the two vertical asymptotes at <span class="math inline">\(3\)</span> and <span class="math inline">\(4\)</span> are found:</p>
+<p>The algorithm used by <code>fzeros</code> relies on both bisection and a method like Newton’s method. The bisection implementation will pick up on places where the function changes sign, even if not continuous. In the example below, the two vertical asymptotes at <span class="math inline">\(3\)</span> and <span class="math inline">\(4\)</span> are found:</p>
 <div id="18" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> (x<span class="op">-</span><span class="fl">1</span>)<span class="fu">*</span>(x<span class="op">-</span><span class="fl">2</span>) <span class="op">/</span> ((x<span class="op">-</span><span class="fl">3</span>)<span class="fu">*</span>(x<span class="op">-</span><span class="fl">4</span>))</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>zs <span class="op">=</span> <span class="fu">find_zeros</span>(f, <span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> (x<span class="op">-</span><span class="fl">1</span>) <span class="op">*</span> (x<span class="op">-</span><span class="fl">2</span>) <span class="op">/</span> ((x<span class="op">-</span><span class="fl">3</span>) <span class="op">*</span> (x<span class="op">-</span><span class="fl">4</span>))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>zs <span class="op">=</span> <span class="fu">fzeros</span>(f, <span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>4-element Vector{Float64}:
  1.0
@@ -506,7 +507,7 @@ f(x) = e^{-x} \cdot (\sin(3x) + \sin(5x)).
 </section>
 <section id="the-sign_chart-function" class="level3" data-number="8.2.3">
 <h3 data-number="8.2.3" class="anchored" data-anchor-id="the-sign_chart-function"><span class="header-section-number">8.2.3</span> The <code>sign_chart</code> function</h3>
-<p>The technique above to find where a function is positive can be automated if <code>find_zeros</code> is used to find the zeros. This is done in <code>sign_chart</code>.</p>
+<p>The technique above to find where a function is positive can be automated if <code>fzeros</code> is used to find the zeros. This is done in <code>sign_chart</code>.</p>
 <p>For example,</p>
 <div id="24" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">exp</span>(x) <span class="op">-</span> x<span class="op">^</span><span class="fl">6</span></span>
@@ -520,7 +521,7 @@ f(x) = e^{-x} \cdot (\sin(3x) + \sin(5x)).
 </div>
 </div>
 </div>
-<p>The output shows how the sign changes at the identified zeros (or other points). In this case we can infer that the function is positive on <span class="math inline">\((-0.8656\dots, 1.22688869\dots)\)</span> and again on <span class="math inline">\((16.998887\dots, \infty)\)</span>.</p>
+<p>The output shows how the sign changes at the identified zeros (or other points). In this case we can infer that the function is positive on <span class="math inline">\((-0.8656\dots, 1.22688869\dots)\)</span> and again on <span class="math inline">\((16.998887\dots, 20)\)</span>. Furthermore, it can be inferred that between <span class="math inline">\((-1, -0.8656\dots)\)</span> the function is <em>negative</em> and as well in <span class="math inline">\((1.22688869\dots, 16.998887\dots)\)</span>.</p>
 <hr>
 <p>Returning to the example function</p>
 <div id="26" class="cell" data-execution_count="1">
@@ -553,27 +554,27 @@ f(x) = e^{-x/2} \cdot (\sin(11x) + \sin(13x))
 <div id="30" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <script>
-var ID = "nm4FJ0m3"
+var ID = "bX8iahJN"
 </script>
-<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="nm4FJ0m3" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="bX8iahJN" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_nm4FJ0m3" correct="-1" attempts="0">
+      <div class="form" id="controls_bX8iahJN" correct="-1" attempts="0">
 
     <div style="padding-top: 5px">
     <br>
 <div class="input-group" aria-label="Input form: Numeric answer">
-    <input id="nm4FJ0m3" type="number" step="any" class="form-control qqinput" placeholder="Numeric answer" aria-label="Numeric answer">
+    <input id="bX8iahJN" type="number" step="any" class="form-control qqinput" placeholder="Numeric answer" aria-label="Numeric answer">
 </div>
 
          </div>
     </div>
-    <div id="nm4FJ0m3_message" class="qqmessage" style="padding-bottom: 15px">
+    <div id="bX8iahJN_message" class="qqmessage" style="padding-bottom: 15px">
     </div>
 
 <script>
-document.getElementById('controls_nm4FJ0m3').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_nm4FJ0m3')
+document.getElementById('controls_bX8iahJN').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_bX8iahJN')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -581,13 +582,13 @@ document.getElementById('controls_nm4FJ0m3').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.getElementById("nm4FJ0m3").addEventListener("change", function() {
+document.getElementById("bX8iahJN").addEventListener("change", function() {
   var correct = (Math.abs(this.value - 11) <= 0);
-  var msgBox = document.getElementById('nm4FJ0m3_message');
+  var msgBox = document.getElementById('bX8iahJN_message');
   
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'> <span>✔&nbsp; Correct </span> </div>";
-    var explanation = document.getElementById("explanation_nm4FJ0m3")
+    var explanation = document.getElementById("explanation_bX8iahJN")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -598,7 +599,7 @@ document.getElementById("nm4FJ0m3").addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'> <span>Χ&nbsp; Incorrect </span> </div>";
-    var explanation = document.getElementById("explanation_nm4FJ0m3")
+    var explanation = document.getElementById("explanation_bX8iahJN")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -617,34 +618,34 @@ document.getElementById("nm4FJ0m3").addEventListener("change", function() {
 </div></div></section>
 <section id="question-1" class="level4">
 <h4 class="anchored" data-anchor-id="question-1">Question</h4>
-<p>What is the largest value identified in <span class="math inline">\([-2,1]\)</span> by <code>find_zeros</code> for the function</p>
+<p>What is the largest value identified in <span class="math inline">\([-2,1]\)</span> by <code>fzeros</code> for the function</p>
 <p><span class="math display">\[
 f(x) = e^{-x/2} \cdot (\sin(11x) + \sin(13x))
 \]</span></p>
 <div id="32" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <script>
-var ID = "wBNbl6y2"
+var ID = "J1ZtZID1"
 </script>
-<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="wBNbl6y2" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="J1ZtZID1" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_wBNbl6y2" correct="-1" attempts="0">
+      <div class="form" id="controls_J1ZtZID1" correct="-1" attempts="0">
 
     <div style="padding-top: 5px">
     <br>
 <div class="input-group" aria-label="Input form: Numeric answer">
-    <input id="wBNbl6y2" type="number" step="any" class="form-control qqinput" placeholder="Numeric answer" aria-label="Numeric answer">
+    <input id="J1ZtZID1" type="number" step="any" class="form-control qqinput" placeholder="Numeric answer" aria-label="Numeric answer">
 </div>
 
          </div>
     </div>
-    <div id="wBNbl6y2_message" class="qqmessage" style="padding-bottom: 15px">
+    <div id="J1ZtZID1_message" class="qqmessage" style="padding-bottom: 15px">
     </div>
 
 <script>
-document.getElementById('controls_wBNbl6y2').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_wBNbl6y2')
+document.getElementById('controls_J1ZtZID1').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_J1ZtZID1')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -652,13 +653,13 @@ document.getElementById('controls_wBNbl6y2').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.getElementById("wBNbl6y2").addEventListener("change", function() {
+document.getElementById("J1ZtZID1").addEventListener("change", function() {
   var correct = (Math.abs(this.value - 0.7853981633974483) <= 0.001);
-  var msgBox = document.getElementById('wBNbl6y2_message');
+  var msgBox = document.getElementById('J1ZtZID1_message');
   
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'> <span>✔&nbsp; Correct </span> </div>";
-    var explanation = document.getElementById("explanation_wBNbl6y2")
+    var explanation = document.getElementById("explanation_J1ZtZID1")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -669,7 +670,7 @@ document.getElementById("wBNbl6y2").addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'> <span>Χ&nbsp; Incorrect </span> </div>";
-    var explanation = document.getElementById("explanation_wBNbl6y2")
+    var explanation = document.getElementById("explanation_J1ZtZID1")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -692,37 +693,19 @@ document.getElementById("wBNbl6y2").addEventListener("change", function() {
 <div id="34" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <script>
-var ID = "5ItztMFm"
+var ID = "Sd5i0WGl"
 </script>
-<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="5ItztMFm" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="Sd5i0WGl" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_5ItztMFm" correct="-1" attempts="0">
+      <div class="form" id="controls_Sd5i0WGl" correct="-1" attempts="0">
 
     <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_5ItztMFm_1">
-    <input class="form-check-input" type="radio" name="radio_5ItztMFm" id="radio_5ItztMFm_1" value="1">
-    
-    <span class="label-body px-1">
-        zero
-    </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label qqradio" for="radio_5ItztMFm_2">
-    <input class="form-check-input" type="radio" name="radio_5ItztMFm" id="radio_5ItztMFm_2" value="2">
-    
-    <span class="label-body px-1">
-        undefined
-    </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label qqradio" for="radio_5ItztMFm_3">
-    <input class="form-check-input" type="radio" name="radio_5ItztMFm" id="radio_5ItztMFm_3" value="3">
+    <label class="form-check-label qqradio" for="radio_Sd5i0WGl_1">
+    <input class="form-check-input" type="radio" name="radio_Sd5i0WGl" id="radio_Sd5i0WGl_1" value="1">
     
     <span class="label-body px-1">
         negative
@@ -730,11 +713,29 @@ var ID = "5ItztMFm"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_5ItztMFm_4">
-    <input class="form-check-input" type="radio" name="radio_5ItztMFm" id="radio_5ItztMFm_4" value="4">
+    <label class="form-check-label qqradio" for="radio_Sd5i0WGl_2">
+    <input class="form-check-input" type="radio" name="radio_Sd5i0WGl" id="radio_Sd5i0WGl_2" value="2">
+    
+    <span class="label-body px-1">
+        undefined
+    </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label qqradio" for="radio_Sd5i0WGl_3">
+    <input class="form-check-input" type="radio" name="radio_Sd5i0WGl" id="radio_Sd5i0WGl_3" value="3">
     
     <span class="label-body px-1">
         positive
+    </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label qqradio" for="radio_Sd5i0WGl_4">
+    <input class="form-check-input" type="radio" name="radio_Sd5i0WGl" id="radio_Sd5i0WGl_4" value="4">
+    
+    <span class="label-body px-1">
+        zero
     </span>
     </label>
 </div>
@@ -742,12 +743,12 @@ var ID = "5ItztMFm"
 
          </div>
     </div>
-    <div id="5ItztMFm_message" class="qqmessage" style="padding-bottom: 15px">
+    <div id="Sd5i0WGl_message" class="qqmessage" style="padding-bottom: 15px">
     </div>
 
 <script>
-document.getElementById('controls_5ItztMFm').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_5ItztMFm')
+document.getElementById('controls_Sd5i0WGl').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_Sd5i0WGl')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -755,14 +756,14 @@ document.getElementById('controls_5ItztMFm').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_5ItztMFm"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_Sd5i0WGl"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 4;
-    var msgBox = document.getElementById('5ItztMFm_message');
+    var correct = rb.value == 3;
+    var msgBox = document.getElementById('Sd5i0WGl_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'> <span>✔&nbsp; Correct </span> </div>";
-    var explanation = document.getElementById("explanation_5ItztMFm")
+    var explanation = document.getElementById("explanation_Sd5i0WGl")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -773,7 +774,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'> <span>Χ&nbsp; Incorrect </span> </div>";
-    var explanation = document.getElementById("explanation_5ItztMFm")
+    var explanation = document.getElementById("explanation_Sd5i0WGl")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -796,28 +797,19 @@ rb.addEventListener("change", function() {
 <div id="36" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <script>
-var ID = "JmUiv6dq"
+var ID = "HyX20GSQ"
 </script>
-<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="JmUiv6dq" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="HyX20GSQ" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_JmUiv6dq" correct="-1" attempts="0">
+      <div class="form" id="controls_HyX20GSQ" correct="-1" attempts="0">
 
     <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_JmUiv6dq_1">
-    <input class="form-check-input" type="radio" name="radio_JmUiv6dq" id="radio_JmUiv6dq_1" value="1">
-    
-    <span class="label-body px-1">
-        There is no sign change; the function is zero at this point, but doesn't cross the x-axis
-    </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label qqradio" for="radio_JmUiv6dq_2">
-    <input class="form-check-input" type="radio" name="radio_JmUiv6dq" id="radio_JmUiv6dq_2" value="2">
+    <label class="form-check-label qqradio" for="radio_HyX20GSQ_1">
+    <input class="form-check-input" type="radio" name="radio_HyX20GSQ" id="radio_HyX20GSQ_1" value="1">
     
     <span class="label-body px-1">
         There is a sign change from <code>+</code> to <code>-</code>
@@ -825,11 +817,20 @@ var ID = "JmUiv6dq"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_JmUiv6dq_3">
-    <input class="form-check-input" type="radio" name="radio_JmUiv6dq" id="radio_JmUiv6dq_3" value="3">
+    <label class="form-check-label qqradio" for="radio_HyX20GSQ_2">
+    <input class="form-check-input" type="radio" name="radio_HyX20GSQ" id="radio_HyX20GSQ_2" value="2">
     
     <span class="label-body px-1">
         There is a sign change from <code>-</code> to <code>+</code>
+    </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label qqradio" for="radio_HyX20GSQ_3">
+    <input class="form-check-input" type="radio" name="radio_HyX20GSQ" id="radio_HyX20GSQ_3" value="3">
+    
+    <span class="label-body px-1">
+        There is no sign change; the function is zero at this point, but doesn't cross the x-axis
     </span>
     </label>
 </div>
@@ -837,12 +838,12 @@ var ID = "JmUiv6dq"
 
          </div>
     </div>
-    <div id="JmUiv6dq_message" class="qqmessage" style="padding-bottom: 15px">
+    <div id="HyX20GSQ_message" class="qqmessage" style="padding-bottom: 15px">
     </div>
 
 <script>
-document.getElementById('controls_JmUiv6dq').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_JmUiv6dq')
+document.getElementById('controls_HyX20GSQ').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_HyX20GSQ')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -850,14 +851,14 @@ document.getElementById('controls_JmUiv6dq').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_JmUiv6dq"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_HyX20GSQ"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 1;
-    var msgBox = document.getElementById('JmUiv6dq_message');
+    var correct = rb.value == 3;
+    var msgBox = document.getElementById('HyX20GSQ_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'> <span>✔&nbsp; Correct </span> </div>";
-    var explanation = document.getElementById("explanation_JmUiv6dq")
+    var explanation = document.getElementById("explanation_HyX20GSQ")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -868,7 +869,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'> <span>Χ&nbsp; Incorrect </span> </div>";
-    var explanation = document.getElementById("explanation_JmUiv6dq")
+    var explanation = document.getElementById("explanation_HyX20GSQ")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -901,6 +902,7 @@ rb.addEventListener("change", function() {
 </div>
 </div>
 <p>In this graph, we estimate graphically that the intervals <span class="math inline">\((-1.2, 0.2)\)</span> and <span class="math inline">\((1.5, 2)\)</span> are where <span class="math inline">\(f\)</span> is positive within this viewing window.</p>
+<hr>
 <p>If we change the screening function to the derivative of <span class="math inline">\(f(x)\)</span>, then our graph will show when the function is increasing (or flat):</p>
 <div id="40" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotif</span>(f, f<span class="op">'</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -923,31 +925,31 @@ rb.addEventListener("change", function() {
 <div id="44" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <script>
-var ID = "UMi2o8zB"
+var ID = "ilD25jQE"
 </script>
-<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="UMi2o8zB" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="ilD25jQE" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_UMi2o8zB" correct="-1" attempts="0">
+      <div class="form" id="controls_ilD25jQE" correct="-1" attempts="0">
 
     <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_UMi2o8zB_1">
-    <input class="form-check-input" type="radio" name="radio_UMi2o8zB" id="radio_UMi2o8zB_1" value="1">
+    <label class="form-check-label qqradio" for="radio_ilD25jQE_1">
+    <input class="form-check-input" type="radio" name="radio_ilD25jQE" id="radio_ilD25jQE_1" value="1">
     
     <span class="label-body px-1">
-        (0,2)
+        (0.4, 2)
     </span>
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_UMi2o8zB_2">
-    <input class="form-check-input" type="radio" name="radio_UMi2o8zB" id="radio_UMi2o8zB_2" value="2">
+    <label class="form-check-label qqradio" for="radio_ilD25jQE_2">
+    <input class="form-check-input" type="radio" name="radio_ilD25jQE" id="radio_ilD25jQE_2" value="2">
     
     <span class="label-body px-1">
-        (0.4, 2)
+        (0,2)
     </span>
     </label>
 </div>
@@ -955,12 +957,12 @@ var ID = "UMi2o8zB"
 
          </div>
     </div>
-    <div id="UMi2o8zB_message" class="qqmessage" style="padding-bottom: 15px">
+    <div id="ilD25jQE_message" class="qqmessage" style="padding-bottom: 15px">
     </div>
 
 <script>
-document.getElementById('controls_UMi2o8zB').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_UMi2o8zB')
+document.getElementById('controls_ilD25jQE').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_ilD25jQE')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -968,14 +970,14 @@ document.getElementById('controls_UMi2o8zB').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_UMi2o8zB"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_ilD25jQE"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 2;
-    var msgBox = document.getElementById('UMi2o8zB_message');
+    var correct = rb.value == 1;
+    var msgBox = document.getElementById('ilD25jQE_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'> <span>✔&nbsp; Correct </span> </div>";
-    var explanation = document.getElementById("explanation_UMi2o8zB")
+    var explanation = document.getElementById("explanation_ilD25jQE")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -986,7 +988,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'> <span>Χ&nbsp; Incorrect </span> </div>";
-    var explanation = document.getElementById("explanation_UMi2o8zB")
+    var explanation = document.getElementById("explanation_ilD25jQE")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1009,28 +1011,19 @@ rb.addEventListener("change", function() {
 <div id="46" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <script>
-var ID = "nx6oyY7M"
+var ID = "2lrvv9v5"
 </script>
-<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="nx6oyY7M" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="2lrvv9v5" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_nx6oyY7M" correct="-1" attempts="0">
+      <div class="form" id="controls_2lrvv9v5" correct="-1" attempts="0">
 
     <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_nx6oyY7M_1">
-    <input class="form-check-input" type="radio" name="radio_nx6oyY7M" id="radio_nx6oyY7M_1" value="1">
-    
-    <span class="label-body px-1">
-        (-2, -1) and (0,1)
-    </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label qqradio" for="radio_nx6oyY7M_2">
-    <input class="form-check-input" type="radio" name="radio_nx6oyY7M" id="radio_nx6oyY7M_2" value="2">
+    <label class="form-check-label qqradio" for="radio_2lrvv9v5_1">
+    <input class="form-check-input" type="radio" name="radio_2lrvv9v5" id="radio_2lrvv9v5_1" value="1">
     
     <span class="label-body px-1">
         (-1, 0) and (1, 2)
@@ -1038,8 +1031,17 @@ var ID = "nx6oyY7M"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_nx6oyY7M_3">
-    <input class="form-check-input" type="radio" name="radio_nx6oyY7M" id="radio_nx6oyY7M_3" value="3">
+    <label class="form-check-label qqradio" for="radio_2lrvv9v5_2">
+    <input class="form-check-input" type="radio" name="radio_2lrvv9v5" id="radio_2lrvv9v5_2" value="2">
+    
+    <span class="label-body px-1">
+        (-2, -1) and (0,1)
+    </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label qqradio" for="radio_2lrvv9v5_3">
+    <input class="form-check-input" type="radio" name="radio_2lrvv9v5" id="radio_2lrvv9v5_3" value="3">
     
     <span class="label-body px-1">
         (-2, 2)
@@ -1050,12 +1052,12 @@ var ID = "nx6oyY7M"
 
          </div>
     </div>
-    <div id="nx6oyY7M_message" class="qqmessage" style="padding-bottom: 15px">
+    <div id="2lrvv9v5_message" class="qqmessage" style="padding-bottom: 15px">
     </div>
 
 <script>
-document.getElementById('controls_nx6oyY7M').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_nx6oyY7M')
+document.getElementById('controls_2lrvv9v5').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_2lrvv9v5')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -1063,14 +1065,14 @@ document.getElementById('controls_nx6oyY7M').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_nx6oyY7M"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_2lrvv9v5"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 2;
-    var msgBox = document.getElementById('nx6oyY7M_message');
+    var correct = rb.value == 1;
+    var msgBox = document.getElementById('2lrvv9v5_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'> <span>✔&nbsp; Correct </span> </div>";
-    var explanation = document.getElementById("explanation_nx6oyY7M")
+    var explanation = document.getElementById("explanation_2lrvv9v5")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -1081,7 +1083,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'> <span>Χ&nbsp; Incorrect </span> </div>";
-    var explanation = document.getElementById("explanation_nx6oyY7M")
+    var explanation = document.getElementById("explanation_2lrvv9v5")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1104,19 +1106,28 @@ rb.addEventListener("change", function() {
 <div id="48" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <script>
-var ID = "loYs73uV"
+var ID = "XX9Da2qx"
 </script>
-<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="loYs73uV" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="XX9Da2qx" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_loYs73uV" correct="-1" attempts="0">
+      <div class="form" id="controls_XX9Da2qx" correct="-1" attempts="0">
 
     <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_loYs73uV_1">
-    <input class="form-check-input" type="radio" name="radio_loYs73uV" id="radio_loYs73uV_1" value="1">
+    <label class="form-check-label qqradio" for="radio_XX9Da2qx_1">
+    <input class="form-check-input" type="radio" name="radio_XX9Da2qx" id="radio_XX9Da2qx_1" value="1">
+    
+    <span class="label-body px-1">
+        (0.6, 3.5)
+    </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label qqradio" for="radio_XX9Da2qx_2">
+    <input class="form-check-input" type="radio" name="radio_XX9Da2qx" id="radio_XX9Da2qx_2" value="2">
     
     <span class="label-body px-1">
         (0, 0.6) and (3.5, 10)
@@ -1124,17 +1135,8 @@ var ID = "loYs73uV"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_loYs73uV_2">
-    <input class="form-check-input" type="radio" name="radio_loYs73uV" id="radio_loYs73uV_2" value="2">
-    
-    <span class="label-body px-1">
-        (0, 2)
-    </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label qqradio" for="radio_loYs73uV_3">
-    <input class="form-check-input" type="radio" name="radio_loYs73uV" id="radio_loYs73uV_3" value="3">
+    <label class="form-check-label qqradio" for="radio_XX9Da2qx_3">
+    <input class="form-check-input" type="radio" name="radio_XX9Da2qx" id="radio_XX9Da2qx_3" value="3">
     
     <span class="label-body px-1">
         (0,10)
@@ -1142,11 +1144,11 @@ var ID = "loYs73uV"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_loYs73uV_4">
-    <input class="form-check-input" type="radio" name="radio_loYs73uV" id="radio_loYs73uV_4" value="4">
+    <label class="form-check-label qqradio" for="radio_XX9Da2qx_4">
+    <input class="form-check-input" type="radio" name="radio_XX9Da2qx" id="radio_XX9Da2qx_4" value="4">
     
     <span class="label-body px-1">
-        (0.6, 3.5)
+        (0, 2)
     </span>
     </label>
 </div>
@@ -1154,12 +1156,12 @@ var ID = "loYs73uV"
 
          </div>
     </div>
-    <div id="loYs73uV_message" class="qqmessage" style="padding-bottom: 15px">
+    <div id="XX9Da2qx_message" class="qqmessage" style="padding-bottom: 15px">
     </div>
 
 <script>
-document.getElementById('controls_loYs73uV').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_loYs73uV')
+document.getElementById('controls_XX9Da2qx').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_XX9Da2qx')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -1167,14 +1169,14 @@ document.getElementById('controls_loYs73uV').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_loYs73uV"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_XX9Da2qx"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 1;
-    var msgBox = document.getElementById('loYs73uV_message');
+    var correct = rb.value == 2;
+    var msgBox = document.getElementById('XX9Da2qx_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'> <span>✔&nbsp; Correct </span> </div>";
-    var explanation = document.getElementById("explanation_loYs73uV")
+    var explanation = document.getElementById("explanation_XX9Da2qx")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -1185,7 +1187,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'> <span>Χ&nbsp; Incorrect </span> </div>";
-    var explanation = document.getElementById("explanation_loYs73uV")
+    var explanation = document.getElementById("explanation_XX9Da2qx")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1210,28 +1212,19 @@ rb.addEventListener("change", function() {
 <div id="50" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <script>
-var ID = "WIjKfHV1"
+var ID = "Qki0mG1Z"
 </script>
-<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="WIjKfHV1" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="Qki0mG1Z" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_WIjKfHV1" correct="-1" attempts="0">
+      <div class="form" id="controls_Qki0mG1Z" correct="-1" attempts="0">
 
     <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_WIjKfHV1_1">
-    <input class="form-check-input" type="radio" name="radio_WIjKfHV1" id="radio_WIjKfHV1_1" value="1">
-    
-    <span class="label-body px-1">
-        It shows where <code>f</code> is <em>increasing</em> only
-    </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label qqradio" for="radio_WIjKfHV1_2">
-    <input class="form-check-input" type="radio" name="radio_WIjKfHV1" id="radio_WIjKfHV1_2" value="2">
+    <label class="form-check-label qqradio" for="radio_Qki0mG1Z_1">
+    <input class="form-check-input" type="radio" name="radio_Qki0mG1Z" id="radio_Qki0mG1Z_1" value="1">
     
     <span class="label-body px-1">
         It shows where <code>f</code> is <em>flat</em> only
@@ -1239,11 +1232,20 @@ var ID = "WIjKfHV1"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_WIjKfHV1_3">
-    <input class="form-check-input" type="radio" name="radio_WIjKfHV1" id="radio_WIjKfHV1_3" value="3">
+    <label class="form-check-label qqradio" for="radio_Qki0mG1Z_2">
+    <input class="form-check-input" type="radio" name="radio_Qki0mG1Z" id="radio_Qki0mG1Z_2" value="2">
     
     <span class="label-body px-1">
         It shows where <code>f</code> is <em>increasing</em> or <em>flat</em>
+    </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label qqradio" for="radio_Qki0mG1Z_3">
+    <input class="form-check-input" type="radio" name="radio_Qki0mG1Z" id="radio_Qki0mG1Z_3" value="3">
+    
+    <span class="label-body px-1">
+        It shows where <code>f</code> is <em>increasing</em> only
     </span>
     </label>
 </div>
@@ -1251,12 +1253,12 @@ var ID = "WIjKfHV1"
 
          </div>
     </div>
-    <div id="WIjKfHV1_message" class="qqmessage" style="padding-bottom: 15px">
+    <div id="Qki0mG1Z_message" class="qqmessage" style="padding-bottom: 15px">
     </div>
 
 <script>
-document.getElementById('controls_WIjKfHV1').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_WIjKfHV1')
+document.getElementById('controls_Qki0mG1Z').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_Qki0mG1Z')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -1264,14 +1266,14 @@ document.getElementById('controls_WIjKfHV1').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_WIjKfHV1"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_Qki0mG1Z"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 3;
-    var msgBox = document.getElementById('WIjKfHV1_message');
+    var correct = rb.value == 2;
+    var msgBox = document.getElementById('Qki0mG1Z_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'> <span>✔&nbsp; Correct </span> </div>";
-    var explanation = document.getElementById("explanation_WIjKfHV1")
+    var explanation = document.getElementById("explanation_Qki0mG1Z")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -1282,7 +1284,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'> <span>Χ&nbsp; Incorrect </span> </div>";
-    var explanation = document.getElementById("explanation_WIjKfHV1")
+    var explanation = document.getElementById("explanation_Qki0mG1Z")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1301,17 +1303,17 @@ rb.addEventListener("change", function() {
 </div></div></section>
 <section id="numerically-finding-zeros-critical-points-and-inflection-point-candidates" class="level3" data-number="8.3.1">
 <h3 data-number="8.3.1" class="anchored" data-anchor-id="numerically-finding-zeros-critical-points-and-inflection-point-candidates"><span class="header-section-number">8.3.1</span> Numerically finding zeros, critical points, and inflection point candidates</h3>
-<p>The <code>find_zeros</code> function can readily identify when some function is zero (or undefined). It can be used, as seen, to find zeros. However, if passed <code>f'</code> it will identify critical points. When passed <code>f''</code> it will find when <span class="math inline">\(f''(x) = 0\)</span> (or undefined). Such points are <em>candidates</em> for inflection points, though a check on whether the concavity changes is necessary to say such is an inflection point.</p>
+<p>The <code>fzeros</code> function can readily identify when some function is zero (or undefined). It can be used, as seen, to find zeros. However, if passed <code>f'</code> it will identify critical points. When passed <code>f''</code> it will find when <span class="math inline">\(f''(x) = 0\)</span> (or undefined). Such points are <em>candidates</em> for inflection points, though a check on whether the concavity changes is necessary to say such is an inflection point.</p>
 <p>In the following we use <code>scatter!</code> to show these values on the graph.</p>
 <div id="52" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">f</span>(x) <span class="op">=</span> <span class="fu">exp</span>(<span class="op">-</span>x<span class="op">/</span><span class="fl">2</span>) <span class="op">*</span> (<span class="fu">sin</span>(<span class="fl">3</span>x) <span class="op">+</span> <span class="fu">sin</span>(<span class="fl">5</span>x))</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>zs <span class="op">=</span> <span class="fu">find_zeros</span>(f, <span class="op">-</span><span class="fl">2</span>, <span class="fl">1</span>)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>cps <span class="op">=</span> <span class="fu">find_zeros</span>(f<span class="op">'</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">1</span>)</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>ips <span class="op">=</span> <span class="fu">find_zeros</span>(f<span class="op">''</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">1</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>zs <span class="op">=</span> <span class="fu">fzeros</span>(f, <span class="op">-</span><span class="fl">2</span>, <span class="fl">1</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>cps <span class="op">=</span> <span class="fu">fzeros</span>(f<span class="op">'</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">1</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>ips <span class="op">=</span> <span class="fu">fzeros</span>(f<span class="op">''</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">1</span>)</span>
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(f, <span class="op">-</span><span class="fl">2</span>, <span class="fl">1</span>)</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(zs, <span class="fu">f</span>.(zs), markercolor<span class="op">=</span><span class="st">"blue"</span>, markersize<span class="op">=</span><span class="fl">7</span>)</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(cps, <span class="fu">f</span>.(cps), markercolor<span class="op">=</span><span class="st">"red"</span>, markersize<span class="op">=</span><span class="fl">3</span>)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(zs,  <span class="fu">f</span>.(zs),  markercolor<span class="op">=</span><span class="st">"blue"</span>,  markersize<span class="op">=</span><span class="fl">7</span>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(cps, <span class="fu">f</span>.(cps), markercolor<span class="op">=</span><span class="st">"red"</span>,   markersize<span class="op">=</span><span class="fl">3</span>)</span>
 <span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="fu">scatter!</span>(ips, <span class="fu">f</span>.(ips), markercolor<span class="op">=</span><span class="st">"green"</span>, markershape<span class="op">=:</span>diamond)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <img src="data:image/png;base64,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">
@@ -1382,28 +1384,19 @@ rb.addEventListener("change", function() {
 <div id="62" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <script>
-var ID = "MqXmwiP8"
+var ID = "wiJsVqvp"
 </script>
-<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="MqXmwiP8" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="wiJsVqvp" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_MqXmwiP8" correct="-1" attempts="0">
+      <div class="form" id="controls_wiJsVqvp" correct="-1" attempts="0">
 
     <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_MqXmwiP8_1">
-    <input class="form-check-input" type="radio" name="radio_MqXmwiP8" id="radio_MqXmwiP8_1" value="1">
-    
-    <span class="label-body px-1">
-        \(f\) is increasing on \((-1,1)\) and concave up on \((0,1)\)
-    </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label qqradio" for="radio_MqXmwiP8_2">
-    <input class="form-check-input" type="radio" name="radio_MqXmwiP8" id="radio_MqXmwiP8_2" value="2">
+    <label class="form-check-label qqradio" for="radio_wiJsVqvp_1">
+    <input class="form-check-input" type="radio" name="radio_wiJsVqvp" id="radio_wiJsVqvp_1" value="1">
     
     <span class="label-body px-1">
         \(f\) is increasing on \((0,1)\) and concave up on \((-1,1)\)
@@ -1411,11 +1404,20 @@ var ID = "MqXmwiP8"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_MqXmwiP8_3">
-    <input class="form-check-input" type="radio" name="radio_MqXmwiP8" id="radio_MqXmwiP8_3" value="3">
+    <label class="form-check-label qqradio" for="radio_wiJsVqvp_2">
+    <input class="form-check-input" type="radio" name="radio_wiJsVqvp" id="radio_wiJsVqvp_2" value="2">
     
     <span class="label-body px-1">
         You don't know – the derivative of |x| does not exist
+    </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label qqradio" for="radio_wiJsVqvp_3">
+    <input class="form-check-input" type="radio" name="radio_wiJsVqvp" id="radio_wiJsVqvp_3" value="3">
+    
+    <span class="label-body px-1">
+        \(f\) is increasing on \((-1,1)\) and concave up on \((0,1)\)
     </span>
     </label>
 </div>
@@ -1423,12 +1425,12 @@ var ID = "MqXmwiP8"
 
          </div>
     </div>
-    <div id="MqXmwiP8_message" class="qqmessage" style="padding-bottom: 15px">
+    <div id="wiJsVqvp_message" class="qqmessage" style="padding-bottom: 15px">
     </div>
 
 <script>
-document.getElementById('controls_MqXmwiP8').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_MqXmwiP8')
+document.getElementById('controls_wiJsVqvp').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_wiJsVqvp')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -1436,14 +1438,14 @@ document.getElementById('controls_MqXmwiP8').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_MqXmwiP8"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_wiJsVqvp"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 2;
-    var msgBox = document.getElementById('MqXmwiP8_message');
+    var correct = rb.value == 1;
+    var msgBox = document.getElementById('wiJsVqvp_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'> <span>✔&nbsp; Correct </span> </div>";
-    var explanation = document.getElementById("explanation_MqXmwiP8")
+    var explanation = document.getElementById("explanation_wiJsVqvp")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -1454,7 +1456,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'> <span>Χ&nbsp; Incorrect </span> </div>";
-    var explanation = document.getElementById("explanation_MqXmwiP8")
+    var explanation = document.getElementById("explanation_wiJsVqvp")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1477,28 +1479,19 @@ rb.addEventListener("change", function() {
 <div id="64" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <script>
-var ID = "RHoB0VBp"
+var ID = "W2mkEsEJ"
 </script>
-<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="RHoB0VBp" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="W2mkEsEJ" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_RHoB0VBp" correct="-1" attempts="0">
+      <div class="form" id="controls_W2mkEsEJ" correct="-1" attempts="0">
 
     <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_RHoB0VBp_1">
-    <input class="form-check-input" type="radio" name="radio_RHoB0VBp" id="radio_RHoB0VBp_1" value="1">
-    
-    <span class="label-body px-1">
-        On (-2, -1) and (0, 1)
-    </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label qqradio" for="radio_RHoB0VBp_2">
-    <input class="form-check-input" type="radio" name="radio_RHoB0VBp" id="radio_RHoB0VBp_2" value="2">
+    <label class="form-check-label qqradio" for="radio_W2mkEsEJ_1">
+    <input class="form-check-input" type="radio" name="radio_W2mkEsEJ" id="radio_W2mkEsEJ_1" value="1">
     
     <span class="label-body px-1">
         Wherever it is defined
@@ -1506,11 +1499,20 @@ var ID = "RHoB0VBp"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_RHoB0VBp_3">
-    <input class="form-check-input" type="radio" name="radio_RHoB0VBp" id="radio_RHoB0VBp_3" value="3">
+    <label class="form-check-label qqradio" for="radio_W2mkEsEJ_2">
+    <input class="form-check-input" type="radio" name="radio_W2mkEsEJ" id="radio_W2mkEsEJ_2" value="2">
     
     <span class="label-body px-1">
         On (-1, 1)
+    </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label qqradio" for="radio_W2mkEsEJ_3">
+    <input class="form-check-input" type="radio" name="radio_W2mkEsEJ" id="radio_W2mkEsEJ_3" value="3">
+    
+    <span class="label-body px-1">
+        On (-2, -1) and (0, 1)
     </span>
     </label>
 </div>
@@ -1518,12 +1520,12 @@ var ID = "RHoB0VBp"
 
          </div>
     </div>
-    <div id="RHoB0VBp_message" class="qqmessage" style="padding-bottom: 15px">
+    <div id="W2mkEsEJ_message" class="qqmessage" style="padding-bottom: 15px">
     </div>
 
 <script>
-document.getElementById('controls_RHoB0VBp').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_RHoB0VBp')
+document.getElementById('controls_W2mkEsEJ').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_W2mkEsEJ')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -1531,14 +1533,14 @@ document.getElementById('controls_RHoB0VBp').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_RHoB0VBp"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_W2mkEsEJ"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 2;
-    var msgBox = document.getElementById('RHoB0VBp_message');
+    var correct = rb.value == 1;
+    var msgBox = document.getElementById('W2mkEsEJ_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'> <span>✔&nbsp; Correct </span> </div>";
-    var explanation = document.getElementById("explanation_RHoB0VBp")
+    var explanation = document.getElementById("explanation_W2mkEsEJ")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -1549,7 +1551,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'> <span>Χ&nbsp; Incorrect </span> </div>";
-    var explanation = document.getElementById("explanation_RHoB0VBp")
+    var explanation = document.getElementById("explanation_W2mkEsEJ")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1572,28 +1574,28 @@ rb.addEventListener("change", function() {
 <div id="66" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <script>
-var ID = "7SjcnXFi"
+var ID = "Q3d0DaQb"
 </script>
-<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="7SjcnXFi" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="Q3d0DaQb" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_7SjcnXFi" correct="-1" attempts="0">
+      <div class="form" id="controls_Q3d0DaQb" correct="-1" attempts="0">
 
     <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_7SjcnXFi_1">
-    <input class="form-check-input" type="radio" name="radio_7SjcnXFi" id="radio_7SjcnXFi_1" value="1">
+    <label class="form-check-label qqradio" for="radio_Q3d0DaQb_1">
+    <input class="form-check-input" type="radio" name="radio_Q3d0DaQb" id="radio_Q3d0DaQb_1" value="1">
     
     <span class="label-body px-1">
-        \((-0.6, 0.6)\)
+        \((-\pi/3, 0)\)
     </span>
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_7SjcnXFi_2">
-    <input class="form-check-input" type="radio" name="radio_7SjcnXFi" id="radio_7SjcnXFi_2" value="2">
+    <label class="form-check-label qqradio" for="radio_Q3d0DaQb_2">
+    <input class="form-check-input" type="radio" name="radio_Q3d0DaQb" id="radio_Q3d0DaQb_2" value="2">
     
     <span class="label-body px-1">
         \((-\pi/3, \pi/3)\)
@@ -1601,11 +1603,11 @@ var ID = "7SjcnXFi"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_7SjcnXFi_3">
-    <input class="form-check-input" type="radio" name="radio_7SjcnXFi" id="radio_7SjcnXFi_3" value="3">
+    <label class="form-check-label qqradio" for="radio_Q3d0DaQb_3">
+    <input class="form-check-input" type="radio" name="radio_Q3d0DaQb" id="radio_Q3d0DaQb_3" value="3">
     
     <span class="label-body px-1">
-        \((-\pi/3, 0)\)
+        \((-0.6, 0.6)\)
     </span>
     </label>
 </div>
@@ -1613,12 +1615,12 @@ var ID = "7SjcnXFi"
 
          </div>
     </div>
-    <div id="7SjcnXFi_message" class="qqmessage" style="padding-bottom: 15px">
+    <div id="Q3d0DaQb_message" class="qqmessage" style="padding-bottom: 15px">
     </div>
 
 <script>
-document.getElementById('controls_7SjcnXFi').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_7SjcnXFi')
+document.getElementById('controls_Q3d0DaQb').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_Q3d0DaQb')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -1626,14 +1628,14 @@ document.getElementById('controls_7SjcnXFi').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_7SjcnXFi"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_Q3d0DaQb"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 1;
-    var msgBox = document.getElementById('7SjcnXFi_message');
+    var correct = rb.value == 3;
+    var msgBox = document.getElementById('Q3d0DaQb_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'> <span>✔&nbsp; Correct </span> </div>";
-    var explanation = document.getElementById("explanation_7SjcnXFi")
+    var explanation = document.getElementById("explanation_Q3d0DaQb")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -1644,7 +1646,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'> <span>Χ&nbsp; Incorrect </span> </div>";
-    var explanation = document.getElementById("explanation_7SjcnXFi")
+    var explanation = document.getElementById("explanation_Q3d0DaQb")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1684,9 +1686,9 @@ rb.addEventListener("change", function() {
 </div>
 </div>
 <p>We see four: one near <span class="math inline">\(0.8\)</span>, one near <span class="math inline">\(1.5\)</span>, one near <span class="math inline">\(2.5\)</span> and one near <span class="math inline">\(5\)</span>.</p>
-<p>As explained, we could use <code>find_zeros</code> to identify these more precisely:</p>
+<p>As explained, we could use <code>fzeros</code> to identify these more precisely:</p>
 <div id="70" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>cps <span class="op">=</span> <span class="fu">find_zeros</span>(f<span class="op">'</span>, <span class="fl">0</span>, <span class="fl">6</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>cps <span class="op">=</span> <span class="fu">fzeros</span>(f<span class="op">'</span>, <span class="fl">0</span>, <span class="fl">6</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>4-element Vector{Float64}:
  0.5235987755982988
@@ -1730,7 +1732,7 @@ rb.addEventListener("change", function() {
 <p>The following graphic is to illustrate why the second derivative test works as it does:</p>
 <div id="78" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(f, <span class="fl">0</span>, <span class="fl">2</span>pi; legend<span class="op">=</span><span class="cn">false</span>, linewidth<span class="op">=</span><span class="fl">4</span>)</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>cps <span class="op">=</span> <span class="fu">find_zeros</span>(f<span class="op">'</span>, <span class="fl">0</span>, <span class="fl">2</span>pi)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>cps <span class="op">=</span> <span class="fu">fzeros</span>(f<span class="op">'</span>, <span class="fl">0</span>, <span class="fl">2</span>pi)</span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_parabola!</span>(c, fc, fppc) <span class="op">=</span> <span class="fu">plot!</span>(x <span class="op">-&gt;</span> fc <span class="op">+</span> fppc <span class="op">*</span> (x <span class="op">-</span> c)<span class="op">^</span><span class="fl">2</span><span class="op">/</span><span class="fl">2</span>, c<span class="op">-</span><span class="fl">3</span><span class="op">/</span><span class="fl">4</span>, c<span class="op">+</span><span class="fl">3</span><span class="op">/</span><span class="fl">4</span>; linewidth<span class="op">=</span><span class="fl">2</span>)</span>
 <span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_parabola!</span>.(cps, <span class="fu">f</span>.(cps), f<span class="op">''</span>.(cps))</span>
 <span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="fu">current</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1745,19 +1747,19 @@ rb.addEventListener("change", function() {
 <div id="80" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <script>
-var ID = "l9JHBF5e"
+var ID = "Rk5bKVNt"
 </script>
-<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="l9JHBF5e" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="Rk5bKVNt" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_l9JHBF5e" correct="-1" attempts="0">
+      <div class="form" id="controls_Rk5bKVNt" correct="-1" attempts="0">
 
     <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_l9JHBF5e_1">
-    <input class="form-check-input" type="radio" name="radio_l9JHBF5e" id="radio_l9JHBF5e_1" value="1">
+    <label class="form-check-label qqradio" for="radio_Rk5bKVNt_1">
+    <input class="form-check-input" type="radio" name="radio_Rk5bKVNt" id="radio_Rk5bKVNt_1" value="1">
     
     <span class="label-body px-1">
         at 0 there is a maximum
@@ -1765,8 +1767,8 @@ var ID = "l9JHBF5e"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_l9JHBF5e_2">
-    <input class="form-check-input" type="radio" name="radio_l9JHBF5e" id="radio_l9JHBF5e_2" value="2">
+    <label class="form-check-label qqradio" for="radio_Rk5bKVNt_2">
+    <input class="form-check-input" type="radio" name="radio_Rk5bKVNt" id="radio_Rk5bKVNt_2" value="2">
     
     <span class="label-body px-1">
         Near -1.93185 and 0.51763 there are relative maxima, near 1.93185 and -0.51763 there are relative minima
@@ -1774,8 +1776,8 @@ var ID = "l9JHBF5e"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_l9JHBF5e_3">
-    <input class="form-check-input" type="radio" name="radio_l9JHBF5e" id="radio_l9JHBF5e_3" value="3">
+    <label class="form-check-label qqradio" for="radio_Rk5bKVNt_3">
+    <input class="form-check-input" type="radio" name="radio_Rk5bKVNt" id="radio_Rk5bKVNt_3" value="3">
     
     <span class="label-body px-1">
         Near -0.51763 there is a relative minimum, near 0.51763 there is a relative maximum
@@ -1786,12 +1788,12 @@ var ID = "l9JHBF5e"
 
          </div>
     </div>
-    <div id="l9JHBF5e_message" class="qqmessage" style="padding-bottom: 15px">
+    <div id="Rk5bKVNt_message" class="qqmessage" style="padding-bottom: 15px">
     </div>
 
 <script>
-document.getElementById('controls_l9JHBF5e').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_l9JHBF5e')
+document.getElementById('controls_Rk5bKVNt').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_Rk5bKVNt')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -1799,14 +1801,14 @@ document.getElementById('controls_l9JHBF5e').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_l9JHBF5e"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_Rk5bKVNt"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
     var correct = rb.value == 3;
-    var msgBox = document.getElementById('l9JHBF5e_message');
+    var msgBox = document.getElementById('Rk5bKVNt_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'> <span>✔&nbsp; Correct </span> </div>";
-    var explanation = document.getElementById("explanation_l9JHBF5e")
+    var explanation = document.getElementById("explanation_Rk5bKVNt")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -1817,7 +1819,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'> <span>Χ&nbsp; Incorrect </span> </div>";
-    var explanation = document.getElementById("explanation_l9JHBF5e")
+    var explanation = document.getElementById("explanation_Rk5bKVNt")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1840,19 +1842,19 @@ rb.addEventListener("change", function() {
 <div id="82" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <script>
-var ID = "b59lSzQe"
+var ID = "1V7QHMbR"
 </script>
-<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="b59lSzQe" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="1V7QHMbR" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_b59lSzQe" correct="-1" attempts="0">
+      <div class="form" id="controls_1V7QHMbR" correct="-1" attempts="0">
 
     <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_b59lSzQe_1">
-    <input class="form-check-input" type="radio" name="radio_b59lSzQe" id="radio_b59lSzQe_1" value="1">
+    <label class="form-check-label qqradio" for="radio_1V7QHMbR_1">
+    <input class="form-check-input" type="radio" name="radio_1V7QHMbR" id="radio_1V7QHMbR_1" value="1">
     
     <span class="label-body px-1">
         -1 is a relative min and 0.5 is a maximum
@@ -1860,8 +1862,8 @@ var ID = "b59lSzQe"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_b59lSzQe_2">
-    <input class="form-check-input" type="radio" name="radio_b59lSzQe" id="radio_b59lSzQe_2" value="2">
+    <label class="form-check-label qqradio" for="radio_1V7QHMbR_2">
+    <input class="form-check-input" type="radio" name="radio_1V7QHMbR" id="radio_1V7QHMbR_2" value="2">
     
     <span class="label-body px-1">
         This function only has an asymptote at -1, no relative extrema
@@ -1869,8 +1871,8 @@ var ID = "b59lSzQe"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_b59lSzQe_3">
-    <input class="form-check-input" type="radio" name="radio_b59lSzQe" id="radio_b59lSzQe_3" value="3">
+    <label class="form-check-label qqradio" for="radio_1V7QHMbR_3">
+    <input class="form-check-input" type="radio" name="radio_1V7QHMbR" id="radio_1V7QHMbR_3" value="3">
     
     <span class="label-body px-1">
         -1 is a critical point but not an extram, 0.5 is a relative minimum
@@ -1881,12 +1883,12 @@ var ID = "b59lSzQe"
 
          </div>
     </div>
-    <div id="b59lSzQe_message" class="qqmessage" style="padding-bottom: 15px">
+    <div id="1V7QHMbR_message" class="qqmessage" style="padding-bottom: 15px">
     </div>
 
 <script>
-document.getElementById('controls_b59lSzQe').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_b59lSzQe')
+document.getElementById('controls_1V7QHMbR').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_1V7QHMbR')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -1894,14 +1896,14 @@ document.getElementById('controls_b59lSzQe').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_b59lSzQe"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_1V7QHMbR"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
     var correct = rb.value == 3;
-    var msgBox = document.getElementById('b59lSzQe_message');
+    var msgBox = document.getElementById('1V7QHMbR_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'> <span>✔&nbsp; Correct </span> </div>";
-    var explanation = document.getElementById("explanation_b59lSzQe")
+    var explanation = document.getElementById("explanation_1V7QHMbR")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -1912,7 +1914,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'> <span>Χ&nbsp; Incorrect </span> </div>";
-    var explanation = document.getElementById("explanation_b59lSzQe")
+    var explanation = document.getElementById("explanation_1V7QHMbR")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -1935,37 +1937,19 @@ rb.addEventListener("change", function() {
 <div id="84" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <script>
-var ID = "1qR1KMdy"
+var ID = "4XOmDSzp"
 </script>
-<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="1qR1KMdy" data-controltype="" onsubmit="return false;">
+<form class="mx-2 my-3 mw-100 qqquestion" name="WeaveQuestion" data-id="4XOmDSzp" data-controltype="" onsubmit="return false;">
   <div class="form-group ">
     <div class="controls">
-      <div class="form" id="controls_1qR1KMdy" correct="-1" attempts="0">
+      <div class="form" id="controls_4XOmDSzp" correct="-1" attempts="0">
 
     <div style="padding-top: 5px">
     <fieldset style="border:0px">
 <legend style="display: none" aria-label="Select an item">Select an item</legend>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_1qR1KMdy_1">
-    <input class="form-check-input" type="radio" name="radio_1qR1KMdy" id="radio_1qR1KMdy_1" value="1">
-    
-    <span class="label-body px-1">
-        0 is  relative minimum, 1 is a relative max
-    </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label qqradio" for="radio_1qR1KMdy_2">
-    <input class="form-check-input" type="radio" name="radio_1qR1KMdy" id="radio_1qR1KMdy_2" value="2">
-    
-    <span class="label-body px-1">
-        both are relative maximum
-    </span>
-    </label>
-</div>
-<div class="form-check">
-    <label class="form-check-label qqradio" for="radio_1qR1KMdy_3">
-    <input class="form-check-input" type="radio" name="radio_1qR1KMdy" id="radio_1qR1KMdy_3" value="3">
+    <label class="form-check-label qqradio" for="radio_4XOmDSzp_1">
+    <input class="form-check-input" type="radio" name="radio_4XOmDSzp" id="radio_4XOmDSzp_1" value="1">
     
     <span class="label-body px-1">
         0 is a relative maximum, 1 is a relative minimum
@@ -1973,11 +1957,29 @@ var ID = "1qR1KMdy"
     </label>
 </div>
 <div class="form-check">
-    <label class="form-check-label qqradio" for="radio_1qR1KMdy_4">
-    <input class="form-check-input" type="radio" name="radio_1qR1KMdy" id="radio_1qR1KMdy_4" value="4">
+    <label class="form-check-label qqradio" for="radio_4XOmDSzp_2">
+    <input class="form-check-input" type="radio" name="radio_4XOmDSzp" id="radio_4XOmDSzp_2" value="2">
     
     <span class="label-body px-1">
         One can not say from the given information.
+    </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label qqradio" for="radio_4XOmDSzp_3">
+    <input class="form-check-input" type="radio" name="radio_4XOmDSzp" id="radio_4XOmDSzp_3" value="3">
+    
+    <span class="label-body px-1">
+        both are relative maximum
+    </span>
+    </label>
+</div>
+<div class="form-check">
+    <label class="form-check-label qqradio" for="radio_4XOmDSzp_4">
+    <input class="form-check-input" type="radio" name="radio_4XOmDSzp" id="radio_4XOmDSzp_4" value="4">
+    
+    <span class="label-body px-1">
+        0 is  relative minimum, 1 is a relative max
     </span>
     </label>
 </div>
@@ -1985,12 +1987,12 @@ var ID = "1qR1KMdy"
 
          </div>
     </div>
-    <div id="1qR1KMdy_message" class="qqmessage" style="padding-bottom: 15px">
+    <div id="4XOmDSzp_message" class="qqmessage" style="padding-bottom: 15px">
     </div>
 
 <script>
-document.getElementById('controls_1qR1KMdy').addEventListener("quizquestion_answer", (e) => {
-          var o = document.getElementById('controls_1qR1KMdy')
+document.getElementById('controls_4XOmDSzp').addEventListener("quizquestion_answer", (e) => {
+          var o = document.getElementById('controls_4XOmDSzp')
           var atts = Number(o.getAttribute("attempts"))
           o.setAttribute("correct",  e.detail.correct);
           o.setAttribute("attempts", atts + 1)
@@ -1998,14 +2000,14 @@ document.getElementById('controls_1qR1KMdy').addEventListener("quizquestion_answ
 </script>
 
 <script text="text/javascript">
-document.querySelectorAll('input[name="radio_1qR1KMdy"]').forEach(function(rb) {
+document.querySelectorAll('input[name="radio_4XOmDSzp"]').forEach(function(rb) {
 rb.addEventListener("change", function() {
-    var correct = rb.value == 1;
-    var msgBox = document.getElementById('1qR1KMdy_message');
+    var correct = rb.value == 4;
+    var msgBox = document.getElementById('4XOmDSzp_message');
     
   if(correct) {
     msgBox.innerHTML = "<div class='pluto-output admonition note alert alert-success'> <span>✔&nbsp; Correct </span> </div>";
-    var explanation = document.getElementById("explanation_1qR1KMdy")
+    var explanation = document.getElementById("explanation_4XOmDSzp")
     if (explanation != null) {
        explanation.style.display = "none";
     }
@@ -2016,7 +2018,7 @@ rb.addEventListener("change", function() {
 
   } else {
     msgBox.innerHTML = "<div class='pluto-output admonition alert alert-danger'> <span>Χ&nbsp; Incorrect </span> </div>";
-    var explanation = document.getElementById("explanation_1qR1KMdy")
+    var explanation = document.getElementById("explanation_4XOmDSzp")
     if (explanation != null) {
        explanation.style.display = "block";
     }
@@ -2049,7 +2051,7 @@ rb.addEventListener("change", function() {
 <div id="86" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="cn">VERSION</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>v"1.12.5"</code></pre>
+<pre><code>v"1.12.6"</code></pre>
 </div>
 </div>
 <p>Packages and versions:</p>
@@ -2059,7 +2061,7 @@ rb.addEventListener("change", function() {
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
 <pre><span class="ansi-green-fg ansi-bold">Status</span> `~/work/mth229.github.io/mth229.github.io/Project.toml`
-  <span class="ansi-bright-black-fg">[a2e0e22d] </span>CalculusWithJulia v0.3.1
+  <span class="ansi-bright-black-fg">[a2e0e22d] </span>CalculusWithJulia v0.3.2
   <span class="ansi-bright-black-fg">[7073ff75] </span>IJulia v1.34.4
   <span class="ansi-bright-black-fg">[b964fa9f] </span>LaTeXStrings v1.4.0
   <span class="ansi-bright-black-fg">[ebaf19f5] </span>MTH229 v0.3.2
@@ -2067,10 +2069,11 @@ rb.addEventListener("change", function() {
   <span class="ansi-bright-black-fg">[f27b6e38] </span>Polynomials v4.1.1
   <span class="ansi-bright-black-fg">[438e738f] </span>PyCall v1.96.4
   <span class="ansi-bright-black-fg">[612c44de] </span>QuizQuestions v0.3.27
-  <span class="ansi-bright-black-fg">[295af30f] </span>Revise v3.13.2
-  <span class="ansi-bright-black-fg">[f2b01f46] </span>Roots v2.2.13
+  <span class="ansi-bright-black-fg">[295af30f] </span>Revise v3.14.2
+<span class="ansi-yellow-fg">⌅</span> <span class="ansi-bright-black-fg">[f2b01f46] </span>Roots v2.3.0
   <span class="ansi-bright-black-fg">[24249f21] </span>SymPy v2.3.3
   <span class="ansi-bright-black-fg">[56ddb016] </span>Logging v1.11.0
+<span class="ansi-cyan-fg ansi-bold">Info</span> Packages marked with <span class="ansi-yellow-fg">⌅</span> have new versions available but compatibility constraints restrict them from upgrading. To see why use `status --outdated`
 </pre>
 </div>
 </div>
